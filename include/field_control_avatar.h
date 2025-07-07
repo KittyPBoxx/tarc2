@@ -22,6 +22,15 @@ struct FieldInput
     u8 dpadDirection;
 };
 
+enum
+{
+    PLAYER_SPEED_STANDING,
+    PLAYER_SPEED_NORMAL,
+    PLAYER_SPEED_FAST,
+    PLAYER_SPEED_FASTER,
+    PLAYER_SPEED_FASTEST,
+};
+
 void FieldClearPlayerInput(struct FieldInput *pStruct);
 void FieldGetPlayerInput(struct FieldInput *pStruct, u16 keys, u16 heldKeys);
 int ProcessPlayerFieldInput(struct FieldInput *pStruct);
@@ -34,6 +43,8 @@ const u8 *GetInteractedLinkPlayerScript(struct MapPosition *position, u8 metatil
 const u8 *GetCoordEventScriptAtMapPosition(struct MapPosition *position);
 void ClearPoisonStepCounter(void);
 void CancelSignPostMessageBox(struct FieldInput *input);
+s16 GetPlayerSpeed(void);
+bool32 IsRunningDisallowed(u8 metatile);
 
 #define NOT_SIGNPOST 0
 #define WALK_AWAY_SIGNPOST_FRAMES 6

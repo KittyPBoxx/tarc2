@@ -959,31 +959,6 @@
 	.byte SCR_OP_HIDEMONPIC
 	.endm
 
-	@ Draws an image of the winner of the contest. winnerId is any CONTEST_WINNER_* constant.
-	.macro showcontestpainting winnerId:req
-	.byte SCR_OP_SHOWCONTESTPAINTING
-	.byte \winnerId
-	.endm
-
-	@ Displays the given string as braille text in a standard message box. The string should use the .braille directive
-	@ to convert text to braille, and be preceded by brailleformat. The brailleformat data is skipped over (in RS, these
-	@ bytes determined the box's size and position, but in Emerald these are calculated automatically).
-	.macro braillemessage text:req
-	.byte SCR_OP_BRAILLEMESSAGE
-	.4byte \text
-	.endm
-
-	@ Formatting for the braille window, to be put at the start of a pointer used by braillemessage.
-	@ These are from RS and are ignored in Emerald (see ScrCmd_braillemessage, and comment above)
-	.macro brailleformat winLeft:req, winTop:req, winRight:req, winBottom:req, textLeft:req, textTop:req
-	.byte \winLeft
-	.byte \winTop
-	.byte \winRight
-	.byte \winBottom
-	.byte \textLeft
-	.byte \textTop
-	.endm
-
 	@ Gives the player a Pokémon of the specified species and level, and allows to customize extra parameters.
 	@ VAR_RESULT will be set to MON_GIVEN_TO_PARTY, MON_GIVEN_TO_PC, or MON_CANT_GIVE depending on the outcome.
 	.macro givemon species:req, level:req, item, ball, nature, abilityNum, gender, hpEv, atkEv, defEv, speedEv, spAtkEv, spDefEv, hpIv, atkIv, defIv, speedIv, spAtkIv, spDefIv, move1, move2, move3, move4, isShiny, gmaxFactor, teraType, dmaxLevel
@@ -1178,13 +1153,6 @@
 	.2byte \item
 	.endm
 
-	@ Writes the name of the specified decoration to the specified buffer.
-	.macro bufferdecorationname stringVarId:req, decoration:req
-	.byte SCR_OP_BUFFERDECORATIONNAME
-	stringvar \stringVarId
-	.2byte \decoration
-	.endm
-
 	@ Writes the name of the specified move to the specified buffer.
 	.macro buffermovename stringVarId:req, move:req
 	.byte SCR_OP_BUFFERMOVENAME
@@ -1240,12 +1208,6 @@
 	.4byte \products
 	.endm
 
-	@ Starts up the slot machine minigame. id is a SLOT_MACHINE_* value that influences probabilities of certain reel outcomes.
-	.macro playslotmachine id:req
-	.byte SCR_OP_PLAYSLOTMACHINE
-	.2byte \id
-	.endm
-
 	@ Sets a berry tree's berry and growth stage. treeId is any BERRY_TREE_* constant (an index into berryTrees in SaveBlock1),
 	@ berry is any ITEM_TO_BERRY(ITEM_BERRY_NAME) value, and growthStage is any BERRY_STAGE_* constant.
 	.macro setberrytree treeId:req, berry:req, growthStage:req
@@ -1255,79 +1217,10 @@
 	.byte \growthStage
 	.endm
 
-	@ Opens the party menu to select a Pokemon for a contest.
-	.macro choosecontestmon
-	.byte SCR_OP_CHOOSECONTESTMON
-	.endm
-
-	@ Starts the appeals round of a contest.
-	.macro startcontest
-	.byte SCR_OP_STARTCONTEST
-	.endm
-
-	@ Shows the results screen of a contest.
-	.macro showcontestresults
-	.byte SCR_OP_SHOWCONTESTRESULTS
-	.endm
-
-	@ Starts communication to initialize a link contest.
-	.macro contestlinktransfer
-	.byte SCR_OP_CONTESTLINKTRANSFER
-	.endm
-
 	@ Stores a random integer between 0 and limit (exclusive of limit) in VAR_RESULT.
 	.macro random limit:req
 	.byte SCR_OP_RANDOM
 	.2byte \limit
-	.endm
-
-	@ Adds value to the player's money. If adding 'value' money would exceed MAX_MONEY, the player's money is set to MAX_MONEY.
-	@ If 'disable' is set to anything but 0 then this command does nothing.
-	.macro addmoney value:req, disable=0
-	.byte SCR_OP_ADDMONEY
-	.4byte \value
-	.byte \disable
-	.endm
-
-	@ Subtracts value from the player's money. If the player has less than 'value' money, their money is set to 0.
-	@ If 'disable' is set to anything but 0 then this command does nothing.
-	.macro removemoney value:req, disable=0
-	.byte SCR_OP_REMOVEMONEY
-	.4byte \value
-	.byte \disable
-	.endm
-
-	@ Checks if the player has money >= value. VAR_RESULT is set to TRUE if the player has enough money, or FALSE if they do not.
-	@ If 'disable' is set to anything but 0 then this command does nothing.
-	.macro checkmoney value:req, disable=0
-	.byte SCR_OP_CHECKMONEY
-	.4byte \value
-	.byte \disable
-	.endm
-
-	@ Creates a window showing how much money the player has.
-	@ If 'disable' is set to anything but 0 then this command does nothing.
-	.macro showmoneybox x:req, y:req, disable=0
-	.byte SCR_OP_SHOWMONEYBOX
-	.byte \x
-	.byte \y
-	.byte \disable
-	.endm
-
-	@ Destroys the window created by showmoneybox. Consumption of the x and y arguments was dummied out.
-	.macro hidemoneybox
-	.byte SCR_OP_HIDEMONEYBOX
-	.byte 0  @ \x
-	.byte 0  @ \y
-	.endm
-
-	@ Updates the window created by showmoneybox. Consumption of the x and y arguments was dummied out.
-	@ If 'disable' is set to anything but 0 then this command does nothing.
-	.macro updatemoneybox disable=0
-	.byte SCR_OP_UPDATEMONEYBOX
-	.byte 0  @ \x
-	.byte 0  @ \y
-	.byte \disable
 	.endm
 
 	@ Gets whether the effects of the specified PokeNews program are active. newsKind is a POKENEWS_* constant.
@@ -1528,27 +1421,6 @@
 	.byte SCR_OP_SHOWELEVMENU
 	.endm
 
-	@ Gets the number of coins the player has and stores it in the variable 'out'.
-	.macro checkcoins out:req
-	.byte SCR_OP_CHECKCOINS
-	.2byte \out
-	.endm
-
-	@ Gives 'count' coins to the player, up to a total of MAX_COINS.
-	@ If the player already has MAX_COINS then VAR_RESULT is set to TRUE, otherwise it is set to FALSE.
-	.macro addcoins count:req
-	.byte SCR_OP_ADDCOINS
-	.2byte \count
-	.endm
-
-	@ Takes 'count' coins from the player.
-	@ If the player has fewer than 'count' coins then no coins are taken and VAR_RESULT is set to TRUE.
-	@ Otherwise VAR_RESULT is set to FALSE.
-	.macro removecoins count:req
-	.byte SCR_OP_REMOVECOINS
-	.2byte \count
-	.endm
-
 	@ Prepares to start a wild battle against a 'species' at 'level' holding 'item'.
 	@ If 'species2' is something other than SPECIES_NONE, then the battle is a double battle
 	@ that is also against 'species2' at 'level2' holding 'item2'.
@@ -1618,27 +1490,6 @@
 	.byte SCR_OP_VBUFFERSTRING
 	stringvar \stringVarIndex
 	.4byte \text
-	.endm
-
-	@ Create a window showing how many Coins the player has.
-	.macro showcoinsbox x:req, y:req
-	.byte SCR_OP_SHOWCOINSBOX
-	.byte \x
-	.byte \y
-	.endm
-
-	@ Destroys the window created by showcoins. It consumes its arguments but doesn't use them.
-	.macro hidecoinsbox x:req, y:req
-	.byte SCR_OP_HIDECOINSBOX
-	.byte \x
-	.byte \y
-	.endm
-
-	@ Updates the window created by showcoins. It consumes its arguments but doesn't use them.
-	.macro updatecoinsbox x:req, y:req
-	.byte SCR_OP_UPDATECOINSBOX
-	.byte \x
-	.byte \y
 	.endm
 
 	@ Increases the value of the specified game stat by 1. The maximum value of a stat is 0xFFFFFF. See include/constants/game_stat.h
@@ -1787,11 +1638,6 @@
 	.byte SCR_OP_LOCKFORTRAINER
 	.endm
 
-	@ Destroys the window created by braillemessage.
-	.macro closebraillemessage
-	.byte SCR_OP_CLOSEBRAILLEMESSAGE
-	.endm
-
 	@ Prints and draws the message all at once rather than character by character.
 	@ Does not wait for player input to continue.
 	.macro messageinstant text:req
@@ -1825,12 +1671,6 @@
 	.2byte \trainerId
 	.endm
 
-	@ Starts a Pokenav call with the given text.
-	.macro pokenavcall text:req
-	.byte SCR_OP_POKENAVCALL
-	.4byte \text
-	.endm
-
 	@ Warp with a fade to white. Used during the Sootopolis legendary fight.
 	@ Warp commands can be given either the id of which warp location to go to on the destination map
 	@ or a pair of x/y coordinates to go to directly on the destination map.
@@ -1838,15 +1678,7 @@
 	.byte SCR_OP_WARPWHITEFADE
 	formatwarp \map, \a, \b, \c
 	.endm
-
-	@ Buffers the name of the contest category to the buffer.
-	@ For example a category of CONTEST_CATEGORY_COOL will buffer the string "COOLNESS CONTEST".
-	.macro buffercontestname stringVarId:req, category:req
-	.byte SCR_OP_BUFFERCONTESTNAME
-	stringvar \stringVarId
-	.2byte \category
-	.endm
-
+ 
 	@ Writes the name of the specified item to the specified buffer. If 'item' is a Berry or ITEM_POKE_BALL
 	@ and if the quantity is 2 or more, the buffered string will be pluralized ("IES" or "S" appended).
 	@ If the specified item is >= ITEMS_COUNT then the name of ITEM_NONE ("????????") is buffered instead.
@@ -2082,13 +1914,6 @@
 	setfieldeffectargument 1, \y
 	setfieldeffectargument 2, \priority
 	dofieldeffect FLDEFF_SPARKLE
-	.endm
-
-	@ Prints a braille message, waits for an A or B press, then closes the message.
-	.macro braillemsgbox text:req
-	braillemessage \text
-	waitbuttonpress
-	closebraillemessage
 	.endm
 
 	@ Creates a Pokémon with the modernFatefulEncounter bit set for an encounter
@@ -2370,23 +2195,6 @@
 	.4byte \weekday
 	.endm
 
-	@ ============================ @
-	@ ITEM DESCRIPTION HEADER MACROS
-	@ Used with OW_SHOW_ITEM_DESCRIPTIONS config
-	.macro showitemdescription
-	callnative ScriptShowItemDescription, requests_effects=1
-	.byte 0
-	.endm
-
-	.macro showberrydescription
-	callnative ScriptShowItemDescription, requests_effects=1
-	.byte 1
-	.endm
-
-	.macro hideitemdescription
-	callnative ScriptHideItemDescription, requests_effects=1
-	.endm
-
 	@ Remove all of specified item from the player's bag and return the number of removed items to VAR_RESULT
 	.macro removeallitem itemId:req
 	callnative ScrCmd_removeallitem, requests_effects=1
@@ -2424,34 +2232,6 @@
 	.2byte \x
 	.2byte \y
 	.2byte \dest
-	.endm
-
-	@ Returns the state of the Pokedex Seen Flag to VAR_RESULT for the Pokemon with speciesId
-	.macro getseenmon species:req
-	callnative Scrcmd_getsetpokedexflag, requests_effects=1
-	.2byte \species
-	.2byte FLAG_GET_SEEN
-	.endm
-
-	@ Returns the state of the Pokedex Caught Flag to VAR_RESULT for the Pokemon with speciesId
-	.macro getcaughtmon species:req
-	callnative Scrcmd_getsetpokedexflag, requests_effects=1
-	.2byte \species
-	.2byte FLAG_GET_CAUGHT
-	.endm
-
-	@ Sets the Pokedex Seen Flag for the Pokemon with speciesId
-	.macro setseenmon species:req
-	callnative Scrcmd_getsetpokedexflag, requests_effects=1
-	.2byte \species
-	.2byte FLAG_SET_SEEN
-	.endm
-
-	@ Sets the Pokedex Caught Flag for the Pokemon with speciesId
-	.macro setcaughtmon species:req
-	callnative Scrcmd_getsetpokedexflag, requests_effects=1
-	.2byte \species
-	.2byte FLAG_SET_CAUGHT
 	.endm
 
 	@ Check if the Player has speciesId in their party. OPEN_PARTY_SCREEN will have the player select a mon from their party. NO_PARTY_SCREEN will automatically check every mon in the player's party.
@@ -2609,19 +2389,6 @@
 	@ Makes the player and follower NPC face one another.
 	.macro facefollowernpc
 	callnative ScriptFaceFollowerNPC
-	.endm
-
-	@ Makes the follower NPC walk into the player and get hidden.
-	@ Optionally, you can set the walk speed for the movement:
-	@ 0 = Slow
-	@ 1 = Normal (default)
-	@ 2 = Fast
-	@ 3 = Faster
-	.macro hidefollowernpc speed=1
-	callnative ScriptHideNPCFollower
-	.byte \speed
-	waitmovement OBJ_EVENT_ID_NPC_FOLLOWER
-	callnative HideNPCFollower
 	.endm
 
 	@ Checks if you have a follower NPC. Returns the result to VAR_RESULT.

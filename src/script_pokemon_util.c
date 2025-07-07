@@ -3,74 +3,33 @@
 #include "battle_gfx_sfx_util.h"
 #include "berry.h"
 #include "data.h"
-#include "daycare.h"
 #include "decompress.h"
 #include "event_data.h"
 #include "international_string_util.h"
 #include "item.h"
-#include "link.h"
-#include "link_rfu.h"
 #include "main.h"
 #include "menu.h"
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
-#include "pokedex.h"
 #include "pokemon.h"
-#include "pokemon_storage_system.h"
 #include "random.h"
 #include "script.h"
 #include "sprite.h"
 #include "string_util.h"
-#include "tv.h"
 #include "wild_encounter.h"
 #include "constants/abilities.h"
 #include "constants/items.h"
-#include "constants/battle_frontier.h"
-
-static void CB2_ReturnFromChooseHalfParty(void);
-static void CB2_ReturnFromChooseBattleFrontierParty(void);
-static void HealPlayerBoxes(void);
 
 void HealPlayerParty(void)
 {
     u32 i;
     for (i = 0; i < gPlayerPartyCount; i++)
         HealPokemon(&gPlayerParty[i]);
-    if (OW_PC_HEAL >= GEN_8)
-        HealPlayerBoxes();
 
     // Recharge Tera Orb, if possible.
     if (B_FLAG_TERA_ORB_CHARGED != 0 && CheckBagHasItem(ITEM_TERA_ORB, 1))
         FlagSet(B_FLAG_TERA_ORB_CHARGED);
-}
-
-static void HealPlayerBoxes(void)
-{
-    int boxId, boxPosition;
-    struct BoxPokemon *boxMon;
-
-    for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
-    {
-        for (boxPosition = 0; boxPosition < IN_BOX_COUNT; boxPosition++)
-        {
-            boxMon = &gPokemonStoragePtr->boxes[boxId][boxPosition];
-            if (GetBoxMonData(boxMon, MON_DATA_SANITY_HAS_SPECIES))
-                HealBoxPokemon(boxMon);
-        }
-    }
-}
-
-u8 ScriptGiveEgg(u16 species)
-{
-    struct Pokemon mon;
-    u8 isEgg;
-
-    CreateEgg(&mon, species, TRUE);
-    isEgg = TRUE;
-    SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
-
-    return GiveMonToPlayer(&mon);
 }
 
 void HasEnoughMonsForDoubleBattle(void)
@@ -170,49 +129,8 @@ void ScriptSetMonMoveSlot(u8 monIndex, u16 move, u8 slot)
     SetMonMoveSlot(&gPlayerParty[monIndex], move, slot);
 }
 
-// Note: When control returns to the event script, gSpecialVar_Result will be
-// TRUE if the party selection was successful.
-void ChooseHalfPartyForBattle(void)
-{
-    gMain.savedCallback = CB2_ReturnFromChooseHalfParty;
-    VarSet(VAR_FRONTIER_FACILITY, FACILITY_MULTI_OR_EREADER);
-    InitChooseHalfPartyForBattle(0);
-}
-
-static void CB2_ReturnFromChooseHalfParty(void)
-{
-    switch (gSelectedOrderFromParty[0])
-    {
-    case 0:
-        gSpecialVar_Result = FALSE;
-        break;
-    default:
-        gSpecialVar_Result = TRUE;
-        break;
-    }
-
-    SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
-}
-
 void ChoosePartyForBattleFrontier(void)
 {
-    gMain.savedCallback = CB2_ReturnFromChooseBattleFrontierParty;
-    InitChooseHalfPartyForBattle(gSpecialVar_0x8004 + 1);
-}
-
-static void CB2_ReturnFromChooseBattleFrontierParty(void)
-{
-    switch (gSelectedOrderFromParty[0])
-    {
-    case 0:
-        gSpecialVar_Result = FALSE;
-        break;
-    default:
-        gSpecialVar_Result = TRUE;
-        break;
-    }
-
-    SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
 }
 
 void ReducePlayerPartyToSelectedMons(void)
@@ -223,14 +141,14 @@ void ReducePlayerPartyToSelectedMons(void)
     CpuFill32(0, party, sizeof party);
 
     // copy the selected Pokémon according to the order.
-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
+    for (i = 0; i < PLAYER_PARTY_SIZE; i++)
         if (gSelectedOrderFromParty[i]) // as long as the order keeps going (did the player select 1 mon? 2? 3?), do not stop
             party[i] = gPlayerParty[gSelectedOrderFromParty[i] - 1]; // index is 0 based, not literal
 
     CpuFill32(0, gPlayerParty, sizeof gPlayerParty);
 
     // overwrite the first 4 with the order copied to.
-    for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
+    for (i = 0; i < PLAYER_PARTY_SIZE; i++)
         gPlayerParty[i] = party[i];
 
     CalculatePlayerPartyCount();
@@ -334,7 +252,6 @@ void SetTeraType(struct ScriptContext *ctx)
  */
 static u32 ScriptGiveMonParameterized(u8 side, u8 slot, u16 species, u8 level, u16 item, enum PokeBall ball, u8 nature, u8 abilityNum, u8 gender, u8 *evs, u8 *ivs, u16 *moves, bool8 isShiny, bool8 gmaxFactor, u8 teraType, u8 dmaxLevel)
 {
-    u16 nationalDexNum;
     int sentToPc;
     struct Pokemon mon;
     u32 i;
@@ -455,17 +372,6 @@ static u32 ScriptGiveMonParameterized(u8 side, u8 slot, u16 species, u8 level, u
             sentToPc = MON_GIVEN_TO_PARTY;
             CopyMon(&gPlayerParty[i], &mon, sizeof(mon));
             gPlayerPartyCount = i + 1;
-        }
-    }
-
-    if (side == 0)
-    {
-        // set pokédex flags
-        nationalDexNum = SpeciesToNationalPokedexNum(species);
-        if (sentToPc != MON_CANT_GIVE)
-        {
-            GetSetPokedexFlag(nationalDexNum, FLAG_SET_SEEN);
-            GetSetPokedexFlag(nationalDexNum, FLAG_SET_CAUGHT);
         }
     }
 

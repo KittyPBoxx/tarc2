@@ -160,7 +160,6 @@ string generate_map_header_text(Json map_data, Json layouts_data) {
 
     text << "\t.2byte " << json_to_string(map_data, "music") << "\n"
          << "\t.2byte " << json_to_string(layout, "id") << "\n"
-         << "\t.byte "  << json_to_string(map_data, "region_map_section") << "\n"
          << "\t.byte "  << json_to_string(map_data, "requires_flash") << "\n"
          << "\t.byte "  << json_to_string(map_data, "weather") << "\n"
          << "\t.byte "  << json_to_string(map_data, "map_type") << "\n";
@@ -438,6 +437,7 @@ string generate_groups_text(Json groups_data) {
 
     text << get_generated_warning("data/maps/map_groups.json", true);
 
+    text << "\t.align 4\n";
     for (auto &key : groups_data["group_order"].array_items()) {
         string group = json_to_string(key);
         text << group << "::\n";

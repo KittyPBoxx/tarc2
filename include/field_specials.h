@@ -1,8 +1,6 @@
 #ifndef GUARD_FIELD_SPECIALS_H
 #define GUARD_FIELD_SPECIALS_H
 
-extern bool8 gBikeCyclingChallenge;
-extern u8 gBikeCollisions;
 extern u16 gScrollableMultichoice_ScrollOffset;
 
 u8 GetLeadMonIndex(void);
@@ -12,7 +10,6 @@ bool8 InMultiPartnerRoom(void);
 void UpdateTrainerFansAfterLinkBattle(void);
 void IncrementBirthIslandRockStepCount(void);
 bool8 AbnormalWeatherHasExpired(void);
-bool8 ShouldDoBrailleRegicePuzzle(void);
 bool32 ShouldDoWallyCall(void);
 bool32 ShouldDoScottFortreeCall(void);
 bool32 ShouldDoScottBattleFrontierCall(void);

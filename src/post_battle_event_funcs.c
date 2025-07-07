@@ -2,11 +2,9 @@
 #include "main.h"
 #include "credits.h"
 #include "event_data.h"
-#include "hall_of_fame.h"
 #include "load_save.h"
 #include "overworld.h"
 #include "script_pokemon_util.h"
-#include "tv.h"
 #include "constants/heal_locations.h"
 
 int GameClear(void)
@@ -30,15 +28,9 @@ int GameClear(void)
         FlagSet(FLAG_SYS_GAME_CLEAR);
     }
 
-    if (GetGameStat(GAME_STAT_FIRST_HOF_PLAY_TIME) == 0)
-        SetGameStat(GAME_STAT_FIRST_HOF_PLAY_TIME, (gSaveBlock2Ptr->playTimeHours << 16) | (gSaveBlock2Ptr->playTimeMinutes << 8) | gSaveBlock2Ptr->playTimeSeconds);
-
     SetContinueGameWarpStatus();
 
-    if (gSaveBlock2Ptr->playerGender == MALE)
-        SetContinueGameWarpToHealLocation(HEAL_LOCATION_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F);
-    else
-        SetContinueGameWarpToHealLocation(HEAL_LOCATION_LITTLEROOT_TOWN_MAYS_HOUSE_2F);
+    SetContinueGameWarpToHealLocation(HEAL_LOCATION_LITTLEROOT_TOWN);
 
     ribbonGet = FALSE;
 
@@ -55,14 +47,12 @@ int GameClear(void)
         {
             u8 val[1] = {TRUE};
             SetMonData(mon, MON_DATA_CHAMPION_RIBBON, val);
-            ribbonCounts[i].count = GetRibbonCount(mon);
             ribbonGet = TRUE;
         }
     }
 
     if (ribbonGet == TRUE)
     {
-        IncrementGameStat(GAME_STAT_RECEIVED_RIBBONS);
         FlagSet(FLAG_SYS_RIBBON_GET);
 
         for (i = 1; i < 6; i++)
@@ -74,14 +64,9 @@ int GameClear(void)
                 ribbonCounts[i] = prevBest;
             }
         }
-
-        if (ribbonCounts[0].count > NUM_CUTIES_RIBBONS)
-        {
-            TryPutSpotTheCutiesOnAir(&gPlayerParty[ribbonCounts[0].partyIndex], MON_DATA_CHAMPION_RIBBON);
-        }
     }
 
-    SetMainCallback2(CB2_DoHallOfFameScreen);
+    SetMainCallback2(CB2_WhiteOut); // TODO: this will probably need updating
     return 0;
 }
 

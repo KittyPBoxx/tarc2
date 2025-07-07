@@ -1,12 +1,10 @@
 #include "global.h"
 #include "malloc.h"
 #include "battle_anim.h"
-#include "battle_pyramid.h"
 #include "battle_util.h"
 #include "berry.h"
 #include "data.h"
 #include "debug.h"
-#include "decoration.h"
 #include "decompress.h"
 #include "event_data.h"
 #include "event_object_movement.h"
@@ -18,11 +16,9 @@
 #include "field_player_avatar.h"
 #include "field_weather.h"
 #include "fieldmap.h"
-#include "follower_npc.h"
 #include "follower_helper.h"
 #include "gpu_regs.h"
 #include "graphics.h"
-#include "mauville_old_man.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
 #include "palette.h"
@@ -30,14 +26,12 @@
 #include "pokemon.h"
 #include "pokeball.h"
 #include "random.h"
-#include "region_map.h"
 #include "rtc.h"
 #include "script.h"
 #include "sound.h"
 #include "sprite.h"
 #include "task.h"
 #include "trainer_see.h"
-#include "trainer_hill.h"
 #include "util.h"
 #include "wild_encounter.h"
 #include "constants/event_object_movement.h"
@@ -47,15 +41,12 @@
 #include "constants/field_effects.h"
 #include "constants/items.h"
 #include "constants/map_types.h"
-#include "constants/mauville_old_man.h"
 #include "constants/metatile_behaviors.h"
 #include "constants/rgb.h"
-#include "constants/region_map_sections.h"
 #include "constants/songs.h"
 #include "constants/species.h"
 #include "constants/metatile_behaviors.h"
 #include "constants/trainer_types.h"
-#include "constants/union_room.h"
 #include "constants/weather.h"
 
 #define SPECIAL_LOCALIDS_START (min(LOCALID_CAMERA, \
@@ -180,7 +171,6 @@ static void SetObjectEventDynamicGraphicsId(struct ObjectEvent *);
 static void RemoveObjectEventInternal(struct ObjectEvent *);
 static u16 GetObjectEventFlagIdByObjectEventId(u8);
 static void UpdateObjectEventVisibility(struct ObjectEvent *, struct Sprite *);
-static void MakeSpriteTemplateFromObjectEventTemplate(const struct ObjectEventTemplate *, struct SpriteTemplate *, const struct SubspriteTable **);
 static void GetObjectEventMovingCameraOffset(s16 *, s16 *);
 const struct ObjectEventTemplate *GetObjectEventTemplateByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup);
 static void RemoveObjectEventIfOutsideView(struct ObjectEvent *);
@@ -1366,10 +1356,7 @@ u8 GetObjectEventIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroupId)
 {
     if (localId < OBJ_EVENT_ID_DYNAMIC_BASE)
     {
-        if (PlayerHasFollowerNPC() && localId == OBJ_EVENT_ID_NPC_FOLLOWER)
-            return GetFollowerNPCObjectId();
-        else
-            return GetObjectEventIdByLocalIdAndMapInternal(localId, mapNum, mapGroupId);
+        return GetObjectEventIdByLocalIdAndMapInternal(localId, mapNum, mapGroupId);
     }
 
     return GetObjectEventIdByLocalId(localId);
@@ -1481,12 +1468,7 @@ u8 Unref_TryInitLocalObjectEvent(u8 localId)
 
     if (gMapHeader.events != NULL)
     {
-        if (InBattlePyramid())
-            objectEventCount = GetNumBattlePyramidObjectEvents();
-        else if (InTrainerHill())
-            objectEventCount = HILL_TRAINERS_PER_FLOOR;
-        else
-            objectEventCount = gMapHeader.events->objectEventCount;
+        objectEventCount = gMapHeader.events->objectEventCount;
 
         for (i = 0; i < objectEventCount; i++)
         {
@@ -1827,11 +1809,6 @@ static void CopyObjectGraphicsInfoToSpriteTemplate(u16 graphicsId, void (*callba
 static void CopyObjectGraphicsInfoToSpriteTemplate_WithMovementType(u16 graphicsId, u16 movementType, struct SpriteTemplate *spriteTemplate, const struct SubspriteTable **subspriteTables)
 {
     CopyObjectGraphicsInfoToSpriteTemplate(graphicsId, sMovementTypeCallbacks[movementType], spriteTemplate, subspriteTables);
-}
-
-static void UNUSED MakeSpriteTemplateFromObjectEventTemplate(const struct ObjectEventTemplate *objectEventTemplate, struct SpriteTemplate *spriteTemplate, const struct SubspriteTable **subspriteTables)
-{
-    CopyObjectGraphicsInfoToSpriteTemplate_WithMovementType(objectEventTemplate->graphicsId, objectEventTemplate->movementType, spriteTemplate, subspriteTables);
 }
 
 // Loads information from graphicsId, with shininess separate
@@ -2218,9 +2195,7 @@ void UpdateFollowingPokemon(void)
      || !GetFollowerInfo(&species, &shiny, &female)
      || SpeciesToGraphicsInfo(species, shiny, female) == NULL
      || (gMapHeader.mapType == MAP_TYPE_INDOOR && SpeciesToGraphicsInfo(species, shiny, female)->oam->size > ST_OAM_SIZE_2)
-     || FlagGet(FLAG_TEMP_HIDE_FOLLOWER)
-     || PlayerHasFollowerNPC()
-     )
+     || FlagGet(FLAG_TEMP_HIDE_FOLLOWER))
     {
         RemoveFollowingPokemon();
         return;
@@ -2416,7 +2391,6 @@ bool32 CheckMsgInfo(const struct FollowerMsgInfoExtended *info, struct Pokemon *
 // Call an applicable follower message script
 void GetFollowerAction(struct ScriptContext *ctx) // Essentially a big switch for follower messages
 {
-    u32 species;
     s32 multi;
     struct SpecialEmote condEmotes[16] = {0};
     u32 condCount = 0;
@@ -2438,7 +2412,6 @@ void GetFollowerAction(struct ScriptContext *ctx) // Essentially a big switch fo
         [FOLLOWER_EMOTION_POISONED] = 0,
     };
     u32 i, j;
-    bool32 pickedCondition = FALSE;
     if (mon == NULL) // failsafe
     {
         ScriptCall(ctx, EventScript_FollowerLovesYou);
@@ -2446,7 +2419,6 @@ void GetFollowerAction(struct ScriptContext *ctx) // Essentially a big switch fo
     }
     // Set the script to the very end; we'll be calling another script dynamically
     ScriptJump(ctx, EventScript_FollowerEnd);
-    species = GetMonData(mon, MON_DATA_SPECIES);
     multi = GetMonData(mon, MON_DATA_FRIENDSHIP);
     if (multi > 80)
     {
@@ -2548,39 +2520,7 @@ void GetFollowerAction(struct ScriptContext *ctx) // Essentially a big switch fo
         if (condEmotes[i].emotion == emotion && (Random() < 0x10000 / (j++)))  // Replace each item with 1/j chance
             multi = condEmotes[i].index;
     }
-    // (50% chance) Match *scripted* conditional messages, from follower_helper.c
-    for (i = (Random() & 1) ? COND_MSG_COUNT : 0, j = 1; i < COND_MSG_COUNT; i++)
-    {
-        const struct FollowerMsgInfoExtended *info = &gFollowerConditionalMessages[i];
-        if (!CheckMsgInfo(info, mon, species, objEvent))
-            continue;
 
-        // replace choice with weight/j chance
-        if (Random() < (0x10000 / (j++)) * (info->weight ? info->weight : 1))
-        {
-            multi = i;
-            pickedCondition = TRUE;
-        }
-    }
-    // condition message was chosen
-    if (pickedCondition)
-    {
-        emotion = gFollowerConditionalMessages[multi].emotion;
-        ObjectEventEmote(objEvent, emotion);
-        ctx->data[0] = (u32) gFollowerConditionalMessages[multi].text;
-        // text choices are spread across array; pick a random one
-        if (gFollowerConditionalMessages[multi].textSpread)
-        {
-            for (i = 0; i < 4; i++)
-            {
-                if (!((u32*)gFollowerConditionalMessages[multi].text)[i])
-                    break;
-            }
-            ctx->data[0] = i ? ((u32*)gFollowerConditionalMessages[multi].text)[Random() % i] : 0;
-        }
-        ScriptCall(ctx, gFollowerConditionalMessages[multi].script ? gFollowerConditionalMessages[multi].script : gFollowerBasicMessages[emotion].script);
-        return;
-    }
     // otherwise, a basic or C-based message was picked
     ObjectEventEmote(objEvent, emotion);
     ctx->data[0] = (u32) gFollowerBasicMessages[emotion].messages[multi].text; // Load message text
@@ -2719,12 +2659,7 @@ void TrySpawnLightSprites(s16 camX, s16 camY)
     if (gMapHeader.events == NULL)
         return;
 
-    if (InBattlePyramid())
-        objectCount = GetNumBattlePyramidObjectEvents();
-    else if (InTrainerHill())
-        objectCount = 2;
-    else
-        objectCount = gMapHeader.events->objectEventCount;
+    objectCount = gMapHeader.events->objectEventCount;
 
     for (i = 0; i < objectCount; i++)
     {
@@ -2751,12 +2686,7 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
         s16 top = gSaveBlock1Ptr->pos.y;
         s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H + 2;
 
-        if (InBattlePyramid())
-            objectCount = GetNumBattlePyramidObjectEvents();
-        else if (InTrainerHill())
-            objectCount = HILL_TRAINERS_PER_FLOOR;
-        else
-            objectCount = gMapHeader.events->objectEventCount;
+        objectCount = gMapHeader.events->objectEventCount;
 
         for (i = 0; i < objectCount; i++)
         {
@@ -3066,9 +2996,6 @@ const struct ObjectEventGraphicsInfo *GetObjectEventGraphicsInfo(u16 graphicsId)
     if (graphicsId >= OBJ_EVENT_GFX_VARS && graphicsId <= OBJ_EVENT_GFX_VAR_F)
         graphicsId = VarGetObjectEventGraphicsId(graphicsId - OBJ_EVENT_GFX_VARS);
 
-    if (graphicsId == OBJ_EVENT_GFX_BARD)
-        return gMauvilleOldManGraphicsInfoPointers[GetCurrentMauvilleOldMan()];
-
     if (graphicsId & OBJ_EVENT_MON)
         return SpeciesToGraphicsInfo(graphicsId & OBJ_EVENT_MON_SPECIES_MASK, graphicsId & OBJ_EVENT_MON_SHINY, graphicsId & OBJ_EVENT_MON_FEMALE);
 
@@ -3183,14 +3110,6 @@ u8 LoadPlayerObjectEventPalette(u8 gender)
     return LoadObjectEventPalette(paletteTag);
 }
 
-static void UNUSED LoadObjectEventPaletteSet(u16 *paletteTags)
-{
-    u8 i;
-
-    for (i = 0; paletteTags[i] != OBJ_EVENT_PAL_TAG_NONE; i++)
-        LoadObjectEventPalette(paletteTags[i]);
-}
-
 // Really just loads the palette and applies weather fade
 static u8 LoadSpritePaletteIfTagExists(const struct SpritePalette *spritePalette)
 {
@@ -3262,14 +3181,6 @@ void LoadSpecialObjectReflectionPalette(u16 tag, u8 slot)
             return;
         }
     }
-}
-
-static void UNUSED IncrementObjectEventCoords(struct ObjectEvent *objectEvent, s16 x, s16 y)
-{
-    objectEvent->previousCoords.x = objectEvent->currentCoords.x;
-    objectEvent->previousCoords.y = objectEvent->currentCoords.y;
-    objectEvent->currentCoords.x += x;
-    objectEvent->currentCoords.y += y;
 }
 
 void ShiftObjectEventCoords(struct ObjectEvent *objectEvent, s16 x, s16 y)
@@ -3461,15 +3372,6 @@ void CameraObjectSetFollowedSpriteId(u8 spriteId)
     }
 }
 
-static u8 UNUSED CameraObjectGetFollowedSpriteId(void)
-{
-    struct Sprite *camera = FindCameraSprite();
-    if (camera == NULL)
-        return MAX_SPRITES;
-
-    return camera->sCamera_FollowSpriteId;
-}
-
 void CameraObjectFreeze(void)
 {
     struct Sprite *camera = FindCameraSprite();
@@ -3556,21 +3458,6 @@ static u16 GetObjectEventFlagIdByObjectEventId(u8 objectEventId)
     return GetObjectEventFlagIdByLocalIdAndMap(gObjectEvents[objectEventId].localId, gObjectEvents[objectEventId].mapNum, gObjectEvents[objectEventId].mapGroup);
 }
 
-static u8 UNUSED GetObjectTrainerTypeByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup)
-{
-    u8 objectEventId;
-
-    if (TryGetObjectEventIdByLocalIdAndMap(localId, mapNum, mapGroup, &objectEventId))
-        return 0xFF;
-
-    return gObjectEvents[objectEventId].trainerType;
-}
-
-static u8 UNUSED GetObjectTrainerTypeByObjectEventId(u8 objectEventId)
-{
-    return gObjectEvents[objectEventId].trainerType;
-}
-
 // Unused
 u8 GetObjectEventBerryTreeIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup)
 {
@@ -3647,15 +3534,6 @@ void OverrideTemplateCoordsForObjectEvent(const struct ObjectEvent *objectEvent)
     }
 }
 
-static void OverrideObjectEventTemplateScript(const struct ObjectEvent *objectEvent, const u8 *script)
-{
-    struct ObjectEventTemplate *objectEventTemplate;
-
-    objectEventTemplate = GetBaseTemplateForObjectEvent(objectEvent);
-    if (objectEventTemplate)
-        objectEventTemplate->script = script;
-}
-
 void TryOverrideTemplateCoordsForObjectEvent(const struct ObjectEvent *objectEvent, u8 movementType)
 {
     struct ObjectEventTemplate *objectEventTemplate;
@@ -3670,23 +3548,6 @@ void TryOverrideObjectEventTemplateCoords(u8 localId, u8 mapNum, u8 mapGroup)
     u8 objectEventId;
     if (!TryGetObjectEventIdByLocalIdAndMap(localId, mapNum, mapGroup, &objectEventId))
         OverrideTemplateCoordsForObjectEvent(&gObjectEvents[objectEventId]);
-}
-
-void OverrideSecretBaseDecorationSpriteScript(u8 localId, u8 mapNum, u8 mapGroup, u8 decorationCategory)
-{
-    u8 objectEventId;
-    if (!TryGetObjectEventIdByLocalIdAndMap(localId, mapNum, mapGroup, &objectEventId))
-    {
-        switch (decorationCategory)
-        {
-        case DECORCAT_DOLL:
-            OverrideObjectEventTemplateScript(&gObjectEvents[objectEventId], SecretBase_EventScript_DollInteract);
-            break;
-        case DECORCAT_CUSHION:
-            OverrideObjectEventTemplateScript(&gObjectEvents[objectEventId], SecretBase_EventScript_CushionInteract);
-            break;
-        }
-    }
 }
 
 void InitObjectEventPalettes(u8 reflectionType)
@@ -6447,9 +6308,7 @@ u32 GetObjectObjectCollidesWith(struct ObjectEvent *objectEvent, s16 x, s16 y, b
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         curObject = &gObjectEvents[i];
-        if (curObject->active && (curObject->movementType != MOVEMENT_TYPE_FOLLOW_PLAYER || objectEvent != &gObjectEvents[gPlayerAvatar.objectEventId]) && curObject != objectEvent
-         && !FollowerNPC_IsCollisionExempt(curObject, objectEvent)
-         )
+        if (curObject->active && (curObject->movementType != MOVEMENT_TYPE_FOLLOW_PLAYER || objectEvent != &gObjectEvents[gPlayerAvatar.objectEventId]) && curObject != objectEvent)
         {
             // check for collision if curObject is active, not the object in question, and not exempt from collisions
             if ((curObject->currentCoords.x == x && curObject->currentCoords.y == y) || (curObject->previousCoords.x == x && curObject->previousCoords.y == y))
@@ -6493,12 +6352,6 @@ void MoveCoords(u8 direction, s16 *x, s16 *y)
 {
     *x += sDirectionToVectors[direction].x;
     *y += sDirectionToVectors[direction].y;
-}
-
-static void UNUSED MoveCoordsInMapCoordIncrement(u8 direction, s16 *x, s16 *y)
-{
-    *x += sDirectionToVectors[direction].x << 4;
-    *y += sDirectionToVectors[direction].y << 4;
 }
 
 static void MoveCoordsInDirection(u32 dir, s16 *x, s16 *y, s16 deltaX, s16 deltaY)
@@ -6641,7 +6494,6 @@ bool8 ObjectEventSetHeldMovement(struct ObjectEvent *objectEvent, u8 movementAct
     objectEvent->heldMovementActive = TRUE;
     objectEvent->heldMovementFinished = FALSE;
     gSprites[objectEvent->spriteId].sActionFuncId = 0;
-    NPCFollow(objectEvent, movementActionId, FALSE);
 
     // When player is moved via script, set copyable movement
     // for any followers via a lookup table
@@ -10824,18 +10676,6 @@ static void SpriteCB_VirtualObject(struct Sprite *sprite)
     UpdateObjectEventSpriteInvisibility(sprite, sprite->sInvisible);
 }
 
-static void UNUSED DestroyVirtualObjects(void)
-{
-    int i;
-
-    for (i = 0; i < MAX_SPRITES; i++)
-    {
-        struct Sprite *sprite = &gSprites[i];
-        if(sprite->inUse && sprite->callback == SpriteCB_VirtualObject)
-            DestroySprite(sprite);
-    }
-}
-
 static int GetVirtualObjectSpriteId(u8 virtualObjId)
 {
     int i;
@@ -10923,52 +10763,10 @@ void SetVirtualObjectSpriteAnim(u8 virtualObjId, u8 animNum)
     }
 }
 
-static void MoveUnionRoomObjectUp(struct Sprite *sprite)
-{
-    switch(sprite->sAnimState)
-    {
-    case 0:
-        sprite->y2 = 0;
-        sprite->sAnimState++;
-    case 1:
-        sprite->y2 -= 8;
-        if (sprite->y2 == -DISPLAY_HEIGHT)
-        {
-            sprite->y2 = 0;
-            sprite->sInvisible = TRUE;
-            sprite->sAnimNum = 0;
-            sprite->sAnimState = 0;
-        }
-    }
-}
-
-static void MoveUnionRoomObjectDown(struct Sprite *sprite)
-{
-    switch(sprite->sAnimState)
-    {
-    case 0:
-        sprite->y2 = -DISPLAY_HEIGHT;
-        sprite->sAnimState++;
-    case 1:
-        sprite->y2 += 8;
-        if(sprite->y2 == 0)
-        {
-            sprite->sAnimNum = 0;
-            sprite->sAnimState = 0;
-        }
-    }
-}
-
 static void VirtualObject_UpdateAnim(struct Sprite *sprite)
 {
     switch(sprite->sAnimNum)
     {
-    case UNION_ROOM_SPAWN_IN:
-        MoveUnionRoomObjectDown(sprite);
-        break;
-    case UNION_ROOM_SPAWN_OUT:
-        MoveUnionRoomObjectUp(sprite);
-        break;
     case 0:
         break;
     default:
@@ -11244,34 +11042,6 @@ bool8 PlayerIsUnderWaterfall(struct ObjectEvent *objectEvent)
 // Get gfx data from daycare pokemon and store it in vars
 void GetDaycareGraphics(struct ScriptContext *ctx)
 {
-    u16 varGfx[] = {ScriptReadHalfword(ctx), ScriptReadHalfword(ctx)};
-    u16 varForm[] = {ScriptReadHalfword(ctx), ScriptReadHalfword(ctx)};
-    u32 specGfx;
-    bool32 shiny;
-    bool32 female;
-    s32 i;
-
-    Script_RequestEffects(SCREFF_V1);
-    Script_RequestWriteVar(varGfx[0]);
-    Script_RequestWriteVar(varGfx[1]);
-    Script_RequestWriteVar(varForm[0]);
-    Script_RequestWriteVar(varForm[1]);
-
-    for (i = 0; i < 2; i++)
-    {
-        GetMonInfo((struct Pokemon *) &gSaveBlock1Ptr->daycare.mons[i].mon, &specGfx, &shiny, &female);
-        if (specGfx == SPECIES_NONE)
-            break;
-        // Assemble gfx ID like FollowerSetGraphics
-        specGfx = specGfx + OBJ_EVENT_MON;
-        if (shiny)
-            specGfx += OBJ_EVENT_MON_SHINY;
-        if (female)
-            specGfx += OBJ_EVENT_MON_FEMALE;
-        VarSet(varGfx[i], (u16)specGfx);
-        VarSet(varForm[i], 0);  //  This shouldn't be needed anymore, track down
-    }
-    gSpecialVar_Result = i;
 }
 
 // running slow

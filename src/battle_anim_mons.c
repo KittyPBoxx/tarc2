@@ -3,7 +3,6 @@
 #include "battle_anim.h"
 #include "battle_interface.h"
 #include "bg.h"
-#include "contest.h"
 #include "data.h"
 #include "decompress.h"
 #include "dma3.h"
@@ -19,7 +18,6 @@
 
 extern const struct OamData gOamData_AffineNormal_ObjNormal_64x64;
 
-static void AnimTranslateLinear_WithFollowup_SetCornerVecX(struct Sprite *sprite);
 static void AnimFastTranslateLinearWaitEnd(struct Sprite *sprite);
 static void AnimThrowProjectile_Step(struct Sprite *sprite);
 static void AnimBattlerTrace(struct Sprite *sprite);
@@ -109,25 +107,15 @@ u8 GetBattlerSpriteCoord(u8 battler, u8 coordType)
     case BATTLER_COORD_Y_PIC_OFFSET:
     case BATTLER_COORD_Y_PIC_OFFSET_DEFAULT:
     default:
-        if (IsContest())
-        {
-            if (gContestResources->moveAnim->hasTargetAnim)
-                species = gContestResources->moveAnim->targetSpecies;
-            else
-                species = gContestResources->moveAnim->species;
-        }
+        mon = GetBattlerMon(battler);
+        illusionMon = GetIllusionMonPtr(battler);
+        if (illusionMon != NULL)
+            mon = illusionMon;
+        spriteInfo = gBattleSpritesDataPtr->battlerData;
+        if (!spriteInfo[battler].transformSpecies)
+            species = GetMonData(mon, MON_DATA_SPECIES);
         else
-        {
-            mon = GetBattlerMon(battler);
-            illusionMon = GetIllusionMonPtr(battler);
-            if (illusionMon != NULL)
-                mon = illusionMon;
-            spriteInfo = gBattleSpritesDataPtr->battlerData;
-            if (!spriteInfo[battler].transformSpecies)
-                species = GetMonData(mon, MON_DATA_SPECIES);
-            else
-                species = spriteInfo[battler].transformSpecies;
-        }
+            species = spriteInfo[battler].transformSpecies;
         if (coordType == BATTLER_COORD_Y_PIC_OFFSET)
             retVal = GetBattlerSpriteFinal_Y(battler, species, TRUE);
         else
@@ -145,28 +133,14 @@ u8 GetBattlerYDelta(u8 battler, u16 species)
     u8 ret;
     species = SanitizeSpeciesId(species);
 
-    if (IsContest())
+    if (species == SPECIES_UNOWN)
     {
-        if (species == SPECIES_UNOWN)
-        {
-            if (gContestResources->moveAnim->hasTargetAnim)
-                personality = gContestResources->moveAnim->targetPersonality;
-            else
-                personality = gContestResources->moveAnim->personality;
-            species = GetUnownSpeciesId(personality);
-        }
-    }
-    else
-    {
-        if (species == SPECIES_UNOWN)
-        {
-            spriteInfo = gBattleSpritesDataPtr->battlerData;
-            if (!spriteInfo[battler].transformSpecies)
-                personality = GetMonData(GetBattlerMon(battler), MON_DATA_PERSONALITY);
-            else
-                personality = gTransformedPersonalities[battler];
-            species = GetUnownSpeciesId(personality);
-        }
+        spriteInfo = gBattleSpritesDataPtr->battlerData;
+        if (!spriteInfo[battler].transformSpecies)
+            personality = GetMonData(GetBattlerMon(battler), MON_DATA_PERSONALITY);
+        else
+            personality = gTransformedPersonalities[battler];
+        species = GetUnownSpeciesId(personality);
     }
 
     if (IsOnPlayerSide(battler) || IsContest())
@@ -222,21 +196,12 @@ u8 GetBattlerSpriteCoord2(u8 battler, u8 coordType)
 
     if (coordType == BATTLER_COORD_Y_PIC_OFFSET || coordType == BATTLER_COORD_Y_PIC_OFFSET_DEFAULT)
     {
-        if (IsContest())
-        {
-            if (gContestResources->moveAnim->hasTargetAnim)
-                species = gContestResources->moveAnim->targetSpecies;
-            else
-                species = gContestResources->moveAnim->species;
-        }
+        spriteInfo = gBattleSpritesDataPtr->battlerData;
+        if (!spriteInfo[battler].transformSpecies)
+            species = gAnimBattlerSpecies[battler];
         else
-        {
-            spriteInfo = gBattleSpritesDataPtr->battlerData;
-            if (!spriteInfo[battler].transformSpecies)
-                species = gAnimBattlerSpecies[battler];
-            else
-                species = spriteInfo[battler].transformSpecies;
-        }
+            species = spriteInfo[battler].transformSpecies;
+
         if (coordType == BATTLER_COORD_Y_PIC_OFFSET)
             return GetBattlerSpriteFinal_Y(battler, species, TRUE);
         else
@@ -406,34 +371,6 @@ void TranslateSpriteInGrowingCircle(struct Sprite *sprite)
     }
 }
 
-// Exact shape depends on arguments. Can move in a figure-8-like pattern, or circular, etc.
-static void UNUSED TranslateSpriteInLissajousCurve(struct Sprite *sprite)
-{
-    if (sprite->sDuration)
-    {
-        sprite->x2 = Sin(sprite->sCirclePosX, sprite->sAmplitude);
-        sprite->y2 = Cos(sprite->sCirclePosY, sprite->sAmplitude);
-        sprite->sCirclePosX += sprite->sCircleSpeedX;
-        sprite->sCirclePosY += sprite->sCircleSpeedY;
-
-        if (sprite->sCirclePosX >= 0x100)
-            sprite->sCirclePosX -= 0x100;
-        else if (sprite->sCirclePosX < 0)
-            sprite->sCirclePosX += 0x100;
-
-        if (sprite->sCirclePosY >= 0x100)
-            sprite->sCirclePosY -= 0x100;
-        else if (sprite->sCirclePosY < 0)
-            sprite->sCirclePosY += 0x100;
-
-        sprite->sDuration--;
-    }
-    else
-    {
-        SetCallbackToStoredInData6(sprite);
-    }
-}
-
 void TranslateSpriteInEllipse(struct Sprite *sprite)
 {
     if (sprite->sDuration)
@@ -488,14 +425,6 @@ void WaitAnimForDuration(struct Sprite *sprite)
 #define sMoveSteps data[0]
 #define sSpeedX    data[1]
 #define sSpeedY    data[2]
-
-// Functionally unused
-static void AnimPosToTranslateLinear(struct Sprite *sprite)
-{
-    ConvertPosDataToTranslateLinearData(sprite);
-    sprite->callback = TranslateSpriteLinear;
-    sprite->callback(sprite);
-}
 
 void ConvertPosDataToTranslateLinearData(struct Sprite *sprite)
 {
@@ -559,15 +488,6 @@ static void TranslateSpriteLinearFixedPointIconFrame(struct Sprite *sprite)
     UpdateMonIconFrame(sprite);
 }
 
-static void UNUSED TranslateSpriteToBattleTargetPos(struct Sprite *sprite)
-{
-    sprite->sStartX = sprite->x + sprite->x2;
-    sprite->sStartY = sprite->y + sprite->y2;
-    sprite->sTargetX = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X_2);
-    sprite->sTargetY = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y_PIC_OFFSET);
-    sprite->callback = AnimPosToTranslateLinear;
-}
-
 // Same as TranslateSpriteLinear but takes an id to specify which sprite to move
 void TranslateSpriteLinearById(struct Sprite *sprite)
 {
@@ -624,15 +544,6 @@ void DestroySpriteAndMatrix(struct Sprite *sprite)
 {
     FreeSpriteOamMatrix(sprite);
     DestroyAnimSprite(sprite);
-}
-
-static void UNUSED TranslateSpriteToBattleAttackerPos(struct Sprite *sprite)
-{
-    sprite->sStartX = sprite->x + sprite->x2;
-    sprite->sStartY = sprite->y + sprite->y2;
-    sprite->sTargetX = GetBattlerSpriteCoord(gBattleAnimAttacker, BATTLER_COORD_X_2);
-    sprite->sTargetY = GetBattlerSpriteCoord(gBattleAnimAttacker, BATTLER_COORD_Y_PIC_OFFSET);
-    sprite->callback = AnimPosToTranslateLinear;
 }
 
 #undef sStepsX
@@ -916,7 +827,7 @@ void ClearBattleAnimBg(u32 bgId)
 void AnimLoadCompressedBgGfx(u32 bgId, const u32 *src, u32 tilesOffset)
 {
     CpuFill32(0, gBattleAnimBgTileBuffer, 0x2000);
-    LZDecompressWram(src, gBattleAnimBgTileBuffer);
+    DecompressDataWithHeaderWram(src, gBattleAnimBgTileBuffer);
     LoadBgTiles(bgId, gBattleAnimBgTileBuffer, 0x2000, tilesOffset);
 }
 
@@ -1018,15 +929,6 @@ void StartAnimLinearTranslation(struct Sprite *sprite)
     sprite->callback(sprite);
 }
 
-static void UNUSED StartAnimLinearTranslation_SetCornerVecX(struct Sprite *sprite)
-{
-    sprite->data[1] = sprite->x;
-    sprite->data[3] = sprite->y;
-    InitAnimLinearTranslation(sprite);
-    sprite->callback = AnimTranslateLinear_WithFollowup_SetCornerVecX;
-    sprite->callback(sprite);
-}
-
 bool8 AnimTranslateLinear(struct Sprite *sprite)
 {
     u16 v1, v2, x, y;
@@ -1059,14 +961,6 @@ bool8 AnimTranslateLinear(struct Sprite *sprite)
 
 void AnimTranslateLinear_WithFollowup(struct Sprite *sprite)
 {
-    if (AnimTranslateLinear(sprite))
-        SetCallbackToStoredInData6(sprite);
-}
-
-// Functionally unused
-static void AnimTranslateLinear_WithFollowup_SetCornerVecX(struct Sprite *sprite)
-{
-    AnimSetCenterToCornerVecX(sprite);
     if (AnimTranslateLinear(sprite))
         SetCallbackToStoredInData6(sprite);
 }
@@ -1424,11 +1318,6 @@ u32 GetBattleMonSpritePalettesMask(u8 playerLeft, u8 playerRight, u8 opponentLef
 u8 GetSpritePalIdxByBattler(u8 battler)
 {
     return battler;
-}
-
-static u8 UNUSED GetSpritePalIdxByPosition(u8 position)
-{
-    return GetBattlerAtPosition(position);
 }
 
 // gBattleAnimArgs 0-3 used
@@ -1842,24 +1731,16 @@ static u16 GetBattlerYDeltaFromSpriteId(u8 spriteId)
     {
         if (gBattlerSpriteIds[i] == spriteId)
         {
-            if (IsContest())
-            {
-                species = gContestResources->moveAnim->species;
-                return gSpeciesInfo[species].backPicYOffset;
-            }
+            spriteInfo = gBattleSpritesDataPtr->battlerData;
+            if (!spriteInfo[battler].transformSpecies)
+                species = GetMonData(GetBattlerMon(i), MON_DATA_SPECIES);
             else
-            {
-                spriteInfo = gBattleSpritesDataPtr->battlerData;
-                if (!spriteInfo[battler].transformSpecies)
-                    species = GetMonData(GetBattlerMon(i), MON_DATA_SPECIES);
-                else
-                    species = spriteInfo[battler].transformSpecies;
+                species = spriteInfo[battler].transformSpecies;
 
-                if (IsOnPlayerSide(i))
-                    return gSpeciesInfo[species].backPicYOffset;
-                else
-                    return gSpeciesInfo[species].frontPicYOffset;
-            }
+            if (IsOnPlayerSide(i))
+                return gSpeciesInfo[species].backPicYOffset;
+            else
+                return gSpeciesInfo[species].frontPicYOffset;
         }
     }
     return MON_PIC_HEIGHT;
@@ -1925,18 +1806,6 @@ void AnimTask_GetFrustrationPowerLevel(u8 taskId)
         powerLevel = 3;
     gBattleAnimArgs[ARG_RET_ID] = powerLevel;
     DestroyAnimVisualTask(taskId);
-}
-
-static void UNUSED SetPriorityForVisibleBattlers(u8 priority)
-{
-    if (IsBattlerSpriteVisible(gBattleAnimTarget))
-        gSprites[gBattlerSpriteIds[gBattleAnimTarget]].oam.priority = priority;
-    if (IsBattlerSpriteVisible(gBattleAnimAttacker))
-        gSprites[gBattlerSpriteIds[gBattleAnimAttacker]].oam.priority = priority;
-    if (IsBattlerSpriteVisible(BATTLE_PARTNER(gBattleAnimTarget)))
-        gSprites[gBattlerSpriteIds[BATTLE_PARTNER(gBattleAnimTarget)]].oam.priority = priority;
-    if (IsBattlerSpriteVisible(BATTLE_PARTNER(gBattleAnimAttacker)))
-        gSprites[gBattlerSpriteIds[BATTLE_PARTNER(gBattleAnimAttacker)]].oam.priority = priority;
 }
 
 void InitPrioritiesForVisibleBattlers(void)
@@ -2062,66 +1931,45 @@ s16 GetBattlerSpriteCoordAttr(u8 battler, u8 attr)
     u8 y_offset;
     struct BattleSpriteInfo *spriteInfo;
 
-    if (IsContest())
+    struct Pokemon *mon = GetBattlerMon(battler);
+
+    spriteInfo = gBattleSpritesDataPtr->battlerData;
+    if (!spriteInfo[battler].transformSpecies)
     {
-        if (gContestResources->moveAnim->hasTargetAnim)
-        {
-            species = gContestResources->moveAnim->targetSpecies;
-            personality = gContestResources->moveAnim->targetPersonality;
-        }
+        species = GetMonData(mon, MON_DATA_SPECIES);
+        personality = GetMonData(mon, MON_DATA_PERSONALITY);
+    }
+    else
+    {
+        species = spriteInfo[battler].transformSpecies;
+        personality = gTransformedPersonalities[battler];
+    }
+
+    species = SanitizeSpeciesId(species);
+    if (species == SPECIES_UNOWN)
+        species = GetUnownSpeciesId(personality);
+
+    if (IsOnPlayerSide(battler))
+    {
+    #if P_GENDER_DIFFERENCES
+        if (gSpeciesInfo[species].backPicFemale != NULL && IsPersonalityFemale(species, personality))
+            size = gSpeciesInfo[species].backPicSizeFemale;
         else
-        {
-            species = gContestResources->moveAnim->species;
-            personality = gContestResources->moveAnim->personality;
-        }
-        species = SanitizeSpeciesId(species);
-        if (species == SPECIES_UNOWN)
-            species = GetUnownSpeciesId(personality);
-        size = gSpeciesInfo[species].backPicSize;
+    #endif
+            size = gSpeciesInfo[species].backPicSize;
+
         y_offset = gSpeciesInfo[species].backPicYOffset;
     }
     else
     {
-        struct Pokemon *mon = GetBattlerMon(battler);
-
-        spriteInfo = gBattleSpritesDataPtr->battlerData;
-        if (!spriteInfo[battler].transformSpecies)
-        {
-            species = GetMonData(mon, MON_DATA_SPECIES);
-            personality = GetMonData(mon, MON_DATA_PERSONALITY);
-        }
+    #if P_GENDER_DIFFERENCES
+        if (gSpeciesInfo[species].frontPicFemale != NULL && IsPersonalityFemale(species, personality))
+            size = gSpeciesInfo[species].frontPicSizeFemale;
         else
-        {
-            species = spriteInfo[battler].transformSpecies;
-            personality = gTransformedPersonalities[battler];
-        }
+    #endif
+            size = gSpeciesInfo[species].frontPicSize;
 
-        species = SanitizeSpeciesId(species);
-        if (species == SPECIES_UNOWN)
-            species = GetUnownSpeciesId(personality);
-
-        if (IsOnPlayerSide(battler))
-        {
-        #if P_GENDER_DIFFERENCES
-            if (gSpeciesInfo[species].backPicFemale != NULL && IsPersonalityFemale(species, personality))
-                size = gSpeciesInfo[species].backPicSizeFemale;
-            else
-        #endif
-                size = gSpeciesInfo[species].backPicSize;
-
-            y_offset = gSpeciesInfo[species].backPicYOffset;
-        }
-        else
-        {
-        #if P_GENDER_DIFFERENCES
-            if (gSpeciesInfo[species].frontPicFemale != NULL && IsPersonalityFemale(species, personality))
-                size = gSpeciesInfo[species].frontPicSizeFemale;
-            else
-        #endif
-                size = gSpeciesInfo[species].frontPicSize;
-
-            y_offset = gSpeciesInfo[species].frontPicYOffset;
-        }
+        y_offset = gSpeciesInfo[species].frontPicYOffset;
     }
 
     switch (attr)

@@ -1,5 +1,4 @@
 #include "global.h"
-#include "bike.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "fieldmap.h"
@@ -8,6 +7,7 @@
 #include "sprite.h"
 #include "constants/songs.h"
 #include "constants/event_objects.h"
+#include "field_control_avatar.h"
 
 #define ROTATING_GATE_TILE_TAG 0x1300
 #define ROTATING_GATE_PUZZLE_MAX 12
@@ -624,18 +624,6 @@ static EWRAM_DATA u8 sRotatingGate_PuzzleCount = 0;
 
 static s32 GetCurrentMapRotatingGatePuzzleType(void)
 {
-    if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_FORTREE_CITY_GYM) &&
-        gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_FORTREE_CITY_GYM))
-    {
-        return PUZZLE_FORTREE_CITY_GYM;
-    }
-
-    if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ROUTE110_TRICK_HOUSE_PUZZLE6) &&
-        gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_ROUTE110_TRICK_HOUSE_PUZZLE6))
-    {
-        return PUZZLE_ROUTE110_TRICK_HOUSE_PUZZLE6;
-    }
-
     return PUZZLE_NONE;
 }
 

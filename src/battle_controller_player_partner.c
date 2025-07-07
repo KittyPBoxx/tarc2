@@ -7,12 +7,10 @@
 #include "battle_message.h"
 #include "battle_interface.h"
 #include "battle_setup.h"
-#include "battle_tower.h"
 #include "battle_z_move.h"
 #include "bg.h"
 #include "data.h"
 #include "item_use.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
@@ -227,17 +225,7 @@ static void SwitchIn_TryShinyAnim(u32 battler)
 static void PlayerPartnerBufferExecCompleted(u32 battler)
 {
     gBattlerControllerFuncs[battler] = PlayerPartnerBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(battler, B_COMM_CONTROLLER_IS_DONE, 4, &playerId);
-        gBattleResources->bufferA[battler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~(1u << battler);
-    }
+    gBattleControllerExecFlags &= ~(1u << battler);
 }
 
 static void PlayerPartnerHandleLoadMonSprite(u32 battler)
@@ -258,27 +246,9 @@ static void PlayerPartnerHandleDrawTrainerPic(u32 battler)
     bool32 isFrontPic;
     s16 xPos, yPos;
     u32 trainerPicId;
-
-    enum DifficultyLevel difficulty = GetBattlePartnerDifficultyLevel(gPartnerTrainerId);
-
-    if (gPartnerTrainerId > TRAINER_PARTNER(PARTNER_NONE))
-    {
-        trainerPicId = gBattlePartners[difficulty][gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerPic;
-        xPos = 90;
-        yPos = (8 - gTrainerBacksprites[trainerPicId].coordinates.size) * 4 + 80;
-    }
-    else if (IsAiVsAiBattle())
-    {
-        trainerPicId = GetTrainerPicFromId(gPartnerTrainerId);
-        xPos = 60;
-        yPos = 80;
-    }
-    else
-    {
-        trainerPicId = GetFrontierTrainerFrontSpriteId(gPartnerTrainerId);
-        xPos = 32;
-        yPos = 80;
-    }
+    trainerPicId = 0;
+    xPos = 90;
+    yPos = (8 - gTrainerBacksprites[trainerPicId].coordinates.size) * 4 + 80;
 
     // Use back pic only if the partner Steven or is custom.
     if (gPartnerTrainerId > TRAINER_PARTNER(PARTNER_NONE))
@@ -391,14 +361,8 @@ static void PlayerPartnerHandleHealthBarUpdate(u32 battler)
 static void PlayerPartnerHandleIntroTrainerBallThrow(u32 battler)
 {
     const u16 *trainerPal;
-    enum DifficultyLevel difficulty = GetBattlePartnerDifficultyLevel(gPartnerTrainerId);
 
-    if (gPartnerTrainerId > TRAINER_PARTNER(PARTNER_NONE))
-        trainerPal = gTrainerBacksprites[gBattlePartners[difficulty][gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerPic].palette.data;
-    else if (IsAiVsAiBattle())
-        trainerPal = gTrainerSprites[GetTrainerPicFromId(gPartnerTrainerId)].palette.data;
-    else
-        trainerPal = gTrainerSprites[GetFrontierTrainerFrontSpriteId(gPartnerTrainerId)].palette.data; // 2 vs 2 multi battle in Battle Frontier, load front sprite and pal.
+    trainerPal = 0;
 
     BtlController_HandleIntroTrainerBallThrow(battler, 0xD6F9, trainerPal, 24, Controller_PlayerPartnerShowIntroHealthbox);
 }

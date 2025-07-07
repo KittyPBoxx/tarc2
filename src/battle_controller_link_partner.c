@@ -6,17 +6,13 @@
 #include "battle_interface.h"
 #include "battle_message.h"
 #include "battle_setup.h"
-#include "battle_tower.h"
-#include "battle_tv.h"
 #include "bg.h"
 #include "data.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
 #include "pokeball.h"
 #include "pokemon.h"
-#include "recorded_battle.h"
 #include "reshow_battle_screen.h"
 #include "sound.h"
 #include "string_util.h"
@@ -27,7 +23,6 @@
 #include "constants/battle_anim.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
-#include "recorded_battle.h"
 #include "random.h"
 
 static void LinkPartnerHandleLoadMonSprite(u32 battler);
@@ -154,18 +149,7 @@ static void SwitchIn_TryShinyAnim(u32 battler)
 
 static void LinkPartnerBufferExecCompleted(u32 battler)
 {
-    gBattlerControllerFuncs[battler] = LinkPartnerBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(battler, B_COMM_CONTROLLER_IS_DONE, 4, &playerId);
-        gBattleResources->bufferA[battler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~(1u << battler);
-    }
+    // TODO: remove
 }
 
 static void LinkPartnerHandleLoadMonSprite(u32 battler)
@@ -241,17 +225,9 @@ static void LinkPartnerHandleBattleAnimation(u32 battler)
 
 static void LinkPartnerHandleLinkStandbyMsg(u32 battler)
 {
-    RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[battler][2]);
     LinkPartnerBufferExecCompleted(battler);
 }
 
 static void LinkPartnerHandleEndLinkBattle(u32 battler)
 {
-    RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[battler][4]);
-    gBattleOutcome = gBattleResources->bufferA[battler][1];
-    gSaveBlock2Ptr->frontier.disableRecordBattle = gBattleResources->bufferA[battler][2];
-    FadeOutMapMusic(5);
-    BeginFastPaletteFade(3);
-    LinkPartnerBufferExecCompleted(battler);
-    gBattlerControllerFuncs[battler] = SetBattleEndCallbacks;
 }

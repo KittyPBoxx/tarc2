@@ -5,14 +5,6 @@ Common_EventScript_GetGiftMonPartySlot::
 	copyvar VAR_0x8004, VAR_RESULT
 	return
 
-Common_EventScript_NameReceivedBoxMon::
-	fadescreen FADE_TO_BLACK
-	special ChangeBoxPokemonNickname
-	waitstate
-	lock
-	faceplayer
-	return
-
 Common_EventScript_TransferredToPC::
 	bufferboxname STR_VAR_1, VAR_PC_BOX_TO_SEND_MON
 	bufferspeciesname STR_VAR_2, VAR_TEMP_TRANSFERRED_SPECIES

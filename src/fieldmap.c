@@ -1,19 +1,13 @@
 #include "global.h"
-#include "battle_pyramid.h"
 #include "bg.h"
 #include "fieldmap.h"
 #include "fldeff.h"
 #include "fldeff_misc.h"
-#include "frontier_util.h"
 #include "menu.h"
 #include "mirage_tower.h"
 #include "overworld.h"
 #include "palette.h"
-#include "pokenav.h"
 #include "script.h"
-#include "secret_base.h"
-#include "trainer_hill.h"
-#include "tv.h"
 #include "constants/rgb.h"
 #include "constants/metatile_behaviors.h"
 #include "wild_encounter.h"
@@ -67,30 +61,14 @@ const struct MapHeader *const GetMapHeaderFromConnection(const struct MapConnect
 void InitMap(void)
 {
     InitMapLayoutData(&gMapHeader);
-    SetOccupiedSecretBaseEntranceMetatiles(gMapHeader.events);
     RunOnLoadMapScript();
 }
 
 void InitMapFromSavedGame(void)
 {
     InitMapLayoutData(&gMapHeader);
-    InitSecretBaseAppearance(FALSE);
-    SetOccupiedSecretBaseEntranceMetatiles(gMapHeader.events);
     LoadSavedMapView();
     RunOnLoadMapScript();
-    UpdateTVScreensOnMap(gBackupMapLayout.width, gBackupMapLayout.height);
-}
-
-void InitBattlePyramidMap(bool8 setPlayerPosition)
-{
-    CpuFastFill16(MAPGRID_UNDEFINED, sBackupMapData, sizeof(sBackupMapData));
-    GenerateBattlePyramidFloorLayout(sBackupMapData, setPlayerPosition);
-}
-
-void InitTrainerHillMap(void)
-{
-    CpuFastFill16(MAPGRID_UNDEFINED, sBackupMapData, sizeof(sBackupMapData));
-    GenerateTrainerHillFloorLayout(sBackupMapData);
 }
 
 static void InitMapLayoutData(struct MapHeader *mapHeader)
@@ -806,12 +784,6 @@ void GetCameraFocusCoords(u16 *x, u16 *y)
     *y = gSaveBlock1Ptr->pos.y + MAP_OFFSET;
 }
 
-static void UNUSED SetCameraCoords(u16 x, u16 y)
-{
-    gSaveBlock1Ptr->pos.x = x;
-    gSaveBlock1Ptr->pos.y = y;
-}
-
 void GetCameraCoords(u16 *x, u16 *y)
 {
     *x = gSaveBlock1Ptr->pos.x;
@@ -868,11 +840,6 @@ static void CopyTilesetToVramUsingHeap(struct Tileset const *tileset, u16 numTil
 
 // Below two are dummied functions from FRLG, used to tint the overworld palettes for the Quest Log
 static void ApplyGlobalTintToPaletteEntries(u16 offset, u16 size)
-{
-
-}
-
-static void UNUSED ApplyGlobalTintToPaletteSlot(u8 slot, u8 count)
 {
 
 }

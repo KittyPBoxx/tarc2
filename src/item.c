@@ -6,14 +6,11 @@
 #include "text.h"
 #include "event_data.h"
 #include "malloc.h"
-#include "secret_base.h"
 #include "item_menu.h"
 #include "party_menu.h"
 #include "strings.h"
 #include "load_save.h"
 #include "item_use.h"
-#include "battle_pyramid.h"
-#include "battle_pyramid_bag.h"
 #include "graphics.h"
 #include "constants/battle.h"
 #include "constants/items.h"
@@ -127,7 +124,7 @@ bool8 CheckBagHasItem(u16 itemId, u16 count)
 
     if (GetItemPocket(itemId) == 0)
         return FALSE;
-    if (InBattlePyramid() || FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
+    if (FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
         return CheckPyramidBagHasItem(itemId, count);
     pocket = GetItemPocket(itemId) - 1;
     // Check for item slots that contain the item
@@ -182,7 +179,7 @@ bool8 CheckBagHasSpace(u16 itemId, u16 count)
     if (GetItemPocket(itemId) == POCKET_NONE)
         return FALSE;
 
-    if (InBattlePyramid() || FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
+    if (FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
         return CheckPyramidBagHasSpace(itemId, count);
 
     return GetFreeSpaceForItemInBag(itemId) >= count;
@@ -222,7 +219,7 @@ bool8 AddBagItem(u16 itemId, u16 count)
         return FALSE;
 
     // check Battle Pyramid Bag
-    if (InBattlePyramid() || FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
+    if (FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
     {
         return AddPyramidBagItem(itemId, count);
     }
@@ -324,7 +321,7 @@ bool8 RemoveBagItem(u16 itemId, u16 count)
         return FALSE;
 
     // check Battle Pyramid Bag
-    if (InBattlePyramid() || FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
+    if (FlagGet(FLAG_STORING_ITEMS_IN_PYRAMID_BAG) == TRUE)
     {
         return RemovePyramidBagItem(itemId, count);
     }
@@ -346,12 +343,6 @@ bool8 RemoveBagItem(u16 itemId, u16 count)
 
         if (totalQuantity < count)
             return FALSE;   // We don't have enough of the item
-
-        if (CurMapIsSecretBase() == TRUE)
-        {
-            VarSet(VAR_SECRET_BASE_LOW_TV_FLAGS, VarGet(VAR_SECRET_BASE_LOW_TV_FLAGS) | SECRET_BASE_USED_BAG);
-            VarSet(VAR_SECRET_BASE_LAST_ITEM_USED, itemId);
-        }
 
         var = GetItemListPosition(pocket);
         if (itemPocket->capacity > var
@@ -544,15 +535,6 @@ void CompactPCItems(void)
 
 void SwapRegisteredBike(void)
 {
-    switch (gSaveBlock1Ptr->registeredItem)
-    {
-    case ITEM_MACH_BIKE:
-        gSaveBlock1Ptr->registeredItem = ITEM_ACRO_BIKE;
-        break;
-    case ITEM_ACRO_BIKE:
-        gSaveBlock1Ptr->registeredItem = ITEM_MACH_BIKE;
-        break;
-    }
 }
 
 u16 BagGetItemIdByPocketPosition(u8 pocketId, u16 pocketPos)
@@ -658,203 +640,23 @@ u16 CountTotalItemQuantityInBag(u16 itemId)
 
 static bool8 CheckPyramidBagHasItem(u16 itemId, u16 count)
 {
-    u8 i;
-    u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-#if MAX_PYRAMID_BAG_ITEM_CAPACITY > 255
-    u16 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-#else
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-#endif
-
-    for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
-    {
-        if (items[i] == itemId)
-        {
-            if (quantities[i] >= count)
-                return TRUE;
-
-            count -= quantities[i];
-            if (count == 0)
-                return TRUE;
-        }
-    }
-
     return FALSE;
 }
 
 static bool8 CheckPyramidBagHasSpace(u16 itemId, u16 count)
 {
-    u8 i;
-    u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-#if MAX_PYRAMID_BAG_ITEM_CAPACITY > 255
-    u16 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-#else
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-#endif
-
-    for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
-    {
-        if (items[i] == itemId || items[i] == ITEM_NONE)
-        {
-            if (quantities[i] + count <= MAX_PYRAMID_BAG_ITEM_CAPACITY)
-                return TRUE;
-
-            count = (quantities[i] + count) - MAX_PYRAMID_BAG_ITEM_CAPACITY;
-            if (count == 0)
-                return TRUE;
-        }
-    }
-
     return FALSE;
 }
 
 bool8 AddPyramidBagItem(u16 itemId, u16 count)
 {
-    u16 i;
-
-    u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-    u16 *newItems = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newItems));
-
-#if MAX_PYRAMID_BAG_ITEM_CAPACITY > 255
-    u16 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-    u16 *newQuantities = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
-#else
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-    u8 *newQuantities = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
-#endif
-
-    memcpy(newItems, items, PYRAMID_BAG_ITEMS_COUNT * sizeof(*newItems));
-    memcpy(newQuantities, quantities, PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
-
-    for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
-    {
-        if (newItems[i] == itemId && newQuantities[i] < MAX_PYRAMID_BAG_ITEM_CAPACITY)
-        {
-            newQuantities[i] += count;
-            if (newQuantities[i] > MAX_PYRAMID_BAG_ITEM_CAPACITY)
-            {
-                count = newQuantities[i] - MAX_PYRAMID_BAG_ITEM_CAPACITY;
-                newQuantities[i] = MAX_PYRAMID_BAG_ITEM_CAPACITY;
-            }
-            else
-            {
-                count = 0;
-            }
-
-            if (count == 0)
-                break;
-        }
-    }
-
-    if (count > 0)
-    {
-        for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
-        {
-            if (newItems[i] == ITEM_NONE)
-            {
-                newItems[i] = itemId;
-                newQuantities[i] = count;
-                if (newQuantities[i] > MAX_PYRAMID_BAG_ITEM_CAPACITY)
-                {
-                    count = newQuantities[i] - MAX_PYRAMID_BAG_ITEM_CAPACITY;
-                    newQuantities[i] = MAX_PYRAMID_BAG_ITEM_CAPACITY;
-                }
-                else
-                {
-                    count = 0;
-                }
-
-                if (count == 0)
-                    break;
-            }
-        }
-    }
-
-    if (count == 0)
-    {
-        memcpy(items, newItems, PYRAMID_BAG_ITEMS_COUNT * sizeof(*items));
-        memcpy(quantities, newQuantities, PYRAMID_BAG_ITEMS_COUNT * sizeof(*quantities));
-        Free(newItems);
-        Free(newQuantities);
-        return TRUE;
-    }
-    else
-    {
-        Free(newItems);
-        Free(newQuantities);
-        return FALSE;
-    }
+    return FALSE;
 }
 
 bool8 RemovePyramidBagItem(u16 itemId, u16 count)
 {
-    u16 i;
 
-    u16 *items = gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode];
-#if MAX_PYRAMID_BAG_ITEM_CAPACITY > 255
-    u16 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-#else
-    u8 *quantities = gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode];
-#endif
-
-    i = gPyramidBagMenuState.cursorPosition + gPyramidBagMenuState.scrollPosition;
-    if (items[i] == itemId && quantities[i] >= count)
-    {
-        quantities[i] -= count;
-        if (quantities[i] == 0)
-            items[i] = ITEM_NONE;
-        return TRUE;
-    }
-    else
-    {
-        u16 *newItems = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newItems));
-    #if MAX_PYRAMID_BAG_ITEM_CAPACITY > 255
-        u16 *newQuantities = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
-    #else
-        u8 *newQuantities = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
-    #endif
-
-        memcpy(newItems, items, PYRAMID_BAG_ITEMS_COUNT * sizeof(*newItems));
-        memcpy(newQuantities, quantities, PYRAMID_BAG_ITEMS_COUNT * sizeof(*newQuantities));
-
-        for (i = 0; i < PYRAMID_BAG_ITEMS_COUNT; i++)
-        {
-            if (newItems[i] == itemId)
-            {
-                if (newQuantities[i] >= count)
-                {
-                    newQuantities[i] -= count;
-                    count = 0;
-                    if (newQuantities[i] == 0)
-                        newItems[i] = ITEM_NONE;
-                }
-                else
-                {
-                    count -= newQuantities[i];
-                    newQuantities[i] = 0;
-                    newItems[i] = ITEM_NONE;
-                }
-
-                if (count == 0)
-                    break;
-            }
-        }
-
-        if (count == 0)
-        {
-            memcpy(items, newItems, PYRAMID_BAG_ITEMS_COUNT * sizeof(*items));
-            memcpy(quantities, newQuantities, PYRAMID_BAG_ITEMS_COUNT * sizeof(*quantities));
-            Free(newItems);
-            Free(newQuantities);
-            return TRUE;
-        }
-        else
-        {
-            Free(newItems);
-            Free(newQuantities);
-            return FALSE;
-        }
-    }
+    return FALSE;
 }
 
 static u16 SanitizeItemId(u16 itemId)

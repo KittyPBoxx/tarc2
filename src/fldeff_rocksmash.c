@@ -1,5 +1,4 @@
 #include "global.h"
-#include "braille_puzzles.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "event_scripts.h"
@@ -124,14 +123,7 @@ bool8 SetUpFieldMove_RockSmash(void)
 {
     // In Ruby and Sapphire, Regirock's tomb is opened by using Strength. In Emerald,
     // it is opened by using Rock Smash.
-    if (ShouldDoBrailleRegirockEffect())
-    {
-        gSpecialVar_Result = GetCursorSelectionMonId();
-        gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
-        gPostMenuFieldCallback = SetUpPuzzleEffectRegirock;
-        return TRUE;
-    }
-    else if (CheckObjectGraphicsInFrontOfPlayer(OBJ_EVENT_GFX_BREAKABLE_ROCK) == TRUE)
+    if (CheckObjectGraphicsInFrontOfPlayer(OBJ_EVENT_GFX_BREAKABLE_ROCK) == TRUE)
     {
         gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
         gPostMenuFieldCallback = FieldCallback_RockSmash;
@@ -155,7 +147,6 @@ bool8 FldEff_UseRockSmash(void)
 
     gTasks[taskId].data[8] = (u32)FieldMove_RockSmash >> 16;
     gTasks[taskId].data[9] = (u32)FieldMove_RockSmash;
-    IncrementGameStat(GAME_STAT_USED_ROCK_SMASH);
     return FALSE;
 }
 

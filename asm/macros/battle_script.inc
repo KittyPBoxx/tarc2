@@ -1286,15 +1286,6 @@
 	.4byte \passInstr
 	.endm
 
-	.macro trysetcaughtmondexflags failInstr:req
-	.byte 0xf1
-	.4byte \failInstr
-	.endm
-
-	.macro displaydexinfo
-	.byte 0xf2
-	.endm
-
 	.macro trygivecaughtmonnick
 	.byte 0xf3
 	.endm

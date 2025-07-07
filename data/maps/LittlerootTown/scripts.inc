@@ -113,8 +113,6 @@ LittlerootTown_EventScript_StepOffTruckMale::
 	setvar VAR_0x8005, 8
 	call LittlerootTown_EventScript_GoInsideWithMom
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_TRUCK
-	warpsilent MAP_LITTLEROOT_TOWN_BRENDANS_HOUSE_1F, 8, 8
-	waitstate
 	releaseall
 	end
 
@@ -124,8 +122,6 @@ LittlerootTown_EventScript_StepOffTruckFemale::
 	setvar VAR_0x8005, 8
 	call LittlerootTown_EventScript_GoInsideWithMom
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_TRUCK
-	warpsilent MAP_LITTLEROOT_TOWN_MAYS_HOUSE_1F, 2, 8
-	waitstate
 	releaseall
 	end
 
@@ -214,8 +210,6 @@ LittlerootTown_EventScript_BeginDexUpgradeScene::
 	clearflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCH
 	delay 20
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
-	warp MAP_LITTLEROOT_TOWN_PROFESSOR_BIRCHS_LAB, 6, 5
-	waitstate
 	releaseall
 	end
 

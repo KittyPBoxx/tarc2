@@ -1,6 +1,5 @@
 #include "global.h"
 #include "main.h"
-#include "bike.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "field_camera.h"
@@ -9,7 +8,6 @@
 #include "field_screen_effect.h"
 #include "field_player_avatar.h"
 #include "fieldmap.h"
-#include "follower_npc.h"
 #include "menu.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
@@ -22,7 +20,6 @@
 #include "sprite.h"
 #include "strings.h"
 #include "task.h"
-#include "tv.h"
 #include "wild_encounter.h"
 #include "constants/abilities.h"
 #include "constants/event_objects.h"
@@ -33,6 +30,7 @@
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/trainer_types.h"
+#include "field_control_avatar.h"
 
 #define NUM_FORCED_MOVEMENTS 18
 #define NUM_ACRO_BIKE_COLLISIONS 5
@@ -115,7 +113,6 @@ static bool8 PlayerIsAnimActive(void);
 static bool8 PlayerCheckIfAnimFinishedOrInactive(void);
 
 static void PlayerWalkSlowStairs(u8 direction);
-static void UNUSED PlayerWalkSlow(u8 direction);
 static void PlayerRunSlow(u8 direction);
 static void PlayerRun(u8);
 static void PlayerNotOnBikeCollide(u8);
@@ -375,7 +372,6 @@ void PlayerStep(u8 direction, u16 newKeys, u16 heldKeys)
     HideShowWarpArrow(playerObjEvent);
     if (gPlayerAvatar.preventStep == FALSE)
     {
-        Bike_TryAcroBikeHistoryUpdate(newKeys, heldKeys);
         if (TryInterruptObjectEventSpecialAnim(playerObjEvent, direction) == 0)
         {
             npc_clear_strange_bits(playerObjEvent);
@@ -431,10 +427,7 @@ static void npc_clear_strange_bits(struct ObjectEvent *objEvent)
 
 static void MovePlayerAvatarUsingKeypadInput(u8 direction, u16 newKeys, u16 heldKeys)
 {
-    if (gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
-        MovePlayerOnBike(direction, newKeys, heldKeys);
-    else
-        MovePlayerNotOnBike(direction, heldKeys);
+    MovePlayerNotOnBike(direction, heldKeys);
 }
 
 static void PlayerAllowForcedMovementIfMovingSameDirection(void)
@@ -520,10 +513,6 @@ static bool8 DoForcedMovement(u8 direction, void (*moveFunc)(u8))
     {
         playerAvatar->runningState = MOVING;
         moveFunc(direction);
-        if (PlayerHasFollowerNPC()
-         && gObjectEvents[GetFollowerNPCObjectId()].invisible == FALSE
-         && FindTaskIdByFunc(Task_MoveNPCFollowerAfterForcedMovement) == TASK_NONE)
-            CreateTask(Task_MoveNPCFollowerAfterForcedMovement, 3);
         return TRUE;
     }
 }
@@ -628,7 +617,6 @@ static bool8 ForcedMovement_MuddySlope(void)
 
     if (playerObjEvent->movementDirection != DIR_NORTH || GetPlayerSpeed() < PLAYER_SPEED_FASTEST)
     {
-        Bike_UpdateBikeCounterSpeed(0);
         playerObjEvent->facingDirectionLocked = TRUE;
         return DoForcedMovement(DIR_SOUTH, PlayerWalkFast);
     }
@@ -816,21 +804,13 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
     gPlayerAvatar.creeping = FALSE;
     if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_SURFING)
     {
-        if (FlagGet(DN_FLAG_SEARCHING) && (heldKeys & A_BUTTON))
-        {
-            gPlayerAvatar.creeping = TRUE;
-            PlayerWalkSlow(direction);
-        }
-        else
-        {
-            // speed 2 is fast, same speed as running
-            PlayerWalkFast(direction);
-        }
+        // speed 2 is fast, same speed as running
+        PlayerWalkFast(direction);
         return;
     }
 
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER) && (heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
-     && IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior) == 0 && !FollowerNPCComingThroughDoor())
+     && IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior) == 0)
     {
         if (ObjectMovingOnRockStairs(&gObjectEvents[gPlayerAvatar.objectEventId], direction))
             PlayerRunSlow(direction);
@@ -839,11 +819,6 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
 
         gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
         return;
-    }
-    else if (FlagGet(DN_FLAG_SEARCHING) && (heldKeys & A_BUTTON))
-    {
-        gPlayerAvatar.creeping = TRUE;
-        PlayerWalkSlow(direction);
     }
     else
     {
@@ -888,7 +863,6 @@ u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u
 
     if (ShouldJumpLedge(x, y, direction))
     {
-        IncrementGameStat(GAME_STAT_JUMPED_DOWN_LEDGES);
         return COLLISION_LEDGE_JUMP;
     }
     if (collision == COLLISION_OBJECT_EVENT && TryPushBoulder(x, y, direction))
@@ -921,9 +895,7 @@ static bool8 CanStopSurfing(s16 x, s16 y, u8 direction)
 {
     if ((gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_SURFING)
      && MapGridGetElevationAt(x, y) == 3
-     && (GetObjectEventIdByPosition(x, y, 3) == OBJECT_EVENTS_COUNT
-     || GetObjectEventIdByPosition(x, y, 3) == GetFollowerNPCObjectId()
-     ))
+     && (GetObjectEventIdByPosition(x, y, 3) == OBJECT_EVENTS_COUNT))
     {
         CreateStopSurfingTask(direction);
         return TRUE;
@@ -980,35 +952,7 @@ static void CheckAcroBikeCollision(s16 x, s16 y, u8 metatileBehavior, u8 *collis
 
 bool8 IsPlayerCollidingWithFarawayIslandMew(u8 direction)
 {
-    u8 mewObjectId;
-    struct ObjectEvent *object;
-    s16 playerX;
-    s16 playerY;
-    s16 mewPrevX;
-
-    object = &gObjectEvents[gPlayerAvatar.objectEventId];
-    playerX = object->currentCoords.x;
-    playerY = object->currentCoords.y;
-
-    MoveCoords(direction, &playerX, &playerY);
-    mewObjectId = GetObjectEventIdByLocalIdAndMap(LOCALID_FARAWAY_ISLAND_MEW, MAP_NUM(MAP_FARAWAY_ISLAND_INTERIOR), MAP_GROUP(MAP_FARAWAY_ISLAND_INTERIOR));
-    if (mewObjectId == OBJECT_EVENTS_COUNT)
-        return FALSE;
-
-    object = &gObjectEvents[mewObjectId];
-    mewPrevX = object->previousCoords.x;
-
-    if (mewPrevX == playerX)
-    {
-        if (object->previousCoords.y != playerY
-            || object->currentCoords.x != mewPrevX
-            || object->currentCoords.y != object->previousCoords.y)
-        {
-            if (object->previousCoords.x == playerX &&
-                object->previousCoords.y == playerY)
-                return TRUE;
-        }
-    }
+    // TODO: remove
     return FALSE;
 }
 
@@ -1048,19 +992,10 @@ static void PlayerAvatarTransition_Normal(struct ObjectEvent *objEvent)
 
 static void PlayerAvatarTransition_MachBike(struct ObjectEvent *objEvent)
 {
-    ObjectEventSetGraphicsId(objEvent, GetPlayerAvatarGraphicsIdByStateId(PLAYER_AVATAR_STATE_MACH_BIKE));
-    ObjectEventTurn(objEvent, objEvent->movementDirection);
-    SetPlayerAvatarStateMask(PLAYER_AVATAR_FLAG_MACH_BIKE);
-    BikeClearState(0, 0);
 }
 
 static void PlayerAvatarTransition_AcroBike(struct ObjectEvent *objEvent)
 {
-    ObjectEventSetGraphicsId(objEvent, GetPlayerAvatarGraphicsIdByStateId(PLAYER_AVATAR_STATE_ACRO_BIKE));
-    ObjectEventTurn(objEvent, objEvent->movementDirection);
-    SetPlayerAvatarStateMask(PLAYER_AVATAR_FLAG_ACRO_BIKE);
-    BikeClearState(0, 0);
-    Bike_HandleBumpySlopeJump();
 }
 
 static void PlayerAvatarTransition_Surfing(struct ObjectEvent *objEvent)
@@ -1172,10 +1107,6 @@ static void PlayerWalkSlowStairs(u8 direction)
 }
 
 // slow
-static void UNUSED PlayerWalkSlow(u8 direction)
-{
-    PlayerSetAnimId(GetWalkSlowMovementAction(direction), 2);
-}
 static void PlayerRunSlow(u8 direction)
 {
     PlayerSetAnimId(GetPlayerRunSlowMovementAction(direction), 2);
@@ -1211,22 +1142,6 @@ void PlayerOnBikeCollide(u8 direction)
 {
     PlayCollisionSoundIfNotFacingWarp(direction);
     PlayerSetAnimId(GetWalkInPlaceNormalMovementAction(direction), COPY_MOVE_WALK);
-    // Edge case: If the player stops at the top of a mud slide, but the NPC follower is still on a mud slide tile,
-    // move the follower into the player and hide them.
-    if (PlayerHasFollowerNPC())
-    {
-        struct ObjectEvent *npcFollower = &gObjectEvents[GetFollowerNPCObjectId()];
-        struct ObjectEvent *player = &gObjectEvents[gPlayerAvatar.objectEventId];
-
-        if (npcFollower->invisible == FALSE
-         && player->currentMetatileBehavior != MB_MUDDY_SLOPE
-         && npcFollower->currentMetatileBehavior == MB_MUDDY_SLOPE)
-        {
-            gPlayerAvatar.preventStep = TRUE;
-            ObjectEventSetHeldMovement(npcFollower, MOVEMENT_ACTION_WALK_FAST_UP);
-            CreateTask(Task_HideNPCFollowerAfterMovementFinish, 2);
-        }
-    }
 }
 
 void PlayerOnBikeCollideWithFarawayIslandMew(u8 direction)
@@ -1266,8 +1181,7 @@ void PlayerFreeze(void)
 {
     if (gPlayerAvatar.tileTransitionState == T_TILE_CENTER || gPlayerAvatar.tileTransitionState == T_NOT_MOVING)
     {
-        if (IsPlayerNotUsingAcroBikeOnBumpySlope())
-            PlayerForceSetHeldMovement(GetFaceDirectionMovementAction(gObjectEvents[gPlayerAvatar.objectEventId].facingDirection));
+        PlayerForceSetHeldMovement(GetFaceDirectionMovementAction(gObjectEvents[gPlayerAvatar.objectEventId].facingDirection));
     }
 }
 
@@ -1454,11 +1368,6 @@ void StopPlayerAvatar(void)
 
     npc_clear_strange_bits(playerObjEvent);
     SetObjectEventDirection(playerObjEvent, playerObjEvent->facingDirection);
-    if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
-    {
-        Bike_HandleBumpySlopeJump();
-        Bike_UpdateBikeCounterSpeed(0);
-    }
 }
 
 u16 GetRivalAvatarGraphicsIdByStateIdAndGender(u8 state, u8 gender)
@@ -1618,7 +1527,6 @@ void InitPlayerAvatar(s16 x, s16 y, u8 direction, u8 gender)
     gPlayerAvatar.spriteId = objectEvent->spriteId;
     gPlayerAvatar.gender = gender;
     SetPlayerAvatarStateMask(PLAYER_AVATAR_FLAG_CONTROLLABLE | PLAYER_AVATAR_FLAG_ON_FOOT);
-    CreateFollowerNPCAvatar();
 }
 
 void SetPlayerInvisibility(bool8 invisible)
@@ -1868,7 +1776,6 @@ static void CreateStopSurfingTask(u8 direction)
     taskId = CreateTask(Task_StopSurfingInit, 0xFF);
     gTasks[taskId].data[0] = direction;
     Task_StopSurfingInit(taskId);
-    PrepareFollowerNPCDismountSurf();
 }
 
 static void Task_StopSurfingInit(u8 taskId)
@@ -2237,7 +2144,6 @@ static bool32 Fishing_StartEncounter(struct Task *task)
         gPlayerAvatar.preventStep = FALSE;
         UnlockPlayerFieldControls();
         FishingWildEncounter(task->tFishingRod);
-        RecordFishingAttemptForTV(TRUE);
         DestroyTask(FindTaskIdByFunc(Task_Fishing));
     }
     return FALSE;
@@ -2245,7 +2151,6 @@ static bool32 Fishing_StartEncounter(struct Task *task)
 
 static bool32 Fishing_NotEvenNibble(struct Task *task)
 {
-    gChainFishingDexNavStreak = 0;
     AlignFishingAnimationFrames();
     StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingNoCatchDirectionAnimNum(GetPlayerFacingDirection()));
     FillWindowPixelBuffer(0, PIXEL_FILL(1));
@@ -2256,7 +2161,6 @@ static bool32 Fishing_NotEvenNibble(struct Task *task)
 
 static bool32 Fishing_GotAway(struct Task *task)
 {
-    gChainFishingDexNavStreak = 0;
     AlignFishingAnimationFrames();
     StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingNoCatchDirectionAnimNum(GetPlayerFacingDirection()));
     FillWindowPixelBuffer(0, PIXEL_FILL(1));
@@ -2299,7 +2203,6 @@ static bool32 Fishing_EndNoMon(struct Task *task)
         UnlockPlayerFieldControls();
         UnfreezeObjectEvents();
         ClearDialogWindowAndFrame(0, TRUE);
-        RecordFishingAttemptForTV(FALSE);
         DestroyTask(FindTaskIdByFunc(Task_Fishing));
     }
     return FALSE;

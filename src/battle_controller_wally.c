@@ -5,12 +5,10 @@
 #include "battle_interface.h"
 #include "battle_message.h"
 #include "battle_setup.h"
-#include "battle_tv.h"
 #include "bg.h"
 #include "data.h"
 #include "item.h"
 #include "item_menu.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
@@ -275,17 +273,7 @@ static void Intro_WaitForShinyAnimAndHealthbox(u32 battler)
 static void WallyBufferExecCompleted(u32 battler)
 {
     gBattlerControllerFuncs[battler] = WallyBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(battler, B_COMM_CONTROLLER_IS_DONE, 4, &playerId);
-        gBattleResources->bufferA[battler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~(1u << battler);
-    }
+    gBattleControllerExecFlags &= ~(1u << battler);
 }
 
 #define sSpeedX data[0]

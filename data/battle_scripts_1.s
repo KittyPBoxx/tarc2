@@ -3,7 +3,6 @@
 #include "constants/global.h"
 #include "constants/battle.h"
 #include "constants/pokemon.h"
-#include "constants/battle_arena.h"
 #include "constants/battle_script_commands.h"
 #include "constants/battle_anim.h"
 #include "constants/battle_string_ids.h"
@@ -11,7 +10,6 @@
 #include "constants/hold_effects.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
-#include "constants/game_stat.h"
 #include "constants/trainers.h"
 #include "constants/species.h"
 	.include "asm/macros.inc"
@@ -3708,7 +3706,6 @@ BattleScript_EffectDoNothing::
 	ppreduce
 	attackanimation
 	waitanimation
-	incrementgamestat GAME_STAT_USED_SPLASH
 	printstring STRINGID_BUTNOTHINGHAPPENED
 	waitmessage B_WAIT_TIME_LONG
 	goto BattleScript_MoveEnd
@@ -5052,7 +5049,6 @@ BattleScript_EffectSnatch::
 
 BattleScript_EffectStruggle::
 	jumpifnotmove MOVE_STRUGGLE, BattleScript_EffectHit
-	incrementgamestat GAME_STAT_USED_STRUGGLE
 	goto BattleScript_EffectHit
 
 BattleScript_EffectMudSport::
@@ -8984,8 +8980,6 @@ BattleScript_ArenaDoJudgment::
 	arenajudgmentstring B_MSG_REF_JUDGE_BODY
 	arenawaitmessage B_MSG_REF_JUDGE_BODY
 	arenajudgmentwindow
-	jumpifbyte CMP_EQUAL, gBattleCommunication + 1, ARENA_RESULT_PLAYER_LOST, BattleScript_ArenaJudgmentPlayerLoses
-	jumpifbyte CMP_EQUAL, gBattleCommunication + 1, ARENA_RESULT_TIE, BattleScript_ArenaJudgmentDraw
 @ ARENA_RESULT_PLAYER_WON
 	arenajudgmentstring B_MSG_REF_PLAYER_WON
 	arenawaitmessage B_MSG_REF_PLAYER_WON

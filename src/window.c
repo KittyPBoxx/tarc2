@@ -3,6 +3,7 @@
 #include "malloc.h"
 #include "bg.h"
 #include "blit.h"
+#include "decompress.h"
 
 // This global is set to 0 and never changed.
 COMMON_DATA u8 gTransparentTileNumber = 0;
@@ -425,22 +426,6 @@ void BlitBitmapRectToWindow(u32 windowId, const u8 *pixels, u16 srcX, u16 srcY, 
     BlitBitmapRect4Bit(&sourceRect, &destRect, srcX, srcY, destX, destY, rectWidth, rectHeight, 0);
 }
 
-static void UNUSED BlitBitmapRectToWindowWithColorKey(u32 windowId, const u8 *pixels, u16 srcX, u16 srcY, u16 srcWidth, int srcHeight, u16 destX, u16 destY, u16 rectWidth, u16 rectHeight, u8 colorKey)
-{
-    struct Bitmap sourceRect;
-    struct Bitmap destRect;
-
-    sourceRect.pixels = (u8 *)pixels;
-    sourceRect.width = srcWidth;
-    sourceRect.height = srcHeight;
-
-    destRect.pixels = gWindows[windowId].tileData;
-    destRect.width = 8 * gWindows[windowId].window.width;
-    destRect.height = 8 * gWindows[windowId].window.height;
-
-    BlitBitmapRect4Bit(&sourceRect, &destRect, srcX, srcY, destX, destY, rectWidth, rectHeight, colorKey);
-}
-
 void FillWindowPixelRect(u32 windowId, u8 fillValue, u16 x, u16 y, u16 width, u16 height)
 {
     struct Bitmap pixelRect;
@@ -457,7 +442,7 @@ void CopyToWindowPixelBuffer(u32 windowId, const void *src, u16 size, u16 tileOf
     if (size != 0)
         CpuCopy16(src, gWindows[windowId].tileData + (32 * tileOffset), size);
     else
-        LZ77UnCompWram(src, gWindows[windowId].tileData + (32 * tileOffset));
+        DecompressDataWithHeaderWram(src, gWindows[windowId].tileData + (32 * tileOffset));
 }
 
 // Sets all pixels within the window to the fillValue color.

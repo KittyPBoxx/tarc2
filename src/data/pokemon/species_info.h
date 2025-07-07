@@ -147,8 +147,6 @@ const struct SpeciesInfo gSpeciesInfo[] =
         },
     #endif
         .levelUpLearnset = sNoneLevelUpLearnset,
-        .teachableLearnset = sNoneTeachableLearnset,
-        .eggMoveLearnset = sNoneEggMoveLearnset,
     },
 
     #include "species_info/gen_1_families.h"
@@ -239,9 +237,6 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .iconPalIndex = 0,
         FOOTPRINT(QuestionMark)
         .levelUpLearnset = sNoneLevelUpLearnset,
-        .teachableLearnset = sNoneTeachableLearnset,
-        .evolutions = EVOLUTION({EVO_LEVEL, 100, SPECIES_NONE},
-                                {EVO_ITEM, ITEM_MOOMOO_MILK, SPECIES_NONE}),
         //.formSpeciesIdTable = sNoneFormSpeciesIdTable,
         //.formChangeTable = sNoneFormChangeTable,
         //.perfectIVCount = NUM_STATS,

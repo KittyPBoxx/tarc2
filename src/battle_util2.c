@@ -4,7 +4,6 @@
 #include "battle_controllers.h"
 #include "malloc.h"
 #include "pokemon.h"
-#include "trainer_hill.h"
 #include "party_menu.h"
 #include "event_data.h"
 #include "constants/abilities.h"
@@ -14,9 +13,6 @@
 
 void AllocateBattleResources(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
-        InitTrainerHillBattleStruct();
-
     gBattleStruct = AllocZeroed(sizeof(*gBattleStruct));
     gAiBattleData = AllocZeroed(sizeof(*gAiBattleData));
     gAiThinkingStruct = AllocZeroed(sizeof(*gAiThinkingStruct));
@@ -24,12 +20,7 @@ void AllocateBattleResources(void)
     gAiPartyData = AllocZeroed(sizeof(*gAiPartyData));
     gBattleHistory = AllocZeroed(sizeof(*gBattleHistory));
 
-#if B_FLAG_SKY_BATTLE
-    gBattleStruct->isSkyBattle = FlagGet(B_FLAG_SKY_BATTLE);
-#endif
-
     gBattleResources = AllocZeroed(sizeof(*gBattleResources));
-    gBattleResources->secretBase = AllocZeroed(sizeof(*gBattleResources->secretBase));
     gBattleResources->battleScriptsStack = AllocZeroed(sizeof(*gBattleResources->battleScriptsStack));
     gBattleResources->battleCallbackStack = AllocZeroed(sizeof(*gBattleResources->battleCallbackStack));
     gBattleResources->beforeLvlUp = AllocZeroed(sizeof(*gBattleResources->beforeLvlUp));
@@ -39,19 +30,10 @@ void AllocateBattleResources(void)
 
     gBattleAnimBgTileBuffer = AllocZeroed(0x2000);
     gBattleAnimBgTilemapBuffer = AllocZeroed(0x1000);
-
-    if (gBattleTypeFlags & BATTLE_TYPE_SECRET_BASE)
-    {
-        u16 currSecretBaseId = VarGet(VAR_CURRENT_SECRET_BASE);
-        CreateSecretBaseEnemyParty(&gSaveBlock1Ptr->secretBases[currSecretBaseId]);
-    }
 }
 
 void FreeBattleResources(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
-        FreeTrainerHillBattleStruct();
-
     gFieldStatuses = 0;
     if (gBattleResources != NULL)
     {

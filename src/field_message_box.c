@@ -3,7 +3,6 @@
 #include "string_util.h"
 #include "task.h"
 #include "text.h"
-#include "match_call.h"
 #include "field_message_box.h"
 #include "text_window.h"
 #include "script.h"
@@ -74,24 +73,9 @@ bool8 ShowFieldMessage(const u8 *str)
     return TRUE;
 }
 
-static void Task_HidePokenavMessageWhenDone(u8 taskId)
-{
-    if (!IsMatchCallTaskActive())
-    {
-        sFieldMessageBoxMode = FIELD_MESSAGE_BOX_HIDDEN;
-        DestroyTask(taskId);
-    }
-}
-
 bool8 ShowPokenavFieldMessage(const u8 *str)
 {
-    if (sFieldMessageBoxMode != FIELD_MESSAGE_BOX_HIDDEN)
-        return FALSE;
-    StringExpandPlaceholders(gStringVar4, str);
-    CreateTask(Task_HidePokenavMessageWhenDone, 0);
-    StartMatchCallFromScript(str);
-    sFieldMessageBoxMode = FIELD_MESSAGE_BOX_NORMAL;
-    return TRUE;
+    return FALSE;
 }
 
 bool8 ShowFieldAutoScrollMessage(const u8 *str)
@@ -100,13 +84,6 @@ bool8 ShowFieldAutoScrollMessage(const u8 *str)
         return FALSE;
     sFieldMessageBoxMode = FIELD_MESSAGE_BOX_AUTO_SCROLL;
     ExpandStringAndStartDrawFieldMessage(str, FALSE);
-    return TRUE;
-}
-
-static bool8 UNUSED ForceShowFieldAutoScrollMessage(const u8 *str)
-{
-    sFieldMessageBoxMode = FIELD_MESSAGE_BOX_AUTO_SCROLL;
-    ExpandStringAndStartDrawFieldMessage(str, TRUE);
     return TRUE;
 }
 
@@ -151,13 +128,6 @@ bool8 IsFieldMessageBoxHidden(void)
     if (sFieldMessageBoxMode == FIELD_MESSAGE_BOX_HIDDEN)
         return TRUE;
     return FALSE;
-}
-
-static void UNUSED ReplaceFieldMessageWithFrame(void)
-{
-    DestroyTask_DrawFieldMessage();
-    DrawStdWindowFrame(0, TRUE);
-    sFieldMessageBoxMode = FIELD_MESSAGE_BOX_HIDDEN;
 }
 
 void StopFieldMessage(void)

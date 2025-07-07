@@ -10,7 +10,6 @@
 #include "item.h"
 #include "palette.h"
 #include "pokemon.h"
-#include "safari_zone.h"
 #include "sprite.h"
 #include "util.h"
 #include "constants/abilities.h"

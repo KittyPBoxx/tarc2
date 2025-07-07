@@ -1,5 +1,4 @@
 #include "global.h"
-#include "bike.h"
 #include "clock.h"
 #include "event_data.h"
 #include "field_camera.h"
@@ -13,13 +12,13 @@
 #include "metatile_behavior.h"
 #include "overworld.h"
 #include "script.h"
-#include "secret_base.h"
 #include "sound.h"
 #include "task.h"
 #include "constants/field_tasks.h"
 #include "constants/items.h"
 #include "constants/songs.h"
 #include "constants/metatile_labels.h"
+#include "field_control_avatar.h"
 
 /*  This file handles some persistent tasks that run in the overworld.
  *  - Task_RunTimeBasedEvents: Periodically updates local time and RTC events. Also triggers ambient cries.
@@ -30,8 +29,6 @@
  *      . FortreeBridgePerStepCallback: Depresses Fortree log bridges that the player steps on.
  *      . PacifidlogBridgePerStepCallback: Submerges Pacifidlog log bridges that the player steps on.
  *      . SootopolisGymIcePerStepCallback: Cracks/breaks ice in Sootopolis Gym that the player steps on.
- *      . EndTruckSequence: Sets the moving truck boxes to their final position when the truck sequence ends.
- *      . SecretBasePerStepCallback: Records the decorations in a friend's secret base that the player steps on.
  *      . CrackedFloorPerStepCallback: Breaks cracked floors that the player steps on.
  *
  *  NOTE: "PerStep" is perhaps misleading. One function in sPerStepCallbacks is called
@@ -63,8 +60,6 @@ static const TaskFunc sPerStepCallbacks[] =
     [STEP_CB_FORTREE_BRIDGE]    = FortreeBridgePerStepCallback,
     [STEP_CB_PACIFIDLOG_BRIDGE] = PacifidlogBridgePerStepCallback,
     [STEP_CB_SOOTOPOLIS_ICE]    = SootopolisGymIcePerStepCallback,
-    [STEP_CB_TRUCK]             = EndTruckSequence,
-    [STEP_CB_SECRET_BASE]       = SecretBasePerStepCallback,
     [STEP_CB_CRACKED_FLOOR]     = CrackedFloorPerStepCallback
 };
 

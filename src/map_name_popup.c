@@ -1,5 +1,4 @@
 #include "global.h"
-#include "battle_pyramid.h"
 #include "bg.h"
 #include "event_data.h"
 #include "field_weather.h"
@@ -10,15 +9,12 @@
 #include "menu.h"
 #include "map_name_popup.h"
 #include "palette.h"
-#include "region_map.h"
 #include "rtc.h"
 #include "start_menu.h"
 #include "string_util.h"
 #include "task.h"
 #include "text.h"
-#include "constants/battle_frontier.h"
 #include "constants/layouts.h"
-#include "constants/region_map_sections.h"
 #include "constants/weather.h"
 #include "config/general.h"
 #include "config/overworld.h"
@@ -41,9 +37,9 @@ enum MapPopUp_Themes_BW
 
 // static functions
 static void Task_MapNamePopUpWindow(u8 taskId);
-static void UpdateSecondaryPopUpWindow(u8 secondaryPopUpWindowId);
+//static void UpdateSecondaryPopUpWindow(u8 secondaryPopUpWindowId);
 static void ShowMapNamePopUpWindow(void);
-static void LoadMapNamePopUpWindowBg(void);
+//static void LoadMapNamePopUpWindowBg(void);
 
 // EWRAM
 EWRAM_DATA u8 gPopupTaskId = 0;
@@ -313,33 +309,6 @@ static const u8 sRegionMapSectionId_To_PopUpThemeIdMapping_BW[] =
     [MAPSEC_TRAINER_HILL - KANTO_MAPSEC_COUNT] = MAPPOPUP_THEME_BW_DEFAULT,
 };
 
-static const u8 sText_PyramidFloor1[] = _("PYRAMID FLOOR 1");
-static const u8 sText_PyramidFloor2[] = _("PYRAMID FLOOR 2");
-static const u8 sText_PyramidFloor3[] = _("PYRAMID FLOOR 3");
-static const u8 sText_PyramidFloor4[] = _("PYRAMID FLOOR 4");
-static const u8 sText_PyramidFloor5[] = _("PYRAMID FLOOR 5");
-static const u8 sText_PyramidFloor6[] = _("PYRAMID FLOOR 6");
-static const u8 sText_PyramidFloor7[] = _("PYRAMID FLOOR 7");
-static const u8 sText_Pyramid[] = _("PYRAMID");
-
-static const u8 *const sBattlePyramid_MapHeaderStrings[FRONTIER_STAGES_PER_CHALLENGE + 1] =
-{
-    sText_PyramidFloor1,
-    sText_PyramidFloor2,
-    sText_PyramidFloor3,
-    sText_PyramidFloor4,
-    sText_PyramidFloor5,
-    sText_PyramidFloor6,
-    sText_PyramidFloor7,
-    sText_Pyramid,
-};
-
-static bool8 UNUSED StartMenu_ShowMapNamePopup(void)
-{
-    HideStartMenu();
-    ShowMapNamePopup();
-    return TRUE;
-}
 
 // States and data defines for Task_MapNamePopUpWindow
 enum {
@@ -504,79 +473,61 @@ void HideMapNamePopUpWindow(void)
     }
 }
 
-static void UpdateSecondaryPopUpWindow(u8 secondaryPopUpWindowId)
-{
-    u8 mapDisplayHeader[24];
-    u8 *withoutPrefixPtr = &(mapDisplayHeader[0]);
+// static void UpdateSecondaryPopUpWindow(u8 secondaryPopUpWindowId)
+// {
+//     u8 mapDisplayHeader[24];
+//     u8 *withoutPrefixPtr = &(mapDisplayHeader[0]);
 
-    if (OW_POPUP_BW_TIME_MODE != OW_POPUP_BW_TIME_NONE)
-    {
-        RtcCalcLocalTime();
-        FormatDecimalTimeWithoutSeconds(withoutPrefixPtr, gLocalTime.hours, gLocalTime.minutes, OW_POPUP_BW_TIME_MODE == OW_POPUP_BW_TIME_24_HR);
-        AddTextPrinterParameterized(secondaryPopUpWindowId, FONT_SMALL, mapDisplayHeader, GetStringRightAlignXOffset(FONT_SMALL, mapDisplayHeader, DISPLAY_WIDTH) - 5, 8, TEXT_SKIP_DRAW, NULL);
-    }
-    CopyWindowToVram(secondaryPopUpWindowId, COPYWIN_FULL);
-}
+//     if (OW_POPUP_BW_TIME_MODE != OW_POPUP_BW_TIME_NONE)
+//     {
+//         RtcCalcLocalTime();
+//         FormatDecimalTimeWithoutSeconds(withoutPrefixPtr, gLocalTime.hours, gLocalTime.minutes, OW_POPUP_BW_TIME_MODE == OW_POPUP_BW_TIME_24_HR);
+//         AddTextPrinterParameterized(secondaryPopUpWindowId, FONT_SMALL, mapDisplayHeader, GetStringRightAlignXOffset(FONT_SMALL, mapDisplayHeader, DISPLAY_WIDTH) - 5, 8, TEXT_SKIP_DRAW, NULL);
+//     }
+//     CopyWindowToVram(secondaryPopUpWindowId, COPYWIN_FULL);
+// }
 
 static void ShowMapNamePopUpWindow(void)
 {
-    u8 mapDisplayHeader[24];
-    u8 *withoutPrefixPtr;
-    u8 x;
-    const u8 *mapDisplayHeaderSource;
-    u8 mapNamePopUpWindowId, secondaryPopUpWindowId;
+    // u8 mapDisplayHeader[24];
+    // u8 *withoutPrefixPtr;
+    // u8 x;
+    // u8 mapNamePopUpWindowId, secondaryPopUpWindowId;
 
-    if (InBattlePyramid())
-    {
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP)
-        {
-            withoutPrefixPtr = &(mapDisplayHeader[3]);
-            mapDisplayHeaderSource = sBattlePyramid_MapHeaderStrings[FRONTIER_STAGES_PER_CHALLENGE];
-        }
-        else
-        {
-            withoutPrefixPtr = &(mapDisplayHeader[3]);
-            mapDisplayHeaderSource = sBattlePyramid_MapHeaderStrings[gSaveBlock2Ptr->frontier.curChallengeBattleNum];
-        }
-        StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
-    }
-    else
-    {
-        withoutPrefixPtr = &(mapDisplayHeader[3]);
-        GetMapName(withoutPrefixPtr, gMapHeader.regionMapSectionId, 0);
-    }
+    // withoutPrefixPtr = &(mapDisplayHeader[3]);
+    // GetMapName(withoutPrefixPtr, gMapHeader.regionMapSectionId, 0);
 
-    if (OW_POPUP_GENERATION == GEN_5)
-    {
-        if (OW_POPUP_BW_ALPHA_BLEND && !IsWeatherAlphaBlend())
-            SetGpuRegBits(REG_OFFSET_WININ, WININ_WIN0_CLR);
+    // if (OW_POPUP_GENERATION == GEN_5)
+    // {
+    //     if (OW_POPUP_BW_ALPHA_BLEND && !IsWeatherAlphaBlend())
+    //         SetGpuRegBits(REG_OFFSET_WININ, WININ_WIN0_CLR);
 
-        mapNamePopUpWindowId = AddMapNamePopUpWindow();
-        secondaryPopUpWindowId = AddSecondaryPopUpWindow();
-    }
-    else
-    {
-        AddMapNamePopUpWindow();
-    }
+    //     mapNamePopUpWindowId = AddMapNamePopUpWindow();
+    //     secondaryPopUpWindowId = AddSecondaryPopUpWindow();
+    // }
+    // else
+    // {
+    //     AddMapNamePopUpWindow();
+    // }
 
-    LoadMapNamePopUpWindowBg();
+    // LoadMapNamePopUpWindowBg();
 
-    mapDisplayHeader[0] = EXT_CTRL_CODE_BEGIN;
-    mapDisplayHeader[1] = EXT_CTRL_CODE_HIGHLIGHT;
-    mapDisplayHeader[2] = TEXT_COLOR_TRANSPARENT;
+    // mapDisplayHeader[0] = EXT_CTRL_CODE_BEGIN;
+    // mapDisplayHeader[1] = EXT_CTRL_CODE_HIGHLIGHT;
+    // mapDisplayHeader[2] = TEXT_COLOR_TRANSPARENT;
 
-    if (OW_POPUP_GENERATION == GEN_5)
-    {
-        AddTextPrinterParameterized(mapNamePopUpWindowId, FONT_SHORT, mapDisplayHeader, 8, 2, TEXT_SKIP_DRAW, NULL);
-        CopyWindowToVram(mapNamePopUpWindowId, COPYWIN_FULL);
-        UpdateSecondaryPopUpWindow(secondaryPopUpWindowId);
-    }
-    else
-    {
-        x = GetStringCenterAlignXOffset(FONT_NARROW, withoutPrefixPtr, 80);
-        AddTextPrinterParameterized(GetMapNamePopUpWindowId(), FONT_NARROW, mapDisplayHeader, x, 3, TEXT_SKIP_DRAW, NULL);
-        CopyWindowToVram(GetMapNamePopUpWindowId(), COPYWIN_FULL);
-    }
+    // if (OW_POPUP_GENERATION == GEN_5)
+    // {
+    //     AddTextPrinterParameterized(mapNamePopUpWindowId, FONT_SHORT, mapDisplayHeader, 8, 2, TEXT_SKIP_DRAW, NULL);
+    //     CopyWindowToVram(mapNamePopUpWindowId, COPYWIN_FULL);
+    //     UpdateSecondaryPopUpWindow(secondaryPopUpWindowId);
+    // }
+    // else
+    // {
+    //     x = GetStringCenterAlignXOffset(FONT_NARROW, withoutPrefixPtr, 80);
+    //     AddTextPrinterParameterized(GetMapNamePopUpWindowId(), FONT_NARROW, mapDisplayHeader, x, 3, TEXT_SKIP_DRAW, NULL);
+    //     CopyWindowToVram(GetMapNamePopUpWindowId(), COPYWIN_FULL);
+    // }
 }
 
 #define TILE_TOP_EDGE_START 0x21D
@@ -590,75 +541,75 @@ static void ShowMapNamePopUpWindow(void)
 #define TILE_BOT_EDGE_START 0x22F
 #define TILE_BOT_EDGE_END   0x23A
 
-static void DrawMapNamePopUpFrame(u8 bg, u8 x, u8 y, u8 deltaX, u8 deltaY, u8 unused)
-{
-    s32 i;
+// static void DrawMapNamePopUpFrame(u8 bg, u8 x, u8 y, u8 deltaX, u8 deltaY, u8 unused)
+// {
+//     s32 i;
 
-    // Draw top edge
-    for (i = 0; i < 1 + TILE_TOP_EDGE_END - TILE_TOP_EDGE_START; i++)
-        FillBgTilemapBufferRect(bg, TILE_TOP_EDGE_START + i, i - 1 + x, y - 1, 1, 1, 14);
+//     // Draw top edge
+//     for (i = 0; i < 1 + TILE_TOP_EDGE_END - TILE_TOP_EDGE_START; i++)
+//         FillBgTilemapBufferRect(bg, TILE_TOP_EDGE_START + i, i - 1 + x, y - 1, 1, 1, 14);
 
-    // Draw sides
-    FillBgTilemapBufferRect(bg, TILE_LEFT_EDGE_TOP,       x - 1,     y, 1, 1, 14);
-    FillBgTilemapBufferRect(bg, TILE_RIGHT_EDGE_TOP, deltaX + x,     y, 1, 1, 14);
-    FillBgTilemapBufferRect(bg, TILE_LEFT_EDGE_MID,       x - 1, y + 1, 1, 1, 14);
-    FillBgTilemapBufferRect(bg, TILE_RIGHT_EDGE_MID, deltaX + x, y + 1, 1, 1, 14);
-    FillBgTilemapBufferRect(bg, TILE_LEFT_EDGE_BOT,       x - 1, y + 2, 1, 1, 14);
-    FillBgTilemapBufferRect(bg, TILE_RIGHT_EDGE_BOT, deltaX + x, y + 2, 1, 1, 14);
+//     // Draw sides
+//     FillBgTilemapBufferRect(bg, TILE_LEFT_EDGE_TOP,       x - 1,     y, 1, 1, 14);
+//     FillBgTilemapBufferRect(bg, TILE_RIGHT_EDGE_TOP, deltaX + x,     y, 1, 1, 14);
+//     FillBgTilemapBufferRect(bg, TILE_LEFT_EDGE_MID,       x - 1, y + 1, 1, 1, 14);
+//     FillBgTilemapBufferRect(bg, TILE_RIGHT_EDGE_MID, deltaX + x, y + 1, 1, 1, 14);
+//     FillBgTilemapBufferRect(bg, TILE_LEFT_EDGE_BOT,       x - 1, y + 2, 1, 1, 14);
+//     FillBgTilemapBufferRect(bg, TILE_RIGHT_EDGE_BOT, deltaX + x, y + 2, 1, 1, 14);
 
-    // Draw bottom edge
-    for (i = 0; i < 1 + TILE_BOT_EDGE_END - TILE_BOT_EDGE_START; i++)
-        FillBgTilemapBufferRect(bg, TILE_BOT_EDGE_START + i, i - 1 + x, y + deltaY, 1, 1, 14);
-}
+//     // Draw bottom edge
+//     for (i = 0; i < 1 + TILE_BOT_EDGE_END - TILE_BOT_EDGE_START; i++)
+//         FillBgTilemapBufferRect(bg, TILE_BOT_EDGE_START + i, i - 1 + x, y + deltaY, 1, 1, 14);
+// }
 
-static void LoadMapNamePopUpWindowBg(void)
-{
-    u8 popUpThemeId;
-    u8 popupWindowId = GetMapNamePopUpWindowId();
-    u16 regionMapSectionId = gMapHeader.regionMapSectionId;
-    u8 secondaryPopUpWindowId;
+// static void LoadMapNamePopUpWindowBg(void)
+// {
+//     u8 popUpThemeId;
+//     u8 popupWindowId = GetMapNamePopUpWindowId();
+//     u16 regionMapSectionId = gMapHeader.regionMapSectionId;
+//     u8 secondaryPopUpWindowId;
 
-    if (OW_POPUP_GENERATION == GEN_5)
-        secondaryPopUpWindowId = GetSecondaryPopUpWindowId();
+//     if (OW_POPUP_GENERATION == GEN_5)
+//         secondaryPopUpWindowId = GetSecondaryPopUpWindowId();
 
-    if (regionMapSectionId >= KANTO_MAPSEC_START)
-    {
-        if (regionMapSectionId > KANTO_MAPSEC_END)
-            regionMapSectionId -= KANTO_MAPSEC_COUNT;
-        else
-            regionMapSectionId = 0; // Discard kanto region sections;
-    }
+//     if (regionMapSectionId >= KANTO_MAPSEC_START)
+//     {
+//         if (regionMapSectionId > KANTO_MAPSEC_END)
+//             regionMapSectionId -= KANTO_MAPSEC_COUNT;
+//         else
+//             regionMapSectionId = 0; // Discard kanto region sections;
+//     }
 
-    if (OW_POPUP_GENERATION == GEN_5)
-    {
-        popUpThemeId = sRegionMapSectionId_To_PopUpThemeIdMapping_BW[regionMapSectionId];
-        switch (popUpThemeId)
-        {
-            // add additional gen 5-style pop-up themes as cases here
-            default: // MAPPOPUP_THEME_BW_DEFAULT
-                if (OW_POPUP_BW_COLOR == OW_POPUP_BW_COLOR_WHITE)
-                    LoadPalette(sMapPopUpTilesPalette_BW_White, BG_PLTT_ID(14), sizeof(sMapPopUpTilesPalette_BW_White));
-                else
-                    LoadPalette(sMapPopUpTilesPalette_BW_Black, BG_PLTT_ID(14), sizeof(sMapPopUpTilesPalette_BW_Black));
+//     if (OW_POPUP_GENERATION == GEN_5)
+//     {
+//         popUpThemeId = sRegionMapSectionId_To_PopUpThemeIdMapping_BW[regionMapSectionId];
+//         switch (popUpThemeId)
+//         {
+//             // add additional gen 5-style pop-up themes as cases here
+//             default: // MAPPOPUP_THEME_BW_DEFAULT
+//                 if (OW_POPUP_BW_COLOR == OW_POPUP_BW_COLOR_WHITE)
+//                     LoadPalette(sMapPopUpTilesPalette_BW_White, BG_PLTT_ID(14), sizeof(sMapPopUpTilesPalette_BW_White));
+//                 else
+//                     LoadPalette(sMapPopUpTilesPalette_BW_Black, BG_PLTT_ID(14), sizeof(sMapPopUpTilesPalette_BW_Black));
 
-                CopyToWindowPixelBuffer(popupWindowId, sMapPopUpTilesPrimary_BW, sizeof(sMapPopUpTilesPrimary_BW), 0);
-                CopyToWindowPixelBuffer(secondaryPopUpWindowId, sMapPopUpTilesSecondary_BW, sizeof(sMapPopUpTilesSecondary_BW), 0);
-                break;
-        }
+//                 CopyToWindowPixelBuffer(popupWindowId, sMapPopUpTilesPrimary_BW, sizeof(sMapPopUpTilesPrimary_BW), 0);
+//                 CopyToWindowPixelBuffer(secondaryPopUpWindowId, sMapPopUpTilesSecondary_BW, sizeof(sMapPopUpTilesSecondary_BW), 0);
+//                 break;
+//         }
 
-        PutWindowTilemap(popupWindowId);
-        PutWindowTilemap(secondaryPopUpWindowId);
-    }
-    else
-    {
-        popUpThemeId = sMapSectionToThemeId[regionMapSectionId];
-        LoadBgTiles(GetWindowAttribute(popupWindowId, WINDOW_BG), sMapPopUp_OutlineTable[popUpThemeId], 0x400, 0x21D);
-        CallWindowFunction(popupWindowId, DrawMapNamePopUpFrame);
-        PutWindowTilemap(popupWindowId);
-        if (gMapHeader.weather == WEATHER_UNDERWATER_BUBBLES)
-            LoadPalette(&sMapPopUp_Palette_Underwater, BG_PLTT_ID(14), sizeof(sMapPopUp_Palette_Underwater));
-        else
-            LoadPalette(sMapPopUp_PaletteTable[popUpThemeId], BG_PLTT_ID(14), sizeof(sMapPopUp_PaletteTable[0]));
-        BlitBitmapToWindow(popupWindowId, sMapPopUp_Table[popUpThemeId], 0, 0, 80, 24);
-    }
-}
+//         PutWindowTilemap(popupWindowId);
+//         PutWindowTilemap(secondaryPopUpWindowId);
+//     }
+//     else
+//     {
+//         popUpThemeId = sMapSectionToThemeId[regionMapSectionId];
+//         LoadBgTiles(GetWindowAttribute(popupWindowId, WINDOW_BG), sMapPopUp_OutlineTable[popUpThemeId], 0x400, 0x21D);
+//         CallWindowFunction(popupWindowId, DrawMapNamePopUpFrame);
+//         PutWindowTilemap(popupWindowId);
+//         if (gMapHeader.weather == WEATHER_UNDERWATER_BUBBLES)
+//             LoadPalette(&sMapPopUp_Palette_Underwater, BG_PLTT_ID(14), sizeof(sMapPopUp_Palette_Underwater));
+//         else
+//             LoadPalette(sMapPopUp_PaletteTable[popUpThemeId], BG_PLTT_ID(14), sizeof(sMapPopUp_PaletteTable[0]));
+//         BlitBitmapToWindow(popupWindowId, sMapPopUp_Table[popUpThemeId], 0, 0, 80, 24);
+//     }
+// }

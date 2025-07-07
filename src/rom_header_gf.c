@@ -1,7 +1,6 @@
 #include "global.h"
 #include "battle_main.h"
 #include "data.h"
-#include "decoration.h"
 #include "item.h"
 #include "move.h"
 #include "pokeball.h"
@@ -30,7 +29,6 @@ struct GFRomHeader
     const struct SpritePalette *monIconPalettes;
     const u8 (*monSpeciesNames)[];
     const u8 (*moveNames)[];
-    const struct Decoration *decorations;
     u32 flagsOffset;
     u32 varsOffset;
     u32 pokedexOffset;
@@ -65,8 +63,6 @@ struct GFRomHeader
     u32 trainerIdOffset;
     u32 playerNameOffset;
     u32 playerGenderOffset;
-    u32 frontierStatusOffset;
-    u32 frontierStatusOffset2;
     u32 externalEventFlagsOffset;
     u32 externalEventDataOffset;
     u32 unk18;
@@ -88,10 +84,6 @@ struct GFRomHeader
     u8 pcItemsCount;
     u32 pcItemsOffset;
     u32 giftRibbonsOffset;
-#if FREE_ENIGMA_BERRY == FALSE
-    u32 enigmaBerryOffset;
-    u32 enigmaBerrySize;
-#endif //FREE_ENIGMA_BERRY
     const u8 *moveDescriptions;
     u32 unk20;
 };
@@ -112,12 +104,8 @@ static const struct GFRomHeader sGFRomHeader = {
     .monIconPalettes = gMonIconPaletteTable,
     //.monSpeciesNames = gSpeciesNames, // Handled in gSpeciesInfo
     //.moveNames = gMoveNames, // Handled in gMovesInfo
-    .decorations = gDecorations,
     .flagsOffset = offsetof(struct SaveBlock1, flags),
     .varsOffset = offsetof(struct SaveBlock1, vars),
-    .pokedexOffset = offsetof(struct SaveBlock2, pokedex),
-    .seen1Offset = offsetof(struct SaveBlock1, dexSeen),
-    .seen2Offset = offsetof(struct SaveBlock1, dexSeen), // dex flags are combined, just provide the same pointer
     .pokedexVar = VAR_NATIONAL_DEX - VARS_START,
     .pokedexFlag = FLAG_RECEIVED_POKEDEX_FROM_BIRCH,
     .mysteryEventFlag = FLAG_SYS_MYSTERY_EVENT_ENABLE,
@@ -148,19 +136,12 @@ static const struct GFRomHeader sGFRomHeader = {
     .trainerIdOffset = offsetof(struct SaveBlock2, playerTrainerId),
     .playerNameOffset = offsetof(struct SaveBlock2, playerName),
     .playerGenderOffset = offsetof(struct SaveBlock2, playerGender),
-    .frontierStatusOffset = offsetof(struct SaveBlock2, frontier.challengeStatus),
-    .frontierStatusOffset2 = offsetof(struct SaveBlock2, frontier.challengeStatus),
-    .externalEventFlagsOffset = offsetof(struct SaveBlock1, externalEventFlags),
-    .externalEventDataOffset = offsetof(struct SaveBlock1, externalEventData),
     .unk18 = 0x00000000,
     .speciesInfo = gSpeciesInfo,
-    //.abilityNames = gAbilityNames, //handled in gAbilitiesInfo
-    //.abilityDescriptions = gAbilityDescriptionPointers, //handled in gAbilitiesInfo
     .items = gItemsInfo,
     .moves = gMovesInfo,
     .ballGfx = gBallSpriteSheets,
     .ballPalettes = gBallSpritePalettes,
-    .gcnLinkFlagsOffset = offsetof(struct SaveBlock2, gcnLinkFlags),
     .gameClearFlag = FLAG_SYS_GAME_CLEAR,
     .ribbonFlag = FLAG_SYS_RIBBON_GET,
     .bagCountItems = BAG_ITEMS_COUNT,
@@ -170,11 +151,6 @@ static const struct GFRomHeader sGFRomHeader = {
     .bagCountBerries = BAG_BERRIES_COUNT,
     .pcItemsCount = PC_ITEMS_COUNT,
     .pcItemsOffset = offsetof(struct SaveBlock1, pcItems),
-    .giftRibbonsOffset = offsetof(struct SaveBlock1, giftRibbons),
-#if FREE_ENIGMA_BERRY == FALSE
-    .enigmaBerryOffset = offsetof(struct SaveBlock1, enigmaBerry),
-    .enigmaBerrySize = sizeof(struct EnigmaBerry),
-#endif //FREE_ENIGMA_BERRY
     .moveDescriptions = NULL,
     .unk20 = 0x00000000, // 0xFFFFFFFF in FRLG
 };

@@ -1,6 +1,5 @@
 #include "global.h"
 #include "graphics.h"
-#include "mail.h"
 #include "palette.h"
 #include "pokemon_sprite_visualizer.h"
 #include "pokemon_icon.h"
@@ -203,9 +202,6 @@ u16 GetUnownLetterByPersonality(u32 personality)
 u16 GetIconSpeciesNoPersonality(u16 species)
 {
     species = SanitizeSpeciesId(species);
-
-    if (MailSpeciesToSpecies(species, &species) == SPECIES_UNOWN)
-        return species += SPECIES_UNOWN_B; // TODO
     return GetIconSpecies(species, 0);
 }
 

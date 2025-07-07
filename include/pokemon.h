@@ -8,7 +8,6 @@
 #include "constants/region_map_sections.h"
 #include "constants/map_groups.h"
 #include "constants/battle.h"
-#include "contest_effect.h"
 
 #define GET_BASE_SPECIES_ID(speciesId) (GetFormSpeciesId(speciesId, 0))
 #define FORM_SPECIES_END (0xffff)
@@ -470,9 +469,6 @@ struct SpeciesInfo /*0xC4*/
     u16 padding5:12;
     // Move Data
     const struct LevelUpMove *levelUpLearnset;
-    const u16 *teachableLearnset;
-    const u16 *eggMoveLearnset;
-    const struct Evolution *evolutions;
     const u16 *formSpeciesIdTable;
     const struct FormChange *formChangeTable;
 #if OW_POKEMON_OBJECT_EVENTS
@@ -558,7 +554,6 @@ struct NatureInfo
     u8 statUp;
     u8 statDown;
     u8 backAnim;
-    u8 pokeBlockAnim[2];
     u8 battlePalacePercents[4];
     u8 battlePalaceFlavorText;
     u8 battlePalaceSmokescreen;
@@ -614,7 +609,7 @@ extern const struct Fusion *const gFusionTablePointers[NUM_SPECIES];
 #define GET_SHINY_VALUE(otId, personality) (HIHALF(otId) ^ LOHALF(otId) ^ HIHALF(personality) ^ LOHALF(personality))
 
 extern u8 gPlayerPartyCount;
-extern struct Pokemon gPlayerParty[PARTY_SIZE];
+extern struct Pokemon gPlayerParty[PLAYER_PARTY_SIZE];
 extern u8 gEnemyPartyCount;
 extern struct Pokemon gEnemyParty[PARTY_SIZE];
 extern struct SpriteTemplate gMultiuseSpriteTemplate;
@@ -652,11 +647,7 @@ void CreateMaleMon(struct Pokemon *mon, u16 species, u8 level);
 void CreateMonWithIVsPersonality(struct Pokemon *mon, u16 species, u8 level, u32 ivs, u32 personality);
 void CreateMonWithIVsOTID(struct Pokemon *mon, u16 species, u8 level, u8 *ivs, u32 otId);
 void CreateMonWithEVSpread(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 evSpread);
-void CreateBattleTowerMon(struct Pokemon *mon, struct BattleTowerPokemon *src);
-void CreateBattleTowerMon_HandleLevel(struct Pokemon *mon, struct BattleTowerPokemon *src, bool8 lvl50);
-void CreateApprenticeMon(struct Pokemon *mon, const struct Apprentice *src, u8 monId);
 void CreateMonWithEVSpreadNatureOTID(struct Pokemon *mon, u16 species, u8 level, u8 nature, u8 fixedIV, u8 evSpread, u32 otId);
-void ConvertPokemonToBattleTowerPokemon(struct Pokemon *mon, struct BattleTowerPokemon *dest);
 bool8 ShouldIgnoreDeoxysForm(u8 caseId, u8 battler);
 u16 GetUnionRoomTrainerPic(void);
 u16 GetUnionRoomTrainerClass(void);
@@ -711,20 +702,15 @@ u8 GetMonsStateToDoubles(void);
 u8 GetMonsStateToDoubles_2(void);
 u16 GetAbilityBySpecies(u16 species, u8 abilityNum);
 u16 GetMonAbility(struct Pokemon *mon);
-void CreateSecretBaseEnemyParty(struct SecretBase *secretBaseRecord);
 u8 GetSecretBaseTrainerPicIndex(void);
 u8 GetSecretBaseTrainerClass(void);
 bool8 IsPlayerPartyAndPokemonStorageFull(void);
-bool8 IsPokemonStorageFull(void);
 const u8 *GetSpeciesName(u16 species);
 const u8 *GetSpeciesCategory(u16 species);
 const u8 *GetSpeciesPokedexDescription(u16 species);
 u16 GetSpeciesHeight(u16 species);
 u16 GetSpeciesWeight(u16 species);
 const struct LevelUpMove *GetSpeciesLevelUpLearnset(u16 species);
-const u16 *GetSpeciesTeachableLearnset(u16 species);
-const u16 *GetSpeciesEggMoves(u16 species);
-const struct Evolution *GetSpeciesEvolutions(u16 species);
 const u16 *GetSpeciesFormTable(u16 species);
 const struct FormChange *GetSpeciesFormChanges(u16 species);
 u8 CalculatePPWithBonus(u16 move, u8 ppBonuses, u8 moveIndex);

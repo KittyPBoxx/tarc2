@@ -2,7 +2,6 @@
 #include "test/test.h"
 #include "test/overworld_script.h"
 #include "script.h"
-#include "constants/decorations.h"
 #include "constants/moves.h"
 
 TEST("Script_HasNoEffect control flow")
@@ -51,7 +50,6 @@ TEST("Script_HasNoEffect variables")
         checkmoney 5000;
         getpokenewsactive POKENEWS_LILYCOVE;
         checkplayergender;
-        checkcoins VAR_RESULT;
         checkmodernfatefulencounter 0;
         end;
     );
@@ -98,11 +96,6 @@ TEST("Script_HasNoEffect variables")
         end;
     );
 
-    const u8 *checkCoinsVariable = OVERWORLD_SCRIPT(
-        checkcoins VAR_TEMP_0;
-        end;
-    );
-
     EXPECT(Script_HasNoEffect(writeSpecial));
     EXPECT(!Script_HasNoEffect(setVariable));
     EXPECT(!Script_HasNoEffect(addVariable));
@@ -112,5 +105,4 @@ TEST("Script_HasNoEffect variables")
     EXPECT(!Script_HasNoEffect(specialvarVariable));
     EXPECT(!Script_HasNoEffect(getPlayerXYVariable1));
     EXPECT(!Script_HasNoEffect(getPlayerXYVariable2));
-    EXPECT(!Script_HasNoEffect(checkCoinsVariable));
 }

@@ -36,9 +36,8 @@ static const s16 sFarawayIslandRockCoords[4][2] =
 
 static u8 GetMewObjectEventId(void)
 {
-    u8 objectEventId;
-    TryGetObjectEventIdByLocalIdAndMap(LOCALID_FARAWAY_ISLAND_MEW, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId);
-    return objectEventId;
+    // TODO: remove
+    return 0;
 }
 
 // When the player enters Faraway Island interior it begins a "hide and seek" minigame where Mew disappears into the grass
@@ -320,39 +319,18 @@ static u8 GetValidMewMoveDirection(u8 ignoredDir)
 
 void UpdateFarawayIslandStepCounter(void)
 {
-    u16 steps = VarGet(VAR_FARAWAY_ISLAND_STEP_COUNTER);
-    if (gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_FARAWAY_ISLAND_INTERIOR)
-     && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_FARAWAY_ISLAND_INTERIOR))
-    {
-        steps++;
-        if (steps >= 9999)
-            VarSet(VAR_FARAWAY_ISLAND_STEP_COUNTER, 0);
-        else
-            VarSet(VAR_FARAWAY_ISLAND_STEP_COUNTER, steps);
-    }
+    // TODO: remove
 }
 
 bool8 ObjectEventIsFarawayIslandMew(struct ObjectEvent *objectEvent)
 {
-    if (gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_FARAWAY_ISLAND_INTERIOR)
-     && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_FARAWAY_ISLAND_INTERIOR))
-    {
-        if (objectEvent->graphicsId == OBJ_EVENT_GFX_MEW)
-            return TRUE;
-    }
-
+    // TODO: remove
     return FALSE;
 }
 
 bool8 IsMewPlayingHideAndSeek(void)
 {
-    if (gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_FARAWAY_ISLAND_INTERIOR)
-     && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_FARAWAY_ISLAND_INTERIOR))
-    {
-        if (FlagGet(FLAG_CAUGHT_MEW) != TRUE && FlagGet(FLAG_HIDE_MEW) != TRUE)
-            return TRUE;
-    }
-
+    // TODO: remove
     return FALSE;
 }
 

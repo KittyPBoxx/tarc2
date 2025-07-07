@@ -11,18 +11,15 @@
 #include "gpu_regs.h"
 #include "graphics.h"
 #include "international_string_util.h"
-#include "link.h"
 #include "main.h"
 #include "main_menu.h"
 #include "menu.h"
 #include "list_menu.h"
-#include "mystery_event_menu.h"
 #include "naming_screen.h"
 #include "option_menu.h"
 #include "overworld.h"
 #include "palette.h"
 #include "pokeball.h"
-#include "pokedex.h"
 #include "pokemon.h"
 #include "random.h"
 #include "rtc.h"
@@ -37,7 +34,6 @@
 #include "text_window.h"
 #include "title_screen.h"
 #include "window.h"
-#include "mystery_gift_menu.h"
 
 /*
  * Main menu state machine
@@ -252,13 +248,13 @@ static const u16 sBirchSpeechBgPals[][16] = {
     INCBIN_U16("graphics/birch_speech/bg1.gbapal")
 };
 
-static const u32 sBirchSpeechShadowGfx[] = INCBIN_U32("graphics/birch_speech/shadow.4bpp.lz");
-static const u32 sBirchSpeechBgMap[] = INCBIN_U32("graphics/birch_speech/map.bin.lz");
+static const u32 sBirchSpeechShadowGfx[] = INCBIN_U32("graphics/birch_speech/shadow.4bpp.smol");
+static const u32 sBirchSpeechBgMap[] = INCBIN_U32("graphics/birch_speech/map.bin.smolTM");
 static const u16 sBirchSpeechBgGradientPal[] = INCBIN_U16("graphics/birch_speech/bg2.gbapal");
 
 static const u8 gText_SaveFileCorrupted[] = _("The save file is corrupted. The\nprevious save file will be loaded.");
 static const u8 gText_SaveFileErased[] = _("The save file has been erased\ndue to corruption or damage.");
-static const u8 gJPText_No1MSubCircuit[] = _("1Mサブきばんが ささっていません！");
+static const u8 gText_No1MSubCircuit[] = _("Flash memory chip is missing.");
 static const u8 gText_BatteryRunDry[] = _("The internal battery has run dry.\nThe game can be played.\pHowever, clock-based events will\nno longer occur.");
 
 static const u8 gText_MainMenuNewGame[] = _("NEW GAME");
@@ -473,59 +469,11 @@ static const union AffineAnimCmd *const sSpriteAffineAnimTable_PlayerShrink[] =
 };
 
 static const struct MenuAction sMenuActions_Gender[] = {
-    {COMPOUND_STRING("BOY"), {NULL}},
     {COMPOUND_STRING("GIRL"), {NULL}}
 };
 
-static const u8 *const sMalePresetNames[] = {
-    COMPOUND_STRING("STU"),
-    COMPOUND_STRING("MILTON"),
-    COMPOUND_STRING("TOM"),
-    COMPOUND_STRING("KENNY"),
-    COMPOUND_STRING("REID"),
-    COMPOUND_STRING("JUDE"),
-    COMPOUND_STRING("JAXSON"),
-    COMPOUND_STRING("EASTON"),
-    COMPOUND_STRING("WALKER"),
-    COMPOUND_STRING("TERU"),
-    COMPOUND_STRING("JOHNNY"),
-    COMPOUND_STRING("BRETT"),
-    COMPOUND_STRING("SETH"),
-    COMPOUND_STRING("TERRY"),
-    COMPOUND_STRING("CASEY"),
-    COMPOUND_STRING("DARREN"),
-    COMPOUND_STRING("LANDON"),
-    COMPOUND_STRING("COLLIN"),
-    COMPOUND_STRING("STANLEY"),
-    COMPOUND_STRING("QUINCY")
-};
+static const u8 sMalePresetName[PLAYER_NAME_LENGTH + 1] = _("RAE");
 
-static const u8 *const sFemalePresetNames[] = {
-    COMPOUND_STRING("KIMMY"),
-    COMPOUND_STRING("TIARA"),
-    COMPOUND_STRING("BELLA"),
-    COMPOUND_STRING("JAYLA"),
-    COMPOUND_STRING("ALLIE"),
-    COMPOUND_STRING("LIANNA"),
-    COMPOUND_STRING("SARA"),
-    COMPOUND_STRING("MONICA"),
-    COMPOUND_STRING("CAMILA"),
-    COMPOUND_STRING("AUBREE"),
-    COMPOUND_STRING("RUTHIE"),
-    COMPOUND_STRING("HAZEL"),
-    COMPOUND_STRING("NADINE"),
-    COMPOUND_STRING("TANJA"),
-    COMPOUND_STRING("YASMIN"),
-    COMPOUND_STRING("NICOLA"),
-    COMPOUND_STRING("LILLIE"),
-    COMPOUND_STRING("TERRA"),
-    COMPOUND_STRING("LUCY"),
-    COMPOUND_STRING("HALIE")
-};
-
-// The number of male vs. female names is assumed to be the same.
-// If they aren't, the smaller of the two sizes will be used and any extra names will be ignored.
-#define NUM_PRESET_NAMES min(ARRAY_COUNT(sMalePresetNames), ARRAY_COUNT(sFemalePresetNames))
 
 enum
 {
@@ -656,14 +604,10 @@ static void Task_MainMenuCheckSaveFile(u8 taskId)
         SetGpuReg(REG_OFFSET_BLDALPHA, 0);
         SetGpuReg(REG_OFFSET_BLDY, 7);
 
-        if (IsWirelessAdapterConnected())
-            tWirelessAdapterConnected = TRUE;
         switch (gSaveFileStatus)
         {
             case SAVE_STATUS_OK:
                 tMenuType = HAS_SAVED_GAME;
-                if (IsMysteryGiftEnabled())
-                    tMenuType++;
                 gTasks[taskId].func = Task_MainMenuCheckBattery;
                 break;
             case SAVE_STATUS_CORRUPT:
@@ -675,8 +619,6 @@ static void Task_MainMenuCheckSaveFile(u8 taskId)
                 CreateMainMenuErrorWindow(gText_SaveFileCorrupted);
                 gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
                 tMenuType = HAS_SAVED_GAME;
-                if (IsMysteryGiftEnabled() == TRUE)
-                    tMenuType++;
                 break;
             case SAVE_STATUS_EMPTY:
             default:
@@ -684,7 +626,7 @@ static void Task_MainMenuCheckSaveFile(u8 taskId)
                 gTasks[taskId].func = Task_MainMenuCheckBattery;
                 break;
             case SAVE_STATUS_NO_FLASH:
-                CreateMainMenuErrorWindow(gJPText_No1MSubCircuit);
+                CreateMainMenuErrorWindow(gText_No1MSubCircuit);
                 gTasks[taskId].tMenuType = HAS_NO_SAVED_GAME;
                 gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
                 break;
@@ -908,7 +850,6 @@ static bool8 HandleMainMenuInput(u8 taskId)
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
-        IsWirelessAdapterConnected();   // why bother calling this here? debug? Task_HandleMainMenuAPressed will check too
         BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
         gTasks[taskId].func = Task_HandleMainMenuAPressed;
     }
@@ -955,7 +896,6 @@ static void Task_HandleMainMenuInput(u8 taskId)
 
 static void Task_HandleMainMenuAPressed(u8 taskId)
 {
-    bool8 wirelessAdapterConnected;
     u8 action;
 
     if (!gPaletteFade.active)
@@ -970,7 +910,6 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
         ClearStdWindowAndFrame(5, TRUE);
         ClearStdWindowAndFrame(6, TRUE);
         ClearStdWindowAndFrame(7, TRUE);
-        wirelessAdapterConnected = IsWirelessAdapterConnected();
         switch (gTasks[taskId].tMenuType)
         {
             case HAS_NO_SAVED_GAME:
@@ -1001,75 +940,6 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
                         break;
                 }
                 break;
-            case HAS_MYSTERY_GIFT:
-                switch (gTasks[taskId].tCurrItem)
-                {
-                    case 0:
-                    default:
-                        action = ACTION_CONTINUE;
-                        break;
-                    case 1:
-                        action = ACTION_NEW_GAME;
-                        break;
-                    case 2:
-                        action = ACTION_MYSTERY_GIFT;
-                        if (!wirelessAdapterConnected)
-                        {
-                            action = ACTION_INVALID;
-                            gTasks[taskId].tMenuType = HAS_NO_SAVED_GAME;
-                        }
-                        break;
-                    case 3:
-                        action = ACTION_OPTION;
-                        break;
-                }
-                break;
-            case HAS_MYSTERY_EVENTS:
-                switch (gTasks[taskId].tCurrItem)
-                {
-                    case 0:
-                    default:
-                        action = ACTION_CONTINUE;
-                        break;
-                    case 1:
-                        action = ACTION_NEW_GAME;
-                        break;
-                    case 2:
-                        if (gTasks[taskId].tWirelessAdapterConnected)
-                        {
-                            action = ACTION_MYSTERY_GIFT;
-                            if (!wirelessAdapterConnected)
-                            {
-                                action = ACTION_INVALID;
-                                gTasks[taskId].tMenuType = HAS_NO_SAVED_GAME;
-                            }
-                        }
-                        else if (wirelessAdapterConnected)
-                        {
-                            action = ACTION_INVALID;
-                            gTasks[taskId].tMenuType = HAS_SAVED_GAME;
-                        }
-                        else
-                        {
-                            action = ACTION_EREADER;
-                        }
-                        break;
-                    case 3:
-                        if (wirelessAdapterConnected)
-                        {
-                            action = ACTION_INVALID;
-                            gTasks[taskId].tMenuType = HAS_MYSTERY_GIFT;
-                        }
-                        else
-                        {
-                            action = ACTION_MYSTERY_EVENTS;
-                        }
-                        break;
-                    case 4:
-                        action = ACTION_OPTION;
-                        break;
-                }
-                break;
         }
         ChangeBgY(0, 0, BG_COORD_SET);
         ChangeBgY(1, 0, BG_COORD_SET);
@@ -1090,18 +960,6 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
             case ACTION_OPTION:
                 gMain.savedCallback = CB2_ReinitMainMenu;
                 SetMainCallback2(CB2_InitOptionMenu);
-                DestroyTask(taskId);
-                break;
-            case ACTION_MYSTERY_GIFT:
-                SetMainCallback2(CB2_InitMysteryGift);
-                DestroyTask(taskId);
-                break;
-            case ACTION_MYSTERY_EVENTS:
-                SetMainCallback2(CB2_InitMysteryEventMenu);
-                DestroyTask(taskId);
-                break;
-            case ACTION_EREADER:
-                SetMainCallback2(CB2_InitEReader);
                 DestroyTask(taskId);
                 break;
             case ACTION_INVALID:
@@ -1295,8 +1153,8 @@ static void Task_NewGameBirchSpeech_Init(u8 taskId)
     SetGpuReg(REG_OFFSET_BLDALPHA, 0);
     SetGpuReg(REG_OFFSET_BLDY, 0);
 
-    LZ77UnCompVram(sBirchSpeechShadowGfx, (void *)VRAM);
-    LZ77UnCompVram(sBirchSpeechBgMap, (void *)(BG_SCREEN_ADDR(7)));
+    DecompressDataWithHeaderVram(sBirchSpeechShadowGfx, (void *)VRAM);
+    DecompressDataWithHeaderVram(sBirchSpeechBgMap, (void *)(BG_SCREEN_ADDR(7)));
     LoadPalette(sBirchSpeechBgPals, BG_PLTT_ID(0), 2 * PLTT_SIZE_4BPP);
     LoadPalette(&sBirchSpeechBgGradientPal[8], BG_PLTT_ID(0) + 1, PLTT_SIZEOF(8));
     ScanlineEffect_Stop();
@@ -1620,7 +1478,7 @@ static void Task_NewGameBirchSpeech_StartNamingScreen(u8 taskId)
     {
         FreeAllWindowBuffers();
         FreeAndDestroyMonPicSprite(gTasks[taskId].tLotadSpriteId);
-        NewGameBirchSpeech_SetDefaultPlayerName(Random() % NUM_PRESET_NAMES);
+        NewGameBirchSpeech_SetDefaultPlayerName();
         DestroyTask(taskId);
         DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_NewGameBirchSpeech_ReturnFromNamingScreen);
     }
@@ -1830,8 +1688,8 @@ static void CB2_NewGameBirchSpeech_ReturnFromNamingScreen(void)
     DmaFill32(3, 0, OAM, OAM_SIZE);
     DmaFill16(3, 0, PLTT, PLTT_SIZE);
     ResetPaletteFade();
-    LZ77UnCompVram(sBirchSpeechShadowGfx, (u8 *)VRAM);
-    LZ77UnCompVram(sBirchSpeechBgMap, (u8 *)(BG_SCREEN_ADDR(7)));
+    DecompressDataWithHeaderVram(sBirchSpeechShadowGfx, (u8 *)VRAM);
+    DecompressDataWithHeaderVram(sBirchSpeechBgMap, (u8 *)(BG_SCREEN_ADDR(7)));
     LoadPalette(sBirchSpeechBgPals, BG_PLTT_ID(0), 2 * PLTT_SIZE_4BPP);
     LoadPalette(&sBirchSpeechBgGradientPal[1], BG_PLTT_ID(0) + 1, PLTT_SIZEOF(8));
     ResetTasks();
@@ -2123,17 +1981,12 @@ static s8 NewGameBirchSpeech_ProcessGenderMenuInput(void)
     return Menu_ProcessInputNoWrap();
 }
 
-void NewGameBirchSpeech_SetDefaultPlayerName(u8 nameId)
+void NewGameBirchSpeech_SetDefaultPlayerName()
 {
-    const u8 *name;
     u8 i;
 
-    if (gSaveBlock2Ptr->playerGender == MALE)
-        name = sMalePresetNames[nameId];
-    else
-        name = sFemalePresetNames[nameId];
     for (i = 0; i < PLAYER_NAME_LENGTH; i++)
-        gSaveBlock2Ptr->playerName[i] = name[i];
+        gSaveBlock2Ptr->playerName[i] = sMalePresetName[i];
     gSaveBlock2Ptr->playerName[PLAYER_NAME_LENGTH] = EOS;
 }
 
@@ -2179,17 +2032,12 @@ static void MainMenu_FormatSavegameTime(void)
 static void MainMenu_FormatSavegamePokedex(void)
 {
     u8 str[0x20];
-    u16 dexCount;
 
     if (FlagGet(FLAG_SYS_POKEDEX_GET) == TRUE)
     {
-        if (IsNationalPokedexEnabled())
-            dexCount = GetNationalPokedexCount(FLAG_GET_CAUGHT);
-        else
-            dexCount = GetHoennPokedexCount(FLAG_GET_CAUGHT);
         StringExpandPlaceholders(gStringVar4, gText_ContinueMenuPokedex);
         AddTextPrinterParameterized3(2, FONT_NORMAL, 0, 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
-        ConvertIntToDecimalStringN(str, dexCount, STR_CONV_MODE_LEFT_ALIGN, 4);
+        ConvertIntToDecimalStringN(str, 1, STR_CONV_MODE_LEFT_ALIGN, 4);
         AddTextPrinterParameterized3(2, FONT_NORMAL, GetStringRightAlignXOffset(FONT_NORMAL, str, 100), 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, str);
     }
 }

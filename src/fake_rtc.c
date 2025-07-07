@@ -12,22 +12,11 @@ static void FakeRtc_CalcTimeDifference(struct Time *result, struct SiiRtcInfo *t
 
 void FakeRtc_Reset(void)
 {
-#if OW_USE_FAKE_RTC
-    memset(&gSaveBlock3Ptr->fakeRTC, 0, sizeof(gSaveBlock3Ptr->fakeRTC));
-    gSaveBlock3Ptr->fakeRTC.year = 0; // offset by gGen3Epoch.year
-    gSaveBlock3Ptr->fakeRTC.month = gGen3Epoch.month;
-    gSaveBlock3Ptr->fakeRTC.day = gGen3Epoch.day;
-    gSaveBlock3Ptr->fakeRTC.dayOfWeek = gGen3Epoch.dayOfWeek;
-#endif
 }
 
 struct SiiRtcInfo *FakeRtc_GetCurrentTime(void)
 {
-#if OW_USE_FAKE_RTC
-    return &gSaveBlock3Ptr->fakeRTC;
-#else
     return NULL;
-#endif
 }
 
 void FakeRtc_GetRawInfo(struct SiiRtcInfo *rtc)

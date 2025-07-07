@@ -41,9 +41,6 @@ typedef union PACKED TrainerBattleParameter
     u8 data[sizeof(struct _TrainerBattleParameter)];
 } TrainerBattleParameter;
 
-
-extern const struct RematchTrainer gRematchTable[REMATCH_TABLE_ENTRIES];
-
 extern TrainerBattleParameter gTrainerBattleParameter;
 extern u16 gPartnerTrainerId;
 
@@ -52,7 +49,6 @@ extern u16 gPartnerTrainerId;
 void BattleSetup_StartWildBattle(void);
 void BattleSetup_StartDoubleWildBattle(void);
 void BattleSetup_StartBattlePikeWildBattle(void);
-void BattleSetup_StartRoamerBattle(void);
 void StartWallyTutorialBattle(void);
 void BattleSetup_StartScriptedWildBattle(void);
 void BattleSetup_StartScriptedDoubleWildBattle(void);

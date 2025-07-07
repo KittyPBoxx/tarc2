@@ -80,13 +80,6 @@ void PreprocAsmFile(std::string filename, bool isStdin, bool doEnum)
             PrintAsmBytes(s, length);
             break;
         }
-        case Directive::Braille:
-        {
-            unsigned char s[kMaxStringLength];
-            int length = stack.top().ReadBraille(s);
-            PrintAsmBytes(s, length);
-            break;
-        }
         case Directive::Enum:
         {
             if (!stack.top().ParseEnum())

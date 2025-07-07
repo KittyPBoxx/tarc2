@@ -1,6 +1,5 @@
 #include "global.h"
 #include "berry.h"
-#include "bike.h"
 #include "field_camera.h"
 #include "field_player_avatar.h"
 #include "fieldmap.h"
@@ -11,8 +10,6 @@
 #include "rotating_gate.h"
 #include "sprite.h"
 #include "text.h"
-
-//EWRAM_DATA bool8 gUnusedBikeCameraAheadPanback = FALSE;   //  Old EWRAM variable that was never set to anything other than false
 
 struct FieldCameraOffset
 {

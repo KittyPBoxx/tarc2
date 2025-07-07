@@ -20,7 +20,6 @@
 #include "sound.h"
 #include "trig.h"
 #include "graphics.h"
-#include "pokedex.h"
 #include "event_data.h"
 #include "random.h"
 
@@ -538,8 +537,8 @@ static void Task_LoadShowMons(u8 taskId)
         ResetAllPicSprites();
         FreeAllSpritePalettes();
         gReservedSpritePaletteCount = 8;
-        LZ77UnCompVram(gBirchBagGrass_Gfx, (void *)VRAM);
-        LZ77UnCompVram(gBirchGrassTilemap, (void *)(BG_SCREEN_ADDR(7)));
+        DecompressDataWithHeaderVram(gBirchBagGrass_Gfx, (void *)VRAM);
+        DecompressDataWithHeaderVram(gBirchGrassTilemap, (void *)(BG_SCREEN_ADDR(7)));
         LoadPalette(gBirchBagGrass_Pal + 1, BG_PLTT_ID(0) + 1, PLTT_SIZEOF(2 * 16 - 1));
 
         for (i = 0; i < MON_PIC_SIZE; i++)
@@ -1282,7 +1281,7 @@ static void LoadTheEndScreen(u16 tileOffsetLoad, u16 tileOffsetWrite, u16 palOff
     u16 baseTile;
     u16 i;
 
-    LZ77UnCompVram(sCreditsCopyrightEnd_Gfx, (void *)(VRAM + tileOffsetLoad));
+    DecompressDataWithHeaderVram(sCreditsCopyrightEnd_Gfx, (void *)(VRAM + tileOffsetLoad));
     LoadPalette(gIntroCopyright_Pal, palOffset, sizeof(gIntroCopyright_Pal));
 
     baseTile = (palOffset / 16) << 12;
@@ -1502,6 +1501,12 @@ static void SpriteCB_CreditsMon(struct Sprite *sprite)
 
 #define sMonSpriteId data[0]
 
+static u16 CreateMonSpriteFromNationalDexNumber(u16 nationalNum, s16 x, s16 y, u16 paletteSlot)
+{
+    nationalNum = NationalPokedexNumToSpecies(nationalNum);
+    return CreateMonPicSprite(nationalNum, FALSE, 1, TRUE, x, y, paletteSlot, TAG_NONE);
+}
+
 static u8 CreateCreditsMonSprite(u16 nationalDexNum, s16 x, s16 y, u16 position)
 {
     u8 monSpriteId;
@@ -1551,11 +1556,8 @@ static void DeterminePokemonToShow(void)
     // This basically packs all of the caught Pokémon into the front of the array
     for (dexNum = 1, j = 0; dexNum < NATIONAL_DEX_COUNT; dexNum++)
     {
-        if (GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
-        {
-            sCreditsData->caughtMonIds[j] = dexNum;
-            j++;
-        }
+        sCreditsData->caughtMonIds[j] = dexNum;
+        j++;
     }
 
     // Fill the rest of the array with zeroes

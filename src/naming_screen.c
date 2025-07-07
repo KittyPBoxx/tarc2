@@ -14,7 +14,6 @@
 #include "event_object_movement.h"
 #include "event_data.h"
 #include "constants/songs.h"
-#include "pokemon_storage_system.h"
 #include "graphics.h"
 #include "sound.h"
 #include "trig.h"
@@ -25,8 +24,8 @@
 #include "menu.h"
 #include "text_window.h"
 #include "overworld.h"
-#include "walda_phrase.h"
 #include "main.h"
+#include "decompress.h"
 #include "constants/event_objects.h"
 #include "constants/rgb.h"
 
@@ -339,7 +338,6 @@ static bool8 MainState_MoveToOKButton(void);
 static bool8 MainState_PressedOKButton(void);
 static bool8 MainState_FadeOut(void);
 static bool8 MainState_Exit(void);
-static void DisplaySentToPCMessage(void);
 static bool8 MainState_WaitSentToPCMessage(void);
 static bool8 MainState_StartPageSwap(void);
 static bool8 MainState_WaitPageSwap(void);
@@ -474,8 +472,6 @@ static void NamingScreen_Init(void)
     sNamingScreen->template = sNamingScreenTemplates[sNamingScreen->templateNum];
     sNamingScreen->currentPage = sNamingScreen->template->initialPage;
     sNamingScreen->inputCharBaseXPos = (DISPLAY_WIDTH - sNamingScreen->template->maxChars * 8) / 2 + 6;
-    if (sNamingScreen->templateNum == NAMING_SCREEN_WALDA)
-        sNamingScreen->inputCharBaseXPos += 11;
     sNamingScreen->keyRepeatStartDelayCopy = gKeyRepeatStartDelay;
     memset(sNamingScreen->textBuffer, EOS, sizeof(sNamingScreen->textBuffer));
     if (sNamingScreen->template->copyExistingString)
@@ -699,33 +695,6 @@ static bool8 MainState_Exit(void)
         FREE_AND_SET_NULL(sNamingScreen);
     }
     return FALSE;
-}
-
-static UNUSED void DisplaySentToPCMessage(void)
-{
-    u8 stringToDisplay = 0;
-
-    if (!IsDestinationBoxFull())
-    {
-        StringCopy(gStringVar1, GetBoxNamePtr(VarGet(VAR_PC_BOX_TO_SEND_MON)));
-        StringCopy(gStringVar2, sNamingScreen->destBuffer);
-    }
-    else
-    {
-        StringCopy(gStringVar1, GetBoxNamePtr(VarGet(VAR_PC_BOX_TO_SEND_MON)));
-        StringCopy(gStringVar2, sNamingScreen->destBuffer);
-        StringCopy(gStringVar3, GetBoxNamePtr(GetPCBoxToSendMon()));
-        stringToDisplay = 2;
-    }
-
-    if (FlagGet(FLAG_SYS_PC_LANETTE))
-        stringToDisplay++;
-
-    StringExpandPlaceholders(gStringVar4, sTransferredToPCMessages[stringToDisplay]);
-    DrawDialogueFrame(0, FALSE);
-    gTextFlags.canABSpeedUpPrint = TRUE;
-    AddTextPrinterParameterized2(0, FONT_NORMAL, gStringVar4, GetPlayerTextSpeedDelay(), 0, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-    CopyWindowToVram(0, COPYWIN_FULL);
 }
 
 static bool8 MainState_WaitSentToPCMessage(void)
@@ -1366,7 +1335,6 @@ static void NamingScreen_NoIcon(void);
 static void NamingScreen_CreatePlayerIcon(void);
 static void NamingScreen_CreatePCIcon(void);
 static void NamingScreen_CreateMonIcon(void);
-static void NamingScreen_CreateWaldaDadIcon(void);
 static void NamingScreen_CreateCodeIcon(void);
 
 static void (*const sIconFunctions[])(void) =
@@ -1375,7 +1343,6 @@ static void (*const sIconFunctions[])(void) =
     NamingScreen_CreatePlayerIcon,
     NamingScreen_CreatePCIcon,
     NamingScreen_CreateMonIcon,
-    NamingScreen_CreateWaldaDadIcon,
     NamingScreen_CreateCodeIcon,
 };
 
@@ -1416,15 +1383,6 @@ static void NamingScreen_CreateMonIcon(void)
     LoadMonIconPalettes();
     spriteId = CreateMonIcon(sNamingScreen->monSpecies, SpriteCallbackDummy, 56, 40, 0, sNamingScreen->monPersonality);
     gSprites[spriteId].oam.priority = 3;
-}
-
-static void NamingScreen_CreateWaldaDadIcon(void)
-{
-    u8 spriteId;
-
-    spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_MAN_1, SpriteCallbackDummy, 56, 37, 0);
-    gSprites[spriteId].oam.priority = 3;
-    StartSpriteAnim(&gSprites[spriteId], ANIM_STD_GO_SOUTH);
 }
 
 static void NamingScreen_CreateCodeIcon(void)
@@ -1746,7 +1704,6 @@ static void (*const sDrawTextEntryBoxFuncs[])(void) =
     [NAMING_SCREEN_BOX]        = DrawNormalTextEntryBox,
     [NAMING_SCREEN_CAUGHT_MON] = DrawMonTextEntryBox,
     [NAMING_SCREEN_NICKNAME]   = DrawMonTextEntryBox,
-    [NAMING_SCREEN_WALDA]      = DrawNormalTextEntryBox,
     [NAMING_SCREEN_CODE]       = DrawNormalTextEntryBox,
 };
 
@@ -1886,7 +1843,7 @@ static void SaveInputText(void)
 
 static void LoadGfx(void)
 {
-    LZ77UnCompWram(gNamingScreenMenu_Gfx, sNamingScreen->tileBuffer);
+    DecompressDataWithHeaderWram(gNamingScreenMenu_Gfx, sNamingScreen->tileBuffer);
     LoadBgTiles(1, sNamingScreen->tileBuffer, sizeof(sNamingScreen->tileBuffer), 0);
     LoadBgTiles(2, sNamingScreen->tileBuffer, sizeof(sNamingScreen->tileBuffer), 0);
     LoadBgTiles(3, sNamingScreen->tileBuffer, sizeof(sNamingScreen->tileBuffer), 0);
@@ -2080,27 +2037,6 @@ static bool8 IsWideLetter(u8 character)
     return FALSE;
 }
 
-// Debug? Arguments aren't sensible for non-player screens.
-static void UNUSED Debug_NamingScreenPlayer(void)
-{
-    DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnToFieldWithOpenMenu);
-}
-
-static void UNUSED Debug_NamingScreenBox(void)
-{
-    DoNamingScreen(NAMING_SCREEN_BOX, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnToFieldWithOpenMenu);
-}
-
-static void UNUSED Debug_NamingScreenCaughtMon(void)
-{
-    DoNamingScreen(NAMING_SCREEN_CAUGHT_MON, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnToFieldWithOpenMenu);
-}
-
-static void UNUSED Debug_NamingScreenNickname(void)
-{
-    DoNamingScreen(NAMING_SCREEN_NICKNAME, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnToFieldWithOpenMenu);
-}
-
 //--------------------------------------------------
 // Forward-declared variables
 //--------------------------------------------------
@@ -2117,17 +2053,6 @@ static const struct NamingScreenTemplate sPlayerNamingScreenTemplate =
     .title = gText_YourName,
 };
 
-static const struct NamingScreenTemplate sPCBoxNamingTemplate =
-{
-    .copyExistingString = FALSE,
-    .maxChars = BOX_NAME_LENGTH,
-    .iconFunction = 2,
-    .addGenderIcon = FALSE,
-    .initialPage = KBPAGE_LETTERS_UPPER,
-    .unused = 19,
-    .title = gText_BoxName,
-};
-
 static const struct NamingScreenTemplate sMonNamingScreenTemplate =
 {
     .copyExistingString = FALSE,
@@ -2137,17 +2062,6 @@ static const struct NamingScreenTemplate sMonNamingScreenTemplate =
     .initialPage = KBPAGE_LETTERS_UPPER,
     .unused = 35,
     .title = gText_PkmnsNickname,
-};
-
-static const struct NamingScreenTemplate sWaldaWordsScreenTemplate =
-{
-    .copyExistingString = TRUE,
-    .maxChars = WALDA_PHRASE_LENGTH,
-    .iconFunction = 4,
-    .addGenderIcon = FALSE,
-    .initialPage = KBPAGE_LETTERS_UPPER,
-    .unused = 11,
-    .title = gText_TellHimTheWords,
 };
 
 static const u8 sText_EnterCode[] = _("Enter code:");
@@ -2165,10 +2079,8 @@ static const struct NamingScreenTemplate sCodeScreenTemplate =
 static const struct NamingScreenTemplate *const sNamingScreenTemplates[] =
 {
     [NAMING_SCREEN_PLAYER]     = &sPlayerNamingScreenTemplate,
-    [NAMING_SCREEN_BOX]        = &sPCBoxNamingTemplate,
     [NAMING_SCREEN_CAUGHT_MON] = &sMonNamingScreenTemplate,
     [NAMING_SCREEN_NICKNAME]   = &sMonNamingScreenTemplate,
-    [NAMING_SCREEN_WALDA]      = &sWaldaWordsScreenTemplate,
     [NAMING_SCREEN_CODE]       = &sCodeScreenTemplate,
 };
 

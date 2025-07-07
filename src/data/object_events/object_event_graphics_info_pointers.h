@@ -67,12 +67,6 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Man5;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ReporterM;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ReporterF;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Bard;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Anabel;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Tucker;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Greta;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Spenser;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Noland;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Lucy;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_UnusedNatuDoll;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_UnusedMagnemiteDoll;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_UnusedSquirtleDoll;
@@ -231,7 +225,6 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Red;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Leaf;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Deoxys;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_BirthIslandStone;
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Brandon;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendan;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMay;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Lugia;
@@ -320,12 +313,6 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_REPORTER_M] =               &gObjectEventGraphicsInfo_ReporterM,
     [OBJ_EVENT_GFX_REPORTER_F] =               &gObjectEventGraphicsInfo_ReporterF,
     [OBJ_EVENT_GFX_BARD] =                     &gObjectEventGraphicsInfo_Bard,
-    [OBJ_EVENT_GFX_ANABEL] =                   &gObjectEventGraphicsInfo_Anabel,
-    [OBJ_EVENT_GFX_TUCKER] =                   &gObjectEventGraphicsInfo_Tucker,
-    [OBJ_EVENT_GFX_GRETA] =                    &gObjectEventGraphicsInfo_Greta,
-    [OBJ_EVENT_GFX_SPENSER] =                  &gObjectEventGraphicsInfo_Spenser,
-    [OBJ_EVENT_GFX_NOLAND] =                   &gObjectEventGraphicsInfo_Noland,
-    [OBJ_EVENT_GFX_LUCY] =                     &gObjectEventGraphicsInfo_Lucy,
     [OBJ_EVENT_GFX_UNUSED_NATU_DOLL] =         &gObjectEventGraphicsInfo_UnusedNatuDoll,
     [OBJ_EVENT_GFX_UNUSED_MAGNEMITE_DOLL] =    &gObjectEventGraphicsInfo_UnusedMagnemiteDoll,
     [OBJ_EVENT_GFX_UNUSED_SQUIRTLE_DOLL] =     &gObjectEventGraphicsInfo_UnusedSquirtleDoll,
@@ -484,7 +471,6 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_LEAF] =                     &gObjectEventGraphicsInfo_Leaf,
     [OBJ_EVENT_GFX_DEOXYS] =                   &gObjectEventGraphicsInfo_Deoxys,
     [OBJ_EVENT_GFX_DEOXYS_TRIANGLE] =          &gObjectEventGraphicsInfo_BirthIslandStone,
-    [OBJ_EVENT_GFX_BRANDON] =                  &gObjectEventGraphicsInfo_Brandon,
     [OBJ_EVENT_GFX_LINK_RS_BRENDAN] =          &gObjectEventGraphicsInfo_RubySapphireBrendan,
     [OBJ_EVENT_GFX_LINK_RS_MAY] =              &gObjectEventGraphicsInfo_RubySapphireMay,
     [OBJ_EVENT_GFX_LUGIA] =                    &gObjectEventGraphicsInfo_Lugia,
@@ -492,14 +478,4 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_POKE_BALL] =                &gObjectEventGraphicsInfo_PokeBall,
     [OBJ_EVENT_GFX_OW_MON] =                   &gObjectEventGraphicsInfo_Follower,
     [OBJ_EVENT_GFX_LIGHT_SPRITE] =             &gObjectEventGraphicsInfo_BallLight,
-};
-
-const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {
-    [MAUVILLE_MAN_BARD]        = &gObjectEventGraphicsInfo_Bard,
-    [MAUVILLE_MAN_HIPSTER]     = &gObjectEventGraphicsInfo_Hipster,
-    [MAUVILLE_MAN_TRADER]      = &gObjectEventGraphicsInfo_Trader,
-    [MAUVILLE_MAN_STORYTELLER] = &gObjectEventGraphicsInfo_Storyteller,
-    [MAUVILLE_MAN_GIDDY]       = &gObjectEventGraphicsInfo_Giddy,
-    [MAUVILLE_MAN_UNUSED1]     = &gObjectEventGraphicsInfo_UnusedMauvilleOldMan1,
-    [MAUVILLE_MAN_UNUSED2]     = &gObjectEventGraphicsInfo_UnusedMauvilleOldMan2,
 };

@@ -2522,13 +2522,10 @@ static void CreateAbnormalWeatherTask(void)
 #undef tDelay
 
 static u8 TranslateWeatherNum(u8);
-static void UpdateRainCounter(u8, u8);
 
 void SetSavedWeather(u32 weather)
 {
-    u8 oldWeather = gSaveBlock1Ptr->weather;
     gSaveBlock1Ptr->weather = TranslateWeatherNum(weather);
-    UpdateRainCounter(gSaveBlock1Ptr->weather, oldWeather);
 }
 
 u8 GetSavedWeather(void)
@@ -2538,9 +2535,7 @@ u8 GetSavedWeather(void)
 
 void SetSavedWeatherFromCurrMapHeader(void)
 {
-    u8 oldWeather = gSaveBlock1Ptr->weather;
     gSaveBlock1Ptr->weather = TranslateWeatherNum(gMapHeader.weather);
-    UpdateRainCounter(gSaveBlock1Ptr->weather, oldWeather);
 }
 
 void SetWeather(u32 weather)
@@ -2641,11 +2636,4 @@ void UpdateWeatherPerDay(u16 increment)
     u16 weatherStage = gSaveBlock1Ptr->weatherCycleStage + increment;
     weatherStage %= WEATHER_CYCLE_LENGTH;
     gSaveBlock1Ptr->weatherCycleStage = weatherStage;
-}
-
-static void UpdateRainCounter(u8 newWeather, u8 oldWeather)
-{
-    if (newWeather != oldWeather
-     && (newWeather == WEATHER_RAIN || newWeather == WEATHER_RAIN_THUNDERSTORM))
-        IncrementGameStat(GAME_STAT_GOT_RAINED_ON);
 }

@@ -18557,11 +18557,6 @@ gBattleAnimMove_FlameWheel::
 	clearmonbg ANIM_DEF_PARTNER
 	end
 
-FlameWheel1: @ Unused
-	createsprite gFireSpiralOutwardSpriteTemplate, ANIM_ATTACKER, 3, 0, 0, 50
-	delay 4
-	return
-
 gBattleAnimMove_PinMissile::
 	loadspritegfx ANIM_TAG_NEEDLE
 	loadspritegfx ANIM_TAG_IMPACT
@@ -27893,23 +27888,6 @@ IceCrystalEffectLong:
 	playsewithpan SE_M_ICY_WIND, SOUND_PAN_TARGET
 	return
 
-IceSpikesEffectShort: @ Unused
-	loopsewithpan SE_M_ICY_WIND, SOUND_PAN_TARGET, 6, 4
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, 0, 24, 0
-	delay 4
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, 8, 24, 0
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, -8, 24, 0
-	delay 4
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, 16, 24, 0
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, -16, 24, 0
-	delay 4
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, 24, 24, 0
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, -24, 24, 0
-	delay 4
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, 32, 24, 0
-	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, -32, 24, 0
-	return
-
 IceSpikesEffectLong:
 	loopsewithpan SE_M_ICY_WIND, SOUND_PAN_TARGET, 6, 4
 	createsprite gIceGroundSpikeSpriteTemplate, ANIM_TARGET, 2, 0, 24, 1
@@ -28238,19 +28216,6 @@ gBattleAnimGeneral_SubstituteFade::
 
 gBattleAnimGeneral_SubstituteAppear::
 	createvisualtask AnimTask_MonToSubstitute, 2
-	end
-
-gBattleAnimGeneral_PokeblockThrow::
-	createvisualtask AnimTask_SetAttackerTargetLeftPos, 2, 0
-	createvisualtask AnimTask_LoadPokeblockGfx, 2
-	delay 0
-	waitplaysewithpan SE_M_JUMP_KICK, SOUND_PAN_ATTACKER, 22
-	createsprite gPokeblockSpriteTemplate, ANIM_TARGET, 3, -18, 12, 0, 32
-	delay 50
-	loopsewithpan SE_M_TAIL_WHIP, SOUND_PAN_TARGET, 19, 2
-	createvisualtask AnimTask_SwayMon, 5, 1, 8, 1536, 2, ANIM_TARGET
-	waitforvisualfinish
-	createvisualtask AnimTask_FreePokeblockGfx, 2
 	end
 
 gBattleAnimGeneral_ItemKnockoff::

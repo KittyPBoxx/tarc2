@@ -501,7 +501,6 @@
 #include "generational_changes.h"
 #include "item.h"
 #include "random.h"
-#include "recorded_battle.h"
 #include "util.h"
 #include "constants/abilities.h"
 #include "constants/battle_ai.h"
@@ -690,11 +689,7 @@ struct BattleTestData
     u8 moveBattlers;
     bool8 hasAI:1;
     bool8 logAI:1;
-
-    struct RecordedBattleSave recordedBattle;
-    u8 battleRecordTypes[MAX_BATTLERS_COUNT][BATTLER_RECORD_SIZE];
-    u8 battleRecordTurnNumbers[MAX_BATTLERS_COUNT][BATTLER_RECORD_SIZE];
-    u8 battleRecordSourceLineOffsets[MAX_BATTLERS_COUNT][BATTLER_RECORD_SIZE];
+    
     u16 recordIndexes[MAX_BATTLERS_COUNT];
     struct BattlerTurn battleRecordTurns[MAX_TURNS][MAX_BATTLERS_COUNT];
 

@@ -8,9 +8,5 @@
 
 void ReadLatinFont(char *path, struct Image *image);
 void WriteLatinFont(char *path, struct Image *image);
-void ReadHalfwidthJapaneseFont(char *path, struct Image *image);
-void WriteHalfwidthJapaneseFont(char *path, struct Image *image);
-void ReadFullwidthJapaneseFont(char *path, struct Image *image);
-void WriteFullwidthJapaneseFont(char *path, struct Image *image);
 
 #endif // FONT_H

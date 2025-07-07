@@ -1,20 +1,15 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_pike.h"
-#include "battle_pyramid.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "field_message_box.h"
 #include "field_poison.h"
 #include "fldeff_misc.h"
-#include "frontier_util.h"
 #include "party_menu.h"
-#include "pokenav.h"
 #include "script.h"
 #include "string_util.h"
 #include "strings.h"
 #include "task.h"
-#include "trainer_hill.h"
 #include "constants/field_poison.h"
 #include "constants/form_change_types.h"
 #include "constants/party_menu.h"
@@ -93,14 +88,7 @@ static void Task_TryFieldPoisonWhiteOut(u8 taskId)
         if (AllMonsFainted())
         {
             // Battle facilities have their own white out script to handle the challenge loss
-#ifdef BUGFIX
-            if (InBattlePyramid() || InBattlePike() || InTrainerHillChallenge())
-#else
-            if (InBattlePyramid() | InBattlePike() || InTrainerHillChallenge())
-#endif
-                gSpecialVar_Result = FLDPSN_FRONTIER_WHITEOUT;
-            else
-                gSpecialVar_Result = FLDPSN_WHITEOUT;
+            gSpecialVar_Result = FLDPSN_WHITEOUT;
         }
         else
         {

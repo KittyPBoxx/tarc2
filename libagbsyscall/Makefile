@@ -75,7 +75,6 @@ SYSCALLS := IntrWait \
             SoundDriverInit \
             BgAffineSet \
             Diff8bitUnFilterWram \
-            MultiBoot \
             MidiKey2Freq \
             Div \
             Diff8bitUnFilterVram \

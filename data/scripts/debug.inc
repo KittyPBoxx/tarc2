@@ -175,8 +175,6 @@ Debug_CheckSaveBlock::
 	msgbox Debug_SaveBlock2Size, MSGBOX_DEFAULT
 	callnative CheckSaveBlock3Size
 	msgbox Debug_SaveBlock3Size, MSGBOX_DEFAULT
-	callnative CheckPokemonStorageSize
-	msgbox Debug_PokemonStorageSize, MSGBOX_DEFAULT
 	release
 	end
 
@@ -205,21 +203,6 @@ Debug_CheckROMSpace::
 Debug_ROMSize::
 	.string "ROM size: {STR_VAR_1}MB/32MB.\n"
 	.string "Free space: {STR_VAR_2}MB.$"
-
-Debug_HatchAnEgg::
-	lockall
-	getpartysize
-	goto_if_eq VAR_RESULT, 0, Debug_NoPokemon
-	special ChoosePartyMon
-	waitstate
-	goto_if_ge VAR_0x8004, PARTY_SIZE, Debug_HatchAnEgg_End
-	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
-	goto_if_ne VAR_RESULT, SPECIES_EGG, DebugScript_HatchAnEgg_CantForceHatch
-	special EggHatch
-	waitstate
-Debug_HatchAnEgg_End::
-	releaseall
-	end
 
 Debug_NoPokemon::
 	msgbox DebugScript_Text_EmptyParty, MSGBOX_DEFAULT
@@ -271,7 +254,6 @@ Debug_ExpansionVersion:
 	.string "pokeemerald-expansion {STR_VAR_1}$"
 
 Debug_EventScript_Steven_Multi::
-	call MossdeepCity_SpaceCenter_2F_EventScript_ChoosePartyForMultiBattle
 	release
 	end
 

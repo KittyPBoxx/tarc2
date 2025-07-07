@@ -5,7 +5,6 @@
 #include "constants/battle_string_ids.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
-#include "constants/game_stat.h"
 	.include "asm/macros.inc"
 	.include "asm/macros/battle_script.inc"
 	.include "constants/constants.inc"
@@ -31,7 +30,6 @@ gBattlescriptsForUsingItem::
 gBattlescriptsForSafariActions::
 	.4byte BattleScript_ActionWatchesCarefully
 	.4byte BattleScript_ActionGetNear
-	.4byte BattleScript_ActionThrowPokeblock
 	.4byte BattleScript_ActionWallyThrow
 
 BattleScript_ItemEnd:
@@ -178,19 +176,11 @@ BattleScript_SafariBallThrow::
 
 BattleScript_SuccessBallThrow::
 	setbyte sMON_CAUGHT, TRUE
-	incrementgamestat GAME_STAT_POKEMON_CAPTURES
 	printstring STRINGID_GOTCHAPKMNCAUGHTPLAYER
-	jumpifbyte CMP_NOT_EQUAL, sEXP_CATCH, TRUE, BattleScript_TryPrintCaughtMonInfo
+	jumpifbyte CMP_NOT_EQUAL, sEXP_CATCH, TRUE, BattleScript_TryNicknameCaughtMon
 	setbyte sGIVEEXP_STATE, 0
 	getexp BS_TARGET
 	sethword gBattle_BG2_X, 0
-BattleScript_TryPrintCaughtMonInfo:
-	jumpifbattletype BATTLE_TYPE_RECORDED, BattleScript_GiveCaughtMonEnd
-	trysetcaughtmondexflags BattleScript_TryNicknameCaughtMon
-	printstring STRINGID_PKMNDATAADDEDTODEX
-	waitstate
-	setbyte gBattleCommunication, 0
-	displaydexinfo
 BattleScript_TryNicknameCaughtMon::
 	printstring STRINGID_GIVENICKNAMECAPTURED
 	waitstate
@@ -215,7 +205,7 @@ BattleScript_ShakeBallThrow::
 	printfromtable gBallEscapeStringIds
 	waitmessage B_WAIT_TIME_LONG
 	jumpifword CMP_NO_COMMON_BITS, gBattleTypeFlags, BATTLE_TYPE_SAFARI, BattleScript_ShakeBallThrowEnd
-	jumpifbyte CMP_NOT_EQUAL, gNumSafariBalls, 0, BattleScript_ShakeBallThrowEnd
+	jumpifbyte CMP_NOT_EQUAL, 1, 0, BattleScript_ShakeBallThrowEnd
 	printstring STRINGID_OUTOFSAFARIBALLS
 	waitmessage B_WAIT_TIME_LONG
 	setbyte gBattleOutcome, B_OUTCOME_NO_SAFARI_BALLS
@@ -242,14 +232,6 @@ BattleScript_ActionWatchesCarefully:
 
 BattleScript_ActionGetNear:
 	printfromtable gSafariGetNearStringIds
-	waitmessage B_WAIT_TIME_LONG
-	end2
-
-BattleScript_ActionThrowPokeblock:
-	printstring STRINGID_THREWPOKEBLOCKATPKMN
-	waitmessage B_WAIT_TIME_LONG
-	playanimation BS_ATTACKER, B_ANIM_POKEBLOCK_THROW, NULL
-	printfromtable gSafariPokeblockResultStringIds
 	waitmessage B_WAIT_TIME_LONG
 	end2
 

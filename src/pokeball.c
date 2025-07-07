@@ -1471,12 +1471,6 @@ static void SpriteCB_TradePokeballEnd(struct Sprite *sprite)
 #undef sFadePalsHi
 #undef sTimer
 
-// Unreferenced here and in RS, but used in FRLG, possibly by mistake.
-static void UNUSED DestroySpriteAndFreeResources_Ball(struct Sprite *sprite)
-{
-    DestroySpriteAndFreeResources(sprite);
-}
-
 #define sSpeedX data[0]
 #define sSpeedY data[1]
 
@@ -1567,7 +1561,7 @@ void LoadBallGfx(u8 ballId)
     case BALL_REPEAT:
     case BALL_SAFARI:
         var = GetSpriteTileStartByTag(gBallSpriteSheets[ballId].tag);
-        LZDecompressVram(gOpenPokeballGfx, (void *)(OBJ_VRAM0 + 0x100 + var * 32));
+        DecompressDataWithHeaderVram(gOpenPokeballGfx, (void *)(OBJ_VRAM0 + 0x100 + var * 32));
         break;
     }
 }

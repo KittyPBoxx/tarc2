@@ -12313,22 +12313,6 @@ const struct Item gItemsInfo[] =
         .iconPalette = gItemIconPalette_DowsingMachine,
     },
 
-    [ITEM_TOWN_MAP] =
-    {
-        .name = _("Town Map"),
-        .price = 0,
-        .description = COMPOUND_STRING(
-            "Can be viewed\n"
-            "anytime. Shows your\n"
-            "present location."),
-        .importance = 1,
-        .pocket = POCKET_KEY_ITEMS,
-        .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_TownMap,
-        .iconPic = gItemIcon_TownMap,
-        .iconPalette = gItemIconPalette_TownMap,
-    },
-
     [ITEM_VS_SEEKER] =
     {
         .name = _("Vs. Seeker"),
@@ -12393,7 +12377,7 @@ const struct Item gItemsInfo[] =
         .importance = 1,
         .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_FIELD,
-        .fieldUseFunc = ItemUseOutOfBattle_PokemonBoxLink,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .iconPic = gItemIcon_PokemonBoxLink,
         .iconPalette = gItemIconPalette_PokemonBoxLink,
     },
@@ -12459,22 +12443,6 @@ const struct Item gItemsInfo[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse, // Todo
         .iconPic = gItemIcon_PokeRadar,
         .iconPalette = gItemIconPalette_PokeRadar,
-    },
-
-    [ITEM_POKEBLOCK_CASE] =
-    {
-        .name = _("{POKEBLOCK} Case"),
-        .price = 0,
-        .description = COMPOUND_STRING(
-            "A case for holding\n"
-            "{POKEBLOCK}s made with\n"
-            "a Berry Blender."),
-        .importance = 1,
-        .pocket = POCKET_KEY_ITEMS,
-        .type = ITEM_USE_PBLOCK_CASE,
-        .fieldUseFunc = ItemUseOutOfBattle_PokeblockCase,
-        .iconPic = gItemIcon_PokeblockCase,
-        .iconPalette = gItemIconPalette_PokeblockCase,
     },
 
     [ITEM_SOOT_SACK] =

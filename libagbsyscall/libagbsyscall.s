@@ -32,7 +32,6 @@
 	.set L_SoundDriverInit, 1
 	.set L_BgAffineSet, 1
 	.set L_Diff8bitUnFilterWram, 1
-	.set L_MultiBoot, 1
 	.set L_MidiKey2Freq, 1
 	.set L_Div, 1
 	.set L_Diff8bitUnFilterVram, 1
@@ -266,15 +265,6 @@ Diff8bitUnFilterWram:
 	svc #22
 	bx lr
 	thumb_func_end Diff8bitUnFilterWram
-	.endif
-
-	.ifdef L_MultiBoot
-	thumb_func_start MultiBoot
-MultiBoot:
-	mov r1, #1
-	svc #37
-	bx lr
-	thumb_func_end MultiBoot
 	.endif
 
 	.ifdef L_MidiKey2Freq

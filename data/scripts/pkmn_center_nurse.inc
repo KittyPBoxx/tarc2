@@ -2,8 +2,6 @@ Common_EventScript_PkmnCenterNurse::
 	lock
 	faceplayer
 	setvar VAR_0x8004, 0
-	specialvar VAR_RESULT, CountPlayerTrainerStars
-	goto_if_eq VAR_RESULT, 4, EventScript_PkmnCenterNurse_GoldCard
 	msgbox gText_WouldYouLikeToRestYourPkmn, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, EventScript_PkmnCenterNurse_HealPkmn
 	goto_if_eq VAR_RESULT, NO, EventScript_PkmnCenterNurse_Goodbye
@@ -15,7 +13,6 @@ EventScript_PkmnCenterNurse_Goodbye::
 
 @ VAR_0x8004 is 1 when player has Gold Card; jumps are identical
 EventScript_PkmnCenterNurse_HealPkmn::
-	incrementgamestat GAME_STAT_USED_POKECENTER
 	call_if_eq VAR_0x8004, 0, EventScript_PkmnCenterNurse_IllTakeYourPkmn
 	call_if_eq VAR_0x8004, 1, EventScript_PkmnCenterNurse_IllTakeYourPkmn2
 	waitmessage
@@ -52,10 +49,7 @@ EventScript_PkmnCenterNurse_TakeAndHealPkmn::
 EventScript_PkmnCenterNurse_CheckTrainerHillAndUnionRoom::
 	specialvar VAR_RESULT, PlayerNotAtTrainerHillEntrance
 	goto_if_eq VAR_RESULT, 0, EventScript_PkmnCenterNurse_ReturnPkmn
-	specialvar VAR_RESULT, BufferUnionRoomPlayerName
-	copyvar VAR_0x8008, VAR_RESULT
 	goto_if_eq VAR_0x8008, 0, EventScript_PkmnCenterNurse_ReturnPkmn
-	goto_if_eq VAR_0x8008, 1, EventScript_PkmnCenterNurse_PlayerWaitingInUnionRoom
 	end
 
 @ VAR_0x8004 is 1 when player has Gold Card
@@ -74,17 +68,6 @@ EventScript_PkmnCenterNurse_ReturnPkmn2::
 	applymovement VAR_0x800B, Movement_PkmnCenterNurse_Bow
 	waitmovement 0
 	message gText_WeHopeToSeeYouAgain2
-	return
-
-EventScript_PkmnCenterNurse_PlayerWaitingInUnionRoom::
-	goto_if_set FLAG_NURSE_UNION_ROOM_REMINDER, EventScript_PkmnCenterNurse_ReturnPkmn
-	msgbox gText_RestoredPkmnToFullHealth, MSGBOX_DEFAULT
-	setflag FLAG_NURSE_UNION_ROOM_REMINDER
-	message CableClub_Text_PlayerIsWaiting
-	waitmessage
-	applymovement VAR_0x800B, Movement_PkmnCenterNurse_Bow
-	waitmovement 0
-	message gText_WeHopeToSeeYouAgain
 	return
 
 EventScript_PkmnCenterNurse_CheckPokerus::

@@ -8,10 +8,8 @@
 #include "config/caps.h"
 #include "config/pokemon.h"
 #include "config/overworld.h"
-#include "config/dexnav.h"
 #include "config/summary_screen.h"
 #include "config/ai.h"
-#include "config/follower_npc.h"
 
 // Invalid Versions show as "----------" in Gen 4 and Gen 5's summary screen.
 // In Gens 6 and 7, invalid versions instead show "a distant land" in the summary screen.
@@ -45,6 +43,7 @@
 #define GAME_LANGUAGE (LANGUAGE_ENGLISH)
 
 // party sizes
+#define PLAYER_PARTY_SIZE 1
 #define PARTY_SIZE 6
 #define MULTI_PARTY_SIZE (PARTY_SIZE / 2)
 #define FRONTIER_PARTY_SIZE         3
@@ -57,7 +56,6 @@
 
 // capacities of various saveblock objects
 #define DAYCARE_MON_COUNT 2
-#define POKEBLOCKS_COUNT 40
 #define OBJECT_EVENTS_COUNT 16
 #define MAIL_COUNT (10 + PARTY_SIZE)
 #define SECRET_BASES_COUNT 20
@@ -73,17 +71,14 @@
 #define DECOR_MAX_PLAYERS_HOUSE 12
 #define APPRENTICE_COUNT 4
 #define APPRENTICE_MAX_QUESTIONS 9
-#define MAX_REMATCH_ENTRIES 100 // only REMATCH_TABLE_ENTRIES (78) are used
 #define NUM_CONTEST_WINNERS 13
 #define UNION_ROOM_KB_ROW_COUNT 10
 #define GIFT_RIBBONS_COUNT 11
 #define SAVED_TRENDS_COUNT 5
 #define PYRAMID_BAG_ITEMS_COUNT 10
-#define ROAMER_COUNT 1 // Number of maximum concurrent active roamers
 
 // Number of facilities for Ranking Hall.
 // 7 facilities for single mode + tower double mode + tower multi mode.
-// Excludes link modes. See RANKING_HALL_* in include/constants/battle_frontier.h
 #define HALL_FACILITIES_COUNT 9
 // Received via record mixing, 1 for each player other than yourself
 #define HALL_RECORDS_COUNT 3
@@ -114,7 +109,6 @@
 #define POKEMON_NAME_BUFFER_SIZE max(20, POKEMON_NAME_LENGTH + 1) // Frequently used buffer size. Larger than necessary
 #define PLAYER_NAME_LENGTH 7
 #define MAIL_WORDS_COUNT 9
-#define EASY_CHAT_BATTLE_WORDS_COUNT 6
 #define MOVE_NAME_LENGTH 16
 #define NUM_QUESTIONNAIRE_WORDS 4
 #define QUIZ_QUESTION_LEN 9

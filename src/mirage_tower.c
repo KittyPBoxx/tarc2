@@ -60,7 +60,6 @@ struct FallAnim_Fossil
 #define MIRAGE_TOWER_GFX_LENGTH (sizeof(sMirageTower_Gfx))
 #define FOSSIL_DISINTEGRATE_LENGTH 0x100
 
-static void PlayerDescendMirageTower(u8);
 static void DoScreenShake(u8);
 static void IncrementCeilingCrumbleFinishedCount(void);
 static void WaitCeilingCrumble(u8);
@@ -262,14 +261,8 @@ static u16 sDebug_DisintegrationData[8];
 
 bool8 IsMirageTowerVisible(void)
 {
-    if (!(gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ROUTE111) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_ROUTE111)))
-        return FALSE;
-    return FlagGet(FLAG_MIRAGE_TOWER_VISIBLE);
-}
-
-static void UpdateMirageTowerPulseBlend(u8 taskId)
-{
-    UpdatePulseBlend(&sMirageTowerPulseBlend->pulseBlend);
+    // TODO: remove
+    return FALSE;
 }
 
 void ClearMirageTowerPulseBlend(void)
@@ -279,38 +272,12 @@ void ClearMirageTowerPulseBlend(void)
 
 void TryStartMirageTowerPulseBlendEffect(void)
 {
-    if (sMirageTowerPulseBlend)
-    {
-        sMirageTowerPulseBlend = NULL;
-        return;
-    }
-
-    if (gSaveBlock1Ptr->location.mapGroup != MAP_GROUP(MAP_ROUTE111)
-     || gSaveBlock1Ptr->location.mapNum != MAP_NUM(MAP_ROUTE111)
-     || !FlagGet(FLAG_MIRAGE_TOWER_VISIBLE))
-        return;
-
-    sMirageTowerPulseBlend = AllocZeroed(sizeof(*sMirageTowerPulseBlend));
-    InitPulseBlend(&sMirageTowerPulseBlend->pulseBlend);
-    InitPulseBlendPaletteSettings(&sMirageTowerPulseBlend->pulseBlend, &gMirageTowerPulseBlendSettings);
-    MarkUsedPulseBlendPalettes(&sMirageTowerPulseBlend->pulseBlend, 0x1, TRUE);
-    sMirageTowerPulseBlend->taskId = CreateTask(UpdateMirageTowerPulseBlend, 0xFF);
+    // TODO: remove
 }
 
 void ClearMirageTowerPulseBlendEffect(void)
 {
-    if (gSaveBlock1Ptr->location.mapGroup != MAP_GROUP(MAP_ROUTE111)
-     || gSaveBlock1Ptr->location.mapNum   != MAP_NUM(MAP_ROUTE111)
-     || !FlagGet(FLAG_MIRAGE_TOWER_VISIBLE)
-     || sMirageTowerPulseBlend == NULL)
-        return;
-
-    if (FuncIsActiveTask(UpdateMirageTowerPulseBlend))
-        DestroyTask(sMirageTowerPulseBlend->taskId);
-
-    UnmarkUsedPulseBlendPalettes(&sMirageTowerPulseBlend->pulseBlend, 0x1, TRUE);
-    UnloadUsedPulseBlendPalettes(&sMirageTowerPulseBlend->pulseBlend, 0x1, TRUE);
-    FREE_AND_SET_NULL(sMirageTowerPulseBlend);
+    // TODO: remove
 }
 
 void SetMirageTowerVisibility(void)
@@ -338,31 +305,6 @@ void SetMirageTowerVisibility(void)
     }
 
     FlagClear(FLAG_MIRAGE_TOWER_VISIBLE);
-}
-
-void StartPlayerDescendMirageTower(void)
-{
-    CreateTask(PlayerDescendMirageTower, 8);
-}
-
-// As the tower disintegrates, a duplicate object event of the player
-// is created at the top of the tower and moved down to show the player falling
-static void PlayerDescendMirageTower(u8 taskId)
-{
-    u8 objectEventId;
-    struct ObjectEvent *fallingPlayer;
-    struct ObjectEvent *player;
-
-    TryGetObjectEventIdByLocalIdAndMap(LOCALID_ROUTE111_PLAYER_FALLING, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId);
-    fallingPlayer = &gObjectEvents[objectEventId];
-    gSprites[fallingPlayer->spriteId].y2 += 4;
-    player = &gObjectEvents[gPlayerAvatar.objectEventId];
-    if ((gSprites[fallingPlayer->spriteId].y + gSprites[fallingPlayer->spriteId].y2) >=
-        (gSprites[player->spriteId].y + gSprites[player->spriteId].y2))
-    {
-        DestroyTask(taskId);
-        ScriptContext_Enable();
-    }
 }
 
 #define tXShakeOffset data[0]

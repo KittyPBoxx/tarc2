@@ -12,7 +12,6 @@
 #include "field_weather.h"
 #include "fieldmap.h"
 #include "fldeff.h"
-#include "follower_npc.h"
 #include "gpu_regs.h"
 #include "main.h"
 #include "malloc.h"
@@ -23,7 +22,6 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "pokemon.h"
-#include "pokemon_storage_system.h"
 #include "script.h"
 #include "sound.h"
 #include "sprite.h"
@@ -146,7 +144,6 @@ static bool8 LavaridgeGym1FWarpEffect_Warp(struct Task *, struct ObjectEvent *, 
 
 static void Task_EscapeRopeWarpOut(u8);
 static void EscapeRopeWarpOutEffect_Init(struct Task *);
-static void EscapeRopeWarpOutEffect_HideFollowerNPC(struct Task *);
 static void EscapeRopeWarpOutEffect_Spin(struct Task *);
 
 static void FieldCallback_EscapeRopeWarpIn(void);
@@ -698,7 +695,6 @@ static bool8 (*const sLavaridgeGym1FWarpEffectFuncs[])(struct Task *, struct Obj
 static void (*const sEscapeRopeWarpOutEffectFuncs[])(struct Task *) =
 {
     EscapeRopeWarpOutEffect_Init,
-    EscapeRopeWarpOutEffect_HideFollowerNPC,
     EscapeRopeWarpOutEffect_Spin,
 };
 
@@ -928,12 +924,6 @@ u8 CreateTrainerSprite(u8 trainerSpriteID, s16 x, s16 y, u8 subpriority, u8 *buf
     return CreateSprite(&spriteTemplate, x, y, subpriority);
 }
 
-static void UNUSED LoadTrainerGfx_TrainerCard(u8 gender, u16 palOffset, u8 *dest)
-{
-    LZDecompressVram(gTrainerSprites[gender].frontPic.data, dest);
-    LoadPalette(gTrainerSprites[gender].palette.data, palOffset, PLTT_SIZE_4BPP);
-}
-
 u8 AddNewGameBirchObject(s16 x, s16 y, u8 subpriority)
 {
     LoadSpritePalette(&sSpritePalette_NewGameBirch);
@@ -1041,7 +1031,7 @@ bool8 FldEff_PokecenterHeal(void)
     u32 nPokemon;
     struct Task *task;
 
-    nPokemon = (OW_IGNORE_EGGS_ON_HEAL <= GEN_3) ? CalculatePlayerPartyCount() : CountPartyNonEggMons();
+    nPokemon = CalculatePlayerPartyCount();
     task = &gTasks[CreateTask(Task_PokecenterHeal, 0xff)];
     task->tNumMons = nPokemon;
     task->tFirstBallX = 93;
@@ -1385,28 +1375,15 @@ void FieldCallback_UseFly(void)
 
 static void Task_UseFly(u8 taskId)
 {
-    struct ObjectEvent *follower = &gObjectEvents[GetFollowerNPCObjectId()];
     struct Task *task;
     task = &gTasks[taskId];
     if (taskState == 0)
     {
-        if (!PlayerHasFollowerNPC())
-        {
-            taskState = 2;
-        }
-        else
-        {
-            FollowerNPCWalkIntoPlayerForLeaveMap();
-            taskState++;
-        }
+        taskState = 2;
     }
     if (taskState == 1)
     {
-        if (ObjectEventClearHeldMovementIfFinished(follower))
-        {
-            FollowerNPCHideForLeaveMap(follower);
-            taskState++;
-        }
+        taskState++;
     }
     if (taskState == 2)
     {
@@ -1458,8 +1435,6 @@ static void FieldCallback_FlyIntoMap(void)
 
 static void Task_FlyIntoMap(u8 taskId)
 {
-    struct ObjectEvent *player = &gObjectEvents[gPlayerAvatar.objectEventId];
-    struct ObjectEvent *follower = &gObjectEvents[GetFollowerNPCObjectId()];
     struct Task *task;
     task = &gTasks[taskId];
     if (taskState == tWaitPaletteFadeIn)
@@ -1475,24 +1450,12 @@ static void Task_FlyIntoMap(u8 taskId)
     {
         if (!FieldEffectActiveListContains(FLDEFF_FLY_IN))
         {
-            if (FNPC_NPC_FOLLOWER_SHOW_AFTER_LEAVE_ROUTE)
-                FollowerNPCReappearAfterLeaveMap(follower, player);
-
             taskState++;
         }
     }
     if (taskState == tNPCFollowerFacePlayer)
     {
-        if (PlayerHasFollowerNPC() && ObjectEventClearHeldMovementIfFinished(follower))
-        {
-            if (FNPC_NPC_FOLLOWER_SHOW_AFTER_LEAVE_ROUTE)
-                FollowerNPCFaceAfterLeaveMap();
-            taskState++;
-        }
-        else if (!PlayerHasFollowerNPC())
-        {
-            taskState++;
-        }
+        taskState++;
     }
     if (taskState == tTaskEnd)
     {
@@ -1634,8 +1597,6 @@ static bool8 FallWarpEffect_End(struct Task *task)
     UnfreezeObjectEvents();
     InstallCameraPanAheadCallback();
     DestroyTask(FindTaskIdByFunc(Task_FallWarpFieldEffect));
-    FollowerNPC_WarpSetEnd();
-
     return FALSE;
 }
 
@@ -1698,7 +1659,6 @@ static bool8 EscalatorWarpOut_WaitForPlayer(struct Task *task)
         task->tState++;
         task->data[2] = 0;
         task->data[3] = 0;
-        EscalatorMoveFollowerNPC(task->data[1]);
 
         if ((u8)task->data[1] == FALSE)
         {
@@ -1822,7 +1782,6 @@ static bool8 EscalatorWarpIn_Init(struct Task *task)
     ObjectEventSetHeldMovement(objectEvent, GetFaceDirectionMovementAction(DIR_EAST));
     PlayerGetDestCoords(&x, &y);
     behavior = MapGridGetMetatileBehaviorAt(x, y);
-    EscalatorMoveFollowerNPCFinish();
     task->tState++;
     task->data[1] = 16;
 
@@ -2075,20 +2034,12 @@ static bool8 LavaridgeGymB1FWarpEffect_Init(struct Task *task, struct ObjectEven
     if (objectEvent->localId == OBJ_EVENT_ID_PLAYER) // Hide follower before warping
     {
         HideFollowerForFieldEffect();
-        if (PlayerHasFollowerNPC() && gObjectEvents[GetFollowerNPCObjectId()].invisible == FALSE)
-        {
-            FollowerNPCWalkIntoPlayerForLeaveMap();
-            CreateTask(Task_HideNPCFollowerAfterMovementFinish, 2);
-        }
     }
     return TRUE;
 }
 
 static bool8 LavaridgeGymB1FWarpEffect_CameraShake(struct Task *task, struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    if (FindTaskIdByFunc(Task_HideNPCFollowerAfterMovementFinish) != TASK_NONE)
-        return FALSE;
-
     SetCameraPanning(0, task->data[1]);
     task->data[1] = -task->data[1];
     task->data[2]++;
@@ -2281,20 +2232,12 @@ static bool8 LavaridgeGym1FWarpEffect_Init(struct Task *task, struct ObjectEvent
     if (objectEvent->localId == OBJ_EVENT_ID_PLAYER) // Hide follower before warping
     {
         HideFollowerForFieldEffect();
-        if (PlayerHasFollowerNPC() && gObjectEvents[GetFollowerNPCObjectId()].invisible == FALSE)
-        {
-            FollowerNPCWalkIntoPlayerForLeaveMap();
-            CreateTask(Task_HideNPCFollowerAfterMovementFinish, 2);
-        }
     }
     return FALSE;
 }
 
 static bool8 LavaridgeGym1FWarpEffect_AshPuff(struct Task *task, struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    if (FindTaskIdByFunc(Task_HideNPCFollowerAfterMovementFinish) != TASK_NONE)
-        return FALSE;
-
     if (ObjectEventClearHeldMovementIfFinished(objectEvent))
     {
         if (task->data[1] > 3)
@@ -2394,38 +2337,9 @@ static void Task_EscapeRopeWarpOut(u8 taskId)
 
 static void EscapeRopeWarpOutEffect_Init(struct Task *task)
 {
-    if (PlayerHasFollowerNPC())
-        task->tState++;
-    else
-        task->tState += 2;
-
+    task->tState += 2;
     task->tTimer = 64;
     task->tStartDir = GetPlayerFacingDirection();
-}
-
-static void EscapeRopeWarpOutEffect_HideFollowerNPC(struct Task *task)
-{
-    struct ObjectEvent *follower = &gObjectEvents[GetFollowerNPCObjectId()];
-    if (task->tHideFollower == START_MOVEMENT)
-    {
-        if (!PlayerHasFollowerNPC())
-        {
-            task->tState++;
-        }
-        else
-        {
-            FollowerNPCWalkIntoPlayerForLeaveMap();
-            task->tHideFollower = WAIT_MOVEMENT_END;
-        }
-    }
-    if (task->tHideFollower == WAIT_MOVEMENT_END)
-    {
-        if (ObjectEventClearHeldMovementIfFinished(follower))
-        {
-            FollowerNPCHideForLeaveMap(follower);
-            task->tState++;
-        }
-    }
 }
 
 static void EscapeRopeWarpOutEffect_Spin(struct Task *task)
@@ -2494,7 +2408,6 @@ static void EscapeRopeWarpInEffect_Spin(struct Task *task)
 {
     u8 spinDirections[5] = {DIR_SOUTH, DIR_WEST, DIR_EAST, DIR_NORTH, DIR_SOUTH};
     struct ObjectEvent *player = &gObjectEvents[gPlayerAvatar.objectEventId];
-    struct ObjectEvent *follower = &gObjectEvents[GetFollowerNPCObjectId()];
 
     if ((task->tSpinDelay == 0 || (--task->tSpinDelay) == 0) && task->data[3] == 0)
     {
@@ -2519,24 +2432,11 @@ static void EscapeRopeWarpInEffect_Spin(struct Task *task)
 
     if (task->data[3] == 1)
     {
-        if (FNPC_NPC_FOLLOWER_SHOW_AFTER_LEAVE_ROUTE)
-            FollowerNPCReappearAfterLeaveMap(follower, player);
-
         task->data[3]++;
     }
     if (task->data[3] == 2)
     {
-        if (PlayerHasFollowerNPC() && ObjectEventClearHeldMovementIfFinished(follower))
-        {
-            if (FNPC_NPC_FOLLOWER_SHOW_AFTER_LEAVE_ROUTE)
-                FollowerNPCFaceAfterLeaveMap();
-
-            task->data[3]++;
-        }
-        else if (!PlayerHasFollowerNPC())
-        {
-            task->data[3]++;
-        }
+        task->data[3]++;
     }
     if (task->data[3] == 3)
     {
@@ -2737,7 +2637,6 @@ static void TeleportWarpInFieldEffect_SpinEnter(struct Task *task)
 static void TeleportWarpInFieldEffect_SpinGround(struct Task *task)
 {
     struct ObjectEvent *player = &gObjectEvents[gPlayerAvatar.objectEventId];
-    struct ObjectEvent *follower = &gObjectEvents[GetFollowerNPCObjectId()];
 
     u8 spinDirections[5] = {DIR_SOUTH, DIR_WEST, DIR_EAST, DIR_NORTH, DIR_SOUTH};
     if ((--task->data[1]) == 0 && task->data[3] == 0)
@@ -2746,25 +2645,12 @@ static void TeleportWarpInFieldEffect_SpinGround(struct Task *task)
         task->data[1] = 8;
         if ((++task->data[2]) > 4 && task->data[14] == player->facingDirection)
         {
-            if (FNPC_NPC_FOLLOWER_SHOW_AFTER_LEAVE_ROUTE)
-                FollowerNPCReappearAfterLeaveMap(follower, player);
-
             task->data[3] = 1;
         }
     }
     if (task->data[3] == 1)
     {
-        if (PlayerHasFollowerNPC() && ObjectEventClearHeldMovementIfFinished(follower))
-        {
-            if (FNPC_NPC_FOLLOWER_SHOW_AFTER_LEAVE_ROUTE)
-                FollowerNPCFaceAfterLeaveMap();
-
-            task->data[3]++;
-        }
-        else if (!PlayerHasFollowerNPC())
-        {
-            task->data[3]++;
-        }
+        task->data[3]++;
     }
     if (task->data[3] == 2)
     {
@@ -3277,7 +3163,6 @@ static void SurfFieldEffect_JumpOnSurfBlob(struct Task *task)
         ObjectEventSetGraphicsId(objectEvent, GetPlayerAvatarGraphicsIdByStateId(PLAYER_AVATAR_STATE_SURFING));
         ObjectEventClearHeldMovementIfFinished(objectEvent);
         ObjectEventSetHeldMovement(objectEvent, GetJumpSpecialMovementAction(objectEvent->movementDirection));
-        FollowerNPC_FollowerToWater();
 
         gFieldEffectArguments[0] = task->tDestX;
         gFieldEffectArguments[1] = task->tDestY;

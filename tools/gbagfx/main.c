@@ -374,53 +374,6 @@ void HandlePngToLatinFontCommand(char *inputPath, char *outputPath, int argc UNU
     FreeImage(&image);
 }
 
-void HandleHalfwidthJapaneseFontToPngCommand(char *inputPath, char *outputPath, int argc UNUSED, char **argv UNUSED)
-{
-    struct Image image;
-    image.tilemap.data.affine = NULL; // initialize to NULL to avoid issues in FreeImage
-
-    ReadHalfwidthJapaneseFont(inputPath, &image);
-    WritePng(outputPath, &image);
-
-    FreeImage(&image);
-}
-
-void HandlePngToHalfwidthJapaneseFontCommand(char *inputPath, char *outputPath, int argc UNUSED, char **argv UNUSED)
-{
-    struct Image image;
-    image.tilemap.data.affine = NULL; // initialize to NULL to avoid issues in FreeImage
-
-    image.bitDepth = 2;
-
-    ReadPng(inputPath, &image);
-    WriteHalfwidthJapaneseFont(outputPath, &image);
-
-    FreeImage(&image);
-}
-
-void HandleFullwidthJapaneseFontToPngCommand(char *inputPath, char *outputPath, int argc UNUSED, char **argv UNUSED)
-{
-    struct Image image;
-    image.tilemap.data.affine = NULL; // initialize to NULL to avoid issues in FreeImage
-
-    ReadFullwidthJapaneseFont(inputPath, &image);
-    WritePng(outputPath, &image);
-
-    FreeImage(&image);
-}
-
-void HandlePngToFullwidthJapaneseFontCommand(char *inputPath, char *outputPath, int argc UNUSED, char **argv UNUSED)
-{
-    struct Image image;
-    image.tilemap.data.affine = NULL; // initialize to NULL to avoid issues in FreeImage
-
-    image.bitDepth = 2;
-
-    ReadPng(inputPath, &image);
-    WriteFullwidthJapaneseFont(outputPath, &image);
-
-    FreeImage(&image);
-}
 
 void HandleLZCompressCommand(char *inputPath, char *outputPath, int argc, char **argv)
 {
@@ -607,10 +560,6 @@ int main(int argc, char **argv)
         { "pal", "gbapal", HandleJascToGbaPaletteCommand },
         { "latfont", "png", HandleLatinFontToPngCommand },
         { "png", "latfont", HandlePngToLatinFontCommand },
-        { "hwjpnfont", "png", HandleHalfwidthJapaneseFontToPngCommand },
-        { "png", "hwjpnfont", HandlePngToHalfwidthJapaneseFontCommand },
-        { "fwjpnfont", "png", HandleFullwidthJapaneseFontToPngCommand },
-        { "png", "fwjpnfont", HandlePngToFullwidthJapaneseFontCommand },
         { NULL, "huff", HandleHuffCompressCommand },
         { NULL, "lz", HandleLZCompressCommand },
         { "huff", NULL, HandleHuffDecompressCommand },

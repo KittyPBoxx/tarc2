@@ -31,7 +31,6 @@
 #define WIN_INSTRUCTIONS 1
 #define WIN_BOTTOM_LEFT 2
 #define WIN_BOTTOM_RIGHT 3
-#define WIN_FOOTPRINT 4
 #define WIN_END 5
 
 //Battle backgrounds

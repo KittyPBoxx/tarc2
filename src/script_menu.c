@@ -218,31 +218,6 @@ static void FreeListMenuItems(struct ListMenuItem *items, u32 count)
     Free(items);
 }
 
-static u16 UNUSED GetLengthWithExpandedPlayerName(const u8 *str)
-{
-    u16 length = 0;
-
-    while (*str != EOS)
-    {
-        if (*str == PLACEHOLDER_BEGIN)
-        {
-            str++;
-            if (*str == PLACEHOLDER_ID_PLAYER)
-            {
-                length += StringLength(gSaveBlock2Ptr->playerName);
-                str++;
-            }
-        }
-        else
-        {
-            str++;
-            length++;
-        }
-    }
-
-    return length;
-}
-
 void MultichoiceDynamic_InitStack(u32 capacity)
 {
     AGB_ASSERT(sDynamicMultiChoiceStack == NULL);
@@ -729,28 +704,10 @@ static void CreatePCMultichoice(void)
 
     width = ConvertPixelWidthToTileWidth(pixelWidth);
 
-    // Include Hall of Fame option if player is champion
-    if (FlagGet(FLAG_SYS_GAME_CLEAR))
-    {
-        numChoices = 4;
-        windowId = CreateWindowFromRect(0, 0, width, 8);
-        SetStandardWindowBorderStyle(windowId, FALSE);
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_HallOfFame, x, 33, TEXT_SKIP_DRAW, NULL);
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 49, TEXT_SKIP_DRAW, NULL);
-    }
-    else
-    {
-        numChoices = 3;
-        windowId = CreateWindowFromRect(0, 0, width, 6);
-        SetStandardWindowBorderStyle(windowId, FALSE);
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 33, TEXT_SKIP_DRAW, NULL);
-    }
-
-    // Change PC name if player has met Lanette
-    if (FlagGet(FLAG_SYS_PC_LANETTE))
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LanettesPC, x, 1, TEXT_SKIP_DRAW, NULL);
-    else
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_SomeonesPC, x, 1, TEXT_SKIP_DRAW, NULL);
+    numChoices = 2;
+    windowId = CreateWindowFromRect(0, 0, width, 6);
+    SetStandardWindowBorderStyle(windowId, FALSE);
+    AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 33, TEXT_SKIP_DRAW, NULL);
 
     StringExpandPlaceholders(gStringVar4, gText_PlayersPC);
     PrintPlayerNameOnWindow(windowId, gStringVar4, x, 17);
@@ -1024,33 +981,7 @@ void ClearToTransparentAndRemoveWindow(u8 windowId)
 
 static void DrawLinkServicesMultichoiceMenu(u8 multichoiceId)
 {
-    switch (multichoiceId)
-    {
-    case MULTI_WIRELESS_NO_BERRY:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sWirelessOptionsNoBerryCrush[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_CABLE_CLUB_WITH_RECORD_MIX:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sCableClubOptions_WithRecordMix[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_WIRELESS_NO_RECORD:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sWirelessOptions_NoRecordMix[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_WIRELESS_ALL_SERVICES:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sWirelessOptions_AllServices[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_WIRELESS_NO_RECORD_BERRY:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sWirelessOptions_NoRecordMixBerryCrush[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    case MULTI_CABLE_CLUB_NO_RECORD_MIX:
-        FillWindowPixelBuffer(0, PIXEL_FILL(1));
-        AddTextPrinterParameterized2(0, FONT_NORMAL, sCableClubOptions_NoRecordMix[Menu_GetCursorPos()], 0, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY);
-        break;
-    }
+    // TODO: remove
 }
 
 bool16 ScriptMenu_CreateStartMenuForPokenavTutorial(void)

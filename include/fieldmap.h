@@ -41,8 +41,6 @@ void SaveMapView(void);
 void SetCameraFocusCoords(u16 x, u16 y);
 void InitMap(void);
 void InitMapFromSavedGame(void);
-void InitTrainerHillMap(void);
-void InitBattlePyramidMap(bool8 setPlayerPosition);
 void CopyMapTilesetsToVram(struct MapLayout const *mapLayout);
 void LoadMapTilesetPalettes(struct MapLayout const *mapLayout);
 void LoadSecondaryTilesetPalette(struct MapLayout const *mapLayout, bool8 skipFaded);
@@ -52,8 +50,5 @@ void CopySecondaryTilesetToVram(struct MapLayout const *mapLayout);
 const struct MapHeader *const GetMapHeaderFromConnection(const struct MapConnection *connection);
 const struct MapConnection *GetMapConnectionAtPos(s16 x, s16 y);
 void MapGridSetMetatileImpassabilityAt(int x, int y, bool32 impassable);
-
-// field_region_map.c
-void FieldInitRegionMap(MainCallback callback);
 
 #endif //GUARD_FIELDMAP_H

@@ -54,7 +54,6 @@ gSongTable::
 	song se_truck_stop, 1, 1
 	song se_truck_unload, 2, 2
 	song se_truck_door, 1, 1
-	song se_berry_blender, 2, 2
 	song se_card, 1, 1
 	song se_save, 1, 1
 	song se_ball_bounce_1, 1, 1
@@ -382,7 +381,6 @@ gSongTable::
 	song mus_move_deleted, 2, 2
 	song mus_encounter_girl, 0, 0
 	song mus_encounter_male, 0, 0
-	song mus_abandoned_ship, 0, 0
 	song mus_fortree, 0, 0
 	song mus_birch_lab, 0, 0
 	song mus_b_tower_rs, 0, 0

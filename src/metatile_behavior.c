@@ -328,21 +328,6 @@ bool8 MetatileBehavior_IsSouthArrowWarp(u8 metatileBehavior)
         return FALSE;
 }
 
-bool8 UNUSED Unref_MetatileBehavior_IsArrowWarp(u8 metatileBehavior)
-{
-    u8 isArrowWarp = FALSE;
-
-    if (MetatileBehavior_IsEastArrowWarp(metatileBehavior)
-     || MetatileBehavior_IsWestArrowWarp(metatileBehavior)
-     || MetatileBehavior_IsNorthArrowWarp(metatileBehavior)
-     || MetatileBehavior_IsSouthArrowWarp(metatileBehavior))
-    {
-        isArrowWarp = TRUE;
-    }
-
-    return isArrowWarp;
-}
-
 bool8 MetatileBehavior_IsForcedMovementTile(u8 metatileBehavior)
 {
     if ((metatileBehavior >= MB_WALK_EAST && metatileBehavior <= MB_TRICK_HOUSE_PUZZLE_8_FLOOR)
@@ -1099,14 +1084,6 @@ bool8 MetatileBehavior_IsRoulette(u8 metatileBehavior) // unused
         return FALSE;
 }
 
-bool8 MetatileBehavior_IsPokeblockFeeder(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_POKEBLOCK_FEEDER)
-        return TRUE;
-    else
-        return FALSE;
-}
-
 bool8 MetatileBehavior_IsSecretBaseJumpMat(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_SECRET_BASE_JUMP_MAT)
@@ -1351,10 +1328,7 @@ bool8 MetatileBehavior_IsBlueprint(u8 metatileBehavior)
 
 bool8 MetatileBehavior_IsBattlePyramidWarp(u8 metatileBehavior)
 {
-    if (metatileBehavior == MB_BATTLE_PYRAMID_WARP)
-        return TRUE;
-    else
-        return FALSE;
+    return FALSE;
 }
 
 bool8 MetatileBehavior_IsPlayerFacingWirelessBoxResults(u8 tile, u8 playerDir)

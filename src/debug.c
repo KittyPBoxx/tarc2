@@ -12,10 +12,8 @@
 #include "battle_setup.h"
 #include "berry.h"
 #include "clock.h"
-#include "coins.h"
 #include "credits.h"
 #include "data.h"
-#include "daycare.h"
 #include "debug.h"
 #include "event_data.h"
 #include "event_object_movement.h"
@@ -33,18 +31,14 @@
 #include "malloc.h"
 #include "map_name_popup.h"
 #include "menu.h"
-#include "money.h"
 #include "naming_screen.h"
 #include "new_game.h"
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
-#include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_icon.h"
-#include "pokemon_storage_system.h"
 #include "random.h"
-#include "region_map.h"
 #include "rtc.h"
 #include "script.h"
 #include "script_pokemon_util.h"
@@ -56,8 +50,6 @@
 #include "wild_encounter.h"
 #include "constants/abilities.h"
 #include "constants/battle_ai.h"
-#include "constants/battle_frontier.h"
-#include "constants/coins.h"
 #include "constants/expansion.h"
 #include "constants/flags.h"
 #include "constants/items.h"
@@ -135,13 +127,10 @@ enum GivePCBagDebugMenu
     DEBUG_PCBAG_MENU_ITEM_ACCESS_PC,
     DEBUG_PCBAG_MENU_ITEM_FILL,
     DEBUG_PCBAG_MENU_ITEM_CLEAR_BAG,
-    DEBUG_PCBAG_MENU_ITEM_CLEAR_BOXES,
 };
 
 enum GivePCBagFillDebugMenu
 {
-    DEBUG_PCBAG_MENU_ITEM_FILL_PC_BOXES_FAST,
-    DEBUG_PCBAG_MENU_ITEM_FILL_PC_BOXES_SLOW,
     DEBUG_PCBAG_MENU_ITEM_FILL_PC_ITEMS,
     DEBUG_PCBAG_MENU_ITEM_FILL_POCKET_ITEMS,
     DEBUG_PCBAG_MENU_ITEM_FILL_POCKET_BALLS,
@@ -246,10 +235,6 @@ enum GiveDebugMenu
     DEBUG_GIVE_MENU_ITEM_ITEM_X,
     DEBUG_GIVE_MENU_ITEM_POKEMON_SIMPLE,
     DEBUG_GIVE_MENU_ITEM_POKEMON_COMPLEX,
-    DEBUG_GIVE_MENU_ITEM_MAX_MONEY,
-    DEBUG_GIVE_MENU_ITEM_MAX_COINS,
-    DEBUG_GIVE_MENU_ITEM_MAX_BATTLE_POINTS,
-    DEBUG_GIVE_MENU_ITEM_DAYCARE_EGG,
 };
 
 enum SoundDebugMenu
@@ -400,8 +385,6 @@ static void DebugAction_Util_Warp_SelectWarp(u8 taskId);
 static void DebugAction_Util_Weather(u8 taskId);
 static void DebugAction_Util_Weather_SelectId(u8 taskId);
 static void DebugAction_Util_FontTest(u8 taskId);
-static void DebugAction_TimeMenu_CheckWallClock(u8 taskId);
-static void DebugAction_TimeMenu_SetWallClock(u8 taskId);
 static void DebugAction_Util_WatchCredits(u8 taskId);
 static void DebugAction_Util_CheatStart(u8 taskId);
 static void DebugAction_Util_BerryFunctions(u8 taskId);
@@ -418,8 +401,6 @@ static void DebugAction_TimeMenu_ChangeTimeOfDay(u8 taskId);
 static void DebugAction_TimeMenu_ChangeWeekdays(u8 taskId);
 
 static void DebugAction_OpenPCBagFillMenu(u8 taskId);
-static void DebugAction_PCBag_Fill_PCBoxes_Fast(u8 taskId);
-static void DebugAction_PCBag_Fill_PCBoxes_Slow(u8 taskId);
 static void DebugAction_PCBag_Fill_PCItemStorage(u8 taskId);
 static void DebugAction_PCBag_Fill_PocketItems(u8 taskId);
 static void DebugAction_PCBag_Fill_PocketPokeBalls(u8 taskId);
@@ -428,10 +409,7 @@ static void DebugAction_PCBag_Fill_PocketBerries(u8 taskId);
 static void DebugAction_PCBag_Fill_PocketKeyItems(u8 taskId);
 static void DebugAction_PCBag_AccessPC(u8 taskId);
 static void DebugAction_PCBag_ClearBag(u8 taskId);
-static void DebugAction_PCBag_ClearBoxes(u8 taskId);
 
-static void DebugAction_Party_MoveReminder(u8 taskId);
-static void DebugAction_Party_HatchAnEgg(u8 taskId);
 static void DebugAction_Party_HealParty(u8 taskId);
 static void DebugAction_Party_InflictStatus1(u8 taskId);
 static void DebugAction_Party_CheckEVs(u8 taskId);
@@ -479,10 +457,6 @@ static void DebugAction_Give_Pokemon_SelectIVs(u8 taskId);
 static void DebugAction_Give_Pokemon_SelectEVs(u8 taskId);
 static void DebugAction_Give_Pokemon_ComplexCreateMon(u8 taskId);
 static void DebugAction_Give_Pokemon_Move(u8 taskId);
-static void DebugAction_Give_MaxMoney(u8 taskId);
-static void DebugAction_Give_MaxCoins(u8 taskId);
-static void DebugAction_Give_MaxBattlePoints(u8 taskId);
-static void DebugAction_Give_DayCareEgg(u8 taskId);
 
 static void DebugAction_Sound_SE(u8 taskId);
 static void DebugAction_Sound_SE_SelectId(u8 taskId);
@@ -524,9 +498,6 @@ extern const u8 DebugScript_ZeroDaycareMons[];
 
 extern const u8 Debug_ShowFieldMessageStringVar4[];
 extern const u8 Debug_CheatStart[];
-extern const u8 Debug_HatchAnEgg[];
-extern const u8 PlayersHouse_2F_EventScript_SetWallClock[];
-extern const u8 PlayersHouse_2F_EventScript_CheckWallClock[];
 extern const u8 Debug_CheckSaveBlock[];
 extern const u8 Debug_CheckROMSpace[];
 extern const u8 Debug_BoxFilledMessage[];
@@ -539,8 +510,6 @@ extern const u8 Debug_EventScript_FakeRTCNotEnabled[];
 
 extern const u8 Debug_BerryPestsDisabled[];
 extern const u8 Debug_BerryWeedsDisabled[];
-
-extern const u8 FallarborTown_MoveRelearnersHouse_EventScript_ChooseMon[];
 
 #include "data/map_group_count.h"
 
@@ -691,13 +660,10 @@ static const struct ListMenuItem sDebugMenu_Items_PCBag[] =
     [DEBUG_PCBAG_MENU_ITEM_ACCESS_PC]   = {COMPOUND_STRING("Access PC"),                        DEBUG_PCBAG_MENU_ITEM_ACCESS_PC},
     [DEBUG_PCBAG_MENU_ITEM_FILL]        = {COMPOUND_STRING("Fill…{CLEAR_TO 110}{RIGHT_ARROW}"), DEBUG_PCBAG_MENU_ITEM_FILL},
     [DEBUG_PCBAG_MENU_ITEM_CLEAR_BAG]   = {COMPOUND_STRING("Clear Bag"),                        DEBUG_PCBAG_MENU_ITEM_CLEAR_BAG},
-    [DEBUG_PCBAG_MENU_ITEM_CLEAR_BOXES] = {COMPOUND_STRING("Clear Storage Boxes"),              DEBUG_PCBAG_MENU_ITEM_CLEAR_BOXES},
 };
 
 static const struct ListMenuItem sDebugMenu_Items_PCBag_Fill[] =
 {
-    [DEBUG_PCBAG_MENU_ITEM_FILL_PC_BOXES_FAST]    = {COMPOUND_STRING("Fill PC Boxes Fast"),        DEBUG_PCBAG_MENU_ITEM_FILL_PC_BOXES_FAST},
-    [DEBUG_PCBAG_MENU_ITEM_FILL_PC_BOXES_SLOW]    = {COMPOUND_STRING("Fill PC Boxes Slow (LAG!)"), DEBUG_PCBAG_MENU_ITEM_FILL_PC_BOXES_SLOW},
     [DEBUG_PCBAG_MENU_ITEM_FILL_PC_ITEMS]         = {COMPOUND_STRING("Fill PC Items") ,            DEBUG_PCBAG_MENU_ITEM_FILL_PC_ITEMS},
     [DEBUG_PCBAG_MENU_ITEM_FILL_POCKET_ITEMS]     = {COMPOUND_STRING("Fill Pocket Items"),         DEBUG_PCBAG_MENU_ITEM_FILL_POCKET_ITEMS},
     [DEBUG_PCBAG_MENU_ITEM_FILL_POCKET_BALLS]     = {COMPOUND_STRING("Fill Pocket Poké Balls"),    DEBUG_PCBAG_MENU_ITEM_FILL_POCKET_BALLS},
@@ -802,10 +768,6 @@ static const struct ListMenuItem sDebugMenu_Items_Give[] =
     [DEBUG_GIVE_MENU_ITEM_ITEM_X]            = {COMPOUND_STRING("Give item XYZ…{CLEAR_TO 110}{RIGHT_ARROW}"),    DEBUG_GIVE_MENU_ITEM_ITEM_X},
     [DEBUG_GIVE_MENU_ITEM_POKEMON_SIMPLE]    = {COMPOUND_STRING("Pokémon (Basic){CLEAR_TO 110}{RIGHT_ARROW}"),   DEBUG_GIVE_MENU_ITEM_POKEMON_SIMPLE},
     [DEBUG_GIVE_MENU_ITEM_POKEMON_COMPLEX]   = {COMPOUND_STRING("Pokémon (Complex){CLEAR_TO 110}{RIGHT_ARROW}"), DEBUG_GIVE_MENU_ITEM_POKEMON_COMPLEX},
-    [DEBUG_GIVE_MENU_ITEM_MAX_MONEY]         = {COMPOUND_STRING("Max Money"),                                    DEBUG_GIVE_MENU_ITEM_MAX_MONEY},
-    [DEBUG_GIVE_MENU_ITEM_MAX_COINS]         = {COMPOUND_STRING("Max Coins"),                                    DEBUG_GIVE_MENU_ITEM_MAX_COINS},
-    [DEBUG_GIVE_MENU_ITEM_MAX_BATTLE_POINTS] = {COMPOUND_STRING("Max Battle Points"),                            DEBUG_GIVE_MENU_ITEM_MAX_BATTLE_POINTS},
-    [DEBUG_GIVE_MENU_ITEM_DAYCARE_EGG]       = {COMPOUND_STRING("Daycare Egg"),                                  DEBUG_GIVE_MENU_ITEM_DAYCARE_EGG},
 };
 
 static const struct ListMenuItem sDebugMenu_Items_Sound[] =
@@ -873,13 +835,10 @@ static void (*const sDebugMenu_Actions_PCBag[])(u8) =
     [DEBUG_PCBAG_MENU_ITEM_ACCESS_PC]             = DebugAction_PCBag_AccessPC,
     [DEBUG_PCBAG_MENU_ITEM_FILL]                  = DebugAction_OpenPCBagFillMenu,
     [DEBUG_PCBAG_MENU_ITEM_CLEAR_BAG]             = DebugAction_PCBag_ClearBag,
-    [DEBUG_PCBAG_MENU_ITEM_CLEAR_BOXES]           = DebugAction_PCBag_ClearBoxes,
 };
 
 static void (*const sDebugMenu_Actions_PCBag_Fill[])(u8) =
 {
-    [DEBUG_PCBAG_MENU_ITEM_FILL_PC_BOXES_FAST]    = DebugAction_PCBag_Fill_PCBoxes_Fast,
-    [DEBUG_PCBAG_MENU_ITEM_FILL_PC_BOXES_SLOW]    = DebugAction_PCBag_Fill_PCBoxes_Slow,
     [DEBUG_PCBAG_MENU_ITEM_FILL_PC_ITEMS]         = DebugAction_PCBag_Fill_PCItemStorage,
     [DEBUG_PCBAG_MENU_ITEM_FILL_POCKET_ITEMS]     = DebugAction_PCBag_Fill_PocketItems,
     [DEBUG_PCBAG_MENU_ITEM_FILL_POCKET_BALLS]     = DebugAction_PCBag_Fill_PocketPokeBalls,
@@ -890,8 +849,6 @@ static void (*const sDebugMenu_Actions_PCBag_Fill[])(u8) =
 
 static void (*const sDebugMenu_Actions_Party[])(u8) =
 {
-    [DEBUG_PARTY_MENU_ITEM_MOVE_REMINDER]   = DebugAction_Party_MoveReminder,
-    [DEBUG_PARTY_MENU_ITEM_HATCH_AN_EGG]    = DebugAction_Party_HatchAnEgg,
     [DEBUG_PARTY_MENU_ITEM_HEAL_PARTY]      = DebugAction_Party_HealParty,
     [DEBUG_PARTY_MENU_ITEM_INFLICT_STATUS1] = DebugAction_Party_InflictStatus1,
     [DEBUG_PARTY_MENU_ITEM_CHECK_EVS]       = DebugAction_Party_CheckEVs,
@@ -937,10 +894,6 @@ static void (*const sDebugMenu_Actions_Give[])(u8) =
     [DEBUG_GIVE_MENU_ITEM_ITEM_X]            = DebugAction_Give_Item,
     [DEBUG_GIVE_MENU_ITEM_POKEMON_SIMPLE]    = DebugAction_Give_PokemonSimple,
     [DEBUG_GIVE_MENU_ITEM_POKEMON_COMPLEX]   = DebugAction_Give_PokemonComplex,
-    [DEBUG_GIVE_MENU_ITEM_MAX_MONEY]         = DebugAction_Give_MaxMoney,
-    [DEBUG_GIVE_MENU_ITEM_MAX_COINS]         = DebugAction_Give_MaxCoins,
-    [DEBUG_GIVE_MENU_ITEM_MAX_BATTLE_POINTS] = DebugAction_Give_MaxBattlePoints,
-    [DEBUG_GIVE_MENU_ITEM_DAYCARE_EGG]       = DebugAction_Give_DayCareEgg,
 };
 
 static void (*const sDebugMenu_Actions_Sound[])(u8) =
@@ -964,8 +917,6 @@ static void (*const sDebugMenu_Actions_TimeMenu[])(u8) =
     [DEBUG_TIME_MENU_ITEM_PRINTTIMEOFDAY] = DebugAction_TimeMenu_PrintTimeOfDay,
     [DEBUG_TIME_MENU_ITEM_TIMESOFDAY] = DebugAction_TimeMenu_TimesOfDay,
     [DEBUG_TIME_MENU_ITEM_WEEKDAYS] = DebugAction_TimeMenu_Weekdays,
-    [DEBUG_TIME_MENU_ITEM_CHECKWALLCLOCK]  = DebugAction_TimeMenu_CheckWallClock,
-    [DEBUG_TIME_MENU_ITEM_SETWALLCLOCK]    = DebugAction_TimeMenu_SetWallClock,
 };
 
 static void (*const sDebugMenu_Actions_TimeMenu_TimesOfDay[])(u8) =
@@ -1215,6 +1166,8 @@ static void Debug_ShowMenu(void (*HandleInput)(u8), struct ListMenuTemplate LMte
     u8 menuTaskId;
     u8 inputTaskId;
 
+    DebugPrintfLevel(MGBA_LOG_WARN, "Debug_ShowMenu");
+    
     // create window
     HideMapNamePopUpWindow();
     LoadMessageBoxAndBorderGfx();
@@ -1245,8 +1198,10 @@ static void Debug_ShowMenu(void (*HandleInput)(u8), struct ListMenuTemplate LMte
     gTasks[inputTaskId].tWindowId = windowId;
     gTasks[inputTaskId].tSubWindowId = 0;
 
+    DebugPrintfLevel(MGBA_LOG_WARN, "Pre Debug_RefreshListMenu");
     Debug_RefreshListMenu(inputTaskId);
 
+    DebugPrintfLevel(MGBA_LOG_WARN, "Post Debug_RefreshListMenu");
     // draw everything
     CopyWindowToVram(windowId, COPYWIN_FULL);
 }
@@ -1964,7 +1919,6 @@ static void DebugAction_OpenROMInfoMenu(u8 taskId)
 static void DebugAction_Util_Fly(u8 taskId)
 {
     Debug_DestroyMenu_Full(taskId);
-    SetMainCallback2(CB2_OpenFlyMap);
 }
 
 #define tMapGroup  data[5]
@@ -2027,7 +1981,6 @@ static void DebugAction_Util_Warp_SelectMapGroup(u8 taskId)
         ConvertIntToDecimalStringN(gStringVar1, gTasks[taskId].tInput, STR_CONV_MODE_LEADING_ZEROS, (MAP_GROUP_COUNT[gTasks[taskId].tMapGroup] - 1 >= 100) ? 3 : 2);
         ConvertIntToDecimalStringN(gStringVar2, MAP_GROUP_COUNT[gTasks[taskId].tMapGroup] - 1, STR_CONV_MODE_LEADING_ZEROS, (MAP_GROUP_COUNT[gTasks[taskId].tMapGroup] - 1 >= 100) ? 3 : 2);
         StringExpandPlaceholders(gStringVar1, sDebugText_Util_WarpToMap_SelMax);
-        GetMapName(gStringVar2, Overworld_GetMapHeaderByGroupAndId(gTasks[taskId].tMapGroup, gTasks[taskId].tInput)->regionMapSectionId, 0);
         StringCopy(gStringVar3, gText_DigitIndicator[gTasks[taskId].tDigit]);
         StringExpandPlaceholders(gStringVar4, sDebugText_Util_WarpToMap_SelectMap);
         AddTextPrinterParameterized(gTasks[taskId].tSubWindowId, DEBUG_MENU_FONT, gStringVar4, 0, 0, 0, NULL);
@@ -2053,7 +2006,6 @@ static void DebugAction_Util_Warp_SelectMap(u8 taskId)
         ConvertIntToDecimalStringN(gStringVar1, gTasks[taskId].tInput, STR_CONV_MODE_LEADING_ZEROS, (max_value >= 100) ? 3 : 2);
         ConvertIntToDecimalStringN(gStringVar2, MAP_GROUP_COUNT[gTasks[taskId].tMapGroup] - 1, STR_CONV_MODE_LEADING_ZEROS, (max_value >= 100) ? 3 : 2);
         StringExpandPlaceholders(gStringVar1, sDebugText_Util_WarpToMap_SelMax);
-        GetMapName(gStringVar2, Overworld_GetMapHeaderByGroupAndId(gTasks[taskId].tMapGroup, gTasks[taskId].tInput)->regionMapSectionId, 0);
         StringCopy(gStringVar3, gText_DigitIndicator[gTasks[taskId].tDigit]);
         StringExpandPlaceholders(gStringVar4, sDebugText_Util_WarpToMap_SelectMap);
         AddTextPrinterParameterized(gTasks[taskId].tSubWindowId, DEBUG_MENU_FONT, gStringVar4, 0, 0, 0, NULL);
@@ -2143,20 +2095,11 @@ void CheckSaveBlock2Size(struct ScriptContext *ctx)
 
 void CheckSaveBlock3Size(struct ScriptContext *ctx)
 {
-    u32 currSb3Size = (sizeof(struct SaveBlock3));
+    u32 currSb3Size = 0;
     u32 maxSb3Size = SAVE_BLOCK_3_CHUNK_SIZE * NUM_SECTORS_PER_SLOT;
     ConvertIntToDecimalStringN(gStringVar1, currSb3Size, STR_CONV_MODE_LEFT_ALIGN, 6);
     ConvertIntToDecimalStringN(gStringVar2, maxSb3Size, STR_CONV_MODE_LEFT_ALIGN, 6);
     ConvertIntToDecimalStringN(gStringVar3, maxSb3Size - currSb3Size, STR_CONV_MODE_LEFT_ALIGN, 6);
-}
-
-void CheckPokemonStorageSize(struct ScriptContext *ctx)
-{
-    u32 currPkmnStorageSize = sizeof(struct PokemonStorage);
-    u32 maxPkmnStorageSize = SECTOR_DATA_SIZE * (SECTOR_ID_PKMN_STORAGE_END - SECTOR_ID_PKMN_STORAGE_START + 1);
-    ConvertIntToDecimalStringN(gStringVar1, currPkmnStorageSize, STR_CONV_MODE_LEFT_ALIGN, 6);
-    ConvertIntToDecimalStringN(gStringVar2, maxPkmnStorageSize, STR_CONV_MODE_LEFT_ALIGN, 6);
-    ConvertIntToDecimalStringN(gStringVar3, maxPkmnStorageSize - currPkmnStorageSize, STR_CONV_MODE_LEFT_ALIGN, 6);
 }
 
 static void DebugAction_ROMInfo_CheckSaveBlock(u8 taskId)
@@ -2311,16 +2254,6 @@ static void DebugAction_Util_Weather_SelectId(u8 taskId)
 static void DebugAction_Util_FontTest(u8 taskId)
 {
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_FontTest);
-}
-
-static void DebugAction_TimeMenu_CheckWallClock(u8 taskId)
-{
-    Debug_DestroyMenu_Full_Script(taskId, PlayersHouse_2F_EventScript_CheckWallClock);
-}
-
-static void DebugAction_TimeMenu_SetWallClock(u8 taskId)
-{
-    Debug_DestroyMenu_Full_Script(taskId, PlayersHouse_2F_EventScript_SetWallClock);
 }
 
 static void DebugAction_Util_WatchCredits(u8 taskId)
@@ -2694,49 +2627,12 @@ static void DebugAction_FlagsVars_SetValue(u8 taskId)
 
 static void DebugAction_FlagsVars_PokedexFlags_All(u8 taskId)
 {
-    u16 i;
-    for (i = 0; i < NATIONAL_DEX_COUNT; i++)
-    {
-        GetSetPokedexFlag(i + 1, FLAG_SET_CAUGHT);
-        GetSetPokedexFlag(i + 1, FLAG_SET_SEEN);
-    }
     Debug_DestroyMenu_Full(taskId);
     ScriptContext_Enable();
 }
 
 static void DebugAction_FlagsVars_PokedexFlags_Reset(u8 taskId)
 {
-    int boxId, boxPosition, partyId;
-    u16 species;
-
-    // Reset Pokedex to emtpy
-    memset(&gSaveBlock1Ptr->dexCaught, 0, sizeof(gSaveBlock1Ptr->dexCaught));
-    memset(&gSaveBlock1Ptr->dexSeen, 0, sizeof(gSaveBlock1Ptr->dexSeen));
-
-    // Add party Pokemon to Pokedex
-    for (partyId = 0; partyId < PARTY_SIZE; partyId++)
-    {
-        if (GetMonData(&gPlayerParty[partyId], MON_DATA_SANITY_HAS_SPECIES))
-        {
-            species = GetMonData(&gPlayerParty[partyId], MON_DATA_SPECIES);
-            GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_SET_CAUGHT);
-            GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_SET_SEEN);
-        }
-    }
-
-    // Add box Pokemon to Pokedex
-    for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
-    {
-        for (boxPosition = 0; boxPosition < IN_BOX_COUNT; boxPosition++)
-        {
-            if (GetBoxMonData(&gPokemonStoragePtr->boxes[boxId][boxPosition], MON_DATA_SANITY_HAS_SPECIES))
-            {
-                species = GetBoxMonData(&gPokemonStoragePtr->boxes[boxId][boxPosition], MON_DATA_SPECIES);
-                GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_SET_CAUGHT);
-                GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_SET_SEEN);
-            }
-        }
-    }
     Debug_DestroyMenu_Full(taskId);
     ScriptContext_Enable();
 }
@@ -3669,7 +3565,6 @@ static void DebugAction_Give_Pokemon_Move(u8 taskId)
 
 static void DebugAction_Give_Pokemon_ComplexCreateMon(u8 taskId) //https://github.com/ghoulslash/pokeemerald/tree/custom-givemon
 {
-    u16 nationalDexNum;
     int sentToPc;
     struct Pokemon mon;
     u8 i;
@@ -3774,14 +3669,10 @@ static void DebugAction_Give_Pokemon_ComplexCreateMon(u8 taskId) //https://githu
     }
 
     //Pokedex entry
-    nationalDexNum = SpeciesToNationalPokedexNum(species);
     switch(sentToPc)
     {
     case MON_GIVEN_TO_PARTY:
     case MON_GIVEN_TO_PC:
-        GetSetPokedexFlag(nationalDexNum, FLAG_SET_SEEN);
-        GetSetPokedexFlag(nationalDexNum, FLAG_SET_CAUGHT);
-        break;
     case MON_CANT_GIVE:
         break;
     }
@@ -3796,34 +3687,6 @@ static void DebugAction_Give_Pokemon_ComplexCreateMon(u8 taskId) //https://githu
 #undef tIsComplex
 #undef tSpriteId
 #undef tIterator
-
-static void DebugAction_Give_MaxMoney(u8 taskId)
-{
-    SetMoney(&gSaveBlock1Ptr->money, MAX_MONEY);
-}
-
-static void DebugAction_Give_MaxCoins(u8 taskId)
-{
-    SetCoins(MAX_COINS);
-}
-
-static void DebugAction_Give_MaxBattlePoints(u8 taskId)
-{
-    gSaveBlock2Ptr->frontier.battlePoints = MAX_BATTLE_FRONTIER_POINTS;
-}
-
-static void DebugAction_Give_DayCareEgg(u8 taskId)
-{
-    s32 emptySlot = Daycare_FindEmptySpot(&gSaveBlock1Ptr->daycare);
-    if (emptySlot == 0) // no daycare mons
-        Debug_DestroyMenu_Full_Script(taskId, DebugScript_ZeroDaycareMons);
-    else if (emptySlot == 1) // 1 daycare mon
-        Debug_DestroyMenu_Full_Script(taskId, DebugScript_OneDaycareMons);
-    else if (GetDaycareCompatibilityScore(&gSaveBlock1Ptr->daycare) == PARENTS_INCOMPATIBLE) // not compatible parents
-        Debug_DestroyMenu_Full_Script(taskId, DebugScript_DaycareMonsNotCompatible);
-    else // 2 pokemon which can have a pokemon baby together
-        TriggerPendingDaycareEgg();
-}
 
 // *******************************
 // Actions TimeMenu
@@ -3903,70 +3766,6 @@ static void DebugAction_OpenPCBagFillMenu(u8 taskId)
     Debug_ShowMenu(DebugTask_HandleMenuInput_PCBag_Fill, sDebugMenu_ListTemplate_PCBag_Fill);
 }
 
-static void DebugAction_PCBag_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffinity
-{
-    int boxId, boxPosition;
-    u32 personality;
-    struct BoxPokemon boxMon;
-    u16 species = SPECIES_BULBASAUR;
-    u8 speciesName[POKEMON_NAME_LENGTH + 1];
-
-    personality = Random32();
-
-    CreateBoxMon(&boxMon, species, 100, USE_RANDOM_IVS, FALSE, personality, OT_ID_PLAYER_ID, 0);
-
-    for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
-    {
-        for (boxPosition = 0; boxPosition < IN_BOX_COUNT; boxPosition++, species++)
-        {
-            if (!GetBoxMonData(&gPokemonStoragePtr->boxes[boxId][boxPosition], MON_DATA_SANITY_HAS_SPECIES))
-            {
-                StringCopy(speciesName, GetSpeciesName(species));
-                SetBoxMonData(&boxMon, MON_DATA_NICKNAME, &speciesName);
-                SetBoxMonData(&boxMon, MON_DATA_SPECIES, &species);
-                GiveBoxMonInitialMoveset(&boxMon);
-                gPokemonStoragePtr->boxes[boxId][boxPosition] = boxMon;
-            }
-        }
-    }
-
-    // Set flag for user convenience
-    FlagSet(FLAG_SYS_POKEMON_GET);
-    Debug_DestroyMenu_Full(taskId);
-    ScriptContext_Enable();
-}
-
-static void DebugAction_PCBag_Fill_PCBoxes_Slow(u8 taskId)
-{
-    int boxId, boxPosition;
-    struct BoxPokemon boxMon;
-    u32 species = SPECIES_BULBASAUR;
-    bool8 spaceAvailable = FALSE;
-
-    for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
-    {
-        for (boxPosition = 0; boxPosition < IN_BOX_COUNT; boxPosition++)
-        {
-            if (!GetBoxMonData(&gPokemonStoragePtr->boxes[boxId][boxPosition], MON_DATA_SANITY_HAS_SPECIES))
-            {
-                if (!spaceAvailable)
-                    PlayBGM(MUS_RG_MYSTERY_GIFT);
-                CreateBoxMon(&boxMon, species, 100, USE_RANDOM_IVS, FALSE, 0, OT_ID_PLAYER_ID, 0);
-                gPokemonStoragePtr->boxes[boxId][boxPosition] = boxMon;
-                species = (species < NUM_SPECIES - 1) ? species + 1 : 1;
-                spaceAvailable = TRUE;
-            }
-        }
-    }
-
-    // Set flag for user convenience
-    FlagSet(FLAG_SYS_POKEMON_GET);
-    if (spaceAvailable)
-        PlayBGM(GetCurrentMapMusic());
-
-    Debug_DestroyMenu_Full_Script(taskId, Debug_BoxFilledMessage);
-}
-
 static void DebugAction_PCBag_Fill_PCItemStorage(u8 taskId)
 {
     u16 itemId;
@@ -4042,13 +3841,6 @@ static void DebugAction_PCBag_ClearBag(u8 taskId)
 {
     PlaySE(MUS_LEVEL_UP);
     ClearBag();
-}
-
-static void DebugAction_PCBag_ClearBoxes(u8 taskId)
-{
-    ResetPokemonStorageSystem();
-    Debug_DestroyMenu_Full(taskId);
-    ScriptContext_Enable();
 }
 
 // *******************************
@@ -4220,7 +4012,6 @@ static void DebugAction_Sound_MUS_SelectId(u8 taskId)
     X(MUS_MOVE_DELETED) \
     X(MUS_ENCOUNTER_GIRL) \
     X(MUS_ENCOUNTER_MALE) \
-    X(MUS_ABANDONED_SHIP) \
     X(MUS_FORTREE) \
     X(MUS_BIRCH_LAB) \
     X(MUS_B_TOWER_RS) \
@@ -4503,7 +4294,6 @@ static void DebugAction_Sound_MUS_SelectId(u8 taskId)
     X(SE_TRUCK_STOP) \
     X(SE_TRUCK_UNLOAD) \
     X(SE_TRUCK_DOOR) \
-    X(SE_BERRY_BLENDER) \
     X(SE_CARD) \
     X(SE_SAVE) \
     X(SE_BALL_BOUNCE_1) \
@@ -4767,85 +4557,24 @@ static void DebugAction_BerryFunctions_ClearAll(u8 taskId)
 
 static void DebugAction_BerryFunctions_Ready(u8 taskId)
 {
-    u8 i;
-    struct BerryTree *tree;
-
-    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
-    {
-        if (gObjectEvents[i].movementType == MOVEMENT_TYPE_BERRY_TREE_GROWTH)
-        {
-            tree = &gSaveBlock1Ptr->berryTrees[GetObjectEventBerryTreeId(i)];
-            if (tree->stage != BERRY_STAGE_NO_BERRY)
-            {
-                tree->stage = BERRY_STAGE_BERRIES - 1;
-                BerryTreeGrow(tree);
-            }
-        }
-    }
-
     ScriptContext_Enable();
     Debug_DestroyMenu_Full(taskId);
 }
 
 static void DebugAction_BerryFunctions_NextStage(u8 taskId)
 {
-    u8 i;
-    struct BerryTree *tree;
-
-    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
-    {
-        if (gObjectEvents[i].movementType == MOVEMENT_TYPE_BERRY_TREE_GROWTH)
-        {
-            tree = &gSaveBlock1Ptr->berryTrees[GetObjectEventBerryTreeId(i)];
-            BerryTreeGrow(tree);
-        }
-    }
-
     ScriptContext_Enable();
     Debug_DestroyMenu_Full(taskId);
 }
 
 static void DebugAction_BerryFunctions_Pests(u8 taskId)
 {
-    u8 i;
-
-    if (!OW_BERRY_PESTS)
-    {
-        Debug_DestroyMenu_Full_Script(taskId, Debug_BerryPestsDisabled);
-        return;
-    }
-
-    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
-    {
-        if (gObjectEvents[i].movementType == MOVEMENT_TYPE_BERRY_TREE_GROWTH)
-        {
-            if (gSaveBlock1Ptr->berryTrees[GetObjectEventBerryTreeId(i)].stage != BERRY_STAGE_PLANTED)
-                gSaveBlock1Ptr->berryTrees[GetObjectEventBerryTreeId(i)].pests = TRUE;
-        }
-    }
-
     ScriptContext_Enable();
     Debug_DestroyMenu_Full(taskId);
 }
 
 static void DebugAction_BerryFunctions_Weeds(u8 taskId)
 {
-    u8 i;
-
-    if (!OW_BERRY_WEEDS)
-    {
-        Debug_DestroyMenu_Full_Script(taskId, Debug_BerryWeedsDisabled);
-        return;
-    }
-
-    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
-    {
-        if (gObjectEvents[i].movementType == MOVEMENT_TYPE_BERRY_TREE_GROWTH)
-        {
-            gSaveBlock1Ptr->berryTrees[GetObjectEventBerryTreeId(i)].weeds = TRUE;
-        }
-    }
-
     ScriptContext_Enable();
     Debug_DestroyMenu_Full(taskId);
 }
@@ -4853,15 +4582,6 @@ static void DebugAction_BerryFunctions_Weeds(u8 taskId)
 // *******************************
 // Actions Party/Boxes
 
-static void DebugAction_Party_MoveReminder(u8 taskId)
-{
-    Debug_DestroyMenu_Full_Script(taskId, FallarborTown_MoveRelearnersHouse_EventScript_ChooseMon);
-}
-
-static void DebugAction_Party_HatchAnEgg(u8 taskId)
-{
-    Debug_DestroyMenu_Full_Script(taskId, Debug_HatchAnEgg);
-}
 
 static void DebugAction_Party_HealParty(u8 taskId)
 {
@@ -4896,7 +4616,6 @@ static void DebugAction_Party_ClearParty(u8 taskId)
 void CheckEWRAMCounters(struct ScriptContext *ctx)
 {
     ConvertIntToDecimalStringN(gStringVar1, gFollowerSteps, STR_CONV_MODE_LEFT_ALIGN, 5);
-    ConvertIntToDecimalStringN(gStringVar2, gChainFishingDexNavStreak, STR_CONV_MODE_LEFT_ALIGN, 5);
 }
 
 static void DebugAction_Util_CheckEWRAMCounters(u8 taskId)

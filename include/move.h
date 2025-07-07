@@ -1,7 +1,6 @@
 #ifndef GUARD_MOVES_H
 #define GUARD_MOVES_H
 
-#include "contest_effect.h"
 #include "constants/battle.h"
 #include "constants/battle_move_effects.h"
 #include "constants/moves.h"
@@ -154,12 +153,6 @@ struct MoveInfo
 
     // primary/secondary effects
     const struct AdditionalEffect *additionalEffects;
-
-    // contest parameters
-    u8 contestEffect;
-    u8 contestCategory:3;
-    u8 contestComboStarterId;
-    u8 contestComboMoves[MAX_COMBO_MOVES];
     const u8 *battleAnimScript;
 };
 
@@ -553,26 +546,6 @@ static inline u32 GetMoveNonVolatileStatus(u32 move)
 static inline const struct AdditionalEffect *GetMoveAdditionalEffectById(u32 moveId, u32 effect)
 {
     return &gMovesInfo[SanitizeMoveId(moveId)].additionalEffects[effect];
-}
-
-static inline u32 GetMoveContestEffect(u32 moveId)
-{
-    return gMovesInfo[SanitizeMoveId(moveId)].contestEffect;
-}
-
-static inline u32 GetMoveContestCategory(u32 moveId)
-{
-    return gMovesInfo[SanitizeMoveId(moveId)].contestCategory;
-}
-
-static inline u32 GetMoveContestComboStarter(u32 moveId)
-{
-    return gMovesInfo[SanitizeMoveId(moveId)].contestComboStarterId;
-}
-
-static inline u32 GetMoveContestComboMoves(u32 moveId, u32 comboMove)
-{
-    return gMovesInfo[SanitizeMoveId(moveId)].contestComboMoves[comboMove];
 }
 
 static inline const u8 *GetMoveAnimationScript(u32 moveId)

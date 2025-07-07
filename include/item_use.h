@@ -5,7 +5,6 @@ void ItemUseOutOfBattle_Mail(u8 taskId);
 void ItemUseOutOfBattle_Bike(u8 taskId);
 void ItemUseOutOfBattle_Rod(u8 taskId);
 void ItemUseOutOfBattle_Itemfinder(u8 taskId);
-void ItemUseOutOfBattle_PokeblockCase(u8 taskId);
 void ItemUseOutOfBattle_CoinCase(u8 taskId);
 void ItemUseOutOfBattle_PokemonBoxLink(u8 taskId);
 void ItemUseOutOfBattle_PowderJar(u8 taskId);
@@ -48,7 +47,6 @@ void FieldUseFunc_VsSeeker(u8 taskId);
 void Task_ItemUse_CloseMessageBoxAndReturnToField_VsSeeker(u8 taskId);
 void DisplayDadsAdviceCannotUseItemMessage(u8 taskId, bool8 isUsingRegisteredKeyItemOnField);
 void ItemUseOutOfBattle_PokeFlute(u8 taskId);
-void ItemUseOutOfBattle_TownMap(u8 taskId);
 
 enum {
     BALL_THROW_UNABLE_TWO_MONS,

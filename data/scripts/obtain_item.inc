@@ -60,10 +60,8 @@ EventScript_ObtainedItemMessage:
 	message gText_ObtainedTheItem
 EventScript_ContinueObtainedItem:
 	delay 10
-	showitemdescription
 	waitfanfare
 	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
-	hideitemdescription
 	setvar VAR_RESULT, TRUE
 	return
 
@@ -82,13 +80,6 @@ EventScript_PlayFanfareObtainedTMHM::
 Std_ObtainDecoration::
 	adddecoration ITEMID
 	copyvar VAR_0x8007, VAR_RESULT
-	call EventScript_ObtainDecorationMessage
-	return
-
-EventScript_ObtainDecorationMessage::
-	bufferdecorationname STR_VAR_2, ITEMID
-	call_if_eq VAR_0x8007, TRUE, EventScript_ObtainedDecor
-	call_if_eq VAR_0x8007, FALSE, EventScript_NoRoomForDecor
 	return
 
 EventScript_ObtainedDecor::
@@ -129,19 +120,14 @@ EventScript_PickUpItem::
 	call_if_eq VAR_0x8008, TRUE, EventScript_FoundTMHM
 	call_if_eq VAR_0x8008, FALSE, EventScript_FoundItem
 	delay 10
-	showitemdescription
 	waitfanfare
 	waitmessage
 	bufferitemnameplural STR_VAR_2, VAR_0x8004, VAR_0x8005
-	pyramid_inchallenge
-	goto_if_eq VAR_RESULT, TRUE, EventScript_PutBattlePyramidItemInBag
 	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
-	hideitemdescription
 	return
 
 EventScript_PutBattlePyramidItemInBag::
 	msgbox gText_PlayerPutItemInBag, MSGBOX_DEFAULT
-	hideitemdescription
 	return
 
 EventScript_FoundTMHM::
@@ -206,15 +192,11 @@ EventScript_FoundHiddenItem::
 
 EventScript_PutHiddenItemInPocket::
 	delay 10
-	showitemdescription
 	waitmessage
 	waitfanfare
 	bufferitemnameplural STR_VAR_2, VAR_0x8004, 1
 	copyvar VAR_0x8004, VAR_0x8008
 	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
-	hideitemdescription
-	special TryPutTreasureInvestigatorsOnAir
-	special SetHiddenItemFlag
 	releaseall
 	end
 

@@ -13,7 +13,6 @@
 #include "text.h"
 #include "overworld.h"
 #include "menu.h"
-#include "pokedex.h"
 #include "constants/rgb.h"
 
 extern const u8 gText_DexNational[];
@@ -44,8 +43,8 @@ static const u16 sDiplomaPalettes[][16] =
     INCBIN_U16("graphics/diploma/hoenn.gbapal"),
 };
 
-static const u32 sDiplomaTilemap[] = INCBIN_U32("graphics/diploma/tilemap.bin.lz");
-static const u32 sDiplomaTiles[] = INCBIN_U32("graphics/diploma/tiles.4bpp.lz");
+static const u32 sDiplomaTilemap[] = INCBIN_U32("graphics/diploma/tilemap.bin.smolTM");
+static const u32 sDiplomaTiles[] = INCBIN_U32("graphics/diploma/tiles.4bpp.smol");
 
 void CB2_ShowDiploma(void)
 {
@@ -80,7 +79,7 @@ void CB2_ShowDiploma(void)
     DecompressAndCopyTileDataToVram(1, &sDiplomaTiles, 0, 0, 0);
     while (FreeTempTileDataBuffersIfPossible())
         ;
-    LZDecompressWram(sDiplomaTilemap, sDiplomaTilemapPtr);
+    DecompressDataWithHeaderWram(sDiplomaTilemap, sDiplomaTilemapPtr);
     CopyBgTilemapBufferToVram(1);
     DisplayDiplomaText();
     BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
@@ -127,16 +126,8 @@ static void Task_DiplomaFadeOut(u8 taskId)
 
 static void DisplayDiplomaText(void)
 {
-    if (HasAllMons())
-    {
-        SetGpuReg(REG_OFFSET_BG1HOFS, DISPLAY_WIDTH + 16);
-        StringCopy(gStringVar1, gText_DexNational);
-    }
-    else
-    {
-        SetGpuReg(REG_OFFSET_BG1HOFS, 0);
-        StringCopy(gStringVar1, gText_DexHoenn);
-    }
+    SetGpuReg(REG_OFFSET_BG1HOFS, DISPLAY_WIDTH + 16);
+    StringCopy(gStringVar1, gText_DexNational);
     StringExpandPlaceholders(gStringVar4, gText_PokedexDiploma);
     PrintDiplomaText(gStringVar4, 0, 1);
     PutWindowTilemap(0);

@@ -96,49 +96,6 @@ TEST("Form change targets have the appropriate species flags")
     }
 }
 
-TEST("No species has two evolutions that use the evolution tracker")
-{
-    u32 i, j;
-    u32 species = SPECIES_NONE;
-    u32 evolutionTrackerEvolutions;
-    bool32 hasRecoilEvo;
-    const struct Evolution *evolutions;
-
-    for (i = 0; i < NUM_SPECIES; i++)
-    {
-        if (GetSpeciesEvolutions(i) != NULL) PARAMETRIZE { species = i; }
-    }
-
-    evolutionTrackerEvolutions = 0;
-    hasRecoilEvo = FALSE;
-    evolutions = GetSpeciesEvolutions(species);
-
-    for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
-    {
-        if (evolutions[i].params == NULL)
-            continue;
-        for (j = 0; evolutions[i].params[j].condition != CONDITIONS_END; j++)
-        {
-            if (evolutions[i].params[j].condition == IF_USED_MOVE_X_TIMES
-             || evolutions[i].params[j].condition == IF_DEFEAT_X_WITH_ITEMS
-            )
-                evolutionTrackerEvolutions++;
-
-            if (evolutions[i].params[j].condition == IF_RECOIL_DAMAGE_GE)
-            {
-                // Special handling for these since they can be combined as the evolution tracker field is used for the same purpose
-                if (!hasRecoilEvo)
-                {
-                    hasRecoilEvo = TRUE;
-                    evolutionTrackerEvolutions++;
-                }
-            }
-        }
-    }
-
-    EXPECT(evolutionTrackerEvolutions < 2);
-}
-
 extern const u8 gFallbackPokedexText[];
 
 TEST("Every species has a description")

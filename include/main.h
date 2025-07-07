@@ -52,7 +52,6 @@ extern struct Main gMain;
 extern u16 gKeyRepeatContinueDelay;
 extern bool8 gSoftResetDisabled;
 extern IntrFunc gIntrTable[];
-extern u8 gLinkVSyncDisabled;
 extern s8 gPcmDmaCounter;
 
 void AgbMain(void);
@@ -68,7 +67,6 @@ void SetTrainerHillVBlankCounter(u32 *counter);
 void ClearTrainerHillVBlankCounter(void);
 void DoSoftReset(void);
 void ClearPokemonCrySongs(void);
-void RestoreSerialTimer3IntrHandlers(void);
 void StartTimer1(void);
 void SeedRngAndSetTrainerId(void);
 u16 GetGeneratedTrainerIdLower(void);

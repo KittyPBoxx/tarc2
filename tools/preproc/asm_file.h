@@ -30,7 +30,6 @@ enum class Directive
 {
     Include,
     String,
-    Braille,
     Enum,
     Unknown
 };
@@ -46,7 +45,6 @@ public:
     std::string GetGlobalLabel();
     std::string ReadPath();
     int ReadString(unsigned char* s);
-    int ReadBraille(unsigned char* s);
     bool IsAtEnd();
     void OutputLine();
     void OutputLocation();

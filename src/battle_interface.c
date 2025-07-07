@@ -16,10 +16,8 @@
 #include "util.h"
 #include "gpu_regs.h"
 #include "battle_message.h"
-#include "pokedex.h"
 #include "palette.h"
 #include "international_string_util.h"
-#include "safari_zone.h"
 #include "battle_anim.h"
 #include "data.h"
 #include "pokemon_summary_screen.h"
@@ -179,7 +177,6 @@ static void UpdateHpTextInHealthboxInDoubles(u32 healthboxSpriteId, u32 maxOrCur
 static void UpdateStatusIconInHealthbox(u8);
 
 static void TextIntoHealthboxObject(void *, u8 *, s32);
-static void SafariTextIntoHealthboxObject(void *, u8 *, u32);
 static void HpTextIntoHealthboxObject(void *, u8 *, u32);
 static void FillHealthboxObject(void *, u32, u32);
 
@@ -1783,8 +1780,6 @@ static void TryAddPokeballIconToHealthbox(u8 healthboxSpriteId, bool8 noStatus)
     battler = gSprites[healthboxSpriteId].hMain_Battler;
     if (IsOnPlayerSide(battler))
         return;
-    if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(GetMonData(GetBattlerMon(battler), MON_DATA_SPECIES)), FLAG_GET_CAUGHT))
-        return;
 
     healthBarSpriteId = gSprites[healthboxSpriteId].hMain_HealthBarSpriteId;
 
@@ -1969,19 +1964,6 @@ static void UpdateSafariBallsTextOnHealthbox(u8 healthboxSpriteId)
 
 static void UpdateLeftNoOfBallsTextOnHealthbox(u8 healthboxSpriteId)
 {
-    u8 text[16];
-    u8 *txtPtr;
-    u32 windowId, spriteTileNum;
-    u8 *windowTileData;
-
-    txtPtr = StringCopy(text, gText_SafariBallLeft);
-    ConvertIntToDecimalStringN(txtPtr, gNumSafariBalls, STR_CONV_MODE_LEFT_ALIGN, 2);
-
-    windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(text, GetStringRightAlignXOffset(FONT_SMALL, text, 0x2F), 3, 2, &windowId);
-    spriteTileNum = gSprites[healthboxSpriteId].oam.tileNum * TILE_SIZE_4BPP;
-    SafariTextIntoHealthboxObject((void *)(OBJ_VRAM0 + 0x2C0) + spriteTileNum, windowTileData, 2);
-    SafariTextIntoHealthboxObject((void *)(OBJ_VRAM0 + 0xA00) + spriteTileNum, windowTileData + 0x40, 4);
-    RemoveWindowOnHealthbox(windowId);
 }
 
 void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elementId)
@@ -2402,12 +2384,6 @@ static void TextIntoHealthboxObject(void *dest, u8 *windowTileData, s32 windowWi
             windowWidth--;
         } while (windowWidth != 0);
     }
-}
-
-static void SafariTextIntoHealthboxObject(void *dest, u8 *windowTileData, u32 windowWidth)
-{
-    CpuCopy32(windowTileData, dest, windowWidth * TILE_SIZE_4BPP);
-    CpuCopy32(windowTileData + 256, dest + 256, windowWidth * TILE_SIZE_4BPP);
 }
 
 #define ABILITY_POP_UP_TAG 0xD720

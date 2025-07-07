@@ -278,7 +278,6 @@
 #define ANIM_TAG_GREEN_SPIKE                (ANIM_SPRITES_START + 266)
 #define ANIM_TAG_WHITE_CIRCLE_OF_LIGHT      (ANIM_SPRITES_START + 267)
 #define ANIM_TAG_GLOWY_BLUE_ORB             (ANIM_SPRITES_START + 268)
-#define ANIM_TAG_POKEBLOCK                  (ANIM_SPRITES_START + 269)
 #define ANIM_TAG_WHITE_FEATHER              (ANIM_SPRITES_START + 270)
 #define ANIM_TAG_SPARKLE_6                  (ANIM_SPRITES_START + 271)
 #define ANIM_TAG_SPLASH                     (ANIM_SPRITES_START + 272)
@@ -536,7 +535,6 @@
 #define B_ANIM_STATS_CHANGE             0
 #define B_ANIM_SUBSTITUTE_FADE          1
 #define B_ANIM_SUBSTITUTE_APPEAR        2
-#define B_ANIM_POKEBLOCK_THROW          3
 #define B_ANIM_ITEM_KNOCKOFF            4
 #define B_ANIM_TURN_TRAP                5
 #define B_ANIM_HELD_ITEM_EFFECT         6

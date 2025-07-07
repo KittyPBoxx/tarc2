@@ -1,7 +1,6 @@
 #include "global.h"
 #include "international_string_util.h"
 #include "list_menu.h"
-#include "pokedex.h"
 #include "script_menu.h"
 #include "string_util.h"
 #include "strings.h"
@@ -147,20 +146,13 @@ void PadNameString(u8 *dest, u8 padChar)
 
 void ConvertInternationalPlayerName(u8 *str)
 {
-    if (StringLength(str) < PLAYER_NAME_LENGTH - 1)
-        ConvertInternationalString(str, LANGUAGE_JAPANESE);
-    else
-        StripExtCtrlCodes(str);
+    StripExtCtrlCodes(str);
 }
 
 void ConvertInternationalPlayerNameStripChar(u8 *str, u8 removeChar)
 {
     u8 *buffer;
-    if (StringLength(str) < PLAYER_NAME_LENGTH - 1)
-    {
-        ConvertInternationalString(str, LANGUAGE_JAPANESE);
-    }
-    else if (removeChar == EXT_CTRL_CODE_BEGIN)
+    if (removeChar == EXT_CTRL_CODE_BEGIN)
     {
         StripExtCtrlCodes(str);
     }
@@ -205,10 +197,7 @@ void TVShowConvertInternationalString(u8 *dest, const u8 *src, int language)
 // It's impossible to distinguish between Latin languages just from a string alone, so the function defaults to LANGUAGE_ENGLISH. This is the case in all of the versions of the game.
 int GetNicknameLanguage(u8 *str)
 {
-    if (str[0] == EXT_CTRL_CODE_BEGIN && str[1] == EXT_CTRL_CODE_JPN)
-        return LANGUAGE_JAPANESE;
-    else
-        return LANGUAGE_ENGLISH;
+    return LANGUAGE_ENGLISH;
 }
 
 // Used by Pokénav's Match Call to erase the previous trainer's flavor text when switching between their info pages.

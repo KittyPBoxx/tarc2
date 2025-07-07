@@ -892,7 +892,6 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_BATTLE_DOME_RULES]          = MULTICHOICE(MultichoiceList_BattleDomeRules),
     [MULTI_BATTLE_FACTORY_RULES]       = MULTICHOICE(MultichoiceList_BattleFactoryRules),
     [MULTI_BATTLE_PALACE_RULES]        = MULTICHOICE(MultichoiceList_BattlePalaceRules),
-    [MULTI_BATTLE_PYRAMID_RULES]       = MULTICHOICE(MultichoiceList_BattlePyramidRules),
     [MULTI_BATTLE_PIKE_RULES]          = MULTICHOICE(MultichoiceList_BattlePikeRules),
     [MULTI_GO_ON_RECORD_REST_RETIRE]   = MULTICHOICE(MultichoiceList_GoOnRecordRestRetire),
     [MULTI_GO_ON_REST_RETIRE]          = MULTICHOICE(MultichoiceList_GoOnRestRetire),
@@ -939,7 +938,6 @@ const u8 *const gStdStrings[] =
     [STDSTRING_BATTLE_PALACE] = gText_BattlePalace,
     [STDSTRING_BATTLE_ARENA] = gText_BattleArena,
     [STDSTRING_BATTLE_PIKE] = gText_BattlePike,
-    [STDSTRING_BATTLE_PYRAMID] = gText_BattlePyramid,
 };
 
 static const u8 sLinkServicesMultichoiceIds[] =
@@ -969,46 +967,4 @@ static const u8 *const sLilycoveSSTidalDestinations[SSTIDAL_SELECTION_COUNT] =
     [SSTIDAL_SELECTION_BIRTH_ISLAND]    = gText_BirthIsland,
     [SSTIDAL_SELECTION_FARAWAY_ISLAND]  = gText_FarawayIsland,
     [SSTIDAL_SELECTION_EXIT]            = gText_Exit,
-};
-
-static const u8 *const sCableClubOptions_WithRecordMix[] =
-{
-    CableClub_Text_TradeUsingLinkCable,
-    CableClub_Text_BattleUsingLinkCable,
-    CableClub_Text_RecordCornerUsingLinkCable,
-    CableClub_Text_CancelSelectedItem,
-};
-static const u8 *const sWirelessOptionsNoBerryCrush[] =
-{
-    CableClub_Text_YouMayTradeHere,
-    CableClub_Text_YouMayBattleHere,
-    CableClub_Text_CanMixRecords,
-    CableClub_Text_CancelSelectedItem,
-};
-static const u8 *const sWirelessOptions_NoRecordMix[] =
-{
-    CableClub_Text_YouMayTradeHere,
-    CableClub_Text_YouMayBattleHere,
-    CableClub_Text_CanMakeBerryPowder,
-    CableClub_Text_CancelSelectedItem,
-};
-static const u8 *const sWirelessOptions_AllServices[] =
-{
-    CableClub_Text_YouMayTradeHere,
-    CableClub_Text_YouMayBattleHere,
-    CableClub_Text_CanMixRecords,
-    CableClub_Text_CanMakeBerryPowder,
-    CableClub_Text_CancelSelectedItem,
-};
-static const u8 *const sCableClubOptions_NoRecordMix[] =
-{
-    CableClub_Text_TradeUsingLinkCable,
-    CableClub_Text_BattleUsingLinkCable,
-    CableClub_Text_CancelSelectedItem,
-};
-static const u8 *const sWirelessOptions_NoRecordMixBerryCrush[] =
-{
-    CableClub_Text_YouMayTradeHere,
-    CableClub_Text_YouMayBattleHere,
-    CableClub_Text_CancelSelectedItem,
 };

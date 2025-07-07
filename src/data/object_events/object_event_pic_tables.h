@@ -1080,34 +1080,6 @@ static const struct SpriteFrameImage sPicTable_BirthIslandStone[] = {
     obj_frame_tiles(gObjectEventPic_BirthIslandStone),
 };
 
-static const struct SpriteFrameImage sPicTable_Anabel[] = {
-    overworld_ascending_frames(gObjectEventPic_Anabel, 2, 4),
-};
-
-static const struct SpriteFrameImage sPicTable_Tucker[] = {
-    overworld_ascending_frames(gObjectEventPic_Tucker, 2, 4),
-};
-
-static const struct SpriteFrameImage sPicTable_Spenser[] = {
-    overworld_ascending_frames(gObjectEventPic_Spenser, 2, 4),
-};
-
-static const struct SpriteFrameImage sPicTable_Greta[] = {
-    overworld_ascending_frames(gObjectEventPic_Greta, 2, 4),
-};
-
-static const struct SpriteFrameImage sPicTable_Noland[] = {
-    overworld_ascending_frames(gObjectEventPic_Noland, 2, 4),
-};
-
-static const struct SpriteFrameImage sPicTable_Lucy[] = {
-    overworld_ascending_frames(gObjectEventPic_Lucy, 2, 4),
-};
-
-static const struct SpriteFrameImage sPicTable_Brandon[] = {
-    overworld_ascending_frames(gObjectEventPic_Brandon, 2, 4),
-};
-
 static const struct SpriteFrameImage sPicTable_PokeBall[] = {
     overworld_frame(gObjectEventPic_PokeBall, 2, 4, 0),
     overworld_frame(gObjectEventPic_PokeBall, 2, 4, 1),

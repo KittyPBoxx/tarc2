@@ -20,7 +20,6 @@
 #include "overworld.h"
 #include "palette.h"
 #include "palette_util.h"
-#include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_animation.h"
 #include "pokemon_sprite_visualizer.h"
@@ -167,16 +166,6 @@ static const struct WindowTemplate sPokemonSpriteVisualizerWindowTemplate[] =
         .height = 6,
         .paletteNum = 0xF,
         .baseBlock = 1 + 30 + 60 + 36
-    },
-    [WIN_FOOTPRINT] =
-    {
-        .bg = 0,
-        .tilemapLeft = 27,
-        .tilemapTop = 14,
-        .width = 2,
-        .height = 2,
-        .paletteNum = 0xF,
-        .baseBlock = 1 + 30 + 60 + 36 + 144,
     },
     DUMMY_WIN_TEMPLATE,
 };
@@ -416,20 +405,6 @@ static void ResetBGs_PokemonSpriteVisualizer(u16);
 static void HandleInput_PokemonSpriteVisualizer(u8);
 static void ReloadPokemonSprites(struct PokemonSpriteVisualizer *data);
 static void Exit_PokemonSpriteVisualizer(u8);
-
-//Text handling functions
-static void UNUSED PadString(const u8 *src, u8 *dst)
-{
-    u32 i;
-
-    for (i = 0; i < 17 && src[i] != EOS; i++)
-        dst[i] = src[i];
-
-    for (; i < 17; i++)
-        dst[i] = CHAR_SPACE;
-
-    dst[i] = EOS;
-}
 
 static void PrintInstructionsOnWindow(struct PokemonSpriteVisualizer *data)
 {
@@ -927,73 +902,68 @@ static void LoadBattleBg(u8 battleBgType, u8 battleEnvironment)
     {
     default:
     case MAP_BATTLE_SCENE_NORMAL:
-        LZDecompressVram(sBattleEnvironmentTable[battleEnvironment].tileset, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(sBattleEnvironmentTable[battleEnvironment].tilemap, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(sBattleEnvironmentTable[battleEnvironment].tileset, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(sBattleEnvironmentTable[battleEnvironment].tilemap, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(sBattleEnvironmentTable[battleEnvironment].palette, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_GYM:
-        LZDecompressVram(gBattleEnvironmentTiles_Building, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Building, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Building, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Building, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_BuildingGym, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_MAGMA:
-        LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_StadiumMagma, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_AQUA:
-        LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_StadiumAqua, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_SIDNEY:
-        LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_StadiumSidney, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_PHOEBE:
-        LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_StadiumPhoebe, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_GLACIA:
-        LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_StadiumGlacia, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_DRAKE:
-        LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_StadiumDrake, 0x20, 0x60);
         break;
-    case MAP_BATTLE_SCENE_FRONTIER:
-        LZDecompressVram(gBattleEnvironmentTiles_Building, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Building, (void*)(BG_SCREEN_ADDR(26)));
-        LoadPalette(gBattleEnvironmentPalette_Frontier, 0x20, 0x60);
-        break;
     case MAP_BATTLE_SCENE_LEADER:
-        LZDecompressVram(gBattleEnvironmentTiles_Building, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Building, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Building, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Building, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_BuildingLeader, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_WALLACE:
-        LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Stadium, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Stadium, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_StadiumWallace, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_GROUDON:
-        LZDecompressVram(gBattleEnvironmentTiles_Cave, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Cave, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Cave, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Cave, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_Groudon, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_KYOGRE:
-        LZDecompressVram(gBattleEnvironmentTiles_Water, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Water, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Water, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Water, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_Kyogre, 0x20, 0x60);
         break;
     case MAP_BATTLE_SCENE_RAYQUAZA:
-        LZDecompressVram(gBattleEnvironmentTiles_Rayquaza, (void*)(BG_CHAR_ADDR(2)));
-        LZDecompressVram(gBattleEnvironmentTilemap_Rayquaza, (void*)(BG_SCREEN_ADDR(26)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTiles_Rayquaza, (void*)(BG_CHAR_ADDR(2)));
+        DecompressDataWithHeaderVram(gBattleEnvironmentTilemap_Rayquaza, (void*)(BG_SCREEN_ADDR(26)));
         LoadPalette(gBattleEnvironmentPalette_Rayquaza, 0x20, 0x60);
         break;
     }
@@ -1330,10 +1300,6 @@ void CB2_Pokemon_Sprite_Visualizer(void)
 
             //BattleNg Name
             PrintBattleBgName(taskId);
-
-            //Footprint
-            DrawFootprint(WIN_FOOTPRINT, species);
-            CopyWindowToVram(WIN_FOOTPRINT, COPYWIN_GFX);
 
             gMain.state++;
             break;
@@ -2031,10 +1997,6 @@ static void ReloadPokemonSprites(struct PokemonSpriteVisualizer *data)
 
     //Arrow invisibility
     SetArrowInvisibility(data);
-
-    //Footprint
-    DrawFootprint(WIN_FOOTPRINT, species);
-    CopyWindowToVram(WIN_FOOTPRINT, COPYWIN_GFX);
 }
 
 static void Exit_PokemonSpriteVisualizer(u8 taskId)

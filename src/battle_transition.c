@@ -1,7 +1,6 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_transition.h"
-#include "battle_transition_frontier.h"
 #include "bg.h"
 #include "decompress.h"
 #include "event_object_movement.h"
@@ -123,11 +122,6 @@ static void Task_ShredSplit(u8);
 static void Task_Blackhole(u8);
 static void Task_BlackholePulsate(u8);
 static void Task_RectangularSpiral(u8);
-static void Task_FrontierLogoWiggle(u8);
-static void Task_FrontierLogoWave(u8);
-static void Task_FrontierSquares(u8);
-static void Task_FrontierSquaresScroll(u8);
-static void Task_FrontierSquaresSpiral(u8);
 static void VBlankCB_BattleTransition(void);
 static void VBlankCB_Swirl(void);
 static void HBlankCB_Swirl(void);
@@ -138,8 +132,6 @@ static void VBlankCB_CircularMask(void);
 static void VBlankCB_ClockwiseWipe(void);
 static void VBlankCB_Ripple(void);
 static void HBlankCB_Ripple(void);
-static void VBlankCB_FrontierLogoWave(void);
-static void HBlankCB_FrontierLogoWave(void);
 static void VBlankCB_Wave(void);
 static void VBlankCB_Slice(void);
 static void HBlankCB_Slice(void);
@@ -221,12 +213,6 @@ static bool8 BlackholePulsate_Main(struct Task *);
 static bool8 RectangularSpiral_Init(struct Task *);
 static bool8 RectangularSpiral_Main(struct Task *);
 static bool8 RectangularSpiral_End(struct Task *);
-static bool8 FrontierLogoWiggle_Init(struct Task *);
-static bool8 FrontierLogoWiggle_SetGfx(struct Task *);
-static bool8 FrontierLogoWave_Init(struct Task *);
-static bool8 FrontierLogoWave_SetGfx(struct Task *);
-static bool8 FrontierLogoWave_InitScanline(struct Task *);
-static bool8 FrontierLogoWave_Main(struct Task *);
 static bool8 Rayquaza_Init(struct Task *);
 static bool8 Rayquaza_SetGfx(struct Task *);
 static bool8 Rayquaza_PaletteFlash(struct Task *);
@@ -234,19 +220,6 @@ static bool8 Rayquaza_FadeToBlack(struct Task *);
 static bool8 Rayquaza_WaitFade(struct Task *);
 static bool8 Rayquaza_SetBlack(struct Task *);
 static bool8 Rayquaza_TriRing(struct Task *);
-static bool8 FrontierSquares_Init(struct Task *);
-static bool8 FrontierSquares_Draw(struct Task *);
-static bool8 FrontierSquares_Shrink(struct Task *);
-static bool8 FrontierSquares_End(struct Task *);
-static bool8 FrontierSquaresSpiral_Init(struct Task *);
-static bool8 FrontierSquaresSpiral_Outward(struct Task *);
-static bool8 FrontierSquaresSpiral_SetBlack(struct Task *);
-static bool8 FrontierSquaresSpiral_Inward(struct Task *);
-static bool8 FrontierSquaresScroll_Init(struct Task *);
-static bool8 FrontierSquaresScroll_Draw(struct Task *);
-static bool8 FrontierSquaresScroll_SetBlack(struct Task *);
-static bool8 FrontierSquaresScroll_Erase(struct Task *);
-static bool8 FrontierSquaresScroll_End(struct Task *);
 static bool8 Mugshot_Init(struct Task *);
 static bool8 Mugshot_SetGfx(struct Task *);
 static bool8 Mugshot_ShowBanner(struct Task *);
@@ -288,8 +261,6 @@ static bool8 MugshotTrainerPic_SlidePartner(struct Sprite *);
 static bool8 MugshotTrainerPic_SlideOffscreen(struct Sprite *);
 
 static s16 sDebug_RectangularSpiralData;
-static u8 sTestingTransitionId;
-static u8 sTestingTransitionState;
 static struct RectangularSpiralLine sRectangularSpiralLines[4];
 
 EWRAM_DATA static struct TransitionData *sTransitionData = NULL;
@@ -302,7 +273,7 @@ static const u8 sUnusedBrendan_Gfx[] = INCBIN_U8("graphics/battle_transitions/un
 static const u8 sUnusedLass_Gfx[] = INCBIN_U8("graphics/battle_transitions/unused_lass.4bpp");
 static const u32 sShrinkingBoxTileset[] = INCBIN_U32("graphics/battle_transitions/shrinking_box.4bpp");
 static const u16 sEvilTeam_Palette[] = INCBIN_U16("graphics/battle_transitions/evil_team.gbapal");
-static const u32 sTeamAqua_Tileset[] = INCBIN_U32("graphics/battle_transitions/team_aqua.4bpp.lz");
+static const u32 sTeamAqua_Tileset[] = INCBIN_U32("graphics/battle_transitions/team_aqua.4bpp");
 static const u32 sTeamAqua_Tilemap[] = INCBIN_U32("graphics/battle_transitions/team_aqua.bin.lz");
 static const u32 sTeamMagma_Tileset[] = INCBIN_U32("graphics/battle_transitions/team_magma.4bpp.lz");
 static const u32 sTeamMagma_Tilemap[] = INCBIN_U32("graphics/battle_transitions/team_magma.bin.lz");
@@ -325,15 +296,6 @@ static const u16 sGroudon2_Palette[] = INCBIN_U16("graphics/battle_transitions/g
 static const u16 sRayquaza_Palette[] = INCBIN_U16("graphics/battle_transitions/rayquaza.gbapal");
 static const u32 sRayquaza_Tileset[] = INCBIN_U32("graphics/battle_transitions/rayquaza.4bpp");
 static const u32 sRayquaza_Tilemap[] = INCBIN_U32("graphics/battle_transitions/rayquaza.bin");
-static const u16 sFrontierLogo_Palette[] = INCBIN_U16("graphics/battle_transitions/frontier_logo.gbapal");
-static const u32 sFrontierLogo_Tileset[] = INCBIN_U32("graphics/battle_transitions/frontier_logo.4bpp.lz");
-static const u32 sFrontierLogo_Tilemap[] = INCBIN_U32("graphics/battle_transitions/frontier_logo.bin.lz");
-static const u16 sFrontierSquares_Palette[] = INCBIN_U16("graphics/battle_transitions/frontier_squares_blanktiles.gbapal");
-static const u32 sFrontierSquares_FilledBg_Tileset[] = INCBIN_U32("graphics/battle_transitions/frontier_square_1.4bpp.lz");
-static const u32 sFrontierSquares_EmptyBg_Tileset[] = INCBIN_U32("graphics/battle_transitions/frontier_square_2.4bpp.lz");
-static const u32 sFrontierSquares_Shrink1_Tileset[] = INCBIN_U32("graphics/battle_transitions/frontier_square_3.4bpp.lz");
-static const u32 sFrontierSquares_Shrink2_Tileset[] = INCBIN_U32("graphics/battle_transitions/frontier_square_4.4bpp.lz");
-static const u32 sFrontierSquares_Tilemap[] = INCBIN_U32("graphics/battle_transitions/frontier_squares.bin");
 
 // All battle transitions use the same intro
 static const TaskFunc sTasks_Intro[B_TRANSITION_COUNT] =
@@ -369,20 +331,7 @@ static const TaskFunc sTasks_Main[B_TRANSITION_COUNT] =
     [B_TRANSITION_SHRED_SPLIT] = Task_ShredSplit,
     [B_TRANSITION_BLACKHOLE] = Task_Blackhole,
     [B_TRANSITION_BLACKHOLE_PULSATE] = Task_BlackholePulsate,
-    [B_TRANSITION_RECTANGULAR_SPIRAL] = Task_RectangularSpiral,
-    [B_TRANSITION_FRONTIER_LOGO_WIGGLE] = Task_FrontierLogoWiggle,
-    [B_TRANSITION_FRONTIER_LOGO_WAVE] = Task_FrontierLogoWave,
-    [B_TRANSITION_FRONTIER_SQUARES] = Task_FrontierSquares,
-    [B_TRANSITION_FRONTIER_SQUARES_SCROLL] = Task_FrontierSquaresScroll,
-    [B_TRANSITION_FRONTIER_SQUARES_SPIRAL] = Task_FrontierSquaresSpiral,
-    [B_TRANSITION_FRONTIER_CIRCLES_MEET] = Task_FrontierCirclesMeet,
-    [B_TRANSITION_FRONTIER_CIRCLES_CROSS] = Task_FrontierCirclesCross,
-    [B_TRANSITION_FRONTIER_CIRCLES_ASYMMETRIC_SPIRAL] = Task_FrontierCirclesAsymmetricSpiral,
-    [B_TRANSITION_FRONTIER_CIRCLES_SYMMETRIC_SPIRAL] = Task_FrontierCirclesSymmetricSpiral,
-    [B_TRANSITION_FRONTIER_CIRCLES_MEET_IN_SEQ] = Task_FrontierCirclesMeetInSeq,
-    [B_TRANSITION_FRONTIER_CIRCLES_CROSS_IN_SEQ] = Task_FrontierCirclesCrossInSeq,
-    [B_TRANSITION_FRONTIER_CIRCLES_ASYMMETRIC_SPIRAL_IN_SEQ] = Task_FrontierCirclesAsymmetricSpiralInSeq,
-    [B_TRANSITION_FRONTIER_CIRCLES_SYMMETRIC_SPIRAL_IN_SEQ] = Task_FrontierCirclesSymmetricSpiralInSeq,
+    [B_TRANSITION_RECTANGULAR_SPIRAL] = Task_RectangularSpiral
 };
 
 static const TransitionStateFunc sTaskHandlers[] =
@@ -895,50 +844,6 @@ static const struct SpritePalette sSpritePalette_UnusedTrainer = {sUnusedTrainer
 static const u16 sBigPokeball_Tilemap[] = INCBIN_U16("graphics/battle_transitions/big_pokeball_map.bin");
 static const u16 sMugshotsTilemap[] = INCBIN_U16("graphics/battle_transitions/elite_four_bg_map.bin");
 
-static const TransitionStateFunc sFrontierLogoWiggle_Funcs[] =
-{
-    FrontierLogoWiggle_Init,
-    FrontierLogoWiggle_SetGfx,
-    PatternWeave_Blend1,
-    PatternWeave_Blend2,
-    PatternWeave_FinishAppear,
-    PatternWeave_CircularMask
-};
-
-static const TransitionStateFunc sFrontierLogoWave_Funcs[] =
-{
-    FrontierLogoWave_Init,
-    FrontierLogoWave_SetGfx,
-    FrontierLogoWave_InitScanline,
-    FrontierLogoWave_Main
-};
-
-static const TransitionStateFunc sFrontierSquares_Funcs[] =
-{
-    FrontierSquares_Init,
-    FrontierSquares_Draw,
-    FrontierSquares_Shrink,
-    FrontierSquares_End
-};
-
-static const TransitionStateFunc sFrontierSquaresSpiral_Funcs[] =
-{
-    FrontierSquaresSpiral_Init,
-    FrontierSquaresSpiral_Outward,
-    FrontierSquaresSpiral_SetBlack,
-    FrontierSquaresSpiral_Inward,
-    FrontierSquares_End
-};
-
-static const TransitionStateFunc sFrontierSquaresScroll_Funcs[] =
-{
-    FrontierSquaresScroll_Init,
-    FrontierSquaresScroll_Draw,
-    FrontierSquaresScroll_SetBlack,
-    FrontierSquaresScroll_Erase,
-    FrontierSquaresScroll_End
-};
-
 #define SQUARE_SIZE 4
 #define MARGIN_SIZE 1 // Squares do not fit evenly across the width, so there is a margin on either side.
 #define NUM_SQUARES_PER_ROW ((DISPLAY_WIDTH - (MARGIN_SIZE * 8 * 2)) / (SQUARE_SIZE * 8))
@@ -973,35 +878,6 @@ static const u8 sFrontierSquaresScroll_Positions[] = {
 //---------------------------
 // Main transition functions
 //---------------------------
-
-static void CB2_TestBattleTransition(void)
-{
-    switch (sTestingTransitionState)
-    {
-    case 0:
-        LaunchBattleTransitionTask(sTestingTransitionId);
-        sTestingTransitionState++;
-        break;
-    case 1:
-        if (IsBattleTransitionDone())
-        {
-            sTestingTransitionState = 0;
-            SetMainCallback2(CB2_ReturnToField);
-        }
-        break;
-    }
-
-    RunTasks();
-    AnimateSprites();
-    BuildOamBuffer();
-    UpdatePaletteFade();
-}
-
-static void UNUSED TestBattleTransition(u8 transitionId)
-{
-    sTestingTransitionId = transitionId;
-    SetMainCallback2(CB2_TestBattleTransition);
-}
 
 void BattleTransition_StartOnField(u8 transitionId)
 {
@@ -1385,7 +1261,7 @@ static bool8 Aqua_Init(struct Task *task)
     InitPatternWeaveTransition(task);
     GetBg0TilesDst(&tilemap, &tileset);
     CpuFill16(0, tilemap, BG_SCREEN_SIZE);
-    LZ77UnCompVram(sTeamAqua_Tileset, tileset);
+    DecompressDataWithHeaderVram(sTeamAqua_Tileset, tileset);
     LoadPalette(sEvilTeam_Palette, BG_PLTT_ID(15), sizeof(sEvilTeam_Palette));
 
     task->tState++;
@@ -1400,7 +1276,7 @@ static bool8 Magma_Init(struct Task *task)
     InitPatternWeaveTransition(task);
     GetBg0TilesDst(&tilemap, &tileset);
     CpuFill16(0, tilemap, BG_SCREEN_SIZE);
-    LZ77UnCompVram(sTeamMagma_Tileset, tileset);
+    DecompressDataWithHeaderVram(sTeamMagma_Tileset, tileset);
     LoadPalette(sEvilTeam_Palette, BG_PLTT_ID(15), sizeof(sEvilTeam_Palette));
 
     task->tState++;
@@ -1460,7 +1336,7 @@ static bool8 Aqua_SetGfx(struct Task *task)
     u16 *tilemap, *tileset;
 
     GetBg0TilesDst(&tilemap, &tileset);
-    LZ77UnCompVram(sTeamAqua_Tilemap, tilemap);
+    DecompressDataWithHeaderVram(sTeamAqua_Tilemap, tilemap);
     SetSinWave((s16*)gScanlineEffectRegBuffers[0], 0, task->tSinIndex, 132, task->tAmplitude, DISPLAY_HEIGHT);
 
     task->tState++;
@@ -1472,7 +1348,7 @@ static bool8 Magma_SetGfx(struct Task *task)
     u16 *tilemap, *tileset;
 
     GetBg0TilesDst(&tilemap, &tileset);
-    LZ77UnCompVram(sTeamMagma_Tilemap, tilemap);
+    DecompressDataWithHeaderVram(sTeamMagma_Tilemap, tilemap);
     SetSinWave((s16*)gScanlineEffectRegBuffers[0], 0, task->tSinIndex, 132, task->tAmplitude, DISPLAY_HEIGHT);
 
     task->tState++;
@@ -1526,8 +1402,8 @@ static bool8 Kyogre_Init(struct Task *task)
 
     GetBg0TilesDst(&tilemap, &tileset);
     CpuFill16(0, tilemap, BG_SCREEN_SIZE);
-    LZ77UnCompVram(sKyogre_Tileset, tileset);
-    LZ77UnCompVram(sKyogre_Tilemap, tilemap);
+    DecompressDataWithHeaderVram(sKyogre_Tileset, tileset);
+    DecompressDataWithHeaderVram(sKyogre_Tilemap, tilemap);
 
     task->tState++;
     return FALSE;
@@ -3418,8 +3294,8 @@ static bool8 Groudon_Init(struct Task *task)
 
     GetBg0TilesDst(&tilemap, &tileset);
     CpuFill16(0, tilemap, BG_SCREEN_SIZE);
-    LZ77UnCompVram(sGroudon_Tileset, tileset);
-    LZ77UnCompVram(sGroudon_Tilemap, tilemap);
+    DecompressDataWithHeaderVram(sGroudon_Tileset, tileset);
+    DecompressDataWithHeaderVram(sGroudon_Tilemap, tilemap);
 
     task->tState++;
     task->tTimer = 0;
@@ -4289,549 +4165,3 @@ static bool8 UpdateBlackWipe(s16 *data, bool8 xExact, bool8 yExact)
     else
         return FALSE;
 }
-
-//-----------------------------------
-// B_TRANSITION_FRONTIER_LOGO_WIGGLE
-//-----------------------------------
-
-#define tSinIndex  data[4]
-#define tAmplitude data[5]
-
-static bool8 FrontierLogoWiggle_Init(struct Task *task)
-{
-    u16 *tilemap, *tileset;
-
-    InitPatternWeaveTransition(task);
-    GetBg0TilesDst(&tilemap, &tileset);
-    CpuFill16(0, tilemap, BG_SCREEN_SIZE);
-    LZ77UnCompVram(sFrontierLogo_Tileset, tileset);
-    LoadPalette(sFrontierLogo_Palette, BG_PLTT_ID(15), sizeof(sFrontierLogo_Palette));
-
-    task->tState++;
-    return FALSE;
-}
-
-static bool8 FrontierLogoWiggle_SetGfx(struct Task *task)
-{
-    u16 *tilemap, *tileset;
-
-    GetBg0TilesDst(&tilemap, &tileset);
-    LZ77UnCompVram(sFrontierLogo_Tilemap, tilemap);
-    SetSinWave((s16*)gScanlineEffectRegBuffers[0], 0, task->tSinIndex, 132, task->tAmplitude, DISPLAY_HEIGHT);
-
-    task->tState++;
-    return TRUE;
-}
-
-static void Task_FrontierLogoWiggle(u8 taskId)
-{
-    while (sFrontierLogoWiggle_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
-}
-
-#undef tSinIndex
-#undef tAmplitude
-
-//---------------------------------
-// B_TRANSITION_FRONTIER_LOGO_WAVE
-//---------------------------------
-
-#define tSinVal       data[1]
-#define tAmplitudeVal data[2]
-#define tTimer        data[3]
-#define tStartedFade  data[4]
-#define tBlendTarget2 data[5]
-#define tBlendTarget1 data[6]
-#define tSinDecrement data[7]
-
-static void Task_FrontierLogoWave(u8 taskId)
-{
-    while (sFrontierLogoWave_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
-}
-
-static bool8 FrontierLogoWave_Init(struct Task *task)
-{
-    u16 *tilemap, *tileset;
-
-    InitTransitionData();
-    ScanlineEffect_Clear();
-    ClearGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON | DISPCNT_WIN1_ON);
-    task->tAmplitudeVal = 32 << 8;
-    task->tSinVal = 0x7FFF;
-    task->tBlendTarget2 = 0;
-    task->tBlendTarget1 = 16;
-    task->tSinDecrement = 2560;
-    sTransitionData->BLDCNT = BLDCNT_TGT1_BG0 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_ALL;
-    sTransitionData->BLDALPHA = BLDALPHA_BLEND(task->tBlendTarget2, task->tBlendTarget1);
-    REG_BLDCNT = sTransitionData->BLDCNT;
-    REG_BLDALPHA = sTransitionData->BLDALPHA;
-    GetBg0TilesDst(&tilemap, &tileset);
-    CpuFill16(0, tilemap, BG_SCREEN_SIZE);
-    LZ77UnCompVram(sFrontierLogo_Tileset, tileset);
-    LoadPalette(sFrontierLogo_Palette, BG_PLTT_ID(15), sizeof(sFrontierLogo_Palette));
-    sTransitionData->cameraY = 0;
-    UpdateShadowColor(RGB_GRAY);
-
-    task->tState++;
-    return FALSE;
-}
-
-static bool8 FrontierLogoWave_SetGfx(struct Task *task)
-{
-    u16 *tilemap, *tileset;
-
-    GetBg0TilesDst(&tilemap, &tileset);
-    LZ77UnCompVram(sFrontierLogo_Tilemap, tilemap);
-
-    task->tState++;
-    return TRUE;
-}
-
-static bool8 FrontierLogoWave_InitScanline(struct Task *task)
-{
-    u8 i;
-
-    for (i = 0; i < DISPLAY_HEIGHT; i++)
-        gScanlineEffectRegBuffers[1][i] = sTransitionData->cameraY;
-
-    SetVBlankCallback(VBlankCB_FrontierLogoWave);
-    SetHBlankCallback(HBlankCB_FrontierLogoWave);
-    EnableInterrupts(INTR_FLAG_HBLANK);
-
-    task->tState++;
-    return TRUE;
-}
-
-static bool8 FrontierLogoWave_Main(struct Task *task)
-{
-    u8 i;
-    u16 sinVal, amplitude, sinSpread;
-
-    sTransitionData->VBlank_DMA = FALSE;
-
-    amplitude = task->tAmplitudeVal >> 8;
-    sinVal = task->tSinVal;
-    sinSpread = 384;
-
-    task->tSinVal -= task->tSinDecrement;
-
-    if (task->tTimer >= 70)
-    {
-        // Decrease amount of logo movement and distortion
-        // until it rests normally in the middle of the screen.
-        if (task->tAmplitudeVal - 384 >= 0)
-            task->tAmplitudeVal -= 384;
-        else
-            task->tAmplitudeVal = 0;
-    }
-
-    if (task->tTimer >= 0 && task->tTimer % 3 == 0)
-    {
-        // Blend logo into view
-        if (task->tBlendTarget2 < 16)
-            task->tBlendTarget2++;
-        else if (task->tBlendTarget1 > 0)
-            task->tBlendTarget1--;
-
-        sTransitionData->BLDALPHA = BLDALPHA_BLEND(task->tBlendTarget2, task->tBlendTarget1);
-    }
-
-    // Move logo up and down and distort it
-    for (i = 0; i < DISPLAY_HEIGHT; i++, sinVal += sinSpread)
-    {
-        s16 index = sinVal / 256;
-        gScanlineEffectRegBuffers[0][i] = sTransitionData->cameraY + Sin(index & 0xff, amplitude);
-    }
-
-    if (++task->tTimer == 101)
-    {
-        task->tStartedFade++;
-        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
-    }
-
-    if (task->tStartedFade && !gPaletteFade.active)
-        DestroyTask(FindTaskIdByFunc(Task_FrontierLogoWave));
-
-    task->tSinDecrement -= 17;
-    sTransitionData->VBlank_DMA++;
-    return FALSE;
-}
-
-static void VBlankCB_FrontierLogoWave(void)
-{
-    VBlankCB_BattleTransition();
-    REG_BLDCNT = sTransitionData->BLDCNT;
-    REG_BLDALPHA = sTransitionData->BLDALPHA;
-
-    if (sTransitionData->VBlank_DMA)
-        DmaCopy16(3, gScanlineEffectRegBuffers[0], gScanlineEffectRegBuffers[1], DISPLAY_HEIGHT * 2);
-}
-
-static void HBlankCB_FrontierLogoWave(void)
-{
-    u16 var = gScanlineEffectRegBuffers[1][REG_VCOUNT];
-    REG_BG0VOFS = var;
-}
-
-#undef tSinVal
-#undef tAmplitudeVal
-#undef tTimer
-#undef tStartedFade
-#undef tBlendTarget2
-#undef tBlendTarget1
-#undef tSinDecrement
-
-//----------------------------------------------------------------------
-// B_TRANSITION_FRONTIER_SQUARES, B_TRANSITION_FRONTIER_SQUARES_SCROLL,
-// and B_TRANSITION_FRONTIER_SQUARES_SPIRAL
-//----------------------------------------------------------------------
-
-#define tPosX             data[2]
-#define tPosY             data[3]
-#define tRowPos           data[4]
-#define tShrinkState      data[5]
-#define tShrinkDelayTimer data[6]
-#define tShrinkDelay      data[7]
-
-static void Task_FrontierSquares(u8 taskId)
-{
-    while (sFrontierSquares_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
-}
-
-static void Task_FrontierSquaresSpiral(u8 taskId)
-{
-    while (sFrontierSquaresSpiral_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
-}
-
-static void Task_FrontierSquaresScroll(u8 taskId)
-{
-    while (sFrontierSquaresScroll_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
-}
-
-static bool8 FrontierSquares_Init(struct Task *task)
-{
-    u16 *tilemap, *tileset;
-
-    GetBg0TilesDst(&tilemap, &tileset);
-    LZ77UnCompVram(sFrontierSquares_FilledBg_Tileset, tileset);
-
-    FillBgTilemapBufferRect_Palette0(0, 0, 0, 0, 32, 32);
-    FillBgTilemapBufferRect(0, 1, 0, 0, MARGIN_SIZE, 32, 15);
-    FillBgTilemapBufferRect(0, 1, 30 - MARGIN_SIZE, 0, MARGIN_SIZE, 32, 15);
-    CopyBgTilemapBufferToVram(0);
-    LoadPalette(sFrontierSquares_Palette, BG_PLTT_ID(15), sizeof(sFrontierSquares_Palette));
-
-    task->tPosX = MARGIN_SIZE;
-    task->tPosY = 0;
-    task->tRowPos = 0;
-    task->tShrinkDelay = 10;
-
-    task->tState++;
-    return FALSE;
-}
-
-static bool8 FrontierSquares_Draw(struct Task *task)
-{
-    CopyRectToBgTilemapBufferRect(0, sFrontierSquares_Tilemap, 0, 0,
-                                  SQUARE_SIZE, SQUARE_SIZE,
-                                  task->tPosX, task->tPosY,
-                                  SQUARE_SIZE, SQUARE_SIZE,
-                                  15, 0, 0);
-    CopyBgTilemapBufferToVram(0);
-
-    task->tPosX += SQUARE_SIZE;
-    if (++task->tRowPos == NUM_SQUARES_PER_ROW)
-    {
-        task->tPosX = MARGIN_SIZE;
-        task->tPosY += SQUARE_SIZE;
-        task->tRowPos = 0;
-        if (task->tPosY >= NUM_SQUARES_PER_COL * SQUARE_SIZE)
-            task->tState++;
-    }
-
-    return FALSE;
-}
-
-static bool8 FrontierSquares_Shrink(struct Task *task)
-{
-    u8 i;
-    u16 *tilemap, *tileset;
-
-    GetBg0TilesDst(&tilemap, &tileset);
-    if (task->tShrinkDelayTimer++ >= task->tShrinkDelay)
-    {
-        switch (task->tShrinkState)
-        {
-        case 0:
-            for (i = BG_PLTT_ID(15) + 10; i < BG_PLTT_ID(15) + 15; i++)
-            {
-                gPlttBufferUnfaded[i] = RGB_BLACK;
-                gPlttBufferFaded[i] = RGB_BLACK;
-            }
-            break;
-        case 1:
-            BlendPalettes(PALETTES_ALL & ~(1 << 15), 16, RGB_BLACK);
-            LZ77UnCompVram(sFrontierSquares_EmptyBg_Tileset, tileset);
-            break;
-        case 2:
-            LZ77UnCompVram(sFrontierSquares_Shrink1_Tileset, tileset);
-            break;
-        case 3:
-            LZ77UnCompVram(sFrontierSquares_Shrink2_Tileset, tileset);
-            break;
-        default:
-            FillBgTilemapBufferRect_Palette0(0, 1, 0, 0, 32, 32);
-            CopyBgTilemapBufferToVram(0);
-            task->tState++;
-            return FALSE;
-        }
-
-        task->tShrinkDelayTimer = 0;
-        task->tShrinkState++;
-    }
-
-    return FALSE;
-}
-
-#undef tPosX
-#undef tPosY
-#undef tRowPos
-#undef tShrinkState
-#undef tShrinkDelayTimer
-#undef tShrinkDelay
-
-#define tSquareNum data[2]
-#define tFadeFlag  data[3]
-
-static bool8 FrontierSquaresSpiral_Init(struct Task *task)
-{
-    u16 *tilemap, *tileset;
-
-    GetBg0TilesDst(&tilemap, &tileset);
-    LZ77UnCompVram(sFrontierSquares_FilledBg_Tileset, tileset);
-
-    FillBgTilemapBufferRect_Palette0(0, 0, 0, 0, 32, 32);
-    FillBgTilemapBufferRect(0, 1, 0, 0, MARGIN_SIZE, 32, 15);
-    FillBgTilemapBufferRect(0, 1, 30 - MARGIN_SIZE, 0, MARGIN_SIZE, 32, 15);
-    CopyBgTilemapBufferToVram(0);
-    LoadPalette(sFrontierSquares_Palette, BG_PLTT_ID(14), sizeof(sFrontierSquares_Palette));
-    LoadPalette(sFrontierSquares_Palette, BG_PLTT_ID(15), sizeof(sFrontierSquares_Palette));
-    BlendPalette(BG_PLTT_ID(14), 16, 8, RGB_BLACK);
-
-    task->tSquareNum = NUM_SQUARES - 1;
-    task->tFadeFlag = 0;
-
-    task->tState++;
-    return FALSE;
-}
-
-static bool8 FrontierSquaresSpiral_Outward(struct Task *task)
-{
-    u8 pos = sFrontierSquaresSpiral_Positions[task->tSquareNum];
-    u8 x = pos % NUM_SQUARES_PER_ROW;
-    u8 y = pos / NUM_SQUARES_PER_ROW;
-    CopyRectToBgTilemapBufferRect(0, sFrontierSquares_Tilemap, 0, 0,
-                                  SQUARE_SIZE, SQUARE_SIZE,
-                                  SQUARE_SIZE * x + MARGIN_SIZE, SQUARE_SIZE * y,
-                                  SQUARE_SIZE, SQUARE_SIZE,
-                                  15, 0, 0);
-    CopyBgTilemapBufferToVram(0);
-
-    if (--task->tSquareNum < 0)
-        task->tState++;
-    return FALSE;
-}
-
-// Now that the overworld is completely covered by the squares,
-// set it to black so it's not revealed when the squares are removed.
-static bool8 FrontierSquaresSpiral_SetBlack(struct Task *task)
-{
-    BlendPalette(BG_PLTT_ID(14), 16, 3, RGB_BLACK);
-    BlendPalettes(PALETTES_ALL & ~(1 << 15 | 1 << 14), 16, RGB_BLACK);
-
-    task->tSquareNum = 0;
-    task->tFadeFlag = 0;
-
-    task->tState++;
-    return FALSE;
-}
-
-// Spiral inward erasing the squares
-static bool8 FrontierSquaresSpiral_Inward(struct Task *task)
-{
-    // Each square is faded first, then the one that was faded last move is erased.
-    if (task->tFadeFlag ^= 1)
-    {
-        // Shade square
-        CopyRectToBgTilemapBufferRect(0, sFrontierSquares_Tilemap, 0, 0,
-                                      SQUARE_SIZE, SQUARE_SIZE,
-                                      SQUARE_SIZE * (sFrontierSquaresSpiral_Positions[task->tSquareNum] % NUM_SQUARES_PER_ROW) + MARGIN_SIZE,
-                                      SQUARE_SIZE * (sFrontierSquaresSpiral_Positions[task->tSquareNum] / NUM_SQUARES_PER_ROW),
-                                      SQUARE_SIZE, SQUARE_SIZE,
-                                      14, 0, 0);
-    }
-    else
-    {
-        if (task->tSquareNum > 0)
-        {
-            // Erase square
-            FillBgTilemapBufferRect(0, 1,
-                                    SQUARE_SIZE * (sFrontierSquaresSpiral_Positions[task->tSquareNum - 1] % NUM_SQUARES_PER_ROW) + MARGIN_SIZE,
-                                    SQUARE_SIZE * (sFrontierSquaresSpiral_Positions[task->tSquareNum - 1] / NUM_SQUARES_PER_ROW),
-                                    SQUARE_SIZE, SQUARE_SIZE,
-                                    15);
-        }
-        task->tSquareNum++;
-    }
-
-    if (task->tSquareNum >= NUM_SQUARES)
-        task->tState++;
-
-    CopyBgTilemapBufferToVram(0);
-    return FALSE;
-}
-
-static bool8 FrontierSquares_End(struct Task *task)
-{
-    FillBgTilemapBufferRect_Palette0(0, 1, 0, 0, 32, 32);
-    CopyBgTilemapBufferToVram(0);
-    BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
-    DestroyTask(FindTaskIdByFunc(task->func));
-    return FALSE;
-}
-
-#undef tSquareNum
-#undef tFadeFlag
-
-#define tScrollXDir       data[0]
-#define tScrollYDir       data[1]
-#define tScrollUpdateFlag data[2]
-
-#define tSquareNum        data[2]
-
-static void Task_ScrollBg(u8 taskId)
-{
-    if (!(gTasks[taskId].tScrollUpdateFlag ^= 1))
-    {
-        SetGpuReg(REG_OFFSET_BG0VOFS, gBattle_BG0_X);
-        SetGpuReg(REG_OFFSET_BG0HOFS, gBattle_BG0_Y);
-        gBattle_BG0_X += gTasks[taskId].tScrollXDir;
-        gBattle_BG0_Y += gTasks[taskId].tScrollYDir;
-    }
-}
-
-static bool8 FrontierSquaresScroll_Init(struct Task *task)
-{
-    u8 taskId = 0;
-    u16 *tilemap, *tileset;
-
-    GetBg0TilesDst(&tilemap, &tileset);
-    LZ77UnCompVram(sFrontierSquares_FilledBg_Tileset, tileset);
-    FillBgTilemapBufferRect_Palette0(0, 0, 0, 0, 32, 32);
-    CopyBgTilemapBufferToVram(0);
-    LoadPalette(sFrontierSquares_Palette, BG_PLTT_ID(15), sizeof(sFrontierSquares_Palette));
-
-    gBattle_BG0_X = 0;
-    gBattle_BG0_Y = 0;
-    SetGpuReg(REG_OFFSET_BG0VOFS, gBattle_BG0_X);
-    SetGpuReg(REG_OFFSET_BG0HOFS, gBattle_BG0_Y);
-
-    task->tSquareNum = 0;
-
-    // Start scrolling bg in a random direction.
-    taskId = CreateTask(Task_ScrollBg, 1);
-    switch (Random() % 4)
-    {
-    case 0: // Down/right
-        gTasks[taskId].tScrollXDir = 1;
-        gTasks[taskId].tScrollYDir = 1;
-        break;
-    case 1: // Up/left
-        gTasks[taskId].tScrollXDir = -1;
-        gTasks[taskId].tScrollYDir = -1;
-        break;
-    case 2: // Up/right
-        gTasks[taskId].tScrollXDir = 1;
-        gTasks[taskId].tScrollYDir = -1;
-        break;
-    default: // Down/left
-        gTasks[taskId].tScrollXDir = -1;
-        gTasks[taskId].tScrollYDir = 1;
-        break;
-    }
-
-    task->tState++;
-    return FALSE;
-}
-
-static bool8 FrontierSquaresScroll_Draw(struct Task *task)
-{
-    u8 pos = sFrontierSquaresScroll_Positions[task->tSquareNum];
-    u8 x = pos / (NUM_SQUARES_PER_ROW + 1); // +1 because during scroll an additional column covers the margin.
-    u8 y = pos % (NUM_SQUARES_PER_ROW + 1);
-
-    CopyRectToBgTilemapBufferRect(0, &sFrontierSquares_Tilemap, 0, 0,
-                                  SQUARE_SIZE, SQUARE_SIZE,
-                                  SQUARE_SIZE * x + MARGIN_SIZE, SQUARE_SIZE * y,
-                                  SQUARE_SIZE, SQUARE_SIZE,
-                                  15, 0, 0);
-    CopyBgTilemapBufferToVram(0);
-
-    if (++task->tSquareNum >= (int)ARRAY_COUNT(sFrontierSquaresScroll_Positions))
-        task->tState++;
-    return 0;
-}
-
-// Now that the overworld is completely covered by the squares,
-// set it to black so it's not revealed when the squares are removed.
-static bool8 FrontierSquaresScroll_SetBlack(struct Task *task)
-{
-    BlendPalettes(PALETTES_ALL & ~(1 << 15), 16, RGB_BLACK);
-
-    task->tSquareNum = 0;
-
-    task->tState++;
-    return FALSE;
-}
-
-static bool8 FrontierSquaresScroll_Erase(struct Task *task)
-{
-    u8 pos = sFrontierSquaresScroll_Positions[task->tSquareNum];
-    u8 x = pos / (NUM_SQUARES_PER_ROW + 1);
-    u8 y = pos % (NUM_SQUARES_PER_ROW + 1);
-
-    FillBgTilemapBufferRect(0, 1,
-                            SQUARE_SIZE * x + MARGIN_SIZE, SQUARE_SIZE * y,
-                            SQUARE_SIZE, SQUARE_SIZE,
-                            15);
-    CopyBgTilemapBufferToVram(0);
-
-    if (++task->tSquareNum >= (int)ARRAY_COUNT(sFrontierSquaresScroll_Positions))
-    {
-        DestroyTask(FindTaskIdByFunc(Task_ScrollBg));
-        task->tState++;
-    }
-
-    return FALSE;
-}
-
-static bool8 FrontierSquaresScroll_End(struct Task *task)
-{
-    gBattle_BG0_X = 0;
-    gBattle_BG0_Y = 0;
-    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
-    SetGpuReg(REG_OFFSET_BG0HOFS, gBattle_BG0_Y);
-
-    FillBgTilemapBufferRect_Palette0(0, 1, 0, 0, 32, 32);
-    CopyBgTilemapBufferToVram(0);
-    BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
-
-    DestroyTask(FindTaskIdByFunc(task->func));
-    task->tState++; // Changing value of a destroyed task
-
-    return FALSE;
-}
-
-#undef tScrollXDir
-#undef tScrollYDir
-#undef tScrollUpdateFlag
-#undef tSquareNum

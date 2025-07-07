@@ -104,12 +104,12 @@ void BreakSubStringAutomatic(u8 *src, u32 maxWidth, u32 screenLines, u8 fontId, 
     for (u32 i = 0; i < numWords; i++)
     {
         for (u32 j = 0; j < allWords[i].length; j++)
-            allWords[i].width += GetGlyphWidth(src[allWords[i].startIndex + j], FALSE, fontId);
+            allWords[i].width += GetGlyphWidth(src[allWords[i].startIndex + j], fontId);
     }
 
     //  Step 1: Does it all fit one one line? Then no break
     //  Step 2: Try to split across minimum number of lines
-    u32 spaceWidth = GetGlyphWidth(0, FALSE, fontId);
+    u32 spaceWidth = GetGlyphWidth(0, fontId);
     u32 totalWidth = allWords[0].width;
     //  Calculate total widths without any line breaks
     for (u32 i = 1; i < numWords; i++)

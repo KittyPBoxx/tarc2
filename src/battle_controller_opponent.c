@@ -4,19 +4,14 @@
 #include "battle_ai_util.h"
 #include "constants/battle_ai.h"
 #include "battle_anim.h"
-#include "battle_arena.h"
 #include "battle_controllers.h"
 #include "battle_message.h"
 #include "battle_interface.h"
 #include "battle_setup.h"
-#include "battle_tower.h"
-#include "battle_tv.h"
 #include "battle_z_move.h"
 #include "bg.h"
 #include "data.h"
-#include "frontier_util.h"
 #include "item.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
@@ -37,7 +32,6 @@
 #include "constants/party_menu.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
-#include "trainer_hill.h"
 #include "test_runner.h"
 
 static void OpponentHandleLoadMonSprite(u32 battler);
@@ -355,17 +349,7 @@ static void SwitchIn_TryShinyAnim(u32 battler)
 static void OpponentBufferExecCompleted(u32 battler)
 {
     gBattlerControllerFuncs[battler] = OpponentBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(battler, B_COMM_CONTROLLER_IS_DONE, 4, &playerId);
-        gBattleResources->bufferA[battler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~(1u << battler);
-    }
+    gBattleControllerExecFlags &= ~(1u << battler);
 }
 
 static void OpponentHandleLoadMonSprite(u32 battler)
@@ -386,42 +370,6 @@ static u32 OpponentGetTrainerPicId(u32 battlerId)
     if (gBattleTypeFlags & BATTLE_TYPE_SECRET_BASE)
     {
         trainerPicId = GetSecretBaseTrainerPicIndex();
-    }
-    else if (TRAINER_BATTLE_PARAM.opponentA == TRAINER_FRONTIER_BRAIN)
-    {
-        trainerPicId = GetFrontierBrainTrainerPicIndex();
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
-    {
-        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
-        {
-            if (battlerId == 1)
-                trainerPicId = GetTrainerHillTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentA);
-            else
-                trainerPicId = GetTrainerHillTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentB);
-        }
-        else
-        {
-            trainerPicId = GetTrainerHillTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentA);
-        }
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
-    {
-        if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_TOWER_LINK_MULTI))
-        {
-            if (battlerId == 1)
-                trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentA);
-            else
-                trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentB);
-        }
-        else
-        {
-            trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentA);
-        }
-    }
-    else if (gBattleTypeFlags & BATTLE_TYPE_EREADER_TRAINER)
-    {
-        trainerPicId = GetEreaderTrainerFrontSpriteId();
     }
     else if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
     {
@@ -490,7 +438,7 @@ static void OpponentHandleChooseMove(u32 battler)
     u32 chosenMoveIndex;
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleResources->bufferA[battler][4]);
 
-    if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_FIRST_BATTLE | BATTLE_TYPE_SAFARI | BATTLE_TYPE_ROAMER)
+    if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_FIRST_BATTLE | BATTLE_TYPE_SAFARI)
      || IsWildMonSmart())
     {
         if (gBattleTypeFlags & BATTLE_TYPE_PALACE)

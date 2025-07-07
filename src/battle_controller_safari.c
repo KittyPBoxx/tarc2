@@ -7,12 +7,10 @@
 #include "bg.h"
 #include "data.h"
 #include "item_menu.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
 #include "pokeball.h"
-#include "pokeblock.h"
 #include "pokemon.h"
 #include "reshow_battle_screen.h"
 #include "sound.h"
@@ -41,7 +39,6 @@ static void SafariHandleEndLinkBattle(u32 battler);
 
 static void SafariBufferRunCommand(u32 battler);
 static void SafariBufferExecCompleted(u32 battler);
-static void CompleteWhenChosePokeblock(u32 battler);
 
 static void (*const sSafariBufferCommands[CONTROLLER_CMDS_COUNT])(u32 battler) =
 {
@@ -130,7 +127,7 @@ static void HandleInputChooseAction(u32 battler)
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SAFARI_BALL, 0);
             break;
         case 1:
-            BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SAFARI_POKEBLOCK, 0);
+            BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SAFARI_BALL, 0);
             break;
         case 2:
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SAFARI_GO_NEAR, 0);
@@ -206,39 +203,10 @@ static void SafariSetBattleEndCallbacks(u32 battler)
     }
 }
 
-static void SafariOpenPokeblockCase(u32 battler)
-{
-    if (!gPaletteFade.active)
-    {
-        gBattlerControllerFuncs[battler] = CompleteWhenChosePokeblock;
-        FreeAllWindowBuffers();
-        OpenPokeblockCaseInBattle();
-    }
-}
-
-static void CompleteWhenChosePokeblock(u32 battler)
-{
-    if (gMain.callback2 == BattleMainCB2 && !gPaletteFade.active)
-    {
-        BtlController_EmitOneReturnValue(battler, B_COMM_TO_ENGINE, gSpecialVar_ItemId);
-        SafariBufferExecCompleted(battler);
-    }
-}
-
 static void SafariBufferExecCompleted(u32 battler)
 {
     gBattlerControllerFuncs[battler] = SafariBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(battler, B_COMM_CONTROLLER_IS_DONE, 4, &playerId);
-        gBattleResources->bufferA[battler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~(1u << battler);
-    }
+    gBattleControllerExecFlags &= ~(1u << battler);
 }
 
 static void SafariHandleDrawTrainerPic(u32 battler)
@@ -300,9 +268,7 @@ static void SafariHandleChooseAction(u32 battler)
 
 static void SafariHandleChooseItem(u32 battler)
 {
-    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
-    gBattlerControllerFuncs[battler] = SafariOpenPokeblockCase;
-    gBattlerInMenuId = battler;
+    // TODO: remove
 }
 
 static void SafariHandleStatusIconUpdate(u32 battler)

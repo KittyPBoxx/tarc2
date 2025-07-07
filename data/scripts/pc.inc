@@ -17,9 +17,7 @@ EventScript_PCMainMenu::
 
 EventScript_AccessPC::
 	switch VAR_RESULT
-	case 0, EventScript_AccessPokemonStorage
 	case 1, EventScript_AccessPlayersPC
-	case 2, EventScript_AccessHallOfFame
 	case 3, EventScript_TurnOffPC
 	case MULTI_B_PRESSED, EventScript_TurnOffPC
 	end
@@ -28,16 +26,6 @@ EventScript_AccessPlayersPC::
 	playse SE_PC_LOGIN
 	msgbox gText_AccessedPlayersPC, MSGBOX_DEFAULT
 	special PlayerPC
-	waitstate
-	goto EventScript_PCMainMenu
-	end
-
-EventScript_AccessPokemonStorage::
-	playse SE_PC_LOGIN
-	call_if_unset FLAG_SYS_PC_LANETTE, EventScript_AccessSomeonesPC
-	call_if_set FLAG_SYS_PC_LANETTE, EventScript_AccessLanettesPC
-	msgbox gText_StorageSystemOpened, MSGBOX_DEFAULT
-	special ShowPokemonStorageSystemPC
 	waitstate
 	goto EventScript_PCMainMenu
 	end
@@ -57,18 +45,3 @@ EventScript_TurnOffPC::
 	releaseall
 	end
 
-EventScript_AccessHallOfFame::
-	goto_if_unset FLAG_SYS_GAME_CLEAR, EventScript_TurnOffPC
-	playse SE_PC_LOGIN
-	special AccessHallOfFamePC
-	waitstate
-	goto EventScript_AccessPC
-	end
-
-EventScript_AccessPokemonBoxLink::
-	playse SE_PC_LOGIN
-	msgbox gText_StorageSystemOpened, MSGBOX_DEFAULT
-	special ShowPokemonStorageSystemPC
-	waitstate
-	goto EventScript_TurnOffPC
-	end

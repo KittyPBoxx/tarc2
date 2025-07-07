@@ -1,7 +1,6 @@
 #include "global.h"
 #include "malloc.h"
 #include "battle_main.h"
-#include "contest_effect.h"
 #include "data.h"
 #include "decompress.h"
 #include "gpu_regs.h"
@@ -11,11 +10,9 @@
 #include "menu.h"
 #include "menu_specialized.h"
 #include "move.h"
-#include "move_relearner.h"
 #include "palette.h"
 #include "player_pc.h"
 #include "pokemon_summary_screen.h"
-#include "pokemon_storage_system.h"
 #include "scanline_effect.h"
 #include "sound.h"
 #include "strings.h"
@@ -36,9 +33,6 @@ static void ConditionGraph_CalcRightHalf(struct ConditionGraph *);
 static void ConditionGraph_CalcLeftHalf(struct ConditionGraph *);
 static void MoveRelearnerCursorCallback(s32, bool8, struct ListMenu *);
 static void MoveRelearnerDummy(void);
-static void SetNextConditionSparkle(struct Sprite *);
-static void SpriteCB_ConditionSparkle(struct Sprite *);
-static void ShowAllConditionSparkles(struct Sprite *);
 
 static const struct WindowTemplate sWindowTemplates_MailboxMenu[MAILBOXWIN_COUNT] =
 {
@@ -237,25 +231,8 @@ void MailboxMenu_RemoveWindow(u8 windowIdx)
     sMailboxWindowIds[windowIdx] = WINDOW_NONE;
 }
 
-static u8 UNUSED MailboxMenu_GetWindowId(u8 windowIdx)
-{
-    return sMailboxWindowIds[windowIdx];
-}
-
 static void MailboxMenu_ItemPrintFunc(u8 windowId, u32 itemId, u8 y)
 {
-    u8 buffer[30];
-    u16 length;
-
-    if (itemId == LIST_CANCEL)
-        return;
-
-    StringCopy(buffer, gSaveBlock1Ptr->mail[PARTY_SIZE + itemId].playerName);
-    ConvertInternationalPlayerName(buffer);
-    length = StringLength(buffer);
-    if (length < PLAYER_NAME_LENGTH - 1)
-        ConvertInternationalString(buffer, LANGUAGE_JAPANESE);
-    AddTextPrinterParameterized4(windowId, FONT_NORMAL, 8, y, 0, 0, sPlayerNameTextColors, TEXT_SKIP_DRAW, buffer);
 }
 
 u8 MailboxMenu_CreateList(struct PlayerPCItemPageStruct *page)
@@ -752,97 +729,10 @@ u8 LoadMoveRelearnerMovesList(const struct ListMenuItem *items, u16 numChoices)
 
 static void MoveRelearnerLoadBattleMoveDescription(u32 chosenMove)
 {
-    s32 x;
-    u8 buffer[32];
-    const u8 *str;
-
-    if (B_SHOW_CATEGORY_ICON == TRUE)
-        MoveRelearnerShowHideCategoryIcon(chosenMove);
-
-    FillWindowPixelBuffer(RELEARNERWIN_DESC_BATTLE, PIXEL_FILL(1));
-    str = gText_MoveRelearnerBattleMoves;
-    x = GetStringCenterAlignXOffset(FONT_NORMAL, str, 128);
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, str, x, 1, TEXT_SKIP_DRAW, NULL);
-
-    str = gText_MoveRelearnerPP;
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, str, 4, 41, TEXT_SKIP_DRAW, NULL);
-
-    str = gText_MoveRelearnerPower;
-    x = GetStringRightAlignXOffset(FONT_NORMAL, str, 106);
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, str, x, 25, TEXT_SKIP_DRAW, NULL);
-
-    str = gText_MoveRelearnerAccuracy;
-    x = GetStringRightAlignXOffset(FONT_NORMAL, str, 106);
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, str, x, 41, TEXT_SKIP_DRAW, NULL);
-    if (chosenMove == LIST_CANCEL)
-    {
-        // On "Cancel", skip printing move data
-        CopyWindowToVram(RELEARNERWIN_DESC_BATTLE, COPYWIN_GFX);
-        return;
-    }
-    str = gTypesInfo[GetMoveType(chosenMove)].name;
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, str, 4, 25, TEXT_SKIP_DRAW, NULL);
-
-    x = 4 + GetStringWidth(FONT_NORMAL, gText_MoveRelearnerPP, 0);
-    ConvertIntToDecimalStringN(buffer, GetMovePP(chosenMove), STR_CONV_MODE_LEFT_ALIGN, 2);
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, buffer, x, 41, TEXT_SKIP_DRAW, NULL);
-
-    if (GetMovePower(chosenMove) < 2)
-    {
-        str = gText_ThreeDashes;
-    }
-    else
-    {
-        ConvertIntToDecimalStringN(buffer, GetMovePower(chosenMove), STR_CONV_MODE_LEFT_ALIGN, 3);
-        str = buffer;
-    }
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, str, 106, 25, TEXT_SKIP_DRAW, NULL);
-
-    if (GetMoveAccuracy(chosenMove) == 0)
-    {
-        str = gText_ThreeDashes;
-    }
-    else
-    {
-        ConvertIntToDecimalStringN(buffer, GetMoveAccuracy(chosenMove), STR_CONV_MODE_LEFT_ALIGN, 3);
-        str = buffer;
-    }
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, str, 106, 41, TEXT_SKIP_DRAW, NULL);
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NARROW, GetMoveDescription(chosenMove), 0, 65, 0, NULL);
 }
 
 static void MoveRelearnerMenuLoadContestMoveDescription(u32 chosenMove)
 {
-    s32 x;
-    const u8 *str;
-
-    MoveRelearnerShowHideHearts(chosenMove);
-    FillWindowPixelBuffer(RELEARNERWIN_DESC_CONTEST, PIXEL_FILL(1));
-    str = gText_MoveRelearnerContestMovesTitle;
-    x = GetStringCenterAlignXOffset(FONT_NORMAL, str, 128);
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_CONTEST, FONT_NORMAL, str, x, 1, TEXT_SKIP_DRAW, NULL);
-
-    str = gText_MoveRelearnerAppeal;
-    x = GetStringRightAlignXOffset(FONT_NORMAL, str, 92);
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_CONTEST, FONT_NORMAL, str, x, 25, TEXT_SKIP_DRAW, NULL);
-
-    str = gText_MoveRelearnerJam;
-    x = GetStringRightAlignXOffset(FONT_NORMAL, str, 92);
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_CONTEST, FONT_NORMAL, str, x, 41, TEXT_SKIP_DRAW, NULL);
-
-    if (chosenMove == MENU_NOTHING_CHOSEN)
-    {
-        CopyWindowToVram(RELEARNERWIN_DESC_CONTEST, COPYWIN_GFX);
-        return;
-    }
-
-    str = gContestMoveTypeTextPointers[GetMoveContestCategory(chosenMove)];
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_CONTEST, FONT_NORMAL, str, 4, 25, TEXT_SKIP_DRAW, NULL);
-
-    str = gContestEffectDescriptionPointers[GetMoveContestEffect(chosenMove)];
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_CONTEST, FONT_NARROW, str, 0, 65, TEXT_SKIP_DRAW, NULL);
-
-    CopyWindowToVram(RELEARNERWIN_DESC_CONTEST, COPYWIN_GFX);
 }
 
 static void MoveRelearnerCursorCallback(s32 itemIndex, bool8 onInit, struct ListMenu *list)
@@ -882,125 +772,17 @@ s32 GetBoxOrPartyMonData(u16 boxId, u16 monId, s32 request, u8 *dst)
 {
     s32 ret;
 
-    if (boxId == TOTAL_BOXES_COUNT) // Party mon.
-    {
-        if (request == MON_DATA_NICKNAME || request == MON_DATA_OT_NAME)
-            ret = GetMonData(&gPlayerParty[monId], request, dst);
-        else
-            ret = GetMonData(&gPlayerParty[monId], request);
-    }
+    if (request == MON_DATA_NICKNAME || request == MON_DATA_OT_NAME)
+        ret = GetMonData(&gPlayerParty[monId], request, dst);
     else
-    {
-        if (request == MON_DATA_NICKNAME || request == MON_DATA_OT_NAME)
-            ret = GetAndCopyBoxMonDataAt(boxId, monId, request, dst);
-        else
-            ret = GetBoxMonDataAt(boxId, monId, request);
-    }
+        ret = GetMonData(&gPlayerParty[monId], request);
 
     return ret;
-}
-
-// Gets the name/gender/level string for the condition menu
-static u8 *GetConditionMenuMonString(u8 *dst, u16 boxId, u16 monId)
-{
-    u16 box, mon, species, level, gender;
-    struct BoxPokemon *boxMon;
-    u8 *str;
-
-    box = boxId;
-    mon = monId;
-    *(dst++) = EXT_CTRL_CODE_BEGIN;
-    *(dst++) = EXT_CTRL_CODE_COLOR_HIGHLIGHT_SHADOW;
-    *(dst++) = TEXT_COLOR_BLUE;
-    *(dst++) = TEXT_COLOR_TRANSPARENT;
-    *(dst++) = TEXT_COLOR_LIGHT_BLUE;
-    if (GetBoxOrPartyMonData(box, mon, MON_DATA_IS_EGG, NULL))
-        return StringCopyPadded(dst, gText_EggNickname, 0, POKEMON_NAME_LENGTH + 2);
-    GetBoxOrPartyMonData(box, mon, MON_DATA_NICKNAME, dst);
-    StringGet_Nickname(dst);
-    species = GetBoxOrPartyMonData(box, mon, MON_DATA_SPECIES, NULL);
-    if (box == TOTAL_BOXES_COUNT) // Party mon.
-    {
-        level = GetMonData(&gPlayerParty[mon], MON_DATA_LEVEL);
-        gender = GetMonGender(&gPlayerParty[mon]);
-    }
-    else
-    {
-        boxMon = GetBoxedMonPtr(box, mon);
-        gender = GetBoxMonGender(boxMon);
-        level = GetLevelFromBoxMonExp(boxMon);
-    }
-
-    if ((species == SPECIES_NIDORAN_F || species == SPECIES_NIDORAN_M) && !StringCompare(dst, GetSpeciesName(species)))
-        gender = MON_GENDERLESS;
-
-    for (str = dst; *str != EOS; str++)
-        ;
-
-    *(str++) = EXT_CTRL_CODE_BEGIN;
-    *(str++) = EXT_CTRL_CODE_SKIP;
-    *(str++) = 60;
-
-    switch (gender)
-    {
-    default:
-        *(str++) = CHAR_SPACE;
-        break;
-    case MON_MALE:
-        *(str++) = EXT_CTRL_CODE_BEGIN;
-        *(str++) = EXT_CTRL_CODE_COLOR;
-        *(str++) = TEXT_COLOR_RED;
-        *(str++) = EXT_CTRL_CODE_BEGIN;
-        *(str++) = EXT_CTRL_CODE_SHADOW;
-        *(str++) = TEXT_COLOR_LIGHT_RED;
-        *(str++) = CHAR_MALE;
-        break;
-    case MON_FEMALE:
-        *(str++) = EXT_CTRL_CODE_BEGIN;
-        *(str++) = EXT_CTRL_CODE_COLOR;
-        *(str++) = TEXT_COLOR_GREEN;
-        *(str++) = EXT_CTRL_CODE_BEGIN;
-        *(str++) = EXT_CTRL_CODE_SHADOW;
-        *(str++) = TEXT_COLOR_LIGHT_GREEN;
-        *(str++) = CHAR_FEMALE;
-        break;
-    }
-
-    *(str++) = EXT_CTRL_CODE_BEGIN;
-    *(str++) = EXT_CTRL_CODE_COLOR_HIGHLIGHT_SHADOW;
-    *(str++) = TEXT_COLOR_BLUE;
-    *(str++) = TEXT_COLOR_TRANSPARENT;
-    *(str++) = TEXT_COLOR_LIGHT_BLUE;
-    *(str++) = CHAR_SLASH;
-    *(str++) = CHAR_EXTRA_SYMBOL;
-    *(str++) = CHAR_LV_2;
-    str = ConvertIntToDecimalStringN(str, level, STR_CONV_MODE_LEFT_ALIGN, 3);
-    *(str++) = CHAR_SPACE;
-    *str = EOS;
-
-    return str;
-}
-
-// Buffers the string in src to dest up to n chars. If src is less than n chars, fill with spaces
-static u8 *BufferConditionMenuSpacedStringN(u8 *dst, const u8 *src, s16 n)
-{
-    while (*src != EOS)
-    {
-        *(dst++) = *(src++);
-        n--;
-    }
-    while (n-- > 0)
-        *(dst++) = CHAR_SPACE;
-
-    *dst = EOS;
-    return dst;
 }
 
 void GetConditionMenuMonNameAndLocString(u8 *locationDst, u8 *nameDst, u16 boxId, u16 monId, u16 partyId, u16 numMons, bool8 excludesCancel)
 {
     u16 i;
-    u16 box = boxId;
-    u16 mon = monId;
 
     // In this and the below 2 functions, numMons is passed as the number of menu selections (which includes Cancel)
     // To indicate that the Cancel needs to be subtracted they pass an additional bool
@@ -1008,28 +790,11 @@ void GetConditionMenuMonNameAndLocString(u8 *locationDst, u8 *nameDst, u16 boxId
     if (!excludesCancel)
         numMons--;
 
-    if (partyId != numMons)
-    {
-        GetConditionMenuMonString(nameDst, box, mon);
-        locationDst[0] = EXT_CTRL_CODE_BEGIN;
-        locationDst[1] = EXT_CTRL_CODE_COLOR_HIGHLIGHT_SHADOW;
-        locationDst[2] = TEXT_COLOR_BLUE;
-        locationDst[3] = TEXT_COLOR_TRANSPARENT;
-        locationDst[4] = TEXT_COLOR_LIGHT_BLUE;
-        if (box == TOTAL_BOXES_COUNT) // Party mon.
-            BufferConditionMenuSpacedStringN(&locationDst[5], gText_InParty, BOX_NAME_LENGTH);
-        else
-            BufferConditionMenuSpacedStringN(&locationDst[5], GetBoxNamePtr(box), BOX_NAME_LENGTH);
-    }
-    else
-    {
-        for (i = 0; i < POKEMON_NAME_LENGTH + 2; i++)
-            nameDst[i] = CHAR_SPACE;
-        nameDst[i] = EOS;
-        for (i = 0; i < BOX_NAME_LENGTH; i++)
-            locationDst[i] = CHAR_SPACE;
-        locationDst[i] = EOS;
-    }
+    for (i = 0; i < POKEMON_NAME_LENGTH + 2; i++)
+        nameDst[i] = CHAR_SPACE;
+    nameDst[i] = EOS;
+
+    locationDst[i] = EOS;
 }
 
 void GetConditionMenuMonConditions(struct ConditionGraph *graph, u8 *numSparkles, u16 boxId, u16 monId, u16 partyId, u16 id, u16 numMons, bool8 excludesCancel)
@@ -1112,11 +877,6 @@ bool8 ConditionMenu_UpdateMonExit(struct ConditionGraph *graph, s16 *x)
     return (graphUpdating || monUpdating);
 }
 
-static const u32 sConditionPokeball_Gfx[] = INCBIN_U32("graphics/pokenav/condition/pokeball.4bpp");
-static const u32 sConditionPokeballPlaceholder_Gfx[] = INCBIN_U32("graphics/pokenav/condition/pokeball_placeholder.4bpp");
-static const u16 sConditionSparkle_Gfx[] = INCBIN_U16("graphics/pokenav/condition/sparkle.gbapal");
-static const u32 sConditionSparkle_Pal[] = INCBIN_U32("graphics/pokenav/condition/sparkle.4bpp");
-
 static const struct OamData sOam_ConditionMonPic =
 {
     .y = 0,
@@ -1191,312 +951,6 @@ void LoadConditionMonPicTemplate(struct SpriteSheet *sheet, struct SpriteTemplat
     *template = dataTemplate;
     *pal = dataPal;
 }
-
-void LoadConditionSelectionIcons(struct SpriteSheet *sheets, struct SpriteTemplate *template, struct SpritePalette *pals)
-{
-    u8 i;
-
-    struct SpriteSheet dataSheets[] =
-    {
-        {sConditionPokeball_Gfx, 0x100, TAG_CONDITION_BALL},
-        {sConditionPokeballPlaceholder_Gfx, 0x20, TAG_CONDITION_BALL_PLACEHOLDER},
-        {gPokenavConditionCancel_Gfx, 0x100, TAG_CONDITION_CANCEL},
-        {},
-    };
-
-    struct SpritePalette dataPals[] =
-    {
-        {gPokenavConditionCancel_Pal, TAG_CONDITION_BALL},
-        {gPokenavConditionCancel_Pal + 16, TAG_CONDITION_CANCEL},
-        {},
-    };
-
-    // Tag is overwritten for the other selection icons
-    struct SpriteTemplate dataTemplate =
-    {
-        .tileTag = TAG_CONDITION_BALL,
-        .paletteTag = TAG_CONDITION_BALL,
-        .oam = &sOam_ConditionSelectionIcon,
-        .anims = sAnims_ConditionSelectionIcon,
-        .images = NULL,
-        .affineAnims = gDummySpriteAffineAnimTable,
-        .callback = SpriteCallbackDummy,
-    };
-
-    for (i = 0; i < ARRAY_COUNT(dataSheets); i++)
-        *(sheets++) = dataSheets[i];
-
-    *template = dataTemplate;
-
-    for (i = 0; i < ARRAY_COUNT(dataPals); i++)
-        *(pals++) = dataPals[i];
-}
-
-#define sSparkleId           data[0]
-#define sDelayTimer          data[1]
-#define sNumExtraSparkles    data[2]
-#define sCurSparkleId        data[3]
-#define sMonSpriteId         data[4]
-#define sNextSparkleSpriteId data[5]
-
-void LoadConditionSparkle(struct SpriteSheet *sheet, struct SpritePalette *pal)
-{
-    struct SpriteSheet dataSheet = {sConditionSparkle_Pal, 0x380, TAG_CONDITION_SPARKLE};
-    struct SpritePalette dataPal = {sConditionSparkle_Gfx, TAG_CONDITION_SPARKLE};
-
-    *sheet = dataSheet;
-    *pal = dataPal;
-}
-
-static void SpriteCB_ConditionSparkle_DoNextAfterDelay(struct Sprite *sprite)
-{
-    if (++sprite->sDelayTimer > 60)
-    {
-        sprite->sDelayTimer = 0;
-        SetNextConditionSparkle(sprite);
-    }
-}
-
-static void SpriteCB_ConditionSparkle_WaitForAllAnim(struct Sprite *sprite)
-{
-    if (sprite->animEnded)
-    {
-        sprite->sDelayTimer = 0;
-        sprite->callback = SpriteCB_ConditionSparkle_DoNextAfterDelay;
-    }
-}
-
-static const struct OamData sOam_ConditionSparkle =
-{
-    .y = 0,
-    .affineMode = ST_OAM_AFFINE_OFF,
-    .objMode = ST_OAM_OBJ_NORMAL,
-    .bpp = ST_OAM_4BPP,
-    .shape = SPRITE_SHAPE(16x16),
-    .x = 0,
-    .size = SPRITE_SIZE(16x16),
-    .priority = 0,
-};
-
-static const union AnimCmd sAnim_ConditionSparkle[] =
-{
-    ANIMCMD_FRAME(0, 5),
-    ANIMCMD_FRAME(4, 5),
-    ANIMCMD_FRAME(8, 5),
-    ANIMCMD_FRAME(12, 5),
-    ANIMCMD_FRAME(16, 5),
-    ANIMCMD_FRAME(20, 5),
-    ANIMCMD_FRAME(24, 5),
-    ANIMCMD_END
-};
-
-static const union AnimCmd *const sAnims_ConditionSparkle[] =
-{
-    &sAnim_ConditionSparkle[0], // Only this entry is used
-    &sAnim_ConditionSparkle[2],
-    &sAnim_ConditionSparkle[4],
-    &sAnim_ConditionSparkle[6],
-    &sAnim_ConditionSparkle[8], // Here below OOB, will crash if used
-    &sAnim_ConditionSparkle[10],
-    &sAnim_ConditionSparkle[12],
-};
-
-static const struct SpriteTemplate sSpriteTemplate_ConditionSparkle =
-{
-    .tileTag = TAG_CONDITION_SPARKLE,
-    .paletteTag = TAG_CONDITION_SPARKLE,
-    .oam = &sOam_ConditionSparkle,
-    .anims = sAnims_ConditionSparkle,
-    .images = NULL,
-    .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCB_ConditionSparkle,
-};
-
-static const s16 sConditionSparkleCoords[MAX_CONDITION_SPARKLES][2] =
-{
-    {  0,  -35},
-    { 20,  -28},
-    { 33,  -10},
-    { 33,   10},
-    { 20,   28},
-    {  0,   35},
-    {-20,   28},
-    {-33,   10},
-    {-33,  -10},
-    {-20,  -28},
-};
-
-static void SetConditionSparklePosition(struct Sprite *sprite)
-{
-    struct Sprite *mon = &gSprites[sprite->sMonSpriteId];
-
-    if (mon != NULL)
-    {
-        sprite->x = mon->x + mon->x2 + sConditionSparkleCoords[sprite->sSparkleId][0];
-        sprite->y = mon->y + mon->y2 + sConditionSparkleCoords[sprite->sSparkleId][1];
-    }
-    else
-    {
-        sprite->x = sConditionSparkleCoords[sprite->sSparkleId][0] + 40;
-        sprite->y = sConditionSparkleCoords[sprite->sSparkleId][1] + 104;
-    }
-}
-
-static void InitConditionSparkles(u8 count, bool8 allowFirstShowAll, struct Sprite **sprites)
-{
-    u16 i;
-
-    for (i = 0; i < MAX_CONDITION_SPARKLES; i++)
-    {
-        if (sprites[i] != NULL)
-        {
-            sprites[i]->sSparkleId = i;
-            sprites[i]->sDelayTimer = (i * 16) + 1;
-            sprites[i]->sNumExtraSparkles = count;
-            sprites[i]->sCurSparkleId = i;
-            if (!allowFirstShowAll || count != MAX_CONDITION_SPARKLES - 1)
-            {
-                sprites[i]->callback = SpriteCB_ConditionSparkle;
-            }
-            else
-            {
-                SetConditionSparklePosition(sprites[i]);
-                ShowAllConditionSparkles(sprites[i]);
-                sprites[i]->callback = SpriteCB_ConditionSparkle_WaitForAllAnim;
-                sprites[i]->invisible = FALSE;
-            }
-        }
-    }
-}
-
-static void SetNextConditionSparkle(struct Sprite *sprite)
-{
-    u16 i;
-    u8 id = sprite->sNextSparkleSpriteId;
-    for (i = 0; i < sprite->sNumExtraSparkles + 1; i++)
-    {
-        gSprites[id].sDelayTimer = (gSprites[id].sSparkleId * 16) + 1;
-        gSprites[id].callback = SpriteCB_ConditionSparkle;
-        id = gSprites[id].sNextSparkleSpriteId;
-    }
-}
-
-void ResetConditionSparkleSprites(struct Sprite **sprites)
-{
-    u8 i;
-
-    for (i = 0; i < MAX_CONDITION_SPARKLES; i++)
-        sprites[i] = NULL;
-}
-
-void CreateConditionSparkleSprites(struct Sprite **sprites, u8 monSpriteId, u8 _count)
-{
-    u16 i, spriteId, firstSpriteId = 0;
-    u8 count = _count;
-
-    for (i = 0; i < count + 1; i++)
-    {
-        spriteId = CreateSprite(&sSpriteTemplate_ConditionSparkle, 0, 0, 0);
-        if (spriteId != MAX_SPRITES)
-        {
-            sprites[i] = &gSprites[spriteId];
-            sprites[i]->invisible = TRUE;
-            sprites[i]->sMonSpriteId = monSpriteId;
-            if (i != 0)
-                sprites[i - 1]->sNextSparkleSpriteId = spriteId;
-            else
-                firstSpriteId = spriteId;
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    sprites[count]->sNextSparkleSpriteId = firstSpriteId;
-    InitConditionSparkles(count, TRUE, sprites);
-}
-
-void DestroyConditionSparkleSprites(struct Sprite **sprites)
-{
-    u16 i;
-
-    for (i = 0; i < MAX_CONDITION_SPARKLES; i++)
-    {
-        if (sprites[i] != NULL)
-        {
-            DestroySprite(sprites[i]);
-            sprites[i] = NULL;
-        }
-        else
-        {
-            break;
-        }
-    }
-}
-
-void FreeConditionSparkles(struct Sprite **sprites)
-{
-    DestroyConditionSparkleSprites(sprites);
-    FreeSpriteTilesByTag(TAG_CONDITION_SPARKLE);
-    FreeSpritePaletteByTag(TAG_CONDITION_SPARKLE);
-}
-
-static void SpriteCB_ConditionSparkle(struct Sprite *sprite)
-{
-    // Delay, then do sparkle anim
-    if (sprite->sDelayTimer != 0)
-    {
-        if (--sprite->sDelayTimer != 0)
-            return;
-
-        SeekSpriteAnim(sprite, 0);
-        sprite->invisible = FALSE;
-    }
-
-    SetConditionSparklePosition(sprite);
-
-    // Set up next sparkle
-    if (sprite->animEnded)
-    {
-        sprite->invisible = TRUE;
-        if (sprite->sCurSparkleId == sprite->sNumExtraSparkles)
-        {
-            if (sprite->sCurSparkleId == MAX_CONDITION_SPARKLES - 1)
-            {
-                ShowAllConditionSparkles(sprite);
-                sprite->callback = SpriteCB_ConditionSparkle_WaitForAllAnim;
-            }
-            else
-            {
-                sprite->callback = SpriteCB_ConditionSparkle_DoNextAfterDelay;
-            }
-        }
-        else
-        {
-            sprite->callback = SpriteCallbackDummy;
-        }
-    }
-}
-
-static void ShowAllConditionSparkles(struct Sprite *sprite)
-{
-    u8 i, id = sprite->sNextSparkleSpriteId;
-
-    for (i = 0; i < sprite->sNumExtraSparkles + 1; i++)
-    {
-        SeekSpriteAnim(&gSprites[id], 0);
-        gSprites[id].invisible = FALSE;
-        id = gSprites[id].sNextSparkleSpriteId;
-    }
-}
-
-#undef sSparkleId
-#undef sDelayTimer
-#undef sNumExtraSparkles
-#undef sCurSparkleId
-#undef sMonSpriteId
-#undef sNextSparkleSpriteId
 
 static const u8 *const sLvlUpStatStrings[NUM_STATS] =
 {

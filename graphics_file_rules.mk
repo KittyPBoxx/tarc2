@@ -9,14 +9,9 @@ MASKSGFXDIR := graphics/battle_anims/masks
 BATTRANSGFXDIR := graphics/battle_transitions
 TYPESGFXDIR := graphics/types
 RAYQUAZAGFXDIR := graphics/rayquaza_scene
-ROULETTEGFXDIR := graphics/roulette
-SLOTMACHINEGFXDIR := graphics/slot_machine
-PKNAVGFXDIR := graphics/pokenav
-PKNAVOPTIONSGFXDIR := graphics/pokenav/options
 WALLPAPERGFXDIR := graphics/pokemon_storage/wallpapers
 OBJEVENTGFXDIR := graphics/object_events
 MISCGFXDIR := graphics/misc
-JPCONTESTGFXDIR := graphics/contest/japanese
 POKEDEXGFXDIR := graphics/pokedex
 STARTERGFXDIR := graphics/starter_choose
 NAMINGGFXDIR := graphics/naming_screen
@@ -55,12 +50,6 @@ $(TILESETGFXDIR)/secondary/pacifidlog/tiles.4bpp: %.4bpp: %.png
 $(TILESETGFXDIR)/secondary/sootopolis/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 328 -Wnum_tiles
 
-$(TILESETGFXDIR)/secondary/battle_frontier_outside_west/tiles.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 508 -Wnum_tiles
-
-$(TILESETGFXDIR)/secondary/battle_frontier_outside_east/tiles.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 508 -Wnum_tiles
-
 $(TILESETGFXDIR)/primary/building/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 502 -Wnum_tiles
 
@@ -87,9 +76,6 @@ $(TILESETGFXDIR)/secondary/meteor_falls/tiles.4bpp: %.4bpp: %.png
 
 $(TILESETGFXDIR)/secondary/oceanic_museum/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 319 -Wnum_tiles
-
-$(TILESETGFXDIR)/secondary/cable_club/unknown_tiles.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 120 -Wnum_tiles
 
 $(TILESETGFXDIR)/secondary/seashore_house/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 312 -Wnum_tiles
@@ -139,9 +125,6 @@ $(TILESETGFXDIR)/secondary/secret_base/red_cave/tiles.4bpp: %.4bpp: %.png
 $(TILESETGFXDIR)/secondary/inside_of_truck/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 62 -Wnum_tiles
 
-$(TILESETGFXDIR)/secondary/contest/tiles.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 430 -Wnum_tiles
-
 $(TILESETGFXDIR)/secondary/lilycove_museum/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 431 -Wnum_tiles
 
@@ -190,9 +173,6 @@ $(TILESETGFXDIR)/secondary/inside_ship/tiles.4bpp: %.4bpp: %.png
 $(TILESETGFXDIR)/secondary/elite_four/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 505 -Wnum_tiles
 
-$(TILESETGFXDIR)/secondary/battle_frontier/tiles.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 310 -Wnum_tiles
-
 $(TILESETGFXDIR)/secondary/battle_factory/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 424 -Wnum_tiles
 
@@ -208,14 +188,8 @@ $(TILESETGFXDIR)/secondary/mossdeep_game_corner/tiles.4bpp: %.4bpp: %.png
 $(TILESETGFXDIR)/secondary/island_harbor/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 503 -Wnum_tiles
 
-$(TILESETGFXDIR)/secondary/trainer_hill/tiles.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 374 -Wnum_tiles
-
 $(TILESETGFXDIR)/secondary/navel_rock/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 420 -Wnum_tiles
-
-$(TILESETGFXDIR)/secondary/battle_frontier_ranking_hall/tiles.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 136 -Wnum_tiles
 
 $(TILESETGFXDIR)/secondary/mystery_events_house/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 509 -Wnum_tiles
@@ -251,28 +225,6 @@ $(FONTGFXDIR)/short_narrow.latfont: $(FONTGFXDIR)/latin_short_narrow.png
 $(FONTGFXDIR)/short_narrower.latfont: $(FONTGFXDIR)/latin_short_narrower.png
 	$(GFX) $< $@
 
-$(FONTGFXDIR)/small.hwjpnfont: $(FONTGFXDIR)/japanese_small.png
-	$(GFX) $< $@
-
-$(FONTGFXDIR)/normal.hwjpnfont: $(FONTGFXDIR)/japanese_normal.png
-	$(GFX) $< $@
-
-$(FONTGFXDIR)/bold.hwjpnfont: $(FONTGFXDIR)/japanese_bold.png
-	$(GFX) $< $@
-
-$(FONTGFXDIR)/short.fwjpnfont: $(FONTGFXDIR)/japanese_short.png
-	$(GFX) $< $@
-
-$(FONTGFXDIR)/braille.fwjpnfont: $(FONTGFXDIR)/braille.png
-	$(GFX) $< $@
-
-$(FONTGFXDIR)/frlg_male.fwjpnfont: $(FONTGFXDIR)/japanese_frlg_male.png
-	$(GFX) $< $@
-
-$(FONTGFXDIR)/frlg_female.fwjpnfont: $(FONTGFXDIR)/japanese_frlg_female.png
-	$(GFX) $< $@
-
-
 ### Miscellaneous ###
 
 $(TITLESCREENGFXDIR)/pokemon_logo.gbapal: %.gbapal: %.pal
@@ -280,15 +232,6 @@ $(TITLESCREENGFXDIR)/pokemon_logo.gbapal: %.gbapal: %.pal
 
 $(TITLESCREENGFXDIR)/emerald_version.8bpp: %.8bpp: %.png
 	$(GFX) $< $@ -mwidth 8 -mheight 4
-
-graphics/pokemon_jump/bg.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 63 -Wnum_tiles
-
-graphics/pokenav/region_map/map.8bpp: %.8bpp: %.png
-	$(GFX) $< $@ -num_tiles 233 -Wnum_tiles
-
-$(MISCGFXDIR)/japanese_hof.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 29 -Wnum_tiles
 
 $(MISCGFXDIR)/mirage_tower.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 73 -Wnum_tiles
@@ -428,22 +371,6 @@ $(BATTRANSGFXDIR)/regis.4bpp: %.4bpp: %.png
 
 $(BATTRANSGFXDIR)/rayquaza.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 938 -Wnum_tiles
-
-$(BATTRANSGFXDIR)/frontier_square_1.4bpp: $(BATTRANSGFXDIR)/frontier_squares_blanktiles.4bpp \
-                                          $(BATTRANSGFXDIR)/frontier_squares_1.4bpp
-	@cat $^ >$@
-
-$(BATTRANSGFXDIR)/frontier_square_2.4bpp: $(BATTRANSGFXDIR)/frontier_squares_blanktiles.4bpp \
-                                          $(BATTRANSGFXDIR)/frontier_squares_2.4bpp
-	@cat $^ >$@
-
-$(BATTRANSGFXDIR)/frontier_square_3.4bpp: $(BATTRANSGFXDIR)/frontier_squares_blanktiles.4bpp \
-                                          $(BATTRANSGFXDIR)/frontier_squares_3.4bpp
-	@cat $^ >$@
-
-$(BATTRANSGFXDIR)/frontier_square_4.4bpp: $(BATTRANSGFXDIR)/frontier_squares_blanktiles.4bpp \
-                                          $(BATTRANSGFXDIR)/frontier_squares_4.4bpp
-	@cat $^ >$@
 
 $(SLOTMACHINEGFXDIR)/reel_time_gfx.4bpp: $(SLOTMACHINEGFXDIR)/reel_time_pikachu.4bpp \
                                          $(SLOTMACHINEGFXDIR)/reel_time_machine.4bpp
@@ -615,16 +542,11 @@ $(WALLPAPERGFXDIR)/whiscash/tiles.4bpp: $(WALLPAPERGFXDIR)/friends_frame2.4bpp $
 $(INTERFACEGFXDIR)/outline_cursor.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 8 -Wnum_tiles
 
-$(BATTRANSGFXDIR)/frontier_logo_center.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 43 -Wnum_tiles
-
-
 
 ### Pokenav ###
 
 $(PKNAVOPTIONSGFXDIR)/options.4bpp: $(PKNAVOPTIONSGFXDIR)/hoenn_map.4bpp \
                                     $(PKNAVOPTIONSGFXDIR)/condition.4bpp \
-                                    $(PKNAVOPTIONSGFXDIR)/match_call.4bpp \
                                     $(PKNAVOPTIONSGFXDIR)/ribbons.4bpp \
                                     $(PKNAVOPTIONSGFXDIR)/switch_off.4bpp \
                                     $(PKNAVOPTIONSGFXDIR)/party.4bpp \
@@ -642,15 +564,6 @@ $(PKNAVGFXDIR)/header.4bpp: %.4bpp: %.png
 
 $(PKNAVGFXDIR)/device_outline.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 53 -Wnum_tiles
-
-$(PKNAVGFXDIR)/match_call/ui.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 13 -Wnum_tiles
-
-$(POKEDEXGFXDIR)/region_map.8bpp: %.8bpp: %.png
-	$(GFX) $< $@ -num_tiles 232 -Wnum_tiles
-
-$(POKEDEXGFXDIR)/region_map_affine.8bpp: %.8bpp: %.png
-	$(GFX) $< $@ -num_tiles 233 -Wnum_tiles
 
 $(NAMINGGFXDIR)/cursor.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 5 -Wnum_tiles

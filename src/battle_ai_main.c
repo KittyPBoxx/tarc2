@@ -6,7 +6,6 @@
 #include "battle_ai_util.h"
 #include "battle_ai_main.h"
 #include "battle_controllers.h"
-#include "battle_factory.h"
 #include "battle_setup.h"
 #include "battle_z_move.h"
 #include "battle_terastal.h"
@@ -16,7 +15,6 @@
 #include "item.h"
 #include "pokemon.h"
 #include "random.h"
-#include "recorded_battle.h"
 #include "util.h"
 #include "script.h"
 #include "constants/abilities.h"
@@ -39,7 +37,6 @@ static inline void BattleAI_DoAIProcessing_PredictedSwitchin(struct AiThinkingSt
 static bool32 IsPinchBerryItemEffect(enum ItemHoldEffect holdEffect);
 
 // ewram
-EWRAM_DATA const u8 *gAIScriptPtr = NULL;   // Still used in contests
 EWRAM_DATA AiScoreFunc sDynamicAiFunc = NULL;
 
 // const rom data
@@ -51,7 +48,6 @@ static s32 AI_Risky(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 static s32 AI_TryTo2HKO(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 static s32 AI_PreferBatonPass(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 static s32 AI_HPAware(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
-static s32 AI_Roaming(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 static s32 AI_Safari(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 static s32 AI_FirstBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
 static s32 AI_DoubleBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score);
@@ -123,7 +119,7 @@ static s32 (*const sBattleAiFuncTable[])(u32, u32, u32, s32) =
     [58] = NULL,                     // Unused
     [59] = NULL,                     // Unused
     [60] = AI_DynamicFunc,          // AI_FLAG_DYNAMIC_FUNC
-    [61] = AI_Roaming,              // AI_FLAG_ROAMING
+    [61] = NULL,                    // AI_FLAG_ROAMING
     [62] = AI_Safari,               // AI_FLAG_SAFARI
     [63] = AI_FirstBattle,          // AI_FLAG_FIRST_BATTLE
 };
@@ -191,16 +187,10 @@ static u64 GetAiFlags(u16 trainerId)
     }
     else
     {
-        if (gBattleTypeFlags & BATTLE_TYPE_RECORDED)
-            flags = GetAiScriptsInRecordedBattle();
-        else if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
+        if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
             flags = AI_FLAG_SAFARI;
-        else if (gBattleTypeFlags & BATTLE_TYPE_ROAMER)
-            flags = AI_FLAG_ROAMING;
         else if (gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE)
             flags = AI_FLAG_FIRST_BATTLE;
-        else if (gBattleTypeFlags & BATTLE_TYPE_FACTORY)
-            flags = GetAiScriptsInBattleFactory();
         else if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE))
             flags = AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT;
         else
@@ -6069,25 +6059,6 @@ static void AI_Flee(void)
 static void AI_Watch(void)
 {
     gAiThinkingStruct->aiAction |= (AI_ACTION_DONE | AI_ACTION_WATCH | AI_ACTION_DO_NOT_ATTACK);
-}
-
-// Roaming pokemon logic
-static s32 AI_Roaming(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
-{
-    bool32 roamerCanFlee = FALSE;
-
-    if (AI_CanBattlerEscape(battlerAtk))
-        roamerCanFlee = TRUE;
-    else if (gAiLogicData->abilities[battlerAtk] == ABILITY_RUN_AWAY)
-        roamerCanFlee = TRUE;
-    else if (gAiLogicData->holdEffects[battlerAtk] == HOLD_EFFECT_CAN_ALWAYS_RUN)
-        roamerCanFlee = TRUE;
-
-    if (!roamerCanFlee && IsBattlerTrapped(battlerDef, battlerAtk))
-        return score;
-
-    AI_Flee();
-    return score;
 }
 
 // Safari pokemon logic

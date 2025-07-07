@@ -5,16 +5,13 @@
 #include "event_scripts.h"
 #include "field_effect.h"
 #include "field_player_avatar.h"
-#include "follower_npc.h"
 #include "pokemon.h"
 #include "script.h"
 #include "script_movement.h"
 #include "sprite.h"
 #include "task.h"
 #include "trainer_see.h"
-#include "trainer_hill.h"
 #include "util.h"
-#include "battle_pyramid.h"
 #include "constants/battle_setup.h"
 #include "constants/event_objects.h"
 #include "constants/event_object_movement.h"
@@ -436,38 +433,21 @@ static u8 CheckTrainer(u8 objectEventId)
     if (approachDistance == 0)
         return 0;
 
-    if (InTrainerHill() == TRUE)
+    trainerBattlePtr = scriptPtr = GetObjectEventScriptPointerByObjectEventId(objectEventId);
+    struct ScriptContext ctx;
+    if (RunScriptImmediatelyUntilEffect(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE | SCREFF_TRAINERBATTLE, scriptPtr, &ctx))
     {
-        trainerBattlePtr = scriptPtr = GetTrainerHillTrainerScript();
+        if (*ctx.scriptPtr == 0x5c) // trainerbattle
+            trainerBattlePtr = ctx.scriptPtr;
+        else
+            trainerBattlePtr = NULL;
     }
     else
     {
-        trainerBattlePtr = scriptPtr = GetObjectEventScriptPointerByObjectEventId(objectEventId);
-        struct ScriptContext ctx;
-        if (RunScriptImmediatelyUntilEffect(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE | SCREFF_TRAINERBATTLE, scriptPtr, &ctx))
-        {
-            if (*ctx.scriptPtr == 0x5c) // trainerbattle
-                trainerBattlePtr = ctx.scriptPtr;
-            else
-                trainerBattlePtr = NULL;
-        }
-        else
-        {
-            return 0; // no effect
-        }
+        return 0; // no effect
     }
 
-    if (InBattlePyramid())
-    {
-        if (GetBattlePyramidTrainerFlag(objectEventId))
-            return 0;
-    }
-    else if (InTrainerHill() == TRUE)
-    {
-        if (GetHillTrainerFlag(objectEventId))
-            return 0;
-    }
-    else if (trainerBattlePtr)
+    if (trainerBattlePtr)
     {
         if (GetTrainerFlagFromScriptPointer(trainerBattlePtr))
             return 0;
@@ -630,9 +610,6 @@ static void StartTrainerApproach(TaskFunc followupFunc)
         taskId = gApproachingTrainers[0].taskId;
     else
         taskId = gApproachingTrainers[1].taskId;
-
-    if (PlayerHasFollowerNPC() && (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_ON_FOOT))
-        ObjectEventForceSetHeldMovement(&gObjectEvents[GetFollowerNPCObjectId()], GetFaceDirectionAnimNum(gObjectEvents[GetFollowerNPCObjectId()].facingDirection));
 
     taskFunc = Task_RunTrainerSeeFuncList;
     SetTaskFuncWithFollowupFunc(taskId, taskFunc, followupFunc);

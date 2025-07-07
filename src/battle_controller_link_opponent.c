@@ -6,17 +6,13 @@
 #include "battle_interface.h"
 #include "battle_message.h"
 #include "battle_setup.h"
-#include "battle_tower.h"
-#include "battle_tv.h"
 #include "bg.h"
 #include "data.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
 #include "pokeball.h"
 #include "pokemon.h"
-#include "recorded_battle.h"
 #include "reshow_battle_screen.h"
 #include "sound.h"
 #include "string_util.h"
@@ -27,7 +23,6 @@
 #include "constants/battle_anim.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
-#include "recorded_battle.h"
 #include "random.h"
 
 static void LinkOpponentHandleLoadMonSprite(u32 battler);
@@ -310,18 +305,7 @@ static void SwitchIn_TryShinyAnim(u32 battler)
 
 static void LinkOpponentBufferExecCompleted(u32 battler)
 {
-    gBattlerControllerFuncs[battler] = LinkOpponentBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(battler, B_COMM_CONTROLLER_IS_DONE, 4, &playerId);
-        gBattleResources->bufferA[battler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~(1u << battler);
-    }
+    // TODO: remove
 }
 
 static void LinkOpponentHandleLoadMonSprite(u32 battler)
@@ -336,90 +320,12 @@ static void LinkOpponentHandleSwitchInAnim(u32 battler)
 
 static void LinkOpponentHandleDrawTrainerPic(u32 battler)
 {
-    s16 xPos;
-    u32 trainerPicId;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-    {
-        if ((GetBattlerPosition(battler) & BIT_FLANK) != 0) // second mon
-            xPos = 152;
-        else // first mon
-            xPos = 200;
-
-        if (gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER)
-        {
-            if (battler == B_POSITION_OPPONENT_LEFT)
-                trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentA);
-            else
-                trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentB);
-        }
-        else
-        {
-            if ((gLinkPlayers[GetBattlerMultiplayerId(battler)].version & 0xFF) == VERSION_FIRE_RED
-            || (gLinkPlayers[GetBattlerMultiplayerId(battler)].version & 0xFF) == VERSION_LEAF_GREEN)
-            {
-                if (gLinkPlayers[GetBattlerMultiplayerId(battler)].gender != MALE)
-                    trainerPicId = gFacilityClassToPicIndex[FACILITY_CLASS_LEAF];
-                else
-                    trainerPicId = gFacilityClassToPicIndex[FACILITY_CLASS_RED];
-            }
-            else if ((gLinkPlayers[GetBattlerMultiplayerId(battler)].version & 0xFF) == VERSION_RUBY
-                     || (gLinkPlayers[GetBattlerMultiplayerId(battler)].version & 0xFF) == VERSION_SAPPHIRE)
-            {
-                if (gLinkPlayers[GetBattlerMultiplayerId(battler)].gender != MALE)
-                    trainerPicId = gFacilityClassToPicIndex[FACILITY_CLASS_RS_MAY];
-                else
-                    trainerPicId = gFacilityClassToPicIndex[FACILITY_CLASS_RS_BRENDAN];
-            }
-            else
-            {
-                trainerPicId = PlayerGenderToFrontTrainerPicId(gLinkPlayers[GetBattlerMultiplayerId(battler)].gender);
-            }
-        }
-    }
-    else
-    {
-        xPos = 176;
-        if (TRAINER_BATTLE_PARAM.opponentA == TRAINER_UNION_ROOM)
-        {
-            trainerPicId = GetUnionRoomTrainerPic();
-        }
-        else if ((gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].version & 0xFF) == VERSION_FIRE_RED
-                 || (gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].version & 0xFF) == VERSION_LEAF_GREEN)
-        {
-            if (gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].gender != MALE)
-                trainerPicId = gFacilityClassToPicIndex[FACILITY_CLASS_LEAF];
-            else
-                trainerPicId = gFacilityClassToPicIndex[FACILITY_CLASS_RED];
-        }
-        else if ((gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].version & 0xFF) == VERSION_RUBY
-                 || (gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].version & 0xFF) == VERSION_SAPPHIRE)
-        {
-            if (gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].gender != MALE)
-                trainerPicId = gFacilityClassToPicIndex[FACILITY_CLASS_RS_MAY];
-            else
-                trainerPicId = gFacilityClassToPicIndex[FACILITY_CLASS_RS_BRENDAN];
-        }
-        else
-        {
-            trainerPicId = PlayerGenderToFrontTrainerPicId(gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].gender);
-        }
-    }
-
-    BtlController_HandleDrawTrainerPic(battler, trainerPicId, TRUE, xPos, 40, -1);
+    // TODO: remove
 }
 
 static void LinkOpponentHandleTrainerSlide(u32 battler)
 {
-    u32 trainerPicId;
 
-    if (battler == B_POSITION_OPPONENT_LEFT)
-        trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentA);
-    else
-        trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentB);
-
-    BtlController_HandleTrainerSlide(battler, trainerPicId);
-    LinkOpponentBufferExecCompleted(battler); // Possibly a bug, because execution should be completed after the slide in finishes. See Controller_WaitForTrainerPic.
 }
 
 static void LinkOpponentHandleTrainerSlideBack(u32 battler)
@@ -459,22 +365,10 @@ static void LinkOpponentHandleBattleAnimation(u32 battler)
 
 static void LinkOpponentHandleLinkStandbyMsg(u32 battler)
 {
-    RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[battler][2]);
     LinkOpponentBufferExecCompleted(battler);
 }
 
 static void LinkOpponentHandleEndLinkBattle(u32 battler)
 {
-    RecordedBattle_RecordAllBattlerData(&gBattleResources->bufferA[battler][4]);
 
-    if (gBattleResources->bufferA[battler][1] == B_OUTCOME_DREW)
-        gBattleOutcome = gBattleResources->bufferA[battler][1];
-    else
-        gBattleOutcome = gBattleResources->bufferA[battler][1] ^ B_OUTCOME_DREW;
-
-    gSaveBlock2Ptr->frontier.disableRecordBattle = gBattleResources->bufferA[battler][2];
-    FadeOutMapMusic(5);
-    BeginFastPaletteFade(3);
-    LinkOpponentBufferExecCompleted(battler);
-    gBattlerControllerFuncs[battler] = SetBattleEndCallbacks;
 }

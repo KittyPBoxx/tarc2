@@ -953,7 +953,6 @@ extern const u8 gBattleAnimStatus_Nightmare[];
 extern const u8 gBattleAnimGeneral_StatsChange[];
 extern const u8 gBattleAnimGeneral_SubstituteFade[];
 extern const u8 gBattleAnimGeneral_SubstituteAppear[];
-extern const u8 gBattleAnimGeneral_PokeblockThrow[];
 extern const u8 gBattleAnimGeneral_ItemKnockoff[];
 extern const u8 gBattleAnimGeneral_TurnTrap[];
 extern const u8 gBattleAnimGeneral_HeldItemEffect[];

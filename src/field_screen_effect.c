@@ -1,5 +1,4 @@
 #include "global.h"
-#include "cable_club.h"
 #include "event_data.h"
 #include "fieldmap.h"
 #include "field_camera.h"
@@ -12,12 +11,9 @@
 #include "field_screen_effect.h"
 #include "field_special_scene.h"
 #include "field_weather.h"
-#include "follower_npc.h"
 #include "gpu_regs.h"
 #include "heal_location.h"
 #include "io_reg.h"
-#include "link.h"
-#include "link_rfu.h"
 #include "load_save.h"
 #include "main.h"
 #include "menu.h"
@@ -38,13 +34,11 @@
 #include "constants/heal_locations.h"
 #include "constants/songs.h"
 #include "constants/rgb.h"
-#include "trainer_hill.h"
 #include "fldeff.h"
 #include "battle.h"
 
 static void Task_ExitNonAnimDoor(u8);
 static void Task_ExitNonDoor(u8);
-static void Task_DoContestHallWarp(u8);
 static void FillPalBufferWhite(void);
 static void Task_ExitDoor(u8);
 static bool32 WaitForWeatherFadeIn(void);
@@ -174,7 +168,6 @@ static void Task_ReturnToFieldCableLink(u8 taskId)
     switch (task->tState)
     {
     case 0:
-        task->data[1] = CreateTask_ReestablishCableClubLink();
         task->tState++;
         break;
     case 1:
@@ -204,35 +197,7 @@ void FieldCB_ReturnToFieldCableLink(void)
 
 static void Task_ReturnToFieldWirelessLink(u8 taskId)
 {
-    struct Task *task = &gTasks[taskId];
-
-    switch (task->tState)
-    {
-    case 0:
-        SetLinkStandbyCallback();
-        task->tState++;
-        break;
-    case 1:
-        if (!IsLinkTaskFinished())
-        {
-            if (++task->data[1] > 1800)
-                RfuSetErrorParams(F_RFU_ERROR_6 | F_RFU_ERROR_7);
-        }
-        else
-        {
-            WarpFadeInScreen();
-            task->tState++;
-        }
-        break;
-    case 2:
-        if (WaitForWeatherFadeIn() == TRUE)
-        {
-            StartSendingKeysToLink();
-            UnlockPlayerFieldControls();
-            DestroyTask(taskId);
-        }
-        break;
-    }
+    // TODO: remove
 }
 
 void Task_ReturnToFieldRecordMixing(u8 taskId)
@@ -242,15 +207,12 @@ void Task_ReturnToFieldRecordMixing(u8 taskId)
     switch (task->tState)
     {
     case 0:
-        SetLinkStandbyCallback();
         task->tState++;
         break;
     case 1:
-        if (IsLinkTaskFinished())
-            task->tState++;
+        task->tState++;
         break;
     case 2:
-        StartSendingKeysToLink();
         ResetAllMultiplayerState();
         UnlockPlayerFieldControls();
         DestroyTask(taskId);
@@ -292,7 +254,6 @@ void FieldCB_DefaultWarpExit(void)
     Overworld_PlaySpecialMapMusic();
     WarpFadeInScreen();
     SetUpWarpExitTask();
-    FollowerNPC_WarpSetEnd();
     LockPlayerFieldControls();
 }
 
@@ -306,8 +267,7 @@ void FieldCB_WarpExitFadeFromWhite(void)
 
 void FieldCB_WarpExitFadeFromBlack(void)
 {
-    if (!OnTrainerHillEReaderChallengeFloor()) // always false
-        Overworld_PlaySpecialMapMusic();
+    Overworld_PlaySpecialMapMusic();
     FadeInFromBlack();
     SetUpWarpExitTask();
     LockPlayerFieldControls();
@@ -341,7 +301,6 @@ static void Task_ExitDoor(u8 taskId)
     switch (task->tState)
     {
     case 0:
-        HideNPCFollower();
         SetPlayerVisibility(FALSE);
         FreezeObjectEvents();
         PlayerGetDestCoords(x, y);
@@ -371,8 +330,6 @@ static void Task_ExitDoor(u8 taskId)
     case 3:
         if (task->data[1] < 0 || gTasks[task->data[1]].isActive != TRUE)
         {
-            FollowerNPC_SetIndicatorToComeOutDoor();
-            FollowerNPC_WarpSetEnd();
             UnfreezeObjectEvents();
             task->tState = 4;
         }
@@ -393,7 +350,6 @@ static void Task_ExitNonAnimDoor(u8 taskId)
     switch (task->tState)
     {
     case 0:
-        HideNPCFollower();
         SetPlayerVisibility(FALSE);
         FreezeObjectEvents();
         PlayerGetDestCoords(x, y);
@@ -415,11 +371,6 @@ static void Task_ExitNonAnimDoor(u8 taskId)
             s16 x, y;
 
             PlayerGetDestCoords(&x, &y);
-            if (!MetatileBehavior_IsDeepSouthWarp(MapGridGetMetatileBehaviorAt(x, y + 1)))
-                FollowerNPC_SetIndicatorToComeOutDoor();
-            // TODO: Add specific follower door warp behavior for MB_DEEP_SOUTH_WARP.
-
-            FollowerNPC_WarpSetEnd();
             UnfreezeObjectEvents();
             task->tState = 3;
         }
@@ -593,7 +544,6 @@ void DoMossdeepGymWarp(void)
     SaveObjectEvents();
     TryFadeOutOldMapMusic();
     WarpFadeOutScreen();
-    SetFollowerNPCData(FNPC_DATA_WARP_END, FNPC_WARP_REAPPEAR);
     PlaySE(SE_WARP_IN);
     CreateTask(Task_WarpAndLoadMap, 10);
     gFieldCallback = FieldCB_MossdeepGymWarpExit;
@@ -605,73 +555,6 @@ void DoPortholeWarp(void)
     WarpFadeOutScreen();
     CreateTask(Task_WarpAndLoadMap, 10);
     gFieldCallback = FieldCB_ShowPortholeView;
-}
-
-static void Task_DoCableClubWarp(u8 taskId)
-{
-    struct Task *task = &gTasks[taskId];
-
-    switch (task->tState)
-    {
-    case 0:
-        LockPlayerFieldControls();
-        task->tState++;
-        break;
-    case 1:
-        if (!PaletteFadeActive() && BGMusicStopped())
-            task->tState++;
-        break;
-    case 2:
-        WarpIntoMap();
-        SetMainCallback2(CB2_ReturnToFieldCableClub);
-        DestroyTask(taskId);
-        break;
-    }
-}
-
-void DoCableClubWarp(void)
-{
-    LockPlayerFieldControls();
-    TryFadeOutOldMapMusic();
-    WarpFadeOutScreen();
-    PlaySE(SE_EXIT);
-    CreateTask(Task_DoCableClubWarp, 10);
-}
-
-static void Task_ReturnToWorldFromLinkRoom(u8 taskId)
-{
-    s16 *data = gTasks[taskId].data;
-
-    switch (tState)
-    {
-    case 0:
-        ClearLinkCallback_2();
-        FadeScreen(FADE_TO_BLACK, 0);
-        TryFadeOutOldMapMusic();
-        PlaySE(SE_EXIT);
-        tState++;
-        break;
-    case 1:
-        if (!PaletteFadeActive() && BGMusicStopped())
-        {
-            SetCloseLinkCallback();
-            tState++;
-        }
-        break;
-    case 2:
-        if (!gReceivedRemoteLinkPlayers)
-        {
-            WarpIntoMap();
-            SetMainCallback2(CB2_LoadMap);
-            DestroyTask(taskId);
-        }
-        break;
-    }
-}
-
-void ReturnFromLinkRoom(void)
-{
-    CreateTask(Task_ReturnToWorldFromLinkRoom, 10);
 }
 
 void Task_WarpAndLoadMap(u8 taskId)
@@ -722,7 +605,6 @@ void Task_DoDoorWarp(u8 taskId)
     s16 *x = &task->data[2];
     s16 *y = &task->data[3];
     u8 playerObjId = gPlayerAvatar.objectEventId;
-    u8 followerObjId = GetFollowerNPCObjectId();
     struct ObjectEvent *followerObject = GetFollowerObject();
 
     switch (task->tState)
@@ -732,8 +614,6 @@ void Task_DoDoorWarp(u8 taskId)
         if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_DASH))
             SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_ON_FOOT);
 
-        // Just in case came out and went right back in, reset follower NPC door state.
-        SetFollowerNPCData(FNPC_DATA_COME_OUT_DOOR, FNPC_DOOR_NONE);
         FreezeObjectEvents();
         PlayerGetDestCoords(x, y);
         PlaySE(GetDoorSoundEffect(*x, *y - 1));
@@ -752,23 +632,13 @@ void Task_DoDoorWarp(u8 taskId)
             ObjectEventClearHeldMovementIfActive(&gObjectEvents[playerObjId]);
             ObjectEventSetHeldMovement(&gObjectEvents[playerObjId], MOVEMENT_ACTION_WALK_NORMAL_UP);
 
-            if (PlayerHasFollowerNPC() && !gObjectEvents[followerObjId].invisible)
-            {
-                u8 newState = DetermineFollowerNPCState(&gObjectEvents[followerObjId], MOVEMENT_ACTION_WALK_NORMAL_UP,
-                                                        DetermineFollowerNPCDirection(&gObjectEvents[playerObjId], &gObjectEvents[followerObjId]));
-                ObjectEventClearHeldMovementIfActive(&gObjectEvents[followerObjId]);
-                ObjectEventSetHeldMovement(&gObjectEvents[followerObjId], newState);
-            }
-
             task->tState = DOORWARP_HIDE_PLAYER;
         }
         break;
     case DOORWARP_HIDE_PLAYER:
         if (IsPlayerStandingStill())
         {
-            // Don't close door on NPC follower.
-            if (!PlayerHasFollowerNPC() || gObjectEvents[followerObjId].invisible)
-                task->tDoorTask = FieldAnimateDoorClose(*x, *y - 1);
+            task->tDoorTask = FieldAnimateDoorClose(*x, *y - 1);
 
             ObjectEventClearHeldMovementIfFinished(&gObjectEvents[playerObjId]);
             SetPlayerVisibility(FALSE);
@@ -780,12 +650,6 @@ void Task_DoDoorWarp(u8 taskId)
             task->tState = DOORWARP_DO_WARP;
         break;
     case DOORWARP_DO_WARP:
-        if (PlayerHasFollowerNPC())
-        {
-            ObjectEventClearHeldMovementIfActive(&gObjectEvents[followerObjId]);
-            ObjectEventSetHeldMovement(&gObjectEvents[followerObjId], MOVEMENT_ACTION_WALK_NORMAL_UP);
-        }
-
         TryFadeOutOldMapMusic();
         WarpFadeOutScreen();
         PlayRainStoppingSoundEffect();
@@ -793,42 +657,6 @@ void Task_DoDoorWarp(u8 taskId)
         task->func = Task_WarpAndLoadMap;
         break;
     }
-}
-
-static void Task_DoContestHallWarp(u8 taskId)
-{
-    struct Task *task = &gTasks[taskId];
-
-    switch (task->tState)
-    {
-    case 0:
-        FreezeObjectEvents();
-        LockPlayerFieldControls();
-        task->tState++;
-        break;
-    case 1:
-        if (!PaletteFadeActive() && BGMusicStopped())
-        {
-            task->tState++;
-        }
-        break;
-    case 2:
-        WarpIntoMap();
-        SetMainCallback2(CB2_ReturnToFieldContestHall);
-        DestroyTask(taskId);
-        break;
-    }
-}
-
-void DoContestHallWarp(void)
-{
-    LockPlayerFieldControls();
-    TryFadeOutOldMapMusic();
-    WarpFadeOutScreen();
-    PlayRainStoppingSoundEffect();
-    PlaySE(SE_EXIT);
-    gFieldCallback = FieldCB_WarpExitFadeFromBlack;
-    CreateTask(Task_DoContestHallWarp, 10);
 }
 
 static void SetFlashScanlineEffectWindowBoundary(u16 *dest, u32 y, s32 left, s32 right)
@@ -1061,8 +889,6 @@ void WriteFlashScanlineEffectBuffer(u8 flashLevel)
 
 void WriteBattlePyramidViewScanlineEffectBuffer(void)
 {
-    SetFlashScanlineEffectWindowBoundaries(&gScanlineEffectRegBuffers[0][0], DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, gSaveBlock2Ptr->frontier.pyramidLightRadius);
-    CpuFastSet(&gScanlineEffectRegBuffers[0], &gScanlineEffectRegBuffers[1], 480);
 }
 
 static void Task_SpinEnterWarp(u8 taskId)
@@ -1078,7 +904,6 @@ static void Task_SpinEnterWarp(u8 taskId)
     case 1:
         if (WaitForWeatherFadeIn() && IsPlayerSpinEntranceActive() != TRUE)
         {
-            FollowerNPC_WarpSetEnd();
             UnfreezeObjectEvents();
             UnlockPlayerFieldControls();
             DestroyTask(taskId);
@@ -1418,7 +1243,7 @@ static void Task_RushInjuredPokemonToCenter(u8 taskId)
         PutWindowTilemap(windowId);
         CopyWindowToVram(windowId, COPYWIN_FULL);
 
-        gTasks[taskId].tIsPlayerHouse = IsLastHealLocationPlayerHouse();
+        gTasks[taskId].tIsPlayerHouse = FALSE;
         gTasks[taskId].tState = FRLG_WHITEOUT_PRINT_MSG;
         break;
     case FRLG_WHITEOUT_PRINT_MSG:
@@ -1444,10 +1269,7 @@ static void Task_RushInjuredPokemonToCenter(u8 taskId)
         if (WaitForWeatherFadeIn() == TRUE)
         {
             DestroyTask(taskId);
-            if (gTasks[taskId].tIsPlayerHouse)
-                ScriptContext_SetupScript(EventScript_AfterWhiteOutMomHeal);
-            else
-                ScriptContext_SetupScript(EventScript_AfterWhiteOutHeal);
+            ScriptContext_SetupScript(EventScript_AfterWhiteOutHeal);
         }
         break;
     }

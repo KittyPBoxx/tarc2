@@ -150,9 +150,6 @@ struct FollowerMessagePool
     u16 length;
 };
 
-extern const u16 gMinigameDigits_Pal[];
-extern const u32 gMinigameDigits_Gfx[];
-
 extern const struct SpriteFrameImage gBattlerPicTable_PlayerLeft[];
 extern const struct SpriteFrameImage gBattlerPicTable_OpponentLeft[];
 extern const struct SpriteFrameImage gBattlerPicTable_PlayerRight[];
@@ -179,7 +176,6 @@ extern const struct TrainerBacksprite gTrainerBacksprites[];
 extern const u16 gTrainerPicToTrainerBackPic[];
 
 extern const struct Trainer gTrainers[DIFFICULTY_COUNT][TRAINERS_COUNT];
-extern const struct Trainer gBattlePartners[DIFFICULTY_COUNT][PARTNER_COUNT];
 
 extern const struct TrainerClass gTrainerClasses[TRAINER_CLASS_COUNT];
 
@@ -221,10 +217,6 @@ static inline const u8 GetTrainerClassFromId(u16 trainerId)
 
 static inline const u8 *GetTrainerClassNameFromId(u16 trainerId)
 {
-    enum DifficultyLevel difficulty = GetBattlePartnerDifficultyLevel(trainerId);
-
-    if (trainerId > TRAINER_PARTNER(PARTNER_NONE))
-        return gTrainerClasses[gBattlePartners[difficulty][trainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerClass].name;
     return gTrainerClasses[GetTrainerClassFromId(trainerId)].name;
 }
 
@@ -234,10 +226,6 @@ static inline const u8 *GetTrainerNameFromId(u16 trainerId)
 
     enum DifficultyLevel difficulty = GetTrainerDifficultyLevel(sanitizedTrainerId);
 
-    enum DifficultyLevel partnerDifficulty = GetBattlePartnerDifficultyLevel(trainerId);
-
-    if (trainerId > TRAINER_PARTNER(PARTNER_NONE))
-        return gBattlePartners[partnerDifficulty][trainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerName;
     return gTrainers[difficulty][sanitizedTrainerId].trainerName;
 }
 
@@ -245,11 +233,6 @@ static inline const u8 GetTrainerPicFromId(u16 trainerId)
 {
     u32 sanitizedTrainerId = SanitizeTrainerId(trainerId);
     enum DifficultyLevel difficulty = GetTrainerDifficultyLevel(sanitizedTrainerId);
-    enum DifficultyLevel partnerDifficulty = GetBattlePartnerDifficultyLevel(trainerId);
-
-    if (trainerId > TRAINER_PARTNER(PARTNER_NONE))
-        return gBattlePartners[partnerDifficulty][trainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerPic;
-
     return gTrainers[difficulty][sanitizedTrainerId].trainerPic;
 }
 

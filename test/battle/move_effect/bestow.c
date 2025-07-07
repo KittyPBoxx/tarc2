@@ -44,23 +44,6 @@ SINGLE_BATTLE_TEST("Bestow fails if the target already has a held item")
     }
 }
 
-#include "mail.h"
-SINGLE_BATTLE_TEST("Bestow fails if the user is holding Mail")
-{
-    GIVEN {
-        ASSUME(ItemIsMail(ITEM_ORANGE_MAIL));
-        PLAYER(SPECIES_WOBBUFFET) { Item(ITEM_ORANGE_MAIL); }
-        OPPONENT(SPECIES_WOBBUFFET);
-    } WHEN {
-        TURN { MOVE(player, MOVE_BESTOW); }
-    } SCENE {
-        MESSAGE("But it failed!");
-    } THEN {
-        EXPECT(player->item == ITEM_ORANGE_MAIL);
-        EXPECT(opponent->item == ITEM_NONE);
-    }
-}
-
 SINGLE_BATTLE_TEST("Bestow fails if the user's held item is a Mega Stone")
 {
     GIVEN {

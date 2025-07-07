@@ -1,8 +1,6 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_anim.h"
-#include "battle_arena.h"
-#include "battle_pyramid.h"
 #include "battle_util.h"
 #include "battle_controllers.h"
 #include "battle_interface.h"
@@ -18,7 +16,6 @@
 #include "battle_scripts.h"
 #include "random.h"
 #include "text.h"
-#include "safari_zone.h"
 #include "sound.h"
 #include "sprite.h"
 #include "string_util.h"
@@ -31,11 +28,8 @@
 #include "battle_ai_main.h"
 #include "battle_ai_util.h"
 #include "event_data.h"
-#include "link.h"
 #include "malloc.h"
 #include "berry.h"
-#include "pokedex.h"
-#include "mail.h"
 #include "field_weather.h"
 #include "constants/abilities.h"
 #include "constants/battle_anim.h"
@@ -76,29 +70,6 @@ extern const u8 *const gBattlescriptsForRunningByItem[];
 extern const u8 *const gBattlescriptsForUsingItem[];
 extern const u8 *const gBattlescriptsForSafariActions[];
 
-static const u8 sPkblToEscapeFactor[][3] = {
-    {
-        [B_MSG_MON_CURIOUS]    = 0,
-        [B_MSG_MON_ENTHRALLED] = 0,
-        [B_MSG_MON_IGNORED]    = 0
-    },{
-        [B_MSG_MON_CURIOUS]    = 3,
-        [B_MSG_MON_ENTHRALLED] = 5,
-        [B_MSG_MON_IGNORED]    = 0
-    },{
-        [B_MSG_MON_CURIOUS]    = 2,
-        [B_MSG_MON_ENTHRALLED] = 3,
-        [B_MSG_MON_IGNORED]    = 0
-    },{
-        [B_MSG_MON_CURIOUS]    = 1,
-        [B_MSG_MON_ENTHRALLED] = 2,
-        [B_MSG_MON_IGNORED]    = 0
-    },{
-        [B_MSG_MON_CURIOUS]    = 1,
-        [B_MSG_MON_ENTHRALLED] = 1,
-        [B_MSG_MON_IGNORED]    = 0
-    }
-};
 static const u8 sGoNearCounterToCatchFactor[] = {4, 3, 2, 1};
 static const u8 sGoNearCounterToEscapeFactor[] = {4, 4, 4, 4};
 
@@ -533,9 +504,6 @@ void HandleAction_UseMove(void)
         gBattlescriptCurrInstr = GetMoveBattleScript(gCurrentMove);
     }
 
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        BattleArena_AddMindPoints(gBattlerAttacker);
-
     for (i = 0; i < MAX_BATTLERS_COUNT; i++)
         gBattleStruct->hpBefore[i] = gBattleMons[i].hp;
 
@@ -578,7 +546,6 @@ bool32 TryRunFromBattle(u32 battler)
 {
     bool32 effect = FALSE;
     u8 holdEffect;
-    u8 pyramidMultiplier;
     u8 speedVar;
 
     // If this flag is set, running will never be successful under any circumstances.
@@ -604,24 +571,9 @@ bool32 TryRunFromBattle(u32 battler)
     }
     else if (GetBattlerAbility(battler) == ABILITY_RUN_AWAY)
     {
-        if (InBattlePyramid())
-        {
-            gBattleStruct->runTries++;
-            pyramidMultiplier = GetPyramidRunMultiplier();
-            speedVar = (gBattleMons[battler].speed * pyramidMultiplier) / (gBattleMons[BATTLE_OPPOSITE(battler)].speed) + (gBattleStruct->runTries * 30);
-            if (speedVar > (Random() & 0xFF))
-            {
-                gLastUsedAbility = ABILITY_RUN_AWAY;
-                gProtectStructs[battler].fleeType = FLEE_ABILITY;
-                effect++;
-            }
-        }
-        else
-        {
-            gLastUsedAbility = ABILITY_RUN_AWAY;
-            gProtectStructs[battler].fleeType = FLEE_ABILITY;
-            effect++;
-        }
+        gLastUsedAbility = ABILITY_RUN_AWAY;
+        gProtectStructs[battler].fleeType = FLEE_ABILITY;
+        effect++;
     }
     else if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_TRAINER_HILL) && gBattleTypeFlags & BATTLE_TYPE_TRAINER)
     {
@@ -637,14 +589,7 @@ bool32 TryRunFromBattle(u32 battler)
         if (!IsBattlerAlive(runningFromBattler))
             runningFromBattler |= BIT_FLANK;
 
-        if (InBattlePyramid())
-        {
-            pyramidMultiplier = GetPyramidRunMultiplier();
-            speedVar = (gBattleMons[battler].speed * pyramidMultiplier) / (gBattleMons[runningFromBattler].speed) + (gBattleStruct->runTries * 30);
-            if (speedVar > (Random() & 0xFF))
-                effect++;
-        }
-        else if (gBattleMons[battler].speed < gBattleMons[runningFromBattler].speed)
+        if (gBattleMons[battler].speed < gBattleMons[runningFromBattler].speed)
         {
             speedVar = (gBattleMons[battler].speed * 128) / (gBattleMons[runningFromBattler].speed) + (gBattleStruct->runTries * 30);
             if (speedVar > (Random() & 0xFF))
@@ -691,7 +636,6 @@ void HandleAction_Run(void)
         }
 
         gBattleOutcome |= B_OUTCOME_LINK_BATTLE_RAN;
-        gSaveBlock2Ptr->frontier.disableRecordBattle = TRUE;
     }
     else
     {
@@ -736,7 +680,6 @@ void HandleAction_SafariZoneBallThrow(void)
     gBattlerAttacker = gBattlerByTurnOrder[gCurrentTurnActionNumber];
     gBattle_BG0_X = 0;
     gBattle_BG0_Y = 0;
-    gNumSafariBalls--;
     gLastUsedItem = ITEM_SAFARI_BALL;
     gBattlescriptCurrInstr = BattleScript_SafariBallThrow;
     gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
@@ -751,35 +694,6 @@ void HandleAction_ThrowBall(void)
     if (!GetItemImportance(gLastUsedItem))
     	RemoveBagItem(gLastUsedItem, 1);
     gBattlescriptCurrInstr = BattleScript_BallThrow;
-    gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
-}
-
-void HandleAction_ThrowPokeblock(void)
-{
-    gBattlerAttacker = gBattlerByTurnOrder[gCurrentTurnActionNumber];
-    gBattle_BG0_X = 0;
-    gBattle_BG0_Y = 0;
-    gBattleCommunication[MULTISTRING_CHOOSER] = gBattleResources->bufferB[gBattlerAttacker][1] - 1;
-    gLastUsedItem = gBattleResources->bufferB[gBattlerAttacker][2];
-
-    if (gBattleResults.pokeblockThrows < 255)
-        gBattleResults.pokeblockThrows++;
-    if (gBattleStruct->safariPkblThrowCounter < 3)
-        gBattleStruct->safariPkblThrowCounter++;
-    if (gBattleStruct->safariEscapeFactor > 1)
-    {
-        // BUG: safariEscapeFactor can become 0 below. This causes the pokeblock throw glitch.
-        #ifdef BUGFIX
-        if (gBattleStruct->safariEscapeFactor <= sPkblToEscapeFactor[gBattleStruct->safariPkblThrowCounter][gBattleCommunication[MULTISTRING_CHOOSER]])
-        #else
-        if (gBattleStruct->safariEscapeFactor < sPkblToEscapeFactor[gBattleStruct->safariPkblThrowCounter][gBattleCommunication[MULTISTRING_CHOOSER]])
-        #endif
-            gBattleStruct->safariEscapeFactor = 1;
-        else
-            gBattleStruct->safariEscapeFactor -= sPkblToEscapeFactor[gBattleStruct->safariPkblThrowCounter][gBattleCommunication[MULTISTRING_CHOOSER]];
-    }
-
-    gBattlescriptCurrInstr = gBattlescriptsForSafariActions[2];
     gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
 }
 
@@ -981,22 +895,6 @@ u8 GetBattlerForBattleScript(u8 caseId)
     return ret;
 }
 
-static void UNUSED MarkAllBattlersForControllerExec(void)
-{
-    int i;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        for (i = 0; i < gBattlersCount; i++)
-            gBattleControllerExecFlags |= 1u << (i + 32 - MAX_BATTLERS_COUNT);
-    }
-    else
-    {
-        for (i = 0; i < gBattlersCount; i++)
-            gBattleControllerExecFlags |= 1u << i;
-    }
-}
-
 bool32 IsBattlerMarkedForControllerExec(u32 battler)
 {
     if (gBattleTypeFlags & BATTLE_TYPE_LINK)
@@ -1015,11 +913,6 @@ void MarkBattlerForControllerExec(u32 battler)
 
 void MarkBattlerReceivedLinkData(u32 battler)
 {
-    s32 i;
-
-    for (i = 0; i < GetLinkPlayerCount(); i++)
-        gBattleControllerExecFlags |= 1u << (battler + (i << 2));
-
     gBattleControllerExecFlags &= ~(1u << (28 + battler));
 }
 
@@ -4186,19 +4079,19 @@ u32 AbilityBattleEffects(u32 caseID, u32 battler, u32 ability, u32 special, u32 
                 {
                 ABILITY_HEAL_MON_STATUS:
                     if (gBattleMons[battler].status1 & (STATUS1_POISON | STATUS1_TOXIC_POISON))
-                        StringCopy(gBattleTextBuff1, gStatusConditionString_PoisonJpn);
+                        StringCopy(gBattleTextBuff1, gText_Poison);
                     if (gBattleMons[battler].status1 & STATUS1_SLEEP)
                     {
-                        StringCopy(gBattleTextBuff1, gStatusConditionString_SleepJpn);
+                        StringCopy(gBattleTextBuff1, gText_Sleep);
                         TryDeactivateSleepClause(GetBattlerSide(battler), gBattlerPartyIndexes[battler]);
                     }
 
                     if (gBattleMons[battler].status1 & STATUS1_PARALYSIS)
-                        StringCopy(gBattleTextBuff1, gStatusConditionString_ParalysisJpn);
+                        StringCopy(gBattleTextBuff1, gText_Paralysis);
                     if (gBattleMons[battler].status1 & STATUS1_BURN)
-                        StringCopy(gBattleTextBuff1, gStatusConditionString_BurnJpn);
+                        StringCopy(gBattleTextBuff1, gText_Burn);
                     if (gBattleMons[battler].status1 & (STATUS1_FREEZE | STATUS1_FROSTBITE))
-                        StringCopy(gBattleTextBuff1, gStatusConditionString_IceJpn);
+                        StringCopy(gBattleTextBuff1, gText_Ice);
 
                     gBattleMons[battler].status1 = 0;
                     gBattleMons[battler].status2 &= ~STATUS2_NIGHTMARE;
@@ -5058,21 +4951,21 @@ u32 AbilityBattleEffects(u32 caseID, u32 battler, u32 ability, u32 special, u32 
             case ABILITY_PASTEL_VEIL:
                 if (gBattleMons[battler].status1 & (STATUS1_POISON | STATUS1_TOXIC_POISON | STATUS1_TOXIC_COUNTER))
                 {
-                    StringCopy(gBattleTextBuff1, gStatusConditionString_PoisonJpn);
+                    StringCopy(gBattleTextBuff1, gText_Poison);
                     effect = 1;
                 }
                 break;
             case ABILITY_OWN_TEMPO:
                 if (gBattleMons[battler].status2 & STATUS2_CONFUSION)
                 {
-                    StringCopy(gBattleTextBuff1, gStatusConditionString_ConfusionJpn);
+                    StringCopy(gBattleTextBuff1, gText_Confusion);
                     effect = 2;
                 }
                 break;
             case ABILITY_LIMBER:
                 if (gBattleMons[battler].status1 & STATUS1_PARALYSIS)
                 {
-                    StringCopy(gBattleTextBuff1, gStatusConditionString_ParalysisJpn);
+                    StringCopy(gBattleTextBuff1, gText_Paralysis);
                     effect = 1;
                 }
                 break;
@@ -5082,7 +4975,7 @@ u32 AbilityBattleEffects(u32 caseID, u32 battler, u32 ability, u32 special, u32 
                 {
                     TryDeactivateSleepClause(GetBattlerSide(battler), gBattlerPartyIndexes[battler]);
                     gBattleMons[battler].status2 &= ~STATUS2_NIGHTMARE;
-                    StringCopy(gBattleTextBuff1, gStatusConditionString_SleepJpn);
+                    StringCopy(gBattleTextBuff1, gText_Sleep);
                     effect = 1;
                 }
                 break;
@@ -5091,14 +4984,14 @@ u32 AbilityBattleEffects(u32 caseID, u32 battler, u32 ability, u32 special, u32 
             case ABILITY_THERMAL_EXCHANGE:
                 if (gBattleMons[battler].status1 & STATUS1_BURN)
                 {
-                    StringCopy(gBattleTextBuff1, gStatusConditionString_BurnJpn);
+                    StringCopy(gBattleTextBuff1, gText_Burn);
                     effect = 1;
                 }
                 break;
             case ABILITY_MAGMA_ARMOR:
                 if (gBattleMons[battler].status1 & (STATUS1_FREEZE | STATUS1_FROSTBITE))
                 {
-                    StringCopy(gBattleTextBuff1, gStatusConditionString_IceJpn);
+                    StringCopy(gBattleTextBuff1, gText_Ice);
                     effect = 1;
                 }
                 break;
@@ -6221,7 +6114,7 @@ static bool32 GetMentalHerbEffect(u32 battler)
     {
         gBattleMons[battler].status2 &= ~STATUS2_INFATUATION;
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_MENTALHERBCURE_INFATUATION;  // STRINGID_TARGETGOTOVERINFATUATION
-        StringCopy(gBattleTextBuff1, gStatusConditionString_LoveJpn);
+        StringCopy(gBattleTextBuff1, gText_Love);
         ret = TRUE;
     }
     if (B_MENTAL_HERB >= GEN_5)
@@ -6495,26 +6388,26 @@ static u8 ItemEffectMoveEnd(u32 battler, enum ItemHoldEffect holdEffect)
         if ((gBattleMons[battler].status1 & STATUS1_ANY || gBattleMons[battler].status2 & STATUS2_CONFUSION) && !UnnerveOn(battler, gLastUsedItem))
         {
             if (gBattleMons[battler].status1 & STATUS1_PSN_ANY)
-                StringCopy(gBattleTextBuff1, gStatusConditionString_PoisonJpn);
+                StringCopy(gBattleTextBuff1, gText_Poison);
 
             if (gBattleMons[battler].status1 & STATUS1_SLEEP)
             {
                 gBattleMons[battler].status2 &= ~STATUS2_NIGHTMARE;
-                StringCopy(gBattleTextBuff1, gStatusConditionString_SleepJpn);
+                StringCopy(gBattleTextBuff1, gText_Sleep);
                 TryDeactivateSleepClause(GetBattlerSide(battler), gBattlerPartyIndexes[battler]);
             }
 
             if (gBattleMons[battler].status1 & STATUS1_PARALYSIS)
-                StringCopy(gBattleTextBuff1, gStatusConditionString_ParalysisJpn);
+                StringCopy(gBattleTextBuff1, gText_Paralysis);
 
             if (gBattleMons[battler].status1 & STATUS1_BURN)
-                StringCopy(gBattleTextBuff1, gStatusConditionString_BurnJpn);
+                StringCopy(gBattleTextBuff1, gText_Burn);
 
             if (gBattleMons[battler].status1 & STATUS1_FREEZE || gBattleMons[battler].status1 & STATUS1_FROSTBITE)
-                StringCopy(gBattleTextBuff1, gStatusConditionString_IceJpn);
+                StringCopy(gBattleTextBuff1, gText_Ice);
 
             if (gBattleMons[battler].status2 & STATUS2_CONFUSION)
-                StringCopy(gBattleTextBuff1, gStatusConditionString_ConfusionJpn);
+                StringCopy(gBattleTextBuff1, gText_Confusion);
 
             gBattleMons[battler].status1 = 0;
             RemoveConfusionStatus(battler);
@@ -6559,34 +6452,34 @@ static inline bool32 TryCureStatus(u32 battler, enum ItemCaseId caseId)
     {
         if (gBattleMons[battler].status1 & STATUS1_PSN_ANY)
         {
-            StringCopy(gBattleTextBuff1, gStatusConditionString_PoisonJpn);
+            StringCopy(gBattleTextBuff1, gText_Poison);
             string++;
         }
         if (gBattleMons[battler].status1 & STATUS1_SLEEP)
         {
             gBattleMons[battler].status2 &= ~STATUS2_NIGHTMARE;
-            StringCopy(gBattleTextBuff1, gStatusConditionString_SleepJpn);
+            StringCopy(gBattleTextBuff1, gText_Sleep);
             string++;
             TryDeactivateSleepClause(GetBattlerSide(battler), gBattlerPartyIndexes[battler]);
         }
         if (gBattleMons[battler].status1 & STATUS1_PARALYSIS)
         {
-            StringCopy(gBattleTextBuff1, gStatusConditionString_ParalysisJpn);
+            StringCopy(gBattleTextBuff1, gText_Paralysis);
             string++;
         }
         if (gBattleMons[battler].status1 & STATUS1_BURN)
         {
-            StringCopy(gBattleTextBuff1, gStatusConditionString_BurnJpn);
+            StringCopy(gBattleTextBuff1, gText_Burn);
             string++;
         }
         if (gBattleMons[battler].status1 & STATUS1_FREEZE || gBattleMons[battler].status1 & STATUS1_FROSTBITE)
         {
-            StringCopy(gBattleTextBuff1, gStatusConditionString_IceJpn);
+            StringCopy(gBattleTextBuff1, gText_Ice);
             string++;
         }
         if (gBattleMons[battler].status2 & STATUS2_CONFUSION)
         {
-            StringCopy(gBattleTextBuff1, gStatusConditionString_ConfusionJpn);
+            StringCopy(gBattleTextBuff1, gText_Confusion);
             string++;
         }
         if (string <= 1)
@@ -8887,18 +8780,6 @@ static inline u32 CalcAttackStat(struct DamageCalculationData *damageCalcData, u
 
 static bool32 CanEvolve(u32 species)
 {
-    u32 i;
-    const struct Evolution *evolutions = GetSpeciesEvolutions(species);
-
-    if (evolutions != NULL)
-    {
-        for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
-        {
-            if (evolutions[i].method
-             && SanitizeSpeciesId(evolutions[i].targetSpecies) != SPECIES_NONE)
-                return TRUE;
-        }
-    }
     return FALSE;
 }
 
@@ -10288,11 +10169,7 @@ bool32 CanBattlerGetOrLoseItem(u32 battler, u16 itemId)
     u16 species = gBattleMons[battler].species;
     enum ItemHoldEffect holdEffect = GetItemHoldEffect(itemId);
 
-    if (ItemIsMail(itemId))
-        return FALSE;
-    else if (itemId == ITEM_ENIGMA_BERRY_E_READER)
-        return FALSE;
-    else if (DoesSpeciesUseHoldItemToChangeForm(species, itemId))
+    if (DoesSpeciesUseHoldItemToChangeForm(species, itemId))
         return FALSE;
     else if (holdEffect == HOLD_EFFECT_Z_CRYSTAL)
         return FALSE;
@@ -11111,29 +10988,6 @@ bool8 IsMonBannedFromSkyBattles(u16 species)
 {
     switch (species)
     {
-#if B_SKY_BATTLE_STRICT_ELIGIBILITY == TRUE
-        case SPECIES_SPEAROW:
-        case SPECIES_FARFETCHD:
-        case SPECIES_DODUO:
-        case SPECIES_DODRIO:
-        case SPECIES_HOOTHOOT:
-        case SPECIES_NATU:
-        case SPECIES_MURKROW:
-        case SPECIES_DELIBIRD:
-        case SPECIES_TAILLOW:
-        case SPECIES_STARLY:
-        case SPECIES_CHATOT:
-        case SPECIES_SHAYMIN:
-        case SPECIES_PIDOVE:
-        case SPECIES_ARCHEN:
-        case SPECIES_DUCKLETT:
-        case SPECIES_RUFFLET:
-        case SPECIES_VULLABY:
-        case SPECIES_FLETCHLING:
-        case SPECIES_HAWLUCHA:
-        case SPECIES_ROWLET:
-        case SPECIES_PIKIPEK:
-#endif
         case SPECIES_EGG:
             return TRUE;
         default:

@@ -56,7 +56,6 @@
 #define SE_TRUCK_STOP               50 // SE_TRACK_STOP
 #define SE_TRUCK_UNLOAD             51 // SE_TRACK_HAIKI
 #define SE_TRUCK_DOOR               52 // SE_TRACK_DOOR
-#define SE_BERRY_BLENDER            53 // SE_MOTER
 #define SE_CARD                     54 // SE_CARD (Unused, different from the RS card SE)
 #define SE_SAVE                     55 // SE_SAVE
 #define SE_BALL_BOUNCE_1            56 // SE_KON
@@ -311,7 +310,6 @@
 #define MUS_MOVE_DELETED            378 // MUS_ME_WASURE
 #define MUS_ENCOUNTER_GIRL          379 // MUS_SYOUJOEYE
 #define MUS_ENCOUNTER_MALE          380 // MUS_BOYEYE
-#define MUS_ABANDONED_SHIP          381 // MUS_DAN02            // Also used in Faraway and Southern Islands.
 #define MUS_FORTREE                 382 // MUS_MACHI_S3         // Also used in Secret Bases and the Safari Zone's entrance.
 #define MUS_BIRCH_LAB               383 // MUS_ODAMAKI
 #define MUS_B_TOWER_RS              384 // MUS_B_TOWER          // Used in Battle Tents, Trainer Hill and Battle Frontier's lounges and Exchange Service Corner.
@@ -492,7 +490,7 @@
 #define MUS_RG_TEACHY_TV_MENU       558 // MUS_RG_TVNOIZE
 #define END_MUS                     MUS_RG_TEACHY_TV_MENU
 
-// These PH_* constants are phoneme sounds used by the "bard" NPC (see src/bard_music.c and src/mauville_old_man.c).
+// These PH_* constants are phoneme sounds used by the "bard" NPC (see and src/mauville_old_man.c).
 // Each comes in a triplet of PH_*_BLEND, PH_*_HELD, and PH_*_SOLO, and the name of each triplet incorporates the English phonetic sound it represents.
 #define PH_TRAP_BLEND               559
 #define PH_TRAP_HELD                560

@@ -87,9 +87,6 @@ static void Task_ShinyStars(u8);
 static void SpriteCB_ShinyStars_Encircle(struct Sprite *);
 static void SpriteCB_ShinyStars_Diagonal(struct Sprite *);
 static void Task_ShinyStars_Wait(u8);
-static void SpriteCB_PokeBlock_LiftArm(struct Sprite *);
-static void SpriteCB_PokeBlock_Arc(struct Sprite *);
-static void SpriteCB_ThrowPokeBlock_Free(struct Sprite *);
 static void PokeBallOpenParticleAnimation(u8);
 static void GreatBallOpenParticleAnimation(u8);
 static void SafariBallOpenParticleAnimation(u8);
@@ -100,7 +97,6 @@ static void RepeatBallOpenParticleAnimation(u8);
 static void TimerBallOpenParticleAnimation(u8);
 static void PremierBallOpenParticleAnimation(u8);
 static void CB_CriticalCaptureThrownBallMovement(struct Sprite *sprite);
-static void SpriteCB_PokeBlock_Throw(struct Sprite *);
 
 struct CaptureStar
 {
@@ -627,17 +623,6 @@ const u16 gBallOpenFadeColors[] =
     [BALL_CHERISH] = RGB(25, 4, 3),
 };
 
-const struct SpriteTemplate gPokeblockSpriteTemplate =
-{
-    .tileTag = ANIM_TAG_POKEBLOCK,
-    .paletteTag = ANIM_TAG_POKEBLOCK,
-    .oam = &gOamData_AffineOff_ObjNormal_16x16,
-    .anims = gDummySpriteAnimTable,
-    .images = NULL,
-    .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCB_PokeBlock_Throw,
-};
-
 static const union AnimCmd sAnim_SafariRock[] =
 {
     ANIMCMD_FRAME(64, 1),
@@ -646,18 +631,6 @@ static const union AnimCmd sAnim_SafariRock[] =
 
 static const union AnimCmd *const sAnims_SafariRock[] = {
     sAnim_SafariRock,
-};
-
-// Unused, leftover from FRLG
-static const struct SpriteTemplate sSafariRockSpriteTemplate =
-{
-    .tileTag = ANIM_TAG_ROCKS,
-    .paletteTag = ANIM_TAG_ROCKS,
-    .oam = &gOamData_AffineOff_ObjNormal_32x32,
-    .anims = sAnims_SafariRock,
-    .images = NULL,
-    .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCB_PokeBlock_Throw,
 };
 
 extern const struct SpriteTemplate gWishStarSpriteTemplate;
@@ -2591,74 +2564,6 @@ static void SpriteCB_ShinyStars_Diagonal(struct Sprite *sprite)
 #undef sTaskId
 #undef sPhase
 #undef sTimer
-
-void AnimTask_LoadPokeblockGfx(u8 taskId)
-{
-    u8 UNUSED paletteIndex;
-
-    LoadCompressedSpriteSheetUsingHeap(&gBattleAnimPicTable[ANIM_TAG_POKEBLOCK - ANIM_SPRITES_START]);
-    LoadSpritePalette(&gBattleAnimPaletteTable[ANIM_TAG_POKEBLOCK - ANIM_SPRITES_START]);
-    paletteIndex = IndexOfSpritePaletteTag(ANIM_TAG_POKEBLOCK);
-    DestroyAnimVisualTask(taskId);
-}
-
-void AnimTask_FreePokeblockGfx(u8 taskId)
-{
-    FreeSpriteTilesByTag(ANIM_TAG_POKEBLOCK);
-    FreeSpritePaletteByTag(ANIM_TAG_POKEBLOCK);
-    DestroyAnimVisualTask(taskId);
-}
-
-#define sDuration data[0]
-#define sTargetX data[2]
-#define sTargetY data[4]
-#define sAmplitude data[5]
-
-static void SpriteCB_PokeBlock_Throw(struct Sprite *sprite)
-{
-    InitSpritePosToAnimAttacker(sprite, FALSE);
-    sprite->sDuration = 30;
-    sprite->sTargetX = GetBattlerSpriteCoord(GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT), BATTLER_COORD_X) + gBattleAnimArgs[2];
-    sprite->sTargetY = GetBattlerSpriteCoord(GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT), BATTLER_COORD_Y) + gBattleAnimArgs[3];
-    sprite->sAmplitude = -32;
-    InitAnimArcTranslation(sprite);
-    gSprites[gBattlerSpriteIds[gBattleAnimAttacker]].callback = SpriteCB_TrainerThrowObject;
-    sprite->callback = SpriteCB_PokeBlock_LiftArm;
-}
-
-#undef sDuration
-#undef sTargetX
-#undef sTargetY
-#undef sAmplitude
-
-static void SpriteCB_PokeBlock_LiftArm(struct Sprite *sprite)
-{
-    if (gSprites[gBattlerSpriteIds[gBattleAnimAttacker]].animCmdIndex == 1)
-        sprite->callback = SpriteCB_PokeBlock_Arc;
-}
-
-static void SpriteCB_PokeBlock_Arc(struct Sprite *sprite)
-{
-    if (TranslateAnimHorizontalArc(sprite))
-    {
-        sprite->data[0] = 0;
-        sprite->invisible = TRUE;
-        sprite->callback = SpriteCB_ThrowPokeBlock_Free;
-    }
-}
-
-// Destroy after end of player animation
-static void SpriteCB_ThrowPokeBlock_Free(struct Sprite *sprite)
-{
-    if (gSprites[gBattlerSpriteIds[gBattleAnimAttacker]].animEnded)
-    {
-        if (++sprite->data[0] > 0)
-        {
-            StartSpriteAnim(&gSprites[gBattlerSpriteIds[gBattleAnimAttacker]], 0);
-            DestroyAnimSprite(sprite);
-        }
-    }
-}
 
 void AnimTask_SetAttackerTargetLeftPos(u8 taskId)
 {

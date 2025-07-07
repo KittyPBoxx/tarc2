@@ -14,22 +14,17 @@
 #include "battle_interface.h"
 #include "text.h"
 #include "sound.h"
-#include "pokedex.h"
-#include "recorded_battle.h"
 #include "window.h"
 #include "reshow_battle_screen.h"
 #include "main.h"
 #include "palette.h"
-#include "money.h"
 #include "malloc.h"
 #include "bg.h"
 #include "string_util.h"
 #include "pokemon_icon.h"
 #include "caps.h"
 #include "m4a.h"
-#include "mail.h"
 #include "event_data.h"
-#include "pokemon_storage_system.h"
 #include "task.h"
 #include "naming_screen.h"
 #include "battle_setup.h"
@@ -37,12 +32,8 @@
 #include "wild_encounter.h"
 #include "rtc.h"
 #include "party_menu.h"
-#include "battle_arena.h"
-#include "battle_pike.h"
-#include "battle_pyramid.h"
 #include "field_specials.h"
 #include "pokemon_summary_screen.h"
-#include "pokenav.h"
 #include "menu_specialized.h"
 #include "data.h"
 #include "generational_changes.h"
@@ -587,8 +578,6 @@ static void Cmd_snatchsetbattlers(void);
 static void Cmd_removescreens(void);
 static void Cmd_handleballthrow(void);
 static void Cmd_givecaughtmon(void);
-static void Cmd_trysetcaughtmondexflags(void);
-static void Cmd_displaydexinfo(void);
 static void Cmd_trygivecaughtmonnick(void);
 static void Cmd_subattackerhpbydmg(void);
 static void Cmd_removeattackerstatus1(void);
@@ -846,8 +835,6 @@ void (*const gBattleScriptingCommandsTable[])(void) =
     Cmd_removescreens,                           //0xEE
     Cmd_handleballthrow,                         //0xEF
     Cmd_givecaughtmon,                           //0xF0
-    Cmd_trysetcaughtmondexflags,                 //0xF1
-    Cmd_displaydexinfo,                          //0xF2
     Cmd_trygivecaughtmonnick,                    //0xF3
     Cmd_subattackerhpbydmg,                      //0xF4
     Cmd_removeattackerstatus1,                   //0xF5
@@ -5774,10 +5761,6 @@ static void Cmd_return(void)
 static void Cmd_end(void)
 {
     CMD_ARGS();
-
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        BattleArena_AddSkillPoints(gBattlerAttacker);
-
     gCurrentActionFuncId = B_ACTION_TRY_FINISH;
 }
 
@@ -7700,9 +7683,6 @@ static void Cmd_switchinanim(void)
     MarkBattlerForControllerExec(battler);
 
     gBattlescriptCurrInstr = cmd->nextInstr;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
-        BattleArena_InitPoints();
 }
 
 bool32 CanBattlerSwitch(u32 battler)
@@ -8100,7 +8080,6 @@ static void Cmd_switchhandleorder(void)
                 gBattleStruct->monToSwitchIntoId[i] = gBattleResources->bufferB[i][1];
                 if (!(gBattleStruct->field_93 & (1u << i)))
                 {
-                    RecordedBattle_SetBattlerAction(i, gBattleResources->bufferB[i][1]);
                     gBattleStruct->field_93 |= 1u << i;
                 }
             }
@@ -8113,7 +8092,6 @@ static void Cmd_switchhandleorder(void)
     case 2:
         if (!(gBattleStruct->field_93 & (1u << battler)))
         {
-            RecordedBattle_SetBattlerAction(battler, gBattleResources->bufferB[battler][1]);
             gBattleStruct->field_93 |= 1u << battler;
         }
         // fall through
@@ -8775,25 +8753,18 @@ static u32 GetTrainerMoneyToGive(u16 trainerId)
     u32 moneyReward;
     u8 trainerMoney = 0;
 
-    if (trainerId == TRAINER_SECRET_BASE)
-    {
-        moneyReward = 20 * gBattleResources->secretBase->party.levels[0] * gBattleStruct->moneyMultiplier;
-    }
-    else
-    {
-        const struct TrainerMon *party = GetTrainerPartyFromId(trainerId);
-        if (party == NULL)
-            return 20;
-        lastMonLevel = party[GetTrainerPartySizeFromId(trainerId) - 1].lvl;
-        trainerMoney = gTrainerClasses[GetTrainerClassFromId(trainerId)].money ?: 5;
+    const struct TrainerMon *party = GetTrainerPartyFromId(trainerId);
+    if (party == NULL)
+        return 20;
+    lastMonLevel = party[GetTrainerPartySizeFromId(trainerId) - 1].lvl;
+    trainerMoney = gTrainerClasses[GetTrainerClassFromId(trainerId)].money ?: 5;
 
-        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
-            moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * trainerMoney;
-        else if (IsDoubleBattle())
-            moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * 2 * trainerMoney;
-        else
-            moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * trainerMoney;
-    }
+    if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+        moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * trainerMoney;
+    else if (IsDoubleBattle())
+        moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * 2 * trainerMoney;
+    else
+        moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * trainerMoney;
 
     return moneyReward;
 }
@@ -8810,13 +8781,11 @@ static void Cmd_getmoneyreward(void)
         money = GetTrainerMoneyToGive(TRAINER_BATTLE_PARAM.opponentA);
         if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
             money += GetTrainerMoneyToGive(TRAINER_BATTLE_PARAM.opponentB);
-        AddMoney(&gSaveBlock1Ptr->money, money);
     }
     else
     {
         if (B_WHITEOUT_MONEY <= GEN_3)
         {
-            money = GetMoney(&gSaveBlock1Ptr->money) / 2;
         }
         else
         {
@@ -8837,7 +8806,6 @@ static void Cmd_getmoneyreward(void)
             }
             money = sWhiteOutBadgeMoney[count] * sPartyLevel;
         }
-        RemoveMoney(&gSaveBlock1Ptr->money, money);
     }
 
     PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 5, money);
@@ -10372,15 +10340,6 @@ static void Cmd_various(void)
     case VARIOUS_ARENA_JUDGMENT_WINDOW:
     {
         VARIOUS_ARGS();
-
-        i = BattleArena_ShowJudgmentWindow(&gBattleCommunication[0]);
-
-        // BattleArena_ShowJudgmentWindow's last state was an intermediate step.
-        // Return without advancing the current instruction so that it will be called again.
-        if (i == ARENA_RESULT_RUNNING)
-            return;
-
-        gBattleCommunication[1] = i;
         break;
     }
     case VARIOUS_ARENA_OPPONENT_MON_LOST:
@@ -10426,13 +10385,11 @@ static void Cmd_various(void)
     case VARIOUS_DRAW_ARENA_REF_TEXT_BOX:
     {
         VARIOUS_ARGS();
-        DrawArenaRefereeTextBox();
         break;
     }
     case VARIOUS_ERASE_ARENA_REF_TEXT_BOX:
     {
         VARIOUS_ARGS();
-        EraseArenaRefereeTextBox();
         break;
     }
     case VARIOUS_ARENA_JUDGMENT_STRING:
@@ -11548,7 +11505,7 @@ static void Cmd_various(void)
         {
             gBattleMons[battler].status2 &= ~(STATUS2_INFATUATION);
             gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_MENTALHERBCURE_INFATUATION;  // STRINGID_TARGETGOTOVERINFATUATION
-            StringCopy(gBattleTextBuff1, gStatusConditionString_LoveJpn);
+            StringCopy(gBattleTextBuff1, gText_Love);
         }
         // Check taunt
         if (gDisableStructs[battler].tauntTimer != 0)
@@ -12876,7 +12833,6 @@ static void Cmd_givepaydaymoney(void)
     if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK)) && gPaydayMoney != 0)
     {
         u32 bonusMoney = gPaydayMoney * gBattleStruct->moneyMultiplier;
-        AddMoney(&gSaveBlock1Ptr->money, bonusMoney);
 
         PREPARE_HWORD_NUMBER_BUFFER(gBattleTextBuff1, 5, bonusMoney)
 
@@ -15359,65 +15315,53 @@ static void Cmd_pickup(void)
     u16 species, heldItem, ability;
     u8 lvlDivBy10;
 
-    if (!InBattlePike()) // No items in Battle Pike.
+    for (i = 0; i < PARTY_SIZE; i++)
     {
-        bool32 isInPyramid = InBattlePyramid_();
-        for (i = 0; i < PARTY_SIZE; i++)
+        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
+        heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+        lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL)-1) / 10; //Moving this here makes it easier to add in abilities like Honey Gather.
+        if (lvlDivBy10 > 9)
+            lvlDivBy10 = 9;
+
+        ability = gSpeciesInfo[species].abilities[GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM)];
+
+        if (ability == ABILITY_PICKUP
+            && species != SPECIES_NONE
+            && species != SPECIES_EGG
+            && heldItem == ITEM_NONE
+            && (Random() % 10) == 0)
         {
-            species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
-            heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
-            lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL)-1) / 10; //Moving this here makes it easier to add in abilities like Honey Gather.
-            if (lvlDivBy10 > 9)
-                lvlDivBy10 = 9;
+            u32 rand = Random() % 100;
+            u32 percentTotal = 0;
 
-            ability = gSpeciesInfo[species].abilities[GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM)];
-
-            if (ability == ABILITY_PICKUP
-                && species != SPECIES_NONE
-                && species != SPECIES_EGG
-                && heldItem == ITEM_NONE
-                && (Random() % 10) == 0)
+            for (j = 0; j < ARRAY_COUNT(sPickupTable); j++)
             {
-                if (isInPyramid)
+                percentTotal += sPickupTable[j].percentage[lvlDivBy10];
+                if (rand < percentTotal)
                 {
-                    heldItem = GetBattlePyramidPickupItemId();
-                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                }
-                else
-                {
-                    u32 rand = Random() % 100;
-                    u32 percentTotal = 0;
-
-                    for (j = 0; j < ARRAY_COUNT(sPickupTable); j++)
-                    {
-                        percentTotal += sPickupTable[j].percentage[lvlDivBy10];
-                        if (rand < percentTotal)
-                        {
-                            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupTable[j].itemId);
-                            break;
-                        }
-                    }
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupTable[j].itemId);
+                    break;
                 }
             }
-            else if (ability == ABILITY_HONEY_GATHER
-                && species != 0
-                && species != SPECIES_EGG
-                && heldItem == ITEM_NONE)
+        }
+        else if (ability == ABILITY_HONEY_GATHER
+            && species != 0
+            && species != SPECIES_EGG
+            && heldItem == ITEM_NONE)
+        {
+            if ((lvlDivBy10 + 1 ) * 5 > Random() % 100)
             {
-                if ((lvlDivBy10 + 1 ) * 5 > Random() % 100)
-                {
-                    heldItem = ITEM_HONEY;
-                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                }
-            }
-            else if (P_SHUCKLE_BERRY_JUICE == GEN_2
-                && species == SPECIES_SHUCKLE
-                && heldItem == ITEM_ORAN_BERRY
-                && (Random() % 16) == 0)
-            {
-                heldItem = ITEM_BERRY_JUICE;
+                heldItem = ITEM_HONEY;
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
             }
+        }
+        else if (P_SHUCKLE_BERRY_JUICE == GEN_2
+            && species == SPECIES_SHUCKLE
+            && heldItem == ITEM_ORAN_BERRY
+            && (Random() % 16) == 0)
+        {
+            heldItem = ITEM_BERRY_JUICE;
+            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
         }
     }
 
@@ -15767,7 +15711,6 @@ static void Cmd_handleballthrow(void)
                 }
                 break;
             case BALL_REPEAT:
-                if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[gBattlerTarget].species), FLAG_GET_CAUGHT))
                     ballMultiplier = (B_REPEAT_BALL_MODIFIER >= GEN_7 ? 350 : 300);
                 break;
             case BALL_TIMER:
@@ -15805,15 +15748,7 @@ static void Cmd_handleballthrow(void)
                 break;
             case BALL_MOON:
             {
-                const struct Evolution *evolutions = GetSpeciesEvolutions(gBattleMons[gBattlerTarget].species);
-                if (evolutions == NULL)
                     break;
-                for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
-                {
-                    if (evolutions[i].method == EVO_ITEM
-                        && evolutions[i].param == ITEM_MOON_STONE)
-                        ballMultiplier = 400;
-                }
             }
             break;
             case BALL_LOVE:
@@ -16076,22 +16011,8 @@ static void Cmd_givecaughtmon(void)
             }
             else
             {
-                // Mon chosen, try to put it in the PC
-                if (CopyMonToPC(&gPlayerParty[gSelectedMonPartyId]) == MON_GIVEN_TO_PC)
-                {
-                    GetMonNickname(&gPlayerParty[gSelectedMonPartyId], gStringVar2);
-                    StringCopy(gStringVar1, GetBoxNamePtr(GetPCBoxToSendMon()));
-                    ZeroMonData(&gPlayerParty[gSelectedMonPartyId]);
-                    gBattleStruct->itemLost[B_SIDE_PLAYER][gSelectedMonPartyId].originalItem = ITEM_NONE;
-                    gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SWAPPED_INTO_PARTY;
-                    gSelectedMonPartyId = PARTY_SIZE;
-                    gBattleCommunication[MULTIUSE_STATE] = GIVECAUGHTMON_GIVE_AND_SHOW_MSG;
-                }
-                else
-                {
-                    gSelectedMonPartyId = PARTY_SIZE;
-                    gBattleCommunication[MULTIUSE_STATE] = GIVECAUGHTMON_GIVE_AND_SHOW_MSG;
-                }
+                gSelectedMonPartyId = PARTY_SIZE;
+                gBattleCommunication[MULTIUSE_STATE] = GIVECAUGHTMON_GIVE_AND_SHOW_MSG;
             }
         }
         break;
@@ -16106,20 +16027,6 @@ static void Cmd_givecaughtmon(void)
         if (GiveMonToPlayer(GetBattlerMon(GetCatchingBattler())) != MON_GIVEN_TO_PARTY
          && gBattleCommunication[MULTISTRING_CHOOSER] != B_MSG_SWAPPED_INTO_PARTY)
         {
-            if (!ShouldShowBoxWasFullMessage())
-            {
-                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SENT_SOMEONES_PC;
-                StringCopy(gStringVar1, GetBoxNamePtr(VarGet(VAR_PC_BOX_TO_SEND_MON)));
-                GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_NICKNAME, gStringVar2);
-            }
-            else
-            {
-                StringCopy(gStringVar1, GetBoxNamePtr(VarGet(VAR_PC_BOX_TO_SEND_MON))); // box the mon was sent to
-                GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_NICKNAME, gStringVar2);
-                StringCopy(gStringVar3, GetBoxNamePtr(GetPCBoxToSendMon())); //box the mon was going to be sent to
-                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SOMEONES_BOX_FULL;
-            }
-
             // Change to B_MSG_SENT_LANETTES_PC or B_MSG_LANETTES_BOX_FULL
             if (FlagGet(FLAG_SYS_PC_LANETTE))
                 gBattleCommunication[MULTISTRING_CHOOSER]++;
@@ -16136,79 +16043,6 @@ static void Cmd_givecaughtmon(void)
             gBattlescriptCurrInstr = cmd->passInstr;
         else
             gBattlescriptCurrInstr = cmd->nextInstr;
-        break;
-    }
-}
-
-static void Cmd_trysetcaughtmondexflags(void)
-{
-    CMD_ARGS(const u8 *failInstr);
-
-    u32 species = GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_SPECIES, NULL);
-    u32 personality = GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_PERSONALITY, NULL);
-
-    if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_CAUGHT))
-    {
-        gBattlescriptCurrInstr = cmd->failInstr;
-    }
-    else
-    {
-        HandleSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_SET_CAUGHT, personality);
-        gBattlescriptCurrInstr = cmd->nextInstr;
-    }
-}
-
-static void Cmd_displaydexinfo(void)
-{
-    CMD_ARGS();
-
-    u16 species = GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_SPECIES, NULL);
-
-    switch (gBattleCommunication[0])
-    {
-    case 0:
-        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
-        gBattleCommunication[0]++;
-        break;
-    case 1:
-        if (!gPaletteFade.active)
-        {
-            struct Pokemon *mon = GetBattlerMon(GetCatchingBattler());
-            FreeAllWindowBuffers();
-            gBattleCommunication[TASK_ID] = DisplayCaughtMonDexPage(species,
-                                                                    GetMonData(mon, MON_DATA_IS_SHINY),
-                                                                    GetMonData(mon, MON_DATA_PERSONALITY));
-            gBattleCommunication[0]++;
-        }
-        break;
-    case 2:
-        if (!gPaletteFade.active
-            && gMain.callback2 == BattleMainCB2
-            && !gTasks[gBattleCommunication[TASK_ID]].isActive)
-        {
-            SetVBlankCallback(VBlankCB_Battle);
-            gBattleCommunication[0]++;
-        }
-        break;
-    case 3:
-        InitBattleBgsVideo();
-        LoadBattleTextboxAndBackground();
-        gBattle_BG3_X = 256;
-        gBattleCommunication[0]++;
-        break;
-    case 4:
-        if (!IsDma3ManagerBusyWithBgCopy())
-        {
-            BeginNormalPaletteFade(PALETTES_BG, 0, 16, 0, RGB_BLACK);
-            ShowBg(0);
-            ShowBg(3);
-            gBattleCommunication[0]++;
-        }
-        break;
-    case 5:
-        if (!gPaletteFade.active) {
-            gBattlescriptCurrInstr = cmd->nextInstr;
-        }
         break;
     }
 }
@@ -16689,41 +16523,7 @@ void BS_DoStockpileStatChangesWearOff(void)
 
 static bool32 CriticalCapture(u32 odds)
 {
-    u32 numCaught;
-    u32 totalDexCount;
-
-    if (B_CRITICAL_CAPTURE == FALSE)
-        return FALSE;
-
-    if (B_CRITICAL_CAPTURE_LOCAL_DEX == TRUE)
-        totalDexCount = HOENN_DEX_COUNT;
-    else
-        totalDexCount = NATIONAL_DEX_COUNT;
-
-    numCaught = GetNationalPokedexCount(FLAG_GET_CAUGHT);
-
-    if (numCaught <= (totalDexCount * 30) / 650)
-        odds = 0;
-    else if (numCaught <= (totalDexCount * 150) / 650)
-        odds /= 2;
-    else if (numCaught <= (totalDexCount * 300) / 650)
-        ;   // odds = (odds * 100) / 100;
-    else if (numCaught <= (totalDexCount * 450) / 650)
-        odds = (odds * 150) / 100;
-    else if (numCaught <= (totalDexCount * 600) / 650)
-        odds *= 2;
-    else
-        odds = (odds * 250) / 100;
-
-    if (CheckBagHasItem(ITEM_CATCHING_CHARM, 1))
-        odds = (odds * (100 + B_CATCHING_CHARM_BOOST)) / 100;
-
-    odds /= 6;
-
-    if ((Random() % 255) < odds)
-        return TRUE;
-
-    return FALSE;
+    return TRUE;
 }
 
 bool32 IsMoveAffectedByParentalBond(u32 move, u32 battler)
@@ -17707,55 +17507,6 @@ void BS_RunStatChangeItems(void)
 
 static void TryUpdateEvolutionTracker(u32 evolutionCondition, u32 upAmount, u16 usedMove)
 {
-    u32 i, j;
-
-    if (IsOnPlayerSide(gBattlerAttacker)
-     && !(gBattleTypeFlags & (BATTLE_TYPE_LINK
-                             | BATTLE_TYPE_EREADER_TRAINER
-                             | BATTLE_TYPE_RECORDED_LINK
-                             | BATTLE_TYPE_TRAINER_HILL
-                             | BATTLE_TYPE_FRONTIER)))
-    {
-        const struct Evolution *evolutions = GetSpeciesEvolutions(gBattleMons[gBattlerAttacker].species);
-        if (evolutions == NULL)
-            return;
-
-        for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
-        {
-            if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
-                continue;
-            if (evolutions[i].params == NULL)
-                continue;
-
-            for (j = 0; evolutions[i].params[j].condition != CONDITIONS_END; j++)
-            {
-                if (evolutions[i].params[j].condition == evolutionCondition)
-                {
-                    // We only have 10 bits to use
-                    u16 val = min(1023, GetMonData(GetBattlerMon(gBattlerAttacker), MON_DATA_EVOLUTION_TRACKER) + upAmount);
-                    // Reset progress if you faint for the recoil method.
-                    switch (evolutionCondition)
-                    {
-                        case IF_USED_MOVE_X_TIMES:
-                            if (evolutions[i].params[j].arg1 == usedMove)
-                                SetMonData(GetBattlerMon(gBattlerAttacker), MON_DATA_EVOLUTION_TRACKER, &val);
-                            break;
-                        case IF_RECOIL_DAMAGE_GE:
-                            if (gBattleMons[gBattlerAttacker].hp == 0)
-                                val = 0;
-                            SetMonData(GetBattlerMon(gBattlerAttacker), MON_DATA_EVOLUTION_TRACKER, &val);
-                            break;
-                        case IF_DEFEAT_X_WITH_ITEMS:
-                            if (GetMonData(GetBattlerMon(gBattlerTarget), MON_DATA_SPECIES) == evolutions[i].params[j].arg1
-                             && GetMonData(GetBattlerMon(gBattlerTarget), MON_DATA_HELD_ITEM) == evolutions[i].params[j].arg2)
-                                SetMonData(GetBattlerMon(gBattlerAttacker), MON_DATA_EVOLUTION_TRACKER, &val);
-                            break;
-                    }
-                    return;
-                }
-            }
-        }
-    }
 }
 
 void BS_TryUpdateRecoilTracker(void)

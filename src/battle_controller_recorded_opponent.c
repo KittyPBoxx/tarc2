@@ -6,20 +6,16 @@
 #include "battle_interface.h"
 #include "battle_message.h"
 #include "battle_setup.h"
-#include "battle_tower.h"
-#include "battle_tv.h"
 #include "bg.h"
 #include "data.h"
 #include "item_menu.h"
 #include "item_use.h"
-#include "link.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
 #include "party_menu.h"
 #include "pokeball.h"
 #include "pokemon.h"
-#include "recorded_battle.h"
 #include "reshow_battle_screen.h"
 #include "sound.h"
 #include "string_util.h"
@@ -132,17 +128,7 @@ static void RecordedOpponentBufferRunCommand(u32 battler)
 static void RecordedOpponentBufferExecCompleted(u32 battler)
 {
     gBattlerControllerFuncs[battler] = RecordedOpponentBufferRunCommand;
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-    {
-        u8 playerId = GetMultiplayerId();
-
-        PrepareBufferDataTransferLink(battler, 2, 4, &playerId);
-        gBattleResources->bufferA[battler][0] = CONTROLLER_TERMINATOR_NOP;
-    }
-    else
-    {
-        gBattleControllerExecFlags &= ~(1u << battler);
-    }
+    gBattleControllerExecFlags &= ~(1u << battler);
 }
 
 static void Intro_DelayAndEnd(u32 battler)
@@ -328,42 +314,7 @@ static void RecordedOpponentHandleSwitchInAnim(u32 battler)
 
 static void RecordedOpponentHandleDrawTrainerPic(u32 battler)
 {
-    s16 xPos;
-    u32 trainerPicId;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-    {
-        if ((GetBattlerPosition(battler) & BIT_FLANK) != 0) // second mon
-            xPos = 152;
-        else // first mon
-            xPos = 200;
-
-        if (gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER)
-        {
-            if (battler == B_POSITION_OPPONENT_LEFT)
-                trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentA);
-            else
-                trainerPicId = GetFrontierTrainerFrontSpriteId(TRAINER_BATTLE_PARAM.opponentB);
-        }
-        else
-        {
-            trainerPicId = PlayerGenderToFrontTrainerPicId(GetBattlerLinkPlayerGender(battler));
-        }
-    }
-    else
-    {
-        xPos = 176;
-        if (TRAINER_BATTLE_PARAM.opponentA == TRAINER_UNION_ROOM)
-        {
-            trainerPicId = GetUnionRoomTrainerPic();
-        }
-        else
-        {
-            trainerPicId = PlayerGenderToFrontTrainerPicId(gLinkPlayers[gRecordedBattleMultiplayerId ^ BIT_SIDE].gender);
-        }
-    }
-
-    BtlController_HandleDrawTrainerPic(battler, trainerPicId, TRUE, xPos, 40, -1);
 }
 
 static void RecordedOpponentHandleTrainerSlideBack(u32 battler)
@@ -383,42 +334,21 @@ static void RecordedOpponentHandlePrintString(u32 battler)
 
 static void RecordedOpponentHandleChooseAction(u32 battler)
 {
-    BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, RecordedBattle_GetBattlerAction(RECORDED_ACTION_TYPE, battler), 0);
     RecordedOpponentBufferExecCompleted(battler);
 }
 
 static void RecordedOpponentHandleChooseMove(u32 battler)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_PALACE)
-    {
-        BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, 10, ChooseMoveAndTargetInBattlePalace(battler));
-    }
-    else
-    {
-        u8 moveId = RecordedBattle_GetBattlerAction(RECORDED_MOVE_SLOT, battler);
-        u8 target = RecordedBattle_GetBattlerAction(RECORDED_MOVE_TARGET, battler);
-        BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, 10, moveId | (target << 8));
-    }
-
     RecordedOpponentBufferExecCompleted(battler);
 }
 
 static void RecordedOpponentHandleChooseItem(u32 battler)
 {
-    u8 byte1 = RecordedBattle_GetBattlerAction(RECORDED_ITEM_ID, battler);
-    u8 byte2 = RecordedBattle_GetBattlerAction(RECORDED_ITEM_ID, battler);
-    gBattleStruct->chosenItem[battler] = (byte1 << 8) | byte2;
-    gBattleStruct->itemPartyIndex[battler] = RecordedBattle_GetBattlerAction(RECORDED_ITEM_TARGET, battler);
-    gBattleStruct->itemMoveIndex[battler] = RecordedBattle_GetBattlerAction(RECORDED_ITEM_MOVE, battler);
-    BtlController_EmitOneReturnValue(battler, B_COMM_TO_ENGINE, gBattleStruct->chosenItem[battler]);
     RecordedOpponentBufferExecCompleted(battler);
 }
 
 static void RecordedOpponentHandleChoosePokemon(u32 battler)
 {
-    gBattleStruct->monToSwitchIntoId[battler] = RecordedBattle_GetBattlerAction(RECORDED_PARTY_INDEX, battler);
-    gSelectedMonPartyId = gBattleStruct->monToSwitchIntoId[battler]; // Revival Blessing
-    BtlController_EmitChosenMonReturnValue(battler, B_COMM_TO_ENGINE, gBattleStruct->monToSwitchIntoId[battler], NULL);
     RecordedOpponentBufferExecCompleted(battler);
 }
 

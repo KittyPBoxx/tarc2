@@ -66,7 +66,6 @@ gFieldEffectScriptPointers::
 	.4byte gFieldEffectScript_ShowSecretPowerShrub      @ FLDEFF_SECRET_POWER_SHRUB
 	.4byte gFieldEffectScript_ShowCutGrass              @ FLDEFF_CUT_GRASS
 	.4byte gFieldEffectScript_FieldMoveShowMonInit      @ FLDEFF_FIELD_MOVE_SHOW_MON_INIT
-	.4byte gFieldEffectScript_UsePuzzleEffect           @ FLDEFF_USE_TOMB_PUZZLE_EFFECT
 	.4byte gFieldEffectScript_SecretBaseBootPC          @ FLDEFF_PCTURN_ON
 	.4byte gFieldEffectScript_HallOfFameRecord          @ FLDEFF_HALL_OF_FAME_RECORD
 	.4byte gFieldEffectScript_UseTeleport               @ FLDEFF_USE_TELEPORT
@@ -322,10 +321,6 @@ gFieldEffectScript_ShowCutGrass::
 
 gFieldEffectScript_FieldMoveShowMonInit::
 	field_eff_callnative FldEff_FieldMoveShowMonInit
-	field_eff_end
-
-gFieldEffectScript_UsePuzzleEffect::
-	field_eff_callnative FldEff_UsePuzzleEffect
 	field_eff_end
 
 gFieldEffectScript_SecretBaseBootPC::

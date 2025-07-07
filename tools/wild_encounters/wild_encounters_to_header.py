@@ -114,9 +114,6 @@ def ImportWildEncounterFile():
     if IsConfigEnabled():
         IS_ENABLED = True
         TIMES_OF_DAY_COUNT = len(TIME_OF_DAY)
-    
-    global DEXNAV_ENABLED
-    DEXNAV_ENABLED = IsDexnavEnabled()
 
     global fieldInfoStrings
     global fieldStrings
@@ -529,15 +526,6 @@ def IsConfigEnabled():
     CONFIG_ENABLED_PAT = re.compile(r"#define OW_TIME_OF_DAY_ENCOUNTERS\s+(?P<cfg_val>[^ ]*)")
 
     with open("./include/config/overworld.h", "r") as overworld_config_file:
-        config_overworld = overworld_config_file.read()
-        config_setting = CONFIG_ENABLED_PAT.search(config_overworld)
-        return config_setting is not None and config_setting.group("cfg_val") in ("TRUE", "1")
-
-
-def IsDexnavEnabled():
-    CONFIG_ENABLED_PAT = re.compile(r"#define DEXNAV_ENABLED\s+(?P<cfg_val>[^ ]*)")
-
-    with open("./include/config/dexnav.h", "r") as overworld_config_file:
         config_overworld = overworld_config_file.read()
         config_setting = CONFIG_ENABLED_PAT.search(config_overworld)
         return config_setting is not None and config_setting.group("cfg_val") in ("TRUE", "1")
