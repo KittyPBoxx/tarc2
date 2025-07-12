@@ -222,6 +222,8 @@ static const struct SpriteFrameImage sPicTable_SurfBlob[] = {
     overworld_frame(gFieldEffectObjectPic_SurfBlob, 4, 4, 0),
     overworld_frame(gFieldEffectObjectPic_SurfBlob, 4, 4, 1),
     overworld_frame(gFieldEffectObjectPic_SurfBlob, 4, 4, 2),
+    overworld_frame(gFieldEffectObjectPic_SurfBlob, 4, 4, 3),
+    overworld_frame(gFieldEffectObjectPic_SurfBlob, 4, 4, 4),
 };
 
 static const union AnimCmd sSurfBlobAnim_FaceSouth[] =
@@ -248,12 +250,40 @@ static const union AnimCmd sSurfBlobAnim_FaceEast[] =
     ANIMCMD_JUMP(0),
 };
 
+static const union AnimCmd sSurfBlobAnim_FaceSouthwest[] =
+{
+    ANIMCMD_FRAME(3, 1),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd sSurfBlobAnim_FaceSoutheast[] =
+{
+    ANIMCMD_FRAME(3, 1, .hFlip = TRUE),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd sSurfBlobAnim_FaceNorthwest[] =
+{
+    ANIMCMD_FRAME(4, 1),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd sSurfBlobAnim_FaceNortheast[] =
+{
+    ANIMCMD_FRAME(4, 1, .hFlip = TRUE),
+    ANIMCMD_JUMP(0),
+};
+
 static const union AnimCmd *const sAnimTable_SurfBlob[] =
 {
     sSurfBlobAnim_FaceSouth,
     sSurfBlobAnim_FaceNorth,
     sSurfBlobAnim_FaceWest,
     sSurfBlobAnim_FaceEast,
+    sSurfBlobAnim_FaceSouthwest,
+    sSurfBlobAnim_FaceSoutheast,
+    sSurfBlobAnim_FaceNorthwest,
+    sSurfBlobAnim_FaceNortheast,
 };
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_SurfBlob = {
@@ -386,6 +416,8 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_JumpTallGrass = {
 static const struct SpriteFrameImage sPicTable_SandFootprints[] = {
     overworld_frame(gFieldEffectObjectPic_SandFootprints, 2, 2, 0),
     overworld_frame(gFieldEffectObjectPic_SandFootprints, 2, 2, 1),
+    overworld_frame(gFieldEffectObjectPic_SandFootprints, 2, 2, 2),
+    overworld_frame(gFieldEffectObjectPic_SandFootprints, 2, 2, 3),
 };
 
 static const union AnimCmd sSandFootprintsAnim_South[] =
@@ -412,6 +444,30 @@ static const union AnimCmd sSandFootprintsAnim_East[] =
     ANIMCMD_END,
 };
 
+static const union AnimCmd sSandFootprintsAnim_Southwest[] =
+{
+    ANIMCMD_FRAME(2, 1),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sSandFootprintsAnim_Southeast[] =
+{
+    ANIMCMD_FRAME(2, 1, .hFlip = TRUE),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sSandFootprintsAnim_Northwest[] =
+{
+    ANIMCMD_FRAME(3, 1),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sSandFootprintsAnim_Northeast[] =
+{
+    ANIMCMD_FRAME(3, 1, .hFlip = TRUE),
+    ANIMCMD_END,
+};
+
 static const union AnimCmd *const sAnimTable_SandFootprints[] =
 {
     sSandFootprintsAnim_South,
@@ -419,6 +475,10 @@ static const union AnimCmd *const sAnimTable_SandFootprints[] =
     sSandFootprintsAnim_North,
     sSandFootprintsAnim_West,
     sSandFootprintsAnim_East,
+    sSandFootprintsAnim_Southwest,
+    sSandFootprintsAnim_Southeast,
+    sSandFootprintsAnim_Northwest,
+    sSandFootprintsAnim_Northeast,
 };
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_SandFootprints = {
@@ -434,6 +494,8 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_SandFootprints = {
 static const struct SpriteFrameImage sPicTable_DeepSandFootprints[] = {
     overworld_frame(gFieldEffectObjectPic_DeepSandFootprints, 2, 2, 0),
     overworld_frame(gFieldEffectObjectPic_DeepSandFootprints, 2, 2, 1),
+    overworld_frame(gFieldEffectObjectPic_DeepSandFootprints, 2, 2, 2),
+    overworld_frame(gFieldEffectObjectPic_DeepSandFootprints, 2, 2, 3),
 };
 
 static const union AnimCmd sDeepSandFootprintsAnim_South[] =
@@ -460,6 +522,30 @@ static const union AnimCmd sDeepSandFootprintsAnim_East[] =
     ANIMCMD_END,
 };
 
+static const union AnimCmd sDeepSandFootprintsAnim_Southwest[] =
+{
+    ANIMCMD_FRAME(2, 1),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sDeepSandFootprintsAnim_Southeast[] =
+{
+    ANIMCMD_FRAME(2, 1, .hFlip = TRUE),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sDeepSandFootprintsAnim_Northwest[] =
+{
+    ANIMCMD_FRAME(3, 1),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sDeepSandFootprintsAnim_Northeast[] =
+{
+    ANIMCMD_FRAME(3, 1, .hFlip = TRUE),
+    ANIMCMD_END,
+};
+
 static const union AnimCmd *const sAnimTable_DeepSandFootprints[] =
 {
     sDeepSandFootprintsAnim_South,
@@ -467,6 +553,10 @@ static const union AnimCmd *const sAnimTable_DeepSandFootprints[] =
     sDeepSandFootprintsAnim_North,
     sDeepSandFootprintsAnim_West,
     sDeepSandFootprintsAnim_East,
+    sDeepSandFootprintsAnim_Southwest,
+    sDeepSandFootprintsAnim_Southeast,
+    sDeepSandFootprintsAnim_Northwest,
+    sDeepSandFootprintsAnim_Northeast,
 };
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_DeepSandFootprints = {
@@ -588,7 +678,7 @@ static const union AnimCmd *const sAnimTable_BikeTireTracks[] =
 const struct SpriteTemplate gFieldEffectObjectTemplate_BikeTireTracks = {
     .tileTag = TAG_NONE,
     .paletteTag = FLDEFF_PAL_TAG_GENERAL_0,
-    .oam = &gObjectEventBaseOam_16x16,
+    .oam = &gObjectEventBaseOam_32x32,
     .anims = sAnimTable_BikeTireTracks,
     .images = sPicTable_BikeTireTracks,
     .affineAnims = gDummySpriteAffineAnimTable,

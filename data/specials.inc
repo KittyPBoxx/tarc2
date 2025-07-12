@@ -17,9 +17,7 @@
 gSpecials::
 	def_special HealPlayerParty
 	def_special SetCableClubWarp
-	def_special DoSecretBasePCTurnOffEffect
 	def_special GetLinkPartnerNames
-	def_special SpawnLinkPartnerObjectEvent
 	def_special SavePlayerParty
 	def_special LoadPlayerParty
 	def_special ObjectEventInteractionGetBerryTreeData
@@ -141,7 +139,6 @@ gSpecials::
 	def_special LoadWallyZigzagoon
 	def_special IsStarterInParty
 	def_special ShowDeptStoreElevatorFloorSelect
-	def_special InteractWithShieldOrTVDecoration
 	def_special IsPokerusInParty
 	def_special SetSootopolisGymCrackedIceMetatiles
 	def_special ShakeCamera

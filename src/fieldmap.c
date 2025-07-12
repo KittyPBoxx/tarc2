@@ -481,10 +481,11 @@ static void LoadSavedMapView(void)
     }
 }
 
-static void MoveMapViewToBackup(u8 direction)
+static void MoveMapViewToBackup(u8 direction, s8 xoffset, s8 yoffset)
 {
-    int width;
-    u16 *mapView;
+    int width = gBackupMapLayout.width;
+    u16 *mapView = gSaveBlock1Ptr->mapView;
+
     int x0, y0;
     int x2, y2;
     u16 *src, *dest;
@@ -492,33 +493,41 @@ static void MoveMapViewToBackup(u8 direction)
     int r9, r8;
     int x, y;
     int i, j;
-    mapView = gSaveBlock1Ptr->mapView;
-    width = gBackupMapLayout.width;
+
     r9 = 0;
     r8 = 0;
     x0 = gSaveBlock1Ptr->pos.x;
     y0 = gSaveBlock1Ptr->pos.y;
-    x2 = MAP_OFFSET_W;
-    y2 = MAP_OFFSET_H;
+    x2 = 15;
+    y2 = 14;
+
     switch (direction)
     {
     case CONNECTION_NORTH:
+        x0 -= xoffset;
         y0 += 1;
-        y2 = MAP_OFFSET_H - 1;
+        y2 = 13;
         break;
     case CONNECTION_SOUTH:
+        x0 -= xoffset;
         r8 = 1;
-        y2 = MAP_OFFSET_H - 1;
+        y2 = 13;
         break;
     case CONNECTION_WEST:
+        y0 -= yoffset;
         x0 += 1;
-        x2 = MAP_OFFSET_W - 1;
+        x2 = 14;
         break;
     case CONNECTION_EAST:
+        y0 -= yoffset;
         r9 = 1;
-        x2 = MAP_OFFSET_W - 1;
+        x2 = 14;
         break;
     }
+    if (x0 < 0)
+        x0 = 0;
+    if (y0 < 0)
+        y0 = 0;
     for (y = 0; y < y2; y++)
     {
         i = 0;
@@ -526,7 +535,7 @@ static void MoveMapViewToBackup(u8 direction)
         for (x = 0; x < x2; x++)
         {
             desti = width * (y + y0);
-            srci = (y + r8) * MAP_OFFSET_W + r9;
+            srci = (y + r8) * 15 + r9;
             src = &mapView[srci + i];
             dest = &sBackupMapData[x0 + desti + j];
             *dest = *src;
@@ -649,7 +658,7 @@ bool8 CameraMove(int x, int y)
             gCamera.y = old_y - gSaveBlock1Ptr->pos.y;
             gSaveBlock1Ptr->pos.x += x;
             gSaveBlock1Ptr->pos.y += y;
-            MoveMapViewToBackup(direction);
+            MoveMapViewToBackup(direction, x, y);
         }
         else
         {

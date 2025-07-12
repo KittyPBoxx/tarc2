@@ -33,7 +33,6 @@
 #include "field_control_avatar.h"
 
 #define NUM_FORCED_MOVEMENTS 18
-#define NUM_ACRO_BIKE_COLLISIONS 5
 
 enum SpinDirection
 {
@@ -96,13 +95,11 @@ static u8 CheckForObjectEventStaticCollision(struct ObjectEvent *, s16, s16, u8,
 static bool8 CanStopSurfing(s16, s16, u8);
 static bool8 ShouldJumpLedge(s16, s16, u8);
 static bool8 TryPushBoulder(s16, s16, u8);
-static void CheckAcroBikeCollision(s16, s16, u8, u8 *);
 
 static void DoPlayerAvatarTransition(void);
 static void PlayerAvatarTransition_Dummy(struct ObjectEvent *);
 static void PlayerAvatarTransition_Normal(struct ObjectEvent *);
 static void PlayerAvatarTransition_MachBike(struct ObjectEvent *);
-static void PlayerAvatarTransition_AcroBike(struct ObjectEvent *);
 static void PlayerAvatarTransition_Surfing(struct ObjectEvent *);
 static void PlayerAvatarTransition_Underwater(struct ObjectEvent *);
 static void PlayerAvatarTransition_ReturnToField(struct ObjectEvent *);
@@ -112,11 +109,8 @@ static bool8 PlayerAnimIsMultiFrameStationaryAndStateNotTurning(void);
 static bool8 PlayerIsAnimActive(void);
 static bool8 PlayerCheckIfAnimFinishedOrInactive(void);
 
-static void PlayerWalkSlowStairs(u8 direction);
-static void PlayerRunSlow(u8 direction);
 static void PlayerRun(u8);
 static void PlayerNotOnBikeCollide(u8);
-static void PlayerNotOnBikeCollideWithFarawayIslandMew(u8);
 
 static void PlayCollisionSoundIfNotFacingWarp(u8);
 
@@ -179,6 +173,12 @@ static bool32 IsMetatileLand(s16, s16, u32);
 
 static u8 TrySpinPlayerForWarp(struct ObjectEvent *, s16 *);
 
+// GrindRun: Fuction declarations
+static u8 GetGrindRunDirection(u8 direction);
+static u8 CheckForCollision(s16 x, s16 y, u8 direction);
+
+// .rodata
+
 static bool8 (*const sForcedMovementTestFuncs[NUM_FORCED_MOVEMENTS])(u8) =
 {
     MetatileBehavior_IsTrickHouseSlipperyFloor,
@@ -232,28 +232,10 @@ static void (*const sPlayerNotOnBikeFuncs[])(u8, u16) =
     [MOVING]         = PlayerNotOnBikeMoving,
 };
 
-static bool8 (*const sAcroBikeTrickMetatiles[NUM_ACRO_BIKE_COLLISIONS])(u8) =
-{
-    MetatileBehavior_IsBumpySlope,
-    MetatileBehavior_IsIsolatedVerticalRail,
-    MetatileBehavior_IsIsolatedHorizontalRail,
-    MetatileBehavior_IsVerticalRail,
-    MetatileBehavior_IsHorizontalRail,
-};
-
-static const u8 sAcroBikeTrickCollisionTypes[NUM_ACRO_BIKE_COLLISIONS] = {
-    COLLISION_WHEELIE_HOP,
-    COLLISION_ISOLATED_VERTICAL_RAIL,
-    COLLISION_ISOLATED_HORIZONTAL_RAIL,
-    COLLISION_VERTICAL_RAIL,
-    COLLISION_HORIZONTAL_RAIL,
-};
-
 static void (*const sPlayerAvatarTransitionFuncs[])(struct ObjectEvent *) =
 {
     [PLAYER_AVATAR_STATE_NORMAL]     = PlayerAvatarTransition_Normal,
     [PLAYER_AVATAR_STATE_MACH_BIKE]  = PlayerAvatarTransition_MachBike,
-    [PLAYER_AVATAR_STATE_ACRO_BIKE]  = PlayerAvatarTransition_AcroBike,
     [PLAYER_AVATAR_STATE_SURFING]    = PlayerAvatarTransition_Surfing,
     [PLAYER_AVATAR_STATE_UNDERWATER] = PlayerAvatarTransition_Underwater,
     [PLAYER_AVATAR_STATE_FIELD_MOVE] = PlayerAvatarTransition_ReturnToField,
@@ -267,13 +249,16 @@ static bool8 (*const sArrowWarpMetatileBehaviorChecks[])(u8) =
     [DIR_NORTH - 1] = MetatileBehavior_IsNorthArrowWarp,
     [DIR_WEST - 1]  = MetatileBehavior_IsWestArrowWarp,
     [DIR_EAST - 1]  = MetatileBehavior_IsEastArrowWarp,
+    [DIR_SOUTHWEST -1] MetatileBehavior_IsSouthwestArrowWarp,
+    [DIR_SOUTHEAST - 1] MetatileBehavior_IsSoutheastArrowWarp,
+    [DIR_NORTHWEST - 1] MetatileBehavior_IsNorthwestArrowWarp,
+    [DIR_NORTHEAST - 1] MetatileBehavior_IsNortheastArrowWarp,
 };
 
 static const u8 sRivalAvatarGfxIds[][GENDER_COUNT] =
 {
     [PLAYER_AVATAR_STATE_NORMAL]     = {OBJ_EVENT_GFX_RIVAL_BRENDAN_NORMAL,     OBJ_EVENT_GFX_RIVAL_MAY_NORMAL},
     [PLAYER_AVATAR_STATE_MACH_BIKE]  = {OBJ_EVENT_GFX_RIVAL_BRENDAN_MACH_BIKE,  OBJ_EVENT_GFX_RIVAL_MAY_MACH_BIKE},
-    [PLAYER_AVATAR_STATE_ACRO_BIKE]  = {OBJ_EVENT_GFX_RIVAL_BRENDAN_ACRO_BIKE,  OBJ_EVENT_GFX_RIVAL_MAY_ACRO_BIKE},
     [PLAYER_AVATAR_STATE_SURFING]    = {OBJ_EVENT_GFX_RIVAL_BRENDAN_SURFING,    OBJ_EVENT_GFX_RIVAL_MAY_SURFING},
     [PLAYER_AVATAR_STATE_UNDERWATER] = {OBJ_EVENT_GFX_BRENDAN_UNDERWATER,       OBJ_EVENT_GFX_MAY_UNDERWATER},
     [PLAYER_AVATAR_STATE_FIELD_MOVE] = {OBJ_EVENT_GFX_RIVAL_BRENDAN_FIELD_MOVE, OBJ_EVENT_GFX_RIVAL_MAY_FIELD_MOVE},
@@ -286,7 +271,6 @@ static const u8 sPlayerAvatarGfxIds[][GENDER_COUNT] =
 {
     [PLAYER_AVATAR_STATE_NORMAL]     = {OBJ_EVENT_GFX_BRENDAN_NORMAL,     OBJ_EVENT_GFX_MAY_NORMAL},
     [PLAYER_AVATAR_STATE_MACH_BIKE]  = {OBJ_EVENT_GFX_BRENDAN_MACH_BIKE,  OBJ_EVENT_GFX_MAY_MACH_BIKE},
-    [PLAYER_AVATAR_STATE_ACRO_BIKE]  = {OBJ_EVENT_GFX_BRENDAN_ACRO_BIKE,  OBJ_EVENT_GFX_MAY_ACRO_BIKE},
     [PLAYER_AVATAR_STATE_SURFING]    = {OBJ_EVENT_GFX_BRENDAN_SURFING,    OBJ_EVENT_GFX_MAY_SURFING},
     [PLAYER_AVATAR_STATE_UNDERWATER] = {OBJ_EVENT_GFX_BRENDAN_UNDERWATER, OBJ_EVENT_GFX_MAY_UNDERWATER},
     [PLAYER_AVATAR_STATE_FIELD_MOVE] = {OBJ_EVENT_GFX_BRENDAN_FIELD_MOVE, OBJ_EVENT_GFX_MAY_FIELD_MOVE},
@@ -313,7 +297,6 @@ static const u8 sPlayerAvatarGfxToStateFlag[GENDER_COUNT][5][2] =
     {
         {OBJ_EVENT_GFX_BRENDAN_NORMAL,     PLAYER_AVATAR_FLAG_ON_FOOT},
         {OBJ_EVENT_GFX_BRENDAN_MACH_BIKE,  PLAYER_AVATAR_FLAG_MACH_BIKE},
-        {OBJ_EVENT_GFX_BRENDAN_ACRO_BIKE,  PLAYER_AVATAR_FLAG_ACRO_BIKE},
         {OBJ_EVENT_GFX_BRENDAN_SURFING,    PLAYER_AVATAR_FLAG_SURFING},
         {OBJ_EVENT_GFX_BRENDAN_UNDERWATER, PLAYER_AVATAR_FLAG_UNDERWATER},
     },
@@ -321,7 +304,6 @@ static const u8 sPlayerAvatarGfxToStateFlag[GENDER_COUNT][5][2] =
     {
         {OBJ_EVENT_GFX_MAY_NORMAL,         PLAYER_AVATAR_FLAG_ON_FOOT},
         {OBJ_EVENT_GFX_MAY_MACH_BIKE,      PLAYER_AVATAR_FLAG_MACH_BIKE},
-        {OBJ_EVENT_GFX_MAY_ACRO_BIKE,      PLAYER_AVATAR_FLAG_ACRO_BIKE},
         {OBJ_EVENT_GFX_MAY_SURFING,        PLAYER_AVATAR_FLAG_SURFING},
         {OBJ_EVENT_GFX_MAY_UNDERWATER,     PLAYER_AVATAR_FLAG_UNDERWATER},
     }
@@ -333,6 +315,10 @@ static bool8 (*const sArrowWarpMetatileBehaviorChecks2[])(u8) =  //Duplicate of 
     [DIR_NORTH - 1] = MetatileBehavior_IsNorthArrowWarp,
     [DIR_WEST - 1]  = MetatileBehavior_IsWestArrowWarp,
     [DIR_EAST - 1]  = MetatileBehavior_IsEastArrowWarp,
+    [DIR_SOUTHWEST -1] MetatileBehavior_IsSouthwestArrowWarp,
+    [DIR_SOUTHEAST - 1] MetatileBehavior_IsSoutheastArrowWarp,
+    [DIR_NORTHWEST - 1] MetatileBehavior_IsNorthwestArrowWarp,
+    [DIR_NORTHEAST - 1] MetatileBehavior_IsNortheastArrowWarp,
 };
 
 static bool8 (*const sPushBoulderFuncs[])(struct Task *, struct ObjectEvent *, struct ObjectEvent *) =
@@ -771,64 +757,53 @@ static void PlayerNotOnBikeTurningInPlace(u8 direction, u16 heldKeys)
     PlayerTurnInPlace(direction);
 }
 
+
 static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
 {
     u8 collision = CheckForPlayerAvatarCollision(direction);
-
+    u8 grindRunDirection;
     if (collision)
     {
         if (collision == COLLISION_LEDGE_JUMP)
         {
             PlayerJumpLedge(direction);
-            return;
-        }
-        else if (collision == COLLISION_OBJECT_EVENT && IsPlayerCollidingWithFarawayIslandMew(direction))
-        {
-            PlayerNotOnBikeCollideWithFarawayIslandMew(direction);
-            return;
-        }
-        else if (collision == COLLISION_STAIR_WARP)
-        {
-            PlayerFaceDirection(direction);
         }
         else
         {
-            u8 adjustedCollision = collision - COLLISION_STOP_SURFING;
-            if (adjustedCollision > 3)
-                PlayerNotOnBikeCollide(direction);
+            //  GrindRun:  Most of this logic is to only allow grind running
+            //      while running and not walking normally.  If you plan to
+            //      change this, consider that GrindRun takes control away
+            //      from what the player expects and makes precise movements
+            //      more difficult.
+
+            //Check for empty spaces next to and diagonally from the player, otherwise actually collide
+            grindRunDirection = GetGrindRunDirection(direction);
+            if(grindRunDirection != DIR_NONE)
+            {
+                PlayerRun(grindRunDirection);
+                gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
+                return;
+            }
+            else
+            {
+                //No grind running direction?
+                //Collide normally
+                u8 adjustedCollision = collision - COLLISION_STOP_SURFING;
+                if (adjustedCollision > 3)
+                {
+                    PlayerNotOnBikeCollide(direction);
+                }
+                return;
+            }
             return;
         }
-    }
-
-    ResetSpinTimer(); // Everything below will move the player a space, reset the timer.
-    gPlayerAvatar.creeping = FALSE;
-    if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_SURFING)
-    {
-        // speed 2 is fast, same speed as running
-        PlayerWalkFast(direction);
         return;
     }
 
-    if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER) && (heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
-     && IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior) == 0)
-    {
-        if (ObjectMovingOnRockStairs(&gObjectEvents[gPlayerAvatar.objectEventId], direction))
-            PlayerRunSlow(direction);
-        else
-            PlayerRun(direction);
-
-        gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
-        return;
-    }
-    else
-    {
-        if (ObjectMovingOnRockStairs(&gObjectEvents[gPlayerAvatar.objectEventId], direction))
-            PlayerWalkSlowStairs(direction);
-        else
-            PlayerWalkNormal(direction);
-    }
+    PlayerRun(direction);
+    gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
+    return;
 }
-
 static u8 CheckForPlayerAvatarCollision(u8 direction)
 {
     s16 x, y;
@@ -863,7 +838,13 @@ u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u
 
     if (ShouldJumpLedge(x, y, direction))
     {
-        return COLLISION_LEDGE_JUMP;
+        if (IsDirectionDiagonal(direction))
+        {
+            MoveCoords(direction, &x, &y);
+            collision = GetCollisionAtCoords(objectEvent, x, y, direction);
+            if (collision == COLLISION_IMPASSABLE)
+                return collision;
+        }
     }
     if (collision == COLLISION_OBJECT_EVENT && TryPushBoulder(x, y, direction))
         return COLLISION_PUSHED_BOULDER;
@@ -872,7 +853,6 @@ u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u
     {
         if (CheckForRotatingGatePuzzleCollision(direction, x, y))
             return COLLISION_ROTATING_GATE;
-        CheckAcroBikeCollision(x, y, metatileBehavior, &collision);
     }
 
     return collision;
@@ -886,7 +866,6 @@ static u8 CheckForObjectEventStaticCollision(struct ObjectEvent *objectEvent, s1
     {
         if (CheckForRotatingGatePuzzleCollisionWithoutAnimation(direction, x, y))
             return COLLISION_ROTATING_GATE;
-        CheckAcroBikeCollision(x, y, metatileBehavior, &collision);
     }
     return collision;
 }
@@ -908,8 +887,46 @@ static bool8 CanStopSurfing(s16 x, s16 y, u8 direction)
 
 static bool8 ShouldJumpLedge(s16 x, s16 y, u8 direction)
 {
-    if (GetLedgeJumpDirection(x, y, direction) != DIR_NONE)
-        return TRUE;
+    static bool8 (*const ledgeBehaviorFuncs[])(u8) = {
+        [DIR_SOUTH - 1] = MetatileBehavior_IsJumpSouth,
+        [DIR_NORTH - 1] = MetatileBehavior_IsJumpNorth,
+        [DIR_WEST - 1]  = MetatileBehavior_IsJumpWest,
+        [DIR_EAST - 1]  = MetatileBehavior_IsJumpEast,
+    };
+
+    static bool8 (*const diagonalLedgeBehaviorFuncs[][3])(u8) = {
+        [DIR_SOUTHWEST - DIR_SOUTHWEST] = {
+            MetatileBehavior_IsJumpSouth,
+            MetatileBehavior_IsJumpWest,
+            MetatileBehavior_IsJumpSouthwest,
+        },
+        [DIR_SOUTHEAST - DIR_SOUTHWEST] = {
+            MetatileBehavior_IsJumpSouth,
+            MetatileBehavior_IsJumpEast,
+            MetatileBehavior_IsJumpSoutheast,
+        },
+        [DIR_NORTHWEST - DIR_SOUTHWEST] = {
+            MetatileBehavior_IsJumpNorth,
+            MetatileBehavior_IsJumpWest,
+            MetatileBehavior_IsJumpNorthwest,
+        },
+        [DIR_NORTHEAST - DIR_SOUTHWEST] = {
+            MetatileBehavior_IsJumpNorth,
+            MetatileBehavior_IsJumpEast,
+            MetatileBehavior_IsJumpNortheast,
+        },
+    };
+
+    u8 behavior = MapGridGetMetatileBehaviorAt(x, y);
+
+    if (direction == DIR_NONE)
+        return FALSE;
+    else if (direction <= DIR_EAST)
+        return ledgeBehaviorFuncs[direction - 1](behavior);
+    else if (direction <= DIR_NORTHEAST)
+        return diagonalLedgeBehaviorFuncs[direction - DIR_SOUTHWEST][0](behavior)
+            || diagonalLedgeBehaviorFuncs[direction - DIR_SOUTHWEST][1](behavior)
+            || diagonalLedgeBehaviorFuncs[direction - DIR_SOUTHWEST][2](behavior);
     else
         return FALSE;
 }
@@ -934,20 +951,6 @@ static bool8 TryPushBoulder(s16 x, s16 y, u8 direction)
         }
     }
     return FALSE;
-}
-
-static void CheckAcroBikeCollision(s16 x, s16 y, u8 metatileBehavior, u8 *collision)
-{
-    u8 i;
-
-    for (i = 0; i < NUM_ACRO_BIKE_COLLISIONS; i++)
-    {
-        if (sAcroBikeTrickMetatiles[i](metatileBehavior))
-        {
-            *collision = sAcroBikeTrickCollisionTypes[i];
-            return;
-        }
-    }
 }
 
 bool8 IsPlayerCollidingWithFarawayIslandMew(u8 direction)
@@ -994,9 +997,6 @@ static void PlayerAvatarTransition_MachBike(struct ObjectEvent *objEvent)
 {
 }
 
-static void PlayerAvatarTransition_AcroBike(struct ObjectEvent *objEvent)
-{
-}
 
 static void PlayerAvatarTransition_Surfing(struct ObjectEvent *objEvent)
 {
@@ -1049,13 +1049,20 @@ static bool8 PlayerAnimIsMultiFrameStationary(void)
     u8 movementActionId = gObjectEvents[gPlayerAvatar.objectEventId].movementActionId;
 
     if (movementActionId <= MOVEMENT_ACTION_FACE_RIGHT
+     || (movementActionId >= MOVEMENT_ACTION_FACE_SOUTHWEST && movementActionId <= MOVEMENT_ACTION_FACE_NORTHEAST)
      || (movementActionId >= MOVEMENT_ACTION_DELAY_1 && movementActionId <= MOVEMENT_ACTION_DELAY_16)
      || (movementActionId >= MOVEMENT_ACTION_WALK_IN_PLACE_SLOW_DOWN && movementActionId <= MOVEMENT_ACTION_WALK_IN_PLACE_FASTER_RIGHT)
-     || (movementActionId >= MOVEMENT_ACTION_ACRO_WHEELIE_FACE_DOWN && movementActionId <= MOVEMENT_ACTION_ACRO_END_WHEELIE_FACE_RIGHT)
-     || (movementActionId >= MOVEMENT_ACTION_ACRO_WHEELIE_IN_PLACE_DOWN && movementActionId <= MOVEMENT_ACTION_ACRO_WHEELIE_IN_PLACE_RIGHT))
+     || (movementActionId >= MOVEMENT_ACTION_WALK_IN_PLACE_SLOW_SOUTHWEST && movementActionId <= MOVEMENT_ACTION_WALK_IN_PLACE_FASTEST_NORTHEAST))
         return TRUE;
     else
         return FALSE;
+}
+
+void GetXYCoordsOneStepInFrontOfPlayerNonDiagonal(s16 *x, s16 *y)
+{
+    *x = gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.x;
+    *y = gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.y;
+    MoveCoords(GetPlayerFacingDirectionNonDiagonal(), x, y);
 }
 
 static bool8 PlayerAnimIsMultiFrameStationaryAndStateNotTurning(void)
@@ -1098,18 +1105,6 @@ void PlayerSetAnimId(u8 movementActionId, u8 copyableMovement)
         PlayerSetCopyableMovement(copyableMovement);
         ObjectEventSetHeldMovement(&gObjectEvents[gPlayerAvatar.objectEventId], movementActionId);
     }
-}
-
-// slow stairs (from FRLG--faster than slow)
-static void PlayerWalkSlowStairs(u8 direction)
-{
-    PlayerSetAnimId(GetWalkSlowStairsMovementAction(direction), 2);
-}
-
-// slow
-static void PlayerRunSlow(u8 direction)
-{
-    PlayerSetAnimId(GetPlayerRunSlowMovementAction(direction), 2);
 }
 
 // normal speed (1 speed)
@@ -1155,11 +1150,6 @@ static void PlayerNotOnBikeCollide(u8 direction)
     PlayerSetAnimId(GetWalkInPlaceSlowMovementAction(direction), COPY_MOVE_WALK);
 }
 
-static void PlayerNotOnBikeCollideWithFarawayIslandMew(u8 direction)
-{
-    PlayerSetAnimId(GetWalkInPlaceSlowMovementAction(direction), COPY_MOVE_WALK);
-}
-
 void PlayerFaceDirection(u8 direction)
 {
     PlayerSetAnimId(GetFaceDirectionMovementAction(direction), COPY_MOVE_FACE);
@@ -1176,80 +1166,13 @@ void PlayerJumpLedge(u8 direction)
     PlayerSetAnimId(GetJump2MovementAction(direction), COPY_MOVE_JUMP2);
 }
 
-// Stop player on current facing direction once they're done moving and if they're not currently Acro Biking on bumpy slope
+// Stop player on current facing direction once they're done moving
 void PlayerFreeze(void)
 {
     if (gPlayerAvatar.tileTransitionState == T_TILE_CENTER || gPlayerAvatar.tileTransitionState == T_NOT_MOVING)
     {
         PlayerForceSetHeldMovement(GetFaceDirectionMovementAction(gObjectEvents[gPlayerAvatar.objectEventId].facingDirection));
     }
-}
-
-// wheelie idle
-void PlayerIdleWheelie(u8 direction)
-{
-    PlayerSetAnimId(GetAcroWheelieFaceDirectionMovementAction(direction), COPY_MOVE_FACE);
-}
-
-// normal to wheelie
-void PlayerStartWheelie(u8 direction)
-{
-    PlayerSetAnimId(GetAcroPopWheelieFaceDirectionMovementAction(direction), COPY_MOVE_FACE);
-}
-
-// wheelie to normal
-void PlayerEndWheelie(u8 direction)
-{
-    PlayerSetAnimId(GetAcroEndWheelieFaceDirectionMovementAction(direction), COPY_MOVE_FACE);
-}
-
-// wheelie hopping standing
-void PlayerStandingHoppingWheelie(u8 direction)
-{
-    PlaySE(SE_BIKE_HOP);
-    PlayerSetAnimId(GetAcroWheelieHopFaceDirectionMovementAction(direction), COPY_MOVE_FACE);
-}
-
-// wheelie hopping moving
-void PlayerMovingHoppingWheelie(u8 direction)
-{
-    PlaySE(SE_BIKE_HOP);
-    PlayerSetAnimId(GetAcroWheelieHopDirectionMovementAction(direction), COPY_MOVE_WALK);
-}
-
-// wheelie hopping ledge
-void PlayerLedgeHoppingWheelie(u8 direction)
-{
-    PlaySE(SE_BIKE_HOP);
-    PlayerSetAnimId(GetAcroWheelieJumpDirectionMovementAction(direction), COPY_MOVE_JUMP2);
-}
-
-// acro turn jump
-void PlayerAcroTurnJump(u8 direction)
-{
-    PlaySE(SE_BIKE_HOP);
-    PlayerSetAnimId(GetJumpInPlaceTurnAroundMovementAction(direction), COPY_MOVE_FACE);
-}
-
-void PlayerWheelieInPlace(u8 direction)
-{
-    PlaySE(SE_WALL_HIT);
-    PlayerSetAnimId(GetAcroWheelieInPlaceDirectionMovementAction(direction), COPY_MOVE_WALK);
-}
-
-void PlayerPopWheelieWhileMoving(u8 direction)
-{
-    PlayerSetAnimId(GetAcroPopWheelieMoveDirectionMovementAction(direction), COPY_MOVE_WALK);
-}
-
-void PlayerWheelieMove(u8 direction)
-{
-    PlayerSetAnimId(GetAcroWheelieMoveDirectionMovementAction(direction), COPY_MOVE_WALK);
-}
-
-void PlayerEndWheelieWhileMoving(u8 direction)
-{
-    PlayerSetAnimId(GetAcroEndWheelieMoveDirectionMovementAction(direction), COPY_MOVE_WALK);
 }
 
 static void PlayCollisionSoundIfNotFacingWarp(u8 direction)
@@ -1311,12 +1234,33 @@ u8 player_get_pos_including_state_based_drift(s16 *x, s16 *y)
         case MOVEMENT_ACTION_PLAYER_RUN_RIGHT:
             (*x)++;
             return TRUE;
+        case MOVEMENT_ACTION_WALK_NORMAL_NORTHWEST:
+            (*y)--;
+            (*x)--;
+            return TRUE;
+        case MOVEMENT_ACTION_WALK_NORMAL_NORTHEAST:
+            (*y)--;
+            (*x)++;
+            return TRUE;
+        case MOVEMENT_ACTION_WALK_NORMAL_SOUTHWEST:
+            (*y)++;
+            (*x)--;
+            return TRUE;
+        case MOVEMENT_ACTION_WALK_NORMAL_SOUTHEAST:
+            (*y)++;
+            (*x)++;
+            return TRUE;
         }
     }
 
     *x = -1;
     *y = -1;
     return FALSE;
+}
+
+u8 GetPlayerFacingDirectionNonDiagonal(void)
+{
+    return GetNonDiagonalDirection(gObjectEvents[gPlayerAvatar.objectEventId].movementDirection);
 }
 
 u8 GetPlayerFacingDirection(void)
@@ -1401,7 +1345,6 @@ u8 GetPlayerAvatarGenderByGraphicsId(u16 gfxId)
     {
     case OBJ_EVENT_GFX_MAY_NORMAL:
     case OBJ_EVENT_GFX_MAY_MACH_BIKE:
-    case OBJ_EVENT_GFX_MAY_ACRO_BIKE:
     case OBJ_EVENT_GFX_MAY_SURFING:
     case OBJ_EVENT_GFX_MAY_FIELD_MOVE:
     case OBJ_EVENT_GFX_MAY_UNDERWATER:
@@ -1548,13 +1491,6 @@ static void SetPlayerAvatarFishing(u8 direction)
     StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingDirectionAnimNum(direction));
 }
 
-void PlayerUseAcroBikeOnBumpySlope(u8 direction)
-{
-    ObjectEventSetGraphicsId(&gObjectEvents[gPlayerAvatar.objectEventId], GetPlayerAvatarGraphicsIdByStateId(PLAYER_AVATAR_STATE_ACRO_BIKE));
-    StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetAcroWheelieDirectionAnimNum(direction));
-    SeekSpriteAnim(&gSprites[gPlayerAvatar.spriteId], 1);
-}
-
 void SetPlayerAvatarWatering(u8 direction)
 {
     ObjectEventSetGraphicsId(&gObjectEvents[gPlayerAvatar.objectEventId], GetPlayerAvatarGraphicsIdByStateId(PLAYER_AVATAR_STATE_WATERING));
@@ -1570,7 +1506,7 @@ static void HideShowWarpArrow(struct ObjectEvent *objectEvent)
 
     for (x = 0, direction = DIR_SOUTH; x < 4; x++, direction++)
     {
-        if (sArrowWarpMetatileBehaviorChecks2[x](metatileBehavior) && direction == objectEvent->movementDirection)
+        if (sArrowWarpMetatileBehaviorChecks2[x](metatileBehavior) && direction == GetNonDiagonalDirection(objectEvent->movementDirection))
         {
             // Show warp arrow if applicable
             x = objectEvent->currentCoords.x;
@@ -2434,7 +2370,7 @@ static void AlignFishingAnimationFrames(void)
     if (animType == 1 || animType == 2 || animType == 3)
     {
         playerSprite->x2 = 8;
-        if (GetPlayerFacingDirection() == 3)
+        if (GetPlayerFacingDirectionNonDiagonal() == 3)
             playerSprite->x2 = -8;
     }
     if (animType == 5)
@@ -2673,4 +2609,126 @@ bool8 ObjectMovingOnRockStairs(struct ObjectEvent *objectEvent, u8 direction)
     #else
         return FALSE;
     #endif
+}
+
+
+// GrindRun:  Lookup for the relative left 
+//      and right directions of a given direction
+static const u8 GrindRunNeighboringDirectionLookup[][2] =
+{
+    [DIR_NORTH] =
+    {
+        DIR_NORTHWEST, DIR_NORTHEAST
+    },
+    [DIR_EAST] =
+    {
+        DIR_NORTHEAST, DIR_SOUTHEAST
+    },
+    [DIR_SOUTH] =
+    {
+        DIR_SOUTHEAST, DIR_SOUTHWEST
+    },
+    [DIR_WEST] =
+    {
+        DIR_SOUTHWEST, DIR_NORTHWEST
+    },
+    [DIR_SOUTHWEST] =
+    {
+        DIR_SOUTH, DIR_WEST
+    },
+    [DIR_SOUTHEAST] =
+    {
+        DIR_SOUTH, DIR_EAST
+    },
+    [DIR_NORTHWEST] =
+    {
+        DIR_NORTH, DIR_WEST
+    },
+    [DIR_NORTHEAST] =
+    {
+        DIR_NORTH, DIR_EAST
+    }
+
+};
+
+// GrindRun:  Gets which direction to grind run in.  Should
+//      be called after colliding into a wall.  Will follow
+//      the wall left and right from the player to find a
+//      diagonal free space and prefer the cloeset one.
+static u8 GetGrindRunDirection(u8 direction)
+{
+    s16 x, y;
+    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+    x = playerObjEvent->currentCoords.x;
+    y = playerObjEvent->currentCoords.y;
+
+    if(direction > DIR_NORTHEAST || direction < DIR_SOUTH)
+    {
+        return DIR_NONE;
+    }
+
+    //Get relative left and right directions, or set to
+    //  DIR_NONE if there's a wall immediately to the side.
+    if(CheckForCollision(x, y, GrindRunNeighboringDirectionLookup[direction][0]) == FALSE)
+    {
+        return GrindRunNeighboringDirectionLookup[direction][0];
+    }
+    else if(CheckForCollision(x, y, GrindRunNeighboringDirectionLookup[direction][1]) == FALSE)
+    {
+        return GrindRunNeighboringDirectionLookup[direction][1];
+    }
+    else
+    {
+        return DIR_NONE;
+    }
+}
+
+// GrindRun:  This is how GrindRun determines what is and is not a wall.
+//      This function will almost certainly need to be tailored for
+//      larger romhacks.  Especially ones with custom movement options.
+
+//Note:  this function is largely untested, there's probably edgecases...
+static u8 CheckForCollision(s16 x, s16 y, u8 direction)
+{
+    u8 collision;
+    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+
+    MoveCoords(direction, &x, &y);
+    collision = CheckForObjectEventCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y));
+
+    switch (collision)
+    {
+        case COLLISION_NONE:
+            return FALSE;
+        case COLLISION_OUTSIDE_RANGE:
+            return FALSE;
+        case COLLISION_IMPASSABLE:
+            return TRUE;
+        case COLLISION_ELEVATION_MISMATCH:
+            return TRUE;
+        case COLLISION_OBJECT_EVENT:
+            return TRUE;
+        case COLLISION_LEDGE_JUMP:
+            return TRUE;
+        case COLLISION_PUSHED_BOULDER:
+            return TRUE;
+        case COLLISION_ROTATING_GATE:
+            return TRUE;
+        case COLLISION_WHEELIE_HOP:
+            return TRUE;
+        case COLLISION_ISOLATED_VERTICAL_RAIL:
+            return TRUE;
+        case COLLISION_ISOLATED_HORIZONTAL_RAIL:
+            return TRUE;
+        case COLLISION_VERTICAL_RAIL:
+            return TRUE;
+        case COLLISION_HORIZONTAL_RAIL:
+            return TRUE;
+        case COLLISION_SIDEWAYS_STAIRS_TO_RIGHT:
+           return FALSE;
+        case COLLISION_SIDEWAYS_STAIRS_TO_LEFT:
+           return FALSE;
+        default:
+            return TRUE;
+    }
 }

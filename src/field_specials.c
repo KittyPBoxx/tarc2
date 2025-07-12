@@ -81,7 +81,6 @@ void TryLoseFansFromPlayTime(void);
 void SetPlayerGotFirstFans(void);
 u16 GetNumFansOfPlayerInTrainerFanClub(void);
 
-static void LoadLinkPartnerObjectEventSpritePalette(u16, u8, u8);
 static void Task_PetalburgGymSlideOpenRoomDoors(u8);
 static void PetalburgGymSetDoorMetatiles(u8, u16);
 static void Task_PCTurnOnEffect(u8);
@@ -166,8 +165,6 @@ void Special_BeginCyclingRoadChallenge(void)
 
 u16 GetPlayerAvatarBike(void)
 {
-    if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_ACRO_BIKE))
-        return 1;
     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE))
         return 2;
     return 0;
@@ -401,99 +398,6 @@ bool32 ShouldDoRivalRayquazaCall(void)
 u8 GetLinkPartnerNames(void)
 {
     return 0;
-}
-
-void SpawnLinkPartnerObjectEvent(void)
-{
-    u8 j = 0;
-    s16 x = 0;
-    s16 y = 0;
-    u8 movementTypes[] = {
-        MOVEMENT_TYPE_FACE_UP,
-        MOVEMENT_TYPE_FACE_LEFT,
-        MOVEMENT_TYPE_FACE_DOWN,
-        MOVEMENT_TYPE_FACE_RIGHT
-    };
-    s8 coordOffsets[][2] = {
-        { 0,  1},
-        { 1,  0},
-        { 0, -1},
-        {-1,  0}
-    };
-    u8 myLinkPlayerNumber;
-    u8 playerFacingDirection;
-    u8 linkSpriteId;
-    u8 i;
-
-    myLinkPlayerNumber = 0;
-    playerFacingDirection = GetPlayerFacingDirection();
-    switch (playerFacingDirection)
-    {
-    case DIR_WEST:
-        j = 2;
-        x = gSaveBlock1Ptr->pos.x - 1;
-        y = gSaveBlock1Ptr->pos.y;
-        break;
-    case DIR_NORTH:
-        j = 1;
-        x = gSaveBlock1Ptr->pos.x;
-        y = gSaveBlock1Ptr->pos.y - 1;
-        break;
-    case DIR_EAST:
-        x = gSaveBlock1Ptr->pos.x + 1;
-        y = gSaveBlock1Ptr->pos.y;
-        break;
-    case DIR_SOUTH:
-        j = 3;
-        x = gSaveBlock1Ptr->pos.x;
-        y = gSaveBlock1Ptr->pos.y + 1;
-    }
-    for (i = 0; i < gSpecialVar_0x8004; i++)
-    {
-        if (myLinkPlayerNumber != i)
-        {
-            linkSpriteId = OBJ_EVENT_GFX_RIVAL_MAY_NORMAL;
-            SpawnSpecialObjectEventParameterized(linkSpriteId, movementTypes[j], LOCALID_BERRY_BLENDER_PLAYER_END - i, coordOffsets[j][0] + x + MAP_OFFSET, coordOffsets[j][1] + y + MAP_OFFSET, 0);
-            LoadLinkPartnerObjectEventSpritePalette(linkSpriteId, LOCALID_BERRY_BLENDER_PLAYER_END - i, i);
-            j++;
-        }
-    }
-}
-
-static void LoadLinkPartnerObjectEventSpritePalette(u16 graphicsId, u8 localEventId, u8 paletteNum)
-{
-    u8 adjustedPaletteNum;
-    // Note: This temp var is necessary; paletteNum += 6 doesn't match.
-    adjustedPaletteNum = paletteNum + 6;
-    if (graphicsId == OBJ_EVENT_GFX_LINK_RS_BRENDAN ||
-        graphicsId == OBJ_EVENT_GFX_LINK_RS_MAY ||
-        graphicsId == OBJ_EVENT_GFX_RIVAL_BRENDAN_NORMAL ||
-        graphicsId == OBJ_EVENT_GFX_RIVAL_MAY_NORMAL)
-    {
-        u8 obj = GetObjectEventIdByLocalIdAndMap(localEventId, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
-        if (obj != OBJECT_EVENTS_COUNT)
-        {
-            u8 spriteId = gObjectEvents[obj].spriteId;
-            struct Sprite *sprite = &gSprites[spriteId];
-            sprite->oam.paletteNum = adjustedPaletteNum;
-
-            switch (graphicsId)
-            {
-            case OBJ_EVENT_GFX_LINK_RS_BRENDAN:
-                LoadPalette(gObjectEventPal_RubySapphireBrendan, OBJ_PLTT_ID(adjustedPaletteNum), PLTT_SIZE_4BPP);
-                break;
-            case OBJ_EVENT_GFX_LINK_RS_MAY:
-                LoadPalette(gObjectEventPal_RubySapphireMay, OBJ_PLTT_ID(adjustedPaletteNum), PLTT_SIZE_4BPP);
-                break;
-            case OBJ_EVENT_GFX_RIVAL_BRENDAN_NORMAL:
-                LoadPalette(gObjectEventPal_Brendan, OBJ_PLTT_ID(adjustedPaletteNum), PLTT_SIZE_4BPP);
-                break;
-            case OBJ_EVENT_GFX_RIVAL_MAY_NORMAL:
-                LoadPalette(gObjectEventPal_May, OBJ_PLTT_ID(adjustedPaletteNum), PLTT_SIZE_4BPP);
-                break;
-            }
-        }
-    }
 }
 
 static const struct UCoords8 sMauvilleGymSwitchCoords[] =
@@ -908,7 +812,7 @@ static void PCTurnOnEffect(struct Task *task)
         task->tTimer = 0;
 
         // Get where the PC should be, depending on where the player is looking.
-        playerDirection = GetPlayerFacingDirection();
+        playerDirection = GetPlayerFacingDirectionNonDiagonal();
         switch (playerDirection)
         {
         case DIR_NORTH:
@@ -977,7 +881,7 @@ static void PCTurnOffEffect(void)
     u16 metatileId = 0;
 
     // Get where the PC should be, depending on where the player is looking.
-    u8 playerDirection = GetPlayerFacingDirection();
+    u8 playerDirection = GetPlayerFacingDirectionNonDiagonal();
 
     if (IsPlayerInFrontOfPC() == FALSE)
         return;

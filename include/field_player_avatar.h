@@ -65,6 +65,8 @@ bool32 IsPlayerSpinExitActive(void);
 void SetPlayerInvisibility(bool8 invisible);
 u8 player_get_pos_including_state_based_drift(s16 *x, s16 *y);
 void StartFishing(u8 rod);
+u8 GetPlayerFacingDirectionNonDiagonal(void);
+void GetXYCoordsOneStepInFrontOfPlayerNonDiagonal(s16 *xPtr, s16 *yPtr);
 bool8 ObjectMovingOnRockStairs(struct ObjectEvent *objectEvent, u8 direction);
 //sideways stairs
 u8 GetRightSideStairsDirection(u8 direction);

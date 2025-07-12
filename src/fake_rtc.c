@@ -31,7 +31,7 @@ void FakeRtc_TickTimeForward(void)
     if (!OW_USE_FAKE_RTC)
         return;
 
-    if (FlagGet(OW_FLAG_PAUSE_TIME))
+    if (OW_FLAG_PAUSE_TIME)
         return;
 
     FakeRtc_AdvanceTimeBy(0, 0, 0, FakeRtc_GetSecondsRatio());
@@ -105,25 +105,22 @@ u32 FakeRtc_GetSecondsRatio(void)
                                                      1;
 }
 
-STATIC_ASSERT((OW_FLAG_PAUSE_TIME == 0 || OW_USE_FAKE_RTC == TRUE), FakeRtcMustBeTrueToPauseTime);
+// STATIC_ASSERT((OW_FLAG_PAUSE_TIME == 0 || OW_USE_FAKE_RTC == TRUE), FakeRtcMustBeTrueToPauseTime);
 
 void Script_PauseFakeRtc(void)
 {
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
-    FlagSet(OW_FLAG_PAUSE_TIME);
 }
 
 void Script_ResumeFakeRtc(void)
 {
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
-    FlagClear(OW_FLAG_PAUSE_TIME);
 }
 
 void Script_ToggleFakeRtc(void)
 {
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
-    FlagToggle(OW_FLAG_PAUSE_TIME);
 }

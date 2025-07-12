@@ -180,12 +180,72 @@ bool8 MetatileBehavior_IsJumpSouth(u8 metatileBehavior)
         return FALSE;
 }
 
+bool8 MetatileBehavior_IsJumpSouthwest(u8 metatileBehavior)
+{
+    return metatileBehavior == MB_JUMP_SOUTHWEST;
+}
+
+bool8 MetatileBehavior_IsJumpSoutheast(u8 metatileBehavior)
+{
+    return metatileBehavior == MB_JUMP_SOUTHEAST;
+}
+
+bool8 MetatileBehavior_IsJumpNorthwest(u8 metatileBehavior)
+{
+    return metatileBehavior == MB_JUMP_NORTHWEST;
+}
+
+bool8 MetatileBehavior_IsJumpNortheast(u8 metatileBehavior)
+{
+    return metatileBehavior == MB_JUMP_NORTHEAST;
+}
+
 bool8 MetatileBehavior_IsPokeGrass(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_TALL_GRASS || metatileBehavior == MB_LONG_GRASS)
         return TRUE;
     else
         return FALSE;
+}
+
+bool8 MetatileBehavior_IsNortheastArrowWarp(u8 metatileBehavior)
+{
+    return (MetatileBehavior_IsNorthArrowWarp(metatileBehavior) && MetatileBehavior_IsEastArrowWarp(metatileBehavior));
+}
+
+bool8 MetatileBehavior_IsNorthwestArrowWarp(u8 metatileBehavior)
+{
+    return (MetatileBehavior_IsNorthArrowWarp(metatileBehavior) && MetatileBehavior_IsWestArrowWarp(metatileBehavior));
+}
+
+bool8 MetatileBehavior_IsSoutheastArrowWarp(u8 metatileBehavior)
+{
+    return (MetatileBehavior_IsSouthArrowWarp(metatileBehavior) && MetatileBehavior_IsEastArrowWarp(metatileBehavior));
+}
+
+bool8 MetatileBehavior_IsSouthwestArrowWarp(u8 metatileBehavior)
+{
+    return (MetatileBehavior_IsSouthArrowWarp(metatileBehavior) && MetatileBehavior_IsWestArrowWarp(metatileBehavior));
+}
+
+bool8 MetatileBehavior_IsNortheastBlocked(u8 metatileBehavior)
+{
+    return (MetatileBehavior_IsNorthBlocked(metatileBehavior) && MetatileBehavior_IsEastBlocked(metatileBehavior));
+}
+
+bool8 MetatileBehavior_IsNorthwestBlocked(u8 metatileBehavior)
+{
+    return (MetatileBehavior_IsNorthBlocked(metatileBehavior) && MetatileBehavior_IsWestBlocked(metatileBehavior));
+}
+
+bool8 MetatileBehavior_IsSoutheastBlocked(u8 metatileBehavior)
+{
+    return (MetatileBehavior_IsSouthBlocked(metatileBehavior) && MetatileBehavior_IsEastBlocked(metatileBehavior));
+}
+
+bool8 MetatileBehavior_IsSouthwestBlocked(u8 metatileBehavior)
+{
+    return (MetatileBehavior_IsSouthBlocked(metatileBehavior) && MetatileBehavior_IsWestBlocked(metatileBehavior));
 }
 
 bool8 MetatileBehavior_IsSandOrDeepSand(u8 metatileBehavior)
@@ -208,7 +268,6 @@ bool8 MetatileBehavior_IsReflective(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_POND_WATER
      || metatileBehavior == MB_PUDDLE
-     || metatileBehavior == MB_UNUSED_SOOTOPOLIS_DEEP_WATER_2
      || metatileBehavior == MB_ICE
      || metatileBehavior == MB_SOOTOPOLIS_DEEP_WATER
      || metatileBehavior == MB_REFLECTION_UNDER_BRIDGE)
@@ -907,8 +966,7 @@ bool8 MetatileBehavior_IsDeepOrOceanWater(u8 metatileBehavior)
 
 bool8 Unref_MetatileBehavior_IsUnusedSootopolisWater(u8 metatileBehavior)
 {
-    if (metatileBehavior == MB_UNUSED_SOOTOPOLIS_DEEP_WATER
-     || metatileBehavior == MB_UNUSED_SOOTOPOLIS_DEEP_WATER_2)
+    if (metatileBehavior == MB_UNUSED_SOOTOPOLIS_DEEP_WATER)
         return TRUE;
     else
         return FALSE;

@@ -2091,15 +2091,6 @@
 	.2byte \slot
 	.endm
 
-	@ Saves species and forms of Daycare Pokémon to specific vars. Saves the amount of Daycare mon to VAR_RESULT.
-	.macro getdaycaregfx varSpecies1:req varSpecies2:req varForm1:req varForm2:req
-	callnative GetDaycareGraphics, requests_effects=1
-	.2byte \varSpecies1
-	.2byte \varSpecies2
-	.2byte \varForm1
-	.2byte \varForm2
-	.endm
-
 	@ Plays the cry of the first alive party member.
 	.macro playfirstmoncry
 	callnative PlayFirstMonCry, requests_effects=1

@@ -65,21 +65,6 @@
 
 STATIC_ASSERT((B_FLAG_FOLLOWERS_DISABLED == 0 || OW_FOLLOWERS_ENABLED), FollowersFlagAssignedWithoutEnablingThem);
 
-struct CableClubPlayer
-{
-    u8 playerId;
-    u8 isLocalPlayer;
-    u8 movementMode;
-    u8 facing;
-    struct MapPosition pos;
-    u16 metatileBehavior;
-};
-
-#define PLAYER_LINK_STATE_IDLE 0x80
-#define PLAYER_LINK_STATE_BUSY 0x81
-#define PLAYER_LINK_STATE_READY 0x82
-#define PLAYER_LINK_STATE_EXITING_ROOM 0x83
-
 #define FACING_NONE 0
 #define FACING_UP 1
 #define FACING_DOWN 2
@@ -846,8 +831,6 @@ void StoreInitialPlayerAvatarState(void)
 
     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE))
         sInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_MACH_BIKE;
-    else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_ACRO_BIKE))
-        sInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_ACRO_BIKE;
     else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
         sInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_SURFING;
     else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_UNDERWATER))
@@ -880,10 +863,8 @@ static u8 GetAdjustedInitialTransitionFlags(struct InitialPlayerAvatarState *pla
         return PLAYER_AVATAR_FLAG_ON_FOOT;
     else if (playerStruct->transitionFlags == PLAYER_AVATAR_FLAG_MACH_BIKE)
         return PLAYER_AVATAR_FLAG_MACH_BIKE;
-    else if (playerStruct->transitionFlags != PLAYER_AVATAR_FLAG_ACRO_BIKE)
-        return PLAYER_AVATAR_FLAG_ON_FOOT;
     else
-        return PLAYER_AVATAR_FLAG_ACRO_BIKE;
+        return PLAYER_AVATAR_FLAG_ON_FOOT;
 }
 
 static u8 GetAdjustedInitialDirection(struct InitialPlayerAvatarState *playerStruct, u8 transitionFlags, u16 metatileBehavior, u8 mapType)
@@ -1012,7 +993,7 @@ static void TransitionMapMusic(void)
         }
         if (newMusic != currentMusic)
         {
-            if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
+            if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE))
                 FadeOutAndFadeInNewMapMusic(newMusic, 4, 4);
             else
                 FadeOutAndPlayNewMapMusic(newMusic, 8);
@@ -1884,15 +1865,6 @@ static void SetKeyInterceptCallback(u16 (*func)(u32))
     sPlayerKeyInterceptCallback = func;
 }
 
-// Once every ~60 frames, if the link state hasn't changed (timer reset by calls
-// to SetKeyInterceptCallback), it does a bunch of sanity checks on the connection.
-// I'm not sure if sRfuKeepAliveTimer is reset in the process, though; rfu stuff is
-// still undocumented.
-static void CheckRfuKeepAliveTimer(void)
-{
-    // TODO: remove
-}
-
 static void ResetAllPlayerLinkStates(void)
 {
 }
@@ -1904,7 +1876,6 @@ static u16 KeyInterCB_SelfIdle(u32 key)
 
 static u16 KeyInterCB_Idle(u32 key)
 {
-    CheckRfuKeepAliveTimer();
     return LINK_KEY_CODE_EMPTY;
 }
 
