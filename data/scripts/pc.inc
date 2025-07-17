@@ -17,17 +17,8 @@ EventScript_PCMainMenu::
 
 EventScript_AccessPC::
 	switch VAR_RESULT
-	case 1, EventScript_AccessPlayersPC
 	case 3, EventScript_TurnOffPC
 	case MULTI_B_PRESSED, EventScript_TurnOffPC
-	end
-
-EventScript_AccessPlayersPC::
-	playse SE_PC_LOGIN
-	msgbox gText_AccessedPlayersPC, MSGBOX_DEFAULT
-	special PlayerPC
-	waitstate
-	goto EventScript_PCMainMenu
 	end
 
 EventScript_AccessSomeonesPC::

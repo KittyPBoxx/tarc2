@@ -14,7 +14,6 @@
 #include "save.h"
 #include "main.h"
 #include "item_menu.h"
-#include "player_pc.h"
 #include "field_specials.h"
 #include "constants/map_groups.h"
 #include "constants/items.h"
@@ -80,7 +79,6 @@ void ResetMenuAndMonGlobals(void)
     gDifferentSaveFile = FALSE;
     ZeroPlayerPartyMons();
     ZeroEnemyPartyMons();
-    ResetBagScrollPositions();
 }
 
 void NewGameInitData(void)
@@ -103,7 +101,6 @@ void NewGameInitData(void)
     ZeroPlayerPartyMons();
     ScriptGiveMon(SPECIES_DITTO, 5, ITEM_NONE);
     ClearBag();
-    NewGameInitPCItems();
     ResetFanClub();
     InitialWarp();
     RunScriptImmediately(EventScript_ResetAllMapFlags);

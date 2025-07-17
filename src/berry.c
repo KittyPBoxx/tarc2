@@ -1940,16 +1940,6 @@ void ObjectEventInteractionGetBerryCountString(void)
         gSpecialVar_Result = FALSE;
 }
 
-void Bag_ChooseBerry(void)
-{
-    SetMainCallback2(CB2_ChooseBerry);
-}
-
-void Bag_ChooseMulch(void)
-{
-    SetMainCallback2(CB2_ChooseMulch);
-}
-
 void ObjectEventInteractionPlantBerryTree(void)
 {
     u8 berry = ItemIdToBerryType(gSpecialVar_ItemId);

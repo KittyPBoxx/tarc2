@@ -30,8 +30,6 @@ struct TilesPal
 };
 
 // this file's functions
-static void SpriteCB_BagVisualSwitchingPockets(struct Sprite *sprite);
-static void SpriteCB_ShakeBagSprite(struct Sprite *sprite);
 static void SpriteCB_SwitchPocketRotatingBallInit(struct Sprite *sprite);
 static void SpriteCB_SwitchPocketRotatingBallContinue(struct Sprite *sprite);
 
@@ -126,21 +124,6 @@ static const union AffineAnimCmd *const sBagAffineAnimCmds[] =
 {
     [ANIM_BAG_NORMAL] = sSpriteAffineAnim_BagNormal,
     [ANIM_BAG_SHAKE]  = sSpriteAffineAnim_BagShake
-};
-
-const struct CompressedSpriteSheet gBagMaleSpriteSheet =
-{
-    gBagMaleTiles, 0x3000, TAG_BAG_GFX
-};
-
-const struct CompressedSpriteSheet gBagFemaleSpriteSheet =
-{
-    gBagFemaleTiles, 0x3000, TAG_BAG_GFX
-};
-
-const struct SpritePalette gBagPaletteTable =
-{
-    gBagPalette, TAG_BAG_GFX
 };
 
 static const struct SpriteTemplate sBagSpriteTemplate =
@@ -392,11 +375,6 @@ static const struct TilesPal sBerryPicTable[] =
     [ITEM_TO_BERRY(ITEM_ENIGMA_BERRY_E_READER) - 1] = {gBerryPic_Enigma, gBerryPalette_Enigma},
 };
 
-const struct CompressedSpriteSheet gBerryCheckCircleSpriteSheet =
-{
-    gBerryCheckCircle_Gfx, 0x800, TAG_BERRY_CHECK_CIRCLE_GFX
-};
-
 const struct SpritePalette gBerryCheckCirclePaletteTable =
 {
     gBerryCheck_Pal, TAG_BERRY_CHECK_CIRCLE_GFX
@@ -441,89 +419,6 @@ static const struct SpriteTemplate sBerryCheckCircleSpriteTemplate =
     .callback = SpriteCallbackDummy,
 };
 
-// code
-void RemoveBagSprite(u8 id)
-{
-    u8 *spriteId = &gBagMenu->spriteIds[id];
-    if (*spriteId != SPRITE_NONE)
-    {
-        FreeSpriteTilesByTag(id + TAG_BAG_GFX);
-        FreeSpritePaletteByTag(id + TAG_BAG_GFX);
-        FreeSpriteOamMatrix(&gSprites[*spriteId]);
-        DestroySprite(&gSprites[*spriteId]);
-        *spriteId = SPRITE_NONE;
-    }
-}
-
-void AddBagVisualSprite(u8 bagPocketId)
-{
-    u8 *spriteId = &gBagMenu->spriteIds[ITEMMENUSPRITE_BAG];
-    *spriteId = CreateSprite(&sBagSpriteTemplate, 68, 66, 0);
-    SetBagVisualPocketId(bagPocketId, FALSE);
-}
-
-#define sPocketId data[0]
-
-void SetBagVisualPocketId(u8 bagPocketId, bool8 isSwitchingPockets)
-{
-    struct Sprite *sprite = &gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_BAG]];
-    if (isSwitchingPockets)
-    {
-        sprite->y2 = -5;
-        sprite->callback = SpriteCB_BagVisualSwitchingPockets;
-        sprite->sPocketId = bagPocketId + 1;
-        StartSpriteAnim(sprite, POCKET_NONE);
-    }
-    else
-    {
-        StartSpriteAnim(sprite, bagPocketId + 1);
-    }
-}
-
-static void SpriteCB_BagVisualSwitchingPockets(struct Sprite *sprite)
-{
-    if (sprite->y2 != 0)
-    {
-        sprite->y2++;
-    }
-    else
-    {
-        StartSpriteAnim(sprite, sprite->sPocketId);
-        sprite->callback = SpriteCallbackDummy;
-    }
-}
-
-#undef sPocketId
-
-void ShakeBagSprite(void)
-{
-    struct Sprite *sprite = &gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_BAG]];
-    if (sprite->affineAnimEnded)
-    {
-        StartSpriteAffineAnim(sprite, ANIM_BAG_SHAKE);
-        sprite->callback = SpriteCB_ShakeBagSprite;
-    }
-}
-
-static void SpriteCB_ShakeBagSprite(struct Sprite *sprite)
-{
-    // Wait for shaking to end
-    if (sprite->affineAnimEnded)
-    {
-        StartSpriteAffineAnim(sprite, ANIM_BAG_NORMAL);
-        sprite->callback = SpriteCallbackDummy;
-    }
-}
-
-void AddSwitchPocketRotatingBallSprite(s16 rotationDirection)
-{
-    u8 *spriteId = &gBagMenu->spriteIds[ITEMMENUSPRITE_BALL];
-    LoadSpriteSheet(&sRotatingBallTable);
-    LoadSpritePalette(&sRotatingBallPaletteTable);
-    *spriteId = CreateSprite(&sRotatingBallSpriteTemplate, 16, 16, 0);
-    gSprites[*spriteId].data[0] = rotationDirection;
-}
-
 static void UpdateSwitchPocketRotatingBallCoords(struct Sprite *sprite)
 {
     sprite->centerToCornerVecX = sprite->data[1] - ((sprite->data[3] + 1) & 1);
@@ -553,60 +448,6 @@ static void SpriteCB_SwitchPocketRotatingBallContinue(struct Sprite *sprite)
         RemoveBagSprite(ITEMMENUSPRITE_BALL);
 }
 
-void AddBagItemIconSprite(u16 itemId, u8 id)
-{
-    u8 *spriteId = &gBagMenu->spriteIds[id + ITEMMENUSPRITE_ITEM];
-    if (*spriteId == SPRITE_NONE)
-    {
-        u8 iconSpriteId;
-
-        // Either TAG_ITEM_ICON or TAG_ITEM_ICON_ALT
-        FreeSpriteTilesByTag(id + TAG_ITEM_ICON);
-        FreeSpritePaletteByTag(id + TAG_ITEM_ICON);
-        iconSpriteId = AddItemIconSprite(id + TAG_ITEM_ICON, id + TAG_ITEM_ICON, itemId);
-        if (iconSpriteId != MAX_SPRITES)
-        {
-            *spriteId = iconSpriteId;
-            gSprites[iconSpriteId].x2 = 24;
-            gSprites[iconSpriteId].y2 = 88;
-        }
-    }
-}
-
-void RemoveBagItemIconSprite(u8 id)
-{
-// BUG: For one frame, the item you scroll to in the Bag menu
-// will have an incorrect palette and may be seen as a flicker.
-#ifdef BUGFIX
-    u8 *spriteId = &gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM];
-
-    if (spriteId[id ^ 1] != SPRITE_NONE)
-        gSprites[spriteId[id ^ 1]].invisible = TRUE;
-
-    if (spriteId[id] != SPRITE_NONE)
-    {
-        DestroySpriteAndFreeResources(&gSprites[spriteId[id]]);
-        spriteId[id] = SPRITE_NONE;
-    }
-#else
-    RemoveBagSprite(id + ITEMMENUSPRITE_ITEM);
-#endif
-}
-
-void CreateItemMenuSwapLine(void)
-{
-    CreateSwapLineSprites(&gBagMenu->spriteIds[ITEMMENUSPRITE_SWAP_LINE], ITEMMENU_SWAP_LINE_LENGTH);
-}
-
-void SetItemMenuSwapLineInvisibility(bool8 invisible)
-{
-    SetSwapLineSpritesInvisibility(&gBagMenu->spriteIds[ITEMMENUSPRITE_SWAP_LINE], ITEMMENU_SWAP_LINE_LENGTH, invisible);
-}
-
-void UpdateItemMenuSwapLinePos(u8 y)
-{
-    UpdateSwapLineSpritesPos(&gBagMenu->spriteIds[ITEMMENUSPRITE_SWAP_LINE], ITEMMENU_SWAP_LINE_LENGTH | SWAP_LINE_HAS_MARGIN, 120, (y + 1) * 16);
-}
 
 static void ArrangeBerryGfx(void *src, void *dest)
 {

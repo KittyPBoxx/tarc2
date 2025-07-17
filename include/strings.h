@@ -607,8 +607,6 @@ extern const u8 gText_RibbonsVar1[];
 extern const u8 gText_OneDash[];
 extern const u8 gText_TwoDashes[];
 
-extern const u8 *const gBagMenu_ReturnToStrings[];
-
 extern const u8 gText_NumPlayerLink[];
 extern const u8 gText_ConfirmStartLinkWithXPlayers[];
 extern const u8 gText_AwaitingLinkup[];

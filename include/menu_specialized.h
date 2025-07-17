@@ -2,7 +2,6 @@
 #define GUARD_MENU_SPECIALIZED_H
 
 #include "sprite.h"
-#include "player_pc.h"
 #include "list_menu.h"
 #include "pokemon.h"
 #include "constants/berry.h"
@@ -89,9 +88,6 @@ struct ConditionGraph
 
 // Mailbox menu
 bool8 MailboxMenu_Alloc(u8 count);
-u8 MailboxMenu_AddWindow(u8 windowIdx);
-u8 MailboxMenu_CreateList(struct PlayerPCItemPageStruct *page);
-void MailboxMenu_AddScrollArrows(struct PlayerPCItemPageStruct *page);
 void MailboxMenu_Free(void);
 void MailboxMenu_RemoveWindow(u8 windowIdx);
 

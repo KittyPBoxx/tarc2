@@ -35,7 +35,6 @@
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
-#include "player_pc.h"
 #include "pokemon.h"
 #include "pokemon_icon.h"
 #include "pokemon_summary_screen.h"
@@ -358,12 +357,6 @@ static void SlidePartyMenuBoxOneStep(u8);
 static void Task_SlideSelectedSlotsOffscreen(u8);
 static void SwitchPartyMon(void);
 static void Task_SlideSelectedSlotsOnscreen(u8);
-static void CB2_SelectBagItemToGive(void);
-static void CB2_GiveHoldItem(void);
-static void Task_SwitchHoldItemsPrompt(u8);
-static void Task_GiveHoldItem(u8);
-static void Task_SwitchItemsYesNo(u8);
-static void Task_HandleSwitchItemsYesNoInput(u8);
 static void UpdatePartyMonHeldItemSprite(struct Pokemon *, struct PartyMenuBox *);
 static void Task_TossHeldItemYesNo(u8 taskId);
 static void Task_HandleTossHeldItemYesNoInput(u8);
@@ -3256,98 +3249,7 @@ static void CursorCb_Item(u8 taskId)
 static void CursorCb_Give(u8 taskId)
 {
     PlaySE(SE_SELECT);
-    sPartyMenuInternal->exitCallback = CB2_SelectBagItemToGive;
     Task_ClosePartyMenu(taskId);
-}
-
-static void CB2_SelectBagItemToGive(void)
-{
-    GoToBagMenu(ITEMMENULOCATION_PARTY, POCKETS_COUNT, CB2_GiveHoldItem);
-}
-
-static void CB2_GiveHoldItem(void)
-{
-    if (gSpecialVar_ItemId == ITEM_NONE)
-    {
-        InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_NONE, Task_TryCreateSelectionWindow, gPartyMenu.exitCallback);
-    }
-    else
-    {
-        sPartyMenuItemId = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM);
-
-        // Already holding item
-        if (sPartyMenuItemId != ITEM_NONE)
-        {
-            InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_NONE, Task_SwitchHoldItemsPrompt, gPartyMenu.exitCallback);
-        }
-        else
-        {
-            InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_NONE, Task_GiveHoldItem, gPartyMenu.exitCallback);
-        }
-    }
-}
-
-static void Task_GiveHoldItem(u8 taskId)
-{
-    u16 item;
-
-    if (!gPaletteFade.active)
-    {
-        item = gSpecialVar_ItemId;
-        DisplayGaveHeldItemMessage(&gPlayerParty[gPartyMenu.slotId], item, FALSE, 0);
-        GiveItemToMon(&gPlayerParty[gPartyMenu.slotId], item);
-        RemoveBagItem(item, 1);
-        gTasks[taskId].func = Task_UpdateHeldItemSprite;
-    }
-}
-
-static void Task_SwitchHoldItemsPrompt(u8 taskId)
-{
-    if (!gPaletteFade.active)
-    {
-        DisplayAlreadyHoldingItemSwitchMessage(&gPlayerParty[gPartyMenu.slotId], sPartyMenuItemId, TRUE);
-        gTasks[taskId].func = Task_SwitchItemsYesNo;
-    }
-}
-
-static void Task_SwitchItemsYesNo(u8 taskId)
-{
-    if (IsPartyMenuTextPrinterActive() != TRUE)
-    {
-        PartyMenuDisplayYesNoMenu();
-        gTasks[taskId].func = Task_HandleSwitchItemsYesNoInput;
-    }
-}
-
-static void Task_HandleSwitchItemsYesNoInput(u8 taskId)
-{
-    switch (Menu_ProcessInputNoWrapClearOnChoose())
-    {
-    case 0: // Yes, switch items
-        RemoveBagItem(gSpecialVar_ItemId, 1);
-
-        // No room to return held item to bag
-        if (AddBagItem(sPartyMenuItemId, 1) == FALSE)
-        {
-            AddBagItem(gSpecialVar_ItemId, 1);
-            BufferBagFullCantTakeItemMessage(sPartyMenuItemId);
-            DisplayPartyMenuMessage(gStringVar4, FALSE);
-            gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
-        }
-        else
-        {
-            GiveItemToMon(&gPlayerParty[gPartyMenu.slotId], gSpecialVar_ItemId);
-            DisplaySwitchedHeldItemMessage(gSpecialVar_ItemId, sPartyMenuItemId, TRUE);
-            gTasks[taskId].func = Task_UpdateHeldItemSprite;
-        }
-        break;
-    case MENU_B_PRESSED:
-        PlaySE(SE_SELECT);
-        // fallthrough
-    case 1: // No
-        gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
-        break;
-    }
 }
 
 static void Task_UpdateHeldItemSprite(u8 taskId)
@@ -4103,7 +4005,6 @@ void CB2_ShowPartyMenuForItemUse(void)
 
 static void CB2_ReturnToBagMenu(void)
 {
-    GoToBagMenu(ITEMMENULOCATION_LAST, POCKETS_COUNT, NULL);
 }
 
 static void Task_SetSacredAshCB(u8 taskId)
@@ -6406,7 +6307,6 @@ static bool8 ReturnGiveItemToBagOrPC(u16 item)
 
 void ChooseMonToGiveMailFromMailbox(void)
 {
-    InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_GIVE_MAILBOX_MAIL, FALSE, PARTY_MSG_GIVE_TO_WHICH_MON, Task_HandleChooseMonInput, Mailbox_ReturnToMailListAfterDeposit);
 }
 
 static void TryGiveMailToSelectedMon(u8 taskId)

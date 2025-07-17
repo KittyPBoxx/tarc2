@@ -423,7 +423,6 @@ static bool8 StartMenuBagCallback(void)
         PlayRainStoppingSoundEffect();
         RemoveExtraStartMenuWindows();
         CleanupOverworldWindowsAndTilemaps();
-        SetMainCallback2(CB2_BagMenuFromStartMenu); // Display bag menu
 
         return TRUE;
     }

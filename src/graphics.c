@@ -1601,21 +1601,6 @@ const u32 gSummaryPage_BattleMoves_Tilemap[]  = INCBIN_U32("graphics/summary_scr
 const u32 gSummaryPage_ContestMoves_Tilemap[] = INCBIN_U32("graphics/summary_screen/page_contest_moves.bin.smolTM");
 const u32 gSummaryPage_InfoEgg_Tilemap[]      = INCBIN_U32("graphics/summary_screen/page_info_egg.bin.smolTM");
 
-const u32 gBagMaleTiles[] = INCBIN_U32("graphics/bag/bag_male.4bpp.smol");
-const u32 gBagFemaleTiles[] = INCBIN_U32("graphics/bag/bag_female.4bpp.smol");
-const u16 gBagPalette[] = INCBIN_U16("graphics/bag/bag.gbapal");
-
-const u16 gBagScreenMale_Pal[] = INCBIN_U16("graphics/bag/menu_male.gbapal");
-const u16 gBagScreenFemale_Pal[] = INCBIN_U16("graphics/bag/menu_female.gbapal");
-
-const u32 gBagScreen_Gfx[] = INCBIN_U32("graphics/bag/menu.4bpp.smol");
-const u32 gBagScreen_GfxTileMap[] = INCBIN_U32("graphics/bag/menu.bin.smolTM");
-
-const u32 gBattlePyramidBag_Gfx[]          = INCBIN_U32("graphics/bag/bag_pyramid.4bpp.smol");
-const u16 gBattlePyramidBag_Pal[]          = INCBIN_U16("graphics/bag/bag_pyramid.gbapal"); // female palette is first and male is second.
-const u32 gBattlePyramidBagTilemap[]       = INCBIN_U32("graphics/bag/menu_pyramid.bin.smolTM");
-const u16 gBattlePyramidBagInterface_Pal[] = INCBIN_U16("graphics/bag/menu_pyramid.gbapal");
-
 const u32 gSwapLineGfx[] = INCBIN_U32("graphics/interface/swap_line.4bpp.smol");
 const u16 gSwapLinePal[] = INCBIN_U16("graphics/interface/swap_line.gbapal");
 
@@ -1691,8 +1676,6 @@ const u16 gMenuInfoElements1_Pal[] = INCBIN_U16("graphics/interface/menu_info1.g
 const u16 gMenuInfoElements2_Pal[] = INCBIN_U16("graphics/interface/menu_info2.gbapal");
 const u16 gMenuInfoElements3_Pal[] = INCBIN_U16("graphics/interface/menu_info3.gbapal");
 const u8 gMenuInfoElements_Gfx[] = INCBIN_U8("graphics/interface/menu_info.4bpp");
-
-const u8 gBagMenuHMIcon_Gfx[] = INCBIN_U8("graphics/bag/hm.4bpp");
 
 const u16 gMonMarkingsMenu_Pal[] = INCBIN_U16("graphics/interface/mon_markings_menu.gbapal");
 const u8 gMonMarkingsMenu_Gfx[] = INCBIN_U8("graphics/interface/mon_markings_menu.4bpp");

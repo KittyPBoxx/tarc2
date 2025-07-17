@@ -83,26 +83,17 @@ struct BagMenu
     u8 unused3[4];
 };
 
-extern struct BagMenu *gBagMenu;
 extern u16 gSpecialVar_ItemId;
 
 void CB2_GoToItemDepositMenu(void);
 void FavorLadyOpenBagMenu(void);
 void QuizLadyOpenBagMenu(void);
 void ApprenticeOpenBagMenu(void);
-void CB2_BagMenuFromBattle(void);
-void UpdatePocketListPosition(u8 pocketId);
 void CB2_ReturnToBagMenuPocket(void);
-void CB2_BagMenuFromStartMenu(void);
 u8 GetItemListPosition(u8 pocketId);
 bool8 UseRegisteredKeyItemOnField(void);
 void CB2_GoToSellMenu(void);
-void GoToBagMenu(u8 location, u8 pocket, void ( *exitCallback)());
-void DoWallyTutorialBagMenu(void);
-void ResetBagScrollPositions(void);
 void ChooseBerryForMachine(void (*exitCallback)(void));
-void CB2_ChooseBerry(void);
-void CB2_ChooseMulch(void);
 void Task_FadeAndCloseBagMenu(u8 taskId);
 void BagMenu_YesNo(u8 taskId, u8 windowType, const struct YesNoFuncTable *funcTable);
 void UpdatePocketItemList(u8 pocketId);

@@ -62,16 +62,6 @@ static void StopBgAnimation(void);
 static void Task_AnimateBg(u8 taskId);
 static void RestoreBgAfterAnim(void);
 
-static const u16 sUnusedPal1[] = INCBIN_U16("graphics/evolution_scene/unused_1.gbapal");
-static const u32 sBgAnim_Gfx[] = INCBIN_U32("graphics/evolution_scene/bg.4bpp.smol");
-static const u32 sBgAnim_Inner_Tilemap[] = INCBIN_U32("graphics/evolution_scene/bg_inner.bin.smolTM");
-static const u32 sBgAnim_Outer_Tilemap[] = INCBIN_U32("graphics/evolution_scene/bg_outer.bin.smolTM");
-static const u16 sBgAnim_Intro_Pal[] = INCBIN_U16("graphics/evolution_scene/bg_anim_intro.gbapal");
-static const u16 sUnusedPal2[] = INCBIN_U16("graphics/evolution_scene/unused_2.gbapal");
-static const u16 sUnusedPal3[]  = INCBIN_U16("graphics/evolution_scene/unused_3.gbapal");
-static const u16 sUnusedPal4[] = INCBIN_U16("graphics/evolution_scene/unused_4.gbapal");
-static const u16 sBgAnim_Pal[] = INCBIN_U16("graphics/evolution_scene/bg_anim.gbapal");
-
 // The below table is used by Task_UpdateBgPalette to control the speed at which the bg color updates.
 // The first two values are indexes into sBgAnim_PalIndexes (indirectly, via sBgAnimPal), and are
 // the start and end of the range of colors in sBgAnim_PalIndexes it will move through incrementally
@@ -1457,16 +1447,6 @@ static void Task_UpdateBgPalette(u8 taskId)
 
 #define tIsLink data[2]
 
-static void CreateBgAnimTask(bool8 isLink)
-{
-    u8 taskId = CreateTask(Task_AnimateBg, 7);
-
-    if (!isLink)
-        gTasks[taskId].tIsLink = FALSE;
-    else
-        gTasks[taskId].tIsLink = TRUE;
-}
-
 static void Task_AnimateBg(u8 taskId)
 {
     u16 *outer_X, *outer_Y;
@@ -1508,60 +1488,8 @@ static void Task_AnimateBg(u8 taskId)
 
 #undef tIsLink
 
-static void InitMovingBgPalette(u16 *palette)
-{
-    s32 i, j;
-
-    for (i = 0; i < (int)ARRAY_COUNT(sBgAnim_PalIndexes); i++)
-    {
-        for (j = 0; j < 16; j++)
-        {
-            palette[i * 16 + j] = sBgAnim_Pal[sBgAnim_PalIndexes[i][j]];
-        }
-    }
-}
-
 static void StartBgAnimation(bool8 isLink)
 {
-    u8 innerBgId, outerBgId;
-
-    sBgAnimPal = AllocZeroed(0x640);
-    InitMovingBgPalette(sBgAnimPal);
-
-    if (!isLink)
-        innerBgId = 1, outerBgId = 2;
-    else
-        innerBgId = 1, outerBgId = 3;
-
-    LoadPalette(sBgAnim_Intro_Pal, BG_PLTT_ID(10), PLTT_SIZE_4BPP);
-
-    DecompressAndLoadBgGfxUsingHeap(1, sBgAnim_Gfx, FALSE, 0, 0);
-    CopyToBgTilemapBuffer(innerBgId, sBgAnim_Inner_Tilemap, 0, 0);
-    CopyToBgTilemapBuffer(outerBgId, sBgAnim_Outer_Tilemap, 0, 0);
-    CopyBgTilemapBufferToVram(innerBgId);
-    CopyBgTilemapBufferToVram(outerBgId);
-
-    if (!isLink)
-    {
-        SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG1 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_BG2);
-        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(8, 8));
-        SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_BG2_ON | DISPCNT_BG1_ON | DISPCNT_BG0_ON | DISPCNT_OBJ_1D_MAP);
-
-        SetBgAttribute(innerBgId, BG_ATTR_PRIORITY, 2);
-        SetBgAttribute(outerBgId, BG_ATTR_PRIORITY, 2);
-
-        ShowBg(1);
-        ShowBg(2);
-    }
-    else
-    {
-        SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG1 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_BG3);
-        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(8, 8));
-        SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_BG3_ON | DISPCNT_BG1_ON | DISPCNT_BG0_ON | DISPCNT_OBJ_1D_MAP);
-    }
-
-    CreateTask(Task_UpdateBgPalette, 5);
-    CreateBgAnimTask(isLink);
 }
 
 #undef tPaused

@@ -23,7 +23,6 @@ gSpecials::
 	def_special ObjectEventInteractionGetBerryTreeData
 	def_special ObjectEventInteractionGetBerryName
 	def_special ObjectEventInteractionGetBerryCountString
-	def_special Bag_ChooseBerry
 	def_special ObjectEventInteractionPlantBerryTree
 	def_special ObjectEventInteractionPickBerryTree
 	def_special ObjectEventInteractionRemoveBerryTree
@@ -100,8 +99,6 @@ gSpecials::
 	def_special StopMapMusic
 	def_special ChoosePartyForBattleFrontier
 	def_special ReducePlayerPartyToSelectedMons
-	def_special BedroomPC
-	def_special PlayerPC
 	def_special FieldShowRegionMap
 	def_special GetWeekCount
 	def_special ResetTrickHouseNuggetFlag
@@ -237,7 +234,6 @@ gSpecials::
 	def_special GetSprayId
 	def_special GetLastUsedSprayType
 	def_special PlayerHasMulch
-	def_special Bag_ChooseMulch
 	def_special ObjectEventInteractionApplyMulch
 	def_special ObjectEventInteractionPullBerryWeed
 	def_special ObjectEventInteractionClearBerryPests

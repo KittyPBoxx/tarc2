@@ -1519,7 +1519,6 @@ static void OpenBagAndChooseItem(u32 battler)
         gBattlerControllerFuncs[battler] = CompleteWhenChoseItem;
         ReshowBattleScreenDummy();
         FreeAllWindowBuffers();
-        CB2_BagMenuFromBattle();
     }
 }
 

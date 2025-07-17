@@ -143,23 +143,6 @@ const u8 gText_ThePokemonList[] = _("the POKéMON LIST");
 const u8 gText_TheShop[] = _("the shop");
 const u8 gText_ThePC[] = _("the PC");
 
-const u8 *const gBagMenu_ReturnToStrings[] =
-{
-    [ITEMMENULOCATION_FIELD]               = gText_TheField,
-    [ITEMMENULOCATION_BATTLE]              = gText_TheBattle,
-    [ITEMMENULOCATION_PARTY]               = gText_ThePokemonList,
-    [ITEMMENULOCATION_SHOP]                = gText_TheShop,
-    [ITEMMENULOCATION_BERRY_TREE]          = gText_TheField,
-    [ITEMMENULOCATION_BERRY_BLENDER_CRUSH] = gText_TheField,
-    [ITEMMENULOCATION_ITEMPC]              = gText_ThePC,
-    [ITEMMENULOCATION_FAVOR_LADY]          = gText_TheField,
-    [ITEMMENULOCATION_QUIZ_LADY]           = gText_TheField,
-    [ITEMMENULOCATION_APPRENTICE]          = gText_TheField,
-    [ITEMMENULOCATION_WALLY]               = gText_TheBattle,
-    [ITEMMENULOCATION_PCBOX]               = gText_ThePC,
-    [ITEMMENULOCATION_BERRY_TREE_MULCH]    = gText_TheField,
-};
-
 const u8 gText_ReturnToVar1[] = _("Return to\n{STR_VAR_1}.");
 
 const u8 *const gPocketNamesStringsTable[] =
