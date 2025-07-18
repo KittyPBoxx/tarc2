@@ -226,15 +226,6 @@ static const struct RotatingGatePuzzle sRotatingGate_TrickHousePuzzleConfig[] =
 // something else, using vars that persist when exiting the map could softlock the puzzle.
 STATIC_ASSERT(MAX_GATES <= (2 * NUM_TEMP_VARS), TooManyRotatingGates)
 
-static const u8 sRotatingGateTiles_1[] = INCBIN_U8("graphics/rotating_gates/l1.4bpp");
-static const u8 sRotatingGateTiles_2[] = INCBIN_U8("graphics/rotating_gates/l2.4bpp");
-static const u8 sRotatingGateTiles_3[] = INCBIN_U8("graphics/rotating_gates/l3.4bpp");
-static const u8 sRotatingGateTiles_4[] = INCBIN_U8("graphics/rotating_gates/l4.4bpp");
-static const u8 sRotatingGateTiles_5[] = INCBIN_U8("graphics/rotating_gates/t1.4bpp");
-static const u8 sRotatingGateTiles_6[] = INCBIN_U8("graphics/rotating_gates/t2.4bpp");
-static const u8 sRotatingGateTiles_7[] = INCBIN_U8("graphics/rotating_gates/t3.4bpp");
-static const u8 sRotatingGateTiles_8[] = INCBIN_U8("graphics/rotating_gates/t4.4bpp");
-
 static const struct OamData sOamData_RotatingGateLarge =
 {
     .y = 0,
@@ -267,19 +258,6 @@ static const struct OamData sOamData_RotatingGateRegular =
     .priority = 2,
     .paletteNum = 2,
     .affineParam = 0,
-};
-
-static const struct SpriteSheet sRotatingGatesGraphicsTable[] =
-{
-    {sRotatingGateTiles_1, sizeof(sRotatingGateTiles_1), ROTATING_GATE_TILE_TAG + GATE_SHAPE_L1},
-    {sRotatingGateTiles_2, sizeof(sRotatingGateTiles_2), ROTATING_GATE_TILE_TAG + GATE_SHAPE_L2},
-    {sRotatingGateTiles_3, sizeof(sRotatingGateTiles_3), ROTATING_GATE_TILE_TAG + GATE_SHAPE_L3},
-    {sRotatingGateTiles_4, sizeof(sRotatingGateTiles_4), ROTATING_GATE_TILE_TAG + GATE_SHAPE_L4},
-    {sRotatingGateTiles_5, sizeof(sRotatingGateTiles_5), ROTATING_GATE_TILE_TAG + GATE_SHAPE_T1},
-    {sRotatingGateTiles_6, sizeof(sRotatingGateTiles_6), ROTATING_GATE_TILE_TAG + GATE_SHAPE_T2},
-    {sRotatingGateTiles_7, sizeof(sRotatingGateTiles_7), ROTATING_GATE_TILE_TAG + GATE_SHAPE_T3},
-    {sRotatingGateTiles_8, sizeof(sRotatingGateTiles_8), ROTATING_GATE_TILE_TAG + GATE_SHAPE_T4},
-    {NULL},
 };
 
 static const union AnimCmd sSpriteAnim_RotatingGateLarge[] =
@@ -803,11 +781,6 @@ static void RotatingGate_HideGatesOutsideViewport(struct Sprite *sprite)
     }
 }
 
-static void LoadRotatingGatePics(void)
-{
-    LoadSpriteSheets(sRotatingGatesGraphicsTable);
-}
-
 static void RotatingGate_DestroyGatesOutsideViewport(void)
 {
     s32 i;
@@ -941,7 +914,6 @@ void RotatingGate_InitPuzzleAndGraphics(void)
 {
     if (GetCurrentMapRotatingGatePuzzleType())
     {
-        LoadRotatingGatePics();
         RotatingGate_LoadPuzzleConfig();
         RotatingGate_CreateGatesWithinViewport(0, 0);
     }

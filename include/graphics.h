@@ -173,12 +173,6 @@ extern const u32 gPokedexSearchMenuHoenn_Tilemap[];
 extern const u32 gPokedexSearchMenuNational_Tilemap[];
 extern const u16 gPokedexSearchMenu_Pal[];
 
-// berry tag screen
-extern const u32 gBerryCheck_Gfx[];
-extern const u16 gBerryCheck_Pal[];
-extern const u32 gBerryTag_Gfx[];
-extern const u32 gBerryTag_Tilemap[];
-
 // rayquaza scene gfx
 extern const u32 gRaySceneDuoFight_Groudon_Gfx[];
 extern const u32 gRaySceneDuoFight_GroudonShoulder_Gfx[];
@@ -2995,7 +2989,6 @@ extern const u32 gWallpaperTilemap_Ribbon[];
 extern const u16 gWallpaperPalettes_Ribbon[][16];
 extern const u32 gWallpaperTiles_Horizontal[];
 extern const u32 gWallpaperTilemap_Horizontal[];
-extern const u16 gWallpaperPalettes_Horizontal[][16];
 
 // Party menu
 extern const u32 gPartyMenuPokeball_Gfx[];

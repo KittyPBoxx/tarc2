@@ -375,11 +375,6 @@ static const struct TilesPal sBerryPicTable[] =
     [ITEM_TO_BERRY(ITEM_ENIGMA_BERRY_E_READER) - 1] = {gBerryPic_Enigma, gBerryPalette_Enigma},
 };
 
-const struct SpritePalette gBerryCheckCirclePaletteTable =
-{
-    gBerryCheck_Pal, TAG_BERRY_CHECK_CIRCLE_GFX
-};
-
 static const struct OamData sBerryCheckCircleOamData =
 {
     .y = 0,

@@ -20,7 +20,6 @@
 #include "sound.h"
 #include "util.h"
 #include "title_screen.h"
-#include "expansion_intro.h"
 #include "constants/rgb.h"
 #include "constants/battle_anim.h"
 
