@@ -343,22 +343,12 @@ static const union AnimCmd *const sAnimTable_Arrow[] =
     sArrowAnim_East,
 };
 
-static const struct SpriteFrameImage sPicTable_Sparkle[] = {
-    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 0),
-    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 1),
-    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 2),
-    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 3),
-    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 4),
-    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 5),
-};
-
-
 const struct SpriteTemplate gFieldEffectObjectTemplate_Arrow = {
     .tileTag = TAG_NONE,
     .paletteTag = OBJ_EVENT_PAL_TAG_MAY,
     .oam = &gObjectEventBaseOam_16x16,
     .anims = sAnimTable_Arrow,
-    .images = sPicTable_Sparkle,
+    .images = sPicTable_Arrow,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCallbackDummy,
 };
@@ -1085,6 +1075,15 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_ReflectionDistortion = {
     .images = NULL,
     .affineAnims = sAffineAnims_ReflectionDistortion,
     .callback = SpriteCallbackDummy,
+};
+
+static const struct SpriteFrameImage sPicTable_Sparkle[] = {
+    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 0),
+    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 1),
+    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 2),
+    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 3),
+    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 4),
+    overworld_frame(gFieldEffectObjectPic_Sparkle, 2, 2, 5),
 };
 
 static const union AnimCmd sAnim_Sparkle[] =
