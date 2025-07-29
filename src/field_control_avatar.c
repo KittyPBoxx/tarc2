@@ -341,11 +341,31 @@ static bool8 TryStartInteractionScript(struct MapPosition *position, u16 metatil
     return TRUE;
 }
 
+static const u8 sVisionDirections[][4] = 
+{
+    [DIR_NORTH]      = { DIR_NORTHEAST, DIR_NORTHWEST, DIR_EAST, DIR_WEST },
+    [DIR_SOUTH]      = { DIR_SOUTHEAST, DIR_SOUTHWEST, DIR_EAST, DIR_WEST },
+    [DIR_EAST]       = { DIR_NORTHEAST, DIR_SOUTHEAST, DIR_NORTH, DIR_SOUTH },
+    [DIR_WEST]       = { DIR_NORTHWEST, DIR_SOUTHWEST, DIR_NORTH, DIR_SOUTH },
+    [DIR_NORTHEAST]  = { DIR_NORTH, DIR_EAST, DIR_NORTHWEST, DIR_SOUTHEAST },
+    [DIR_NORTHWEST]  = { DIR_NORTH, DIR_WEST, DIR_NORTHEAST, DIR_SOUTHWEST },
+    [DIR_SOUTHEAST]  = { DIR_SOUTH, DIR_EAST, DIR_SOUTHWEST, DIR_NORTHEAST },
+    [DIR_SOUTHWEST]  = { DIR_SOUTH, DIR_WEST, DIR_SOUTHEAST, DIR_NORTHWEST },
+};
+
 static const u8 *GetInteractionScript(struct MapPosition *position, u8 metatileBehavior, u8 direction)
 {
+    struct MapPosition playerPos;
+    struct MapPosition tryInteractPos;
+    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+
+    // Try the tile directly in front (original behavior)
     const u8 *script = GetInteractedObjectEventScript(position, metatileBehavior, direction);
     if (script != NULL)
+    {
+        ObjectEventTurn(playerObjEvent, direction);
         return script;
+    }
 
     script = GetInteractedBackgroundEventScript(position, metatileBehavior, direction);
     if (script != NULL)
@@ -359,33 +379,48 @@ static const u8 *GetInteractionScript(struct MapPosition *position, u8 metatileB
     if (script != NULL)
         return script;
 
+    GetPlayerPosition(&playerPos);
+
+    for (int i = 0; i < 4; i++)
+    {
+        u8 testDir = sVisionDirections[direction][i];
+        tryInteractPos = playerPos;
+        MoveCoords(testDir, &tryInteractPos.x, &tryInteractPos.y);
+
+        u8 behavior = MapGridGetMetatileBehaviorAt(tryInteractPos.x, tryInteractPos.y);
+
+        script = GetInteractedObjectEventScript(&tryInteractPos, behavior, testDir);
+        if (script != NULL)
+        {
+            ObjectEventTurn(playerObjEvent, testDir);
+            return script;
+        }
+
+        script = GetInteractedBackgroundEventScript(&tryInteractPos, behavior, testDir);
+        if (script != NULL)
+        {
+            ObjectEventTurn(playerObjEvent, testDir);
+            return script;
+        }
+
+        script = GetInteractedMetatileScript(&tryInteractPos, behavior, testDir);
+        if (script != NULL)
+        {
+            ObjectEventTurn(playerObjEvent, testDir);
+            return script;
+        }
+
+        script = GetInteractedWaterScript(&tryInteractPos, behavior, testDir);
+        if (script != NULL)
+        {
+            ObjectEventTurn(playerObjEvent, testDir);
+            return script;
+        }
+    }
+
     return NULL;
 }
 
-const u8 *GetInteractedLinkPlayerScript(struct MapPosition *position, u8 metatileBehavior, u8 direction)
-{
-    u8 objectEventId;
-    s32 i;
-
-    if (!MetatileBehavior_IsCounter(MapGridGetMetatileBehaviorAt(position->x, position->y)))
-        objectEventId = GetObjectEventIdByPosition(position->x, position->y, position->elevation);
-    else
-        objectEventId = GetObjectEventIdByPosition(position->x + gDirectionToVectors[direction].x, position->y + gDirectionToVectors[direction].y, position->elevation);
-
-    if (objectEventId == OBJECT_EVENTS_COUNT || gObjectEvents[objectEventId].localId == LOCALID_PLAYER)
-        return NULL;
-
-    for (i = 0; i < 4; i++)
-    {
-        if (gLinkPlayerObjectEvents[i].active == TRUE && gLinkPlayerObjectEvents[i].objEventId == objectEventId)
-            return NULL;
-    }
-
-    gSelectedObjectEvent = objectEventId;
-    gSpecialVar_LastTalked = gObjectEvents[objectEventId].localId;
-    gSpecialVar_Facing = direction;
-    return GetObjectEventScriptPointerByObjectEventId(objectEventId);
-}
 
 static const u8 *GetInteractedObjectEventScript(struct MapPosition *position, u8 metatileBehavior, u8 direction)
 {

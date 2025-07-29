@@ -21,6 +21,7 @@
 #include "main.h"
 #include "test_runner.h"
 #include "constants/rgb.h"
+#include "main_menu.h"
 
 static void VBlankIntr(void);
 static void HBlankIntr(void);
@@ -76,7 +77,18 @@ COMMON_DATA void *gAgbMainLoop_sp = NULL;
 
 static EWRAM_DATA u16 sTrainerId = 0;
 
-//EWRAM_DATA void (**gFlashTimerIntrFunc)(void) = NULL;
+EWRAM_DATA u8 gSoftResetFlag;
+
+asm(".arm\n"
+    "SetSoftResetVariable:\n"
+    "	ldr	r1, =gSoftResetFlag\n"
+    "   mov	r0, #0x1\n"
+	"   str	r0, [r1]\n"
+    "   b 0x8000000\n"
+    "SetSoftResetVariableEnd:");
+
+extern const void *SetSoftResetVariable(void);
+extern const void *SetSoftResetVariableEnd(void);
 
 static void UpdateLinkAndCallCallbacks(void);
 static void InitMainCallbacks(void);
@@ -85,6 +97,7 @@ static void CallCallbacks(void);
 static void SeedRngWithRtc(void);
 #endif
 static void ReadKeys(void);
+static void CB2_PostSoftResetInit(void);
 void InitIntrHandlers(void);
 static void WaitForVBlank(void);
 void EnableVCountIntrAtLine150(void);
@@ -93,6 +106,8 @@ void EnableVCountIntrAtLine150(void);
 
 void AgbMain(void)
 {
+    gSoftResetFlag = *(vu8 *)0x3007FFA;
+
     *(vu16 *)BG_PLTT = RGB_WHITE; // Set the backdrop to white on startup
     InitGpuRegManager();
     REG_WAITCNT = WAITCNT_PREFETCH_ENABLE
@@ -100,6 +115,9 @@ void AgbMain(void)
 	        | WAITCNT_WS1_S_1 | WAITCNT_WS1_N_3;
     InitKeys();
     InitIntrHandlers();
+
+    // TODO: TARC accuracy tests
+
     m4aSoundInit();
     EnableVCountIntrAtLine150();
     RtcInit();
@@ -182,7 +200,16 @@ static void InitMainCallbacks(void)
     gMain.vblankCounter1 = 0;
     gMain.vblankCounter2 = 0;
     gMain.callback1 = NULL;
-    SetMainCallback2(gInitialMainCB2);
+    
+    if(gSoftResetFlag)
+    {
+        SetMainCallback2(CB2_PostSoftResetInit);
+    }
+    else
+    {
+        SetMainCallback2(gInitialMainCB2);
+    }
+
     gSaveBlock2Ptr = &gSaveblock2.block;
 }
 
@@ -427,10 +454,27 @@ void DoSoftReset(void)
     DmaStop(2);
     DmaStop(3);
     SiiRtcProtect();
-    SoftReset(RESET_ALL);
+    *(vu32 *)0x2000000 = 0xE59F000C; // ldr r0, =0x3007FFA
+    *(vu32 *)0x2000004 = 0xE3A01001; // mov r1, #1
+    *(vu32 *)0x2000008 = 0xE5C01000; // strb r1, [r0]
+    *(vu32 *)0x200000C = 0xE3A00302; // mov r0, #0x8000000
+    *(vu32 *)0x2000010 = 0xE12FFF10; // bx r0
+    *(vu32 *)0x2000014 = 0x03007FFA; // .pool variable, accessed from 1st instruction write above
+    *(vu8 *)0x3007FFA = 1; // now set this address byte to 1 so the GBA knows to jump to RAM instead of ROM.
+    SoftReset(RESET_ALL & ~RESET_EWRAM); // Do not reset EWRAM so the code isnt destroyed
 }
 
 void ClearPokemonCrySongs(void)
 {
     CpuFill16(0, gPokemonCrySongs, MAX_POKEMON_CRIES * sizeof(struct PokemonCrySong));
+}
+
+static void CB2_PostSoftResetInit(void)
+{
+    gSoftResetFlag = 0;
+
+    SetSaveBlocksPointers(GetSaveBlocksPointersBaseOffset());
+    LoadGameSave(SAVE_NORMAL);
+    SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
+    SetMainCallback2(CB2_InitMainMenu);
 }

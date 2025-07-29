@@ -91,10 +91,10 @@ static void PlayerNotOnBikeTurningInPlace(u8, u16);
 static void PlayerNotOnBikeMoving(u8, u16);
 static u8 CheckForPlayerAvatarCollision(u8);
 static u8 CheckForPlayerAvatarStaticCollision(u8);
-static u8 CheckForObjectEventStaticCollision(struct ObjectEvent *, s16, s16, u8, u8);
 static bool8 CanStopSurfing(s16, s16, u8);
 static bool8 ShouldJumpLedge(s16, s16, u8);
 static bool8 TryPushBoulder(s16, s16, u8);
+static bool8 TryStopForInteraction(s16, s16, u8);
 
 static void DoPlayerAvatarTransition(void);
 static void PlayerAvatarTransition_Dummy(struct ObjectEvent *);
@@ -773,28 +773,27 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
             //      from what the player expects and makes precise movements
             //      more difficult.
 
-            //Check for empty spaces next to and diagonally from the player, otherwise actually collide
-            grindRunDirection = GetGrindRunDirection(direction);
-            if(grindRunDirection != DIR_NONE)
+            if (collision != COLLISION_INTERACTABLE)
             {
-                PlayerWalkFast(grindRunDirection);
-                gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
-                return;
-            }
-            else
-            {
-                //No grind running direction?
-                //Collide normally
-                u8 adjustedCollision = collision - COLLISION_STOP_SURFING;
-                if (adjustedCollision > 3)
+                //Check for empty spaces next to and diagonally from the player, otherwise actually collide
+                grindRunDirection = GetGrindRunDirection(direction);
+                if(grindRunDirection != DIR_NONE)
                 {
-                    PlayerNotOnBikeCollide(direction);
+                    PlayerWalkFast(grindRunDirection);
+                    gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
+                    return;
                 }
-                return;
+            }
+
+            //No grind running direction?
+            //Collide normally
+            u8 adjustedCollision = collision - COLLISION_STOP_SURFING;
+            if (adjustedCollision > 3)
+            {
+                PlayerNotOnBikeCollide(direction);
             }
             return;
         }
-        return;
     }
 
     PlayerWalkFast(direction);
@@ -823,7 +822,7 @@ static u8 CheckForPlayerAvatarStaticCollision(u8 direction)
     x = playerObjEvent->currentCoords.x;
     y = playerObjEvent->currentCoords.y;
     MoveCoords(direction, &x, &y);
-    return CheckForObjectEventStaticCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y));
+    return GetCollisionAtCoords(playerObjEvent, x, y, direction);
 }
 
 u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 direction, u8 metatileBehavior)
@@ -846,24 +845,9 @@ u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u
     if (collision == COLLISION_OBJECT_EVENT && TryPushBoulder(x, y, direction))
         return COLLISION_PUSHED_BOULDER;
 
-    if (collision == COLLISION_NONE)
-    {
-        if (CheckForRotatingGatePuzzleCollision(direction, x, y))
-            return COLLISION_ROTATING_GATE;
-    }
+    if (collision == COLLISION_OBJECT_EVENT && TryStopForInteraction(x, y, direction))
+        return COLLISION_INTERACTABLE;    
 
-    return collision;
-}
-
-static u8 CheckForObjectEventStaticCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 direction, u8 metatileBehavior)
-{
-    u8 collision = GetCollisionAtCoords(objectEvent, x, y, direction);
-
-    if (collision == COLLISION_NONE)
-    {
-        if (CheckForRotatingGatePuzzleCollisionWithoutAnimation(direction, x, y))
-            return COLLISION_ROTATING_GATE;
-    }
     return collision;
 }
 
@@ -949,6 +933,19 @@ static bool8 TryPushBoulder(s16 x, s16 y, u8 direction)
     }
     return FALSE;
 }
+
+static bool8 TryStopForInteraction(s16 x, s16 y, u8 direction)
+{
+    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+    u8 objectEventId = GetObjectEventIdByXY(x, y);
+    if (objectEventId != OBJECT_EVENTS_COUNT && gObjectEvents[objectEventId].graphicsId <= OBJ_EVENT_GFX_HOT_SPRINGS_OLD_WOMAN && gObjectEvents[objectEventId].graphicsId >= 0)
+    {
+        ObjectEventTurn(playerObjEvent, direction);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 
 bool8 IsPlayerCollidingWithFarawayIslandMew(u8 direction)
 {
@@ -2704,7 +2701,7 @@ static u8 CheckForCollision(s16 x, s16 y, u8 direction)
             return TRUE;
         case COLLISION_PUSHED_BOULDER:
             return TRUE;
-        case COLLISION_ROTATING_GATE:
+        case COLLISION_INTERACTABLE:
             return TRUE;
         case COLLISION_WHEELIE_HOP:
             return TRUE;
