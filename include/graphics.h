@@ -3013,9 +3013,6 @@ extern const u32 gHoennTrainerCardBg_Tilemap[];
 
 // Object event pals
 extern const u16 gObjectEventPal_Brendan[];
-extern const u16 gObjectEventPal_May[];
-extern const u16 gObjectEventPal_RubySapphireBrendan[];
-extern const u16 gObjectEventPal_RubySapphireMay[];
 
 // Mail
 extern const u16 gMailPalette_Orange[];

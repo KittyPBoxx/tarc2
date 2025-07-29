@@ -116,8 +116,6 @@ COMMON_DATA u16 *gOverworldTilemapBuffer_Bg3 = NULL;
 COMMON_DATA u16 gHeldKeyCodeToSend = 0;
 COMMON_DATA void (*gFieldCallback)(void) = NULL;
 COMMON_DATA bool8 (*gFieldCallback2)(void) = NULL;
-COMMON_DATA u8 gLocalLinkPlayerId = 0; // This is our player id in a multiplayer mode.
-COMMON_DATA u8 gFieldLinkPlayerCount = 0;
 
 u8 gTimeOfDay;
 struct TimeBlendSettings gTimeBlend;

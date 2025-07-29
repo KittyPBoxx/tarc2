@@ -67,7 +67,6 @@
 #define OBJ_EVENT_GFX_BERRY_TREE                  60
 #define OBJ_EVENT_GFX_BERRY_TREE_EARLY_STAGES     61
 #define OBJ_EVENT_GFX_BERRY_TREE_LATE_STAGES      62
-#define OBJ_EVENT_GFX_BRENDAN_ACRO_BIKE           63
 #define OBJ_EVENT_GFX_PROF_BIRCH                  64
 #define OBJ_EVENT_GFX_MAN_4                       65
 #define OBJ_EVENT_GFX_MAN_5                       66
@@ -95,7 +94,6 @@
 #define OBJ_EVENT_GFX_MR_BRINEYS_BOAT             88
 #define OBJ_EVENT_GFX_MAY_NORMAL                  89
 #define OBJ_EVENT_GFX_MAY_MACH_BIKE               90
-#define OBJ_EVENT_GFX_MAY_ACRO_BIKE               91
 #define OBJ_EVENT_GFX_MAY_SURFING                 92
 #define OBJ_EVENT_GFX_MAY_FIELD_MOVE              93
 #define OBJ_EVENT_GFX_VIGOROTH_CARRYING_BOX       95
@@ -105,12 +103,10 @@
 #define OBJ_EVENT_GFX_ARTIST                      99
 #define OBJ_EVENT_GFX_RIVAL_BRENDAN_NORMAL       100
 #define OBJ_EVENT_GFX_RIVAL_BRENDAN_MACH_BIKE    101
-#define OBJ_EVENT_GFX_RIVAL_BRENDAN_ACRO_BIKE    102
 #define OBJ_EVENT_GFX_RIVAL_BRENDAN_SURFING      103
 #define OBJ_EVENT_GFX_RIVAL_BRENDAN_FIELD_MOVE   104
 #define OBJ_EVENT_GFX_RIVAL_MAY_NORMAL           105
 #define OBJ_EVENT_GFX_RIVAL_MAY_MACH_BIKE        106
-#define OBJ_EVENT_GFX_RIVAL_MAY_ACRO_BIKE        107
 #define OBJ_EVENT_GFX_RIVAL_MAY_SURFING          108
 #define OBJ_EVENT_GFX_RIVAL_MAY_FIELD_MOVE       109
 #define OBJ_EVENT_GFX_CAMERAMAN                  110
@@ -196,8 +192,6 @@
 #define OBJ_EVENT_GFX_CONTEST_JUDGE              190
 #define OBJ_EVENT_GFX_BRENDAN_WATERING           191
 #define OBJ_EVENT_GFX_MAY_WATERING               192
-#define OBJ_EVENT_GFX_BRENDAN_DECORATING         193
-#define OBJ_EVENT_GFX_MAY_DECORATING             194
 #define OBJ_EVENT_GFX_ARCHIE                     195
 #define OBJ_EVENT_GFX_MAXIE                      196
 #define OBJ_EVENT_GFX_KYOGRE_FRONT               197

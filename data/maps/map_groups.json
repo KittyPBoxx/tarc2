@@ -4,8 +4,5 @@
   ],
   "gMapGroup_TownsAndRoutes": [
     "LittlerootTown"
-  ],
-  "connections_include_order": [
-    "LittlerootTown"
   ]
 }

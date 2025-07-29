@@ -24,3 +24,13 @@ const struct Tileset gTileset_Petalburg =
     .metatileAttributes = gMetatileAttributes_Petalburg,
     .callback = InitTilesetAnim_Petalburg,
 };
+const struct Tileset gTileset_woodPrimary1 =
+{
+    .isCompressed = TRUE,
+    .isSecondary = FALSE,
+    .tiles = gTilesetTiles_woodPrimary1,
+    .palettes = gTilesetPalettes_woodPrimary1,
+    .metatiles = gMetatiles_woodPrimary1,
+    .metatileAttributes = gMetatileAttributes_woodPrimary1,
+    .callback = NULL,
+};
