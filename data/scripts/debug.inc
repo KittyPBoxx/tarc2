@@ -137,8 +137,17 @@ Debug_EventScript_Text_DefensiveIVs:
 	.string "HP IVs: {STR_VAR_1}, DEF IVs: {STR_VAR_2}, SPDEF IVs: {STR_VAR_3}$"
 
 Debug_EventScript_Script_1::
+	playmoncry SPECIES_PICHU, 0
+	msgbox Debug_EventScript_Script_1_Text_WildEncounter, MSGBOX_DEFAULT
+	waitmoncry
+    waitbuttonpress
+    setwildbattle SPECIES_PICHU, 25, ITEM_NONE
+	dowildbattle
 	release
 	end
+
+Debug_EventScript_Script_1_Text_WildEncounter:
+    .string "Test Battle Starting$"
 
 Debug_EventScript_Script_2::
 	release

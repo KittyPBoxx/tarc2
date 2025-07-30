@@ -3716,21 +3716,8 @@ static bool8 SetUpFieldMove_Waterfall(void)
     return FALSE;
 }
 
-static void FieldCallback_Dive(void)
-{
-    gFieldEffectArguments[0] = GetCursorSelectionMonId();
-    FieldEffectStart(FLDEFF_USE_DIVE);
-}
-
 static bool8 SetUpFieldMove_Dive(void)
 {
-    gFieldEffectArguments[1] = TrySetDiveWarp();
-    if (gFieldEffectArguments[1] != 0)
-    {
-        gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
-        gPostMenuFieldCallback = FieldCallback_Dive;
-        return TRUE;
-    }
     return FALSE;
 }
 
