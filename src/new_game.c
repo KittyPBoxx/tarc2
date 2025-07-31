@@ -103,6 +103,9 @@ void NewGameInitData(void)
     ClearBag();
     ResetFanClub();
     InitialWarp();
+
+    AddBagItem(ITEM_TERA_ORB, 1);
+
     RunScriptImmediately(EventScript_ResetAllMapFlags);
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     RtcInitLocalTimeOffset(0, 0);
