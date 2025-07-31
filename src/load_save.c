@@ -156,7 +156,7 @@ void SavePlayerParty(void)
 
     gSaveBlock1Ptr->playerPartyCount = gPlayerPartyCount;
 
-    for (i = 0; i < PLAYER_PARTY_SIZE; i++)
+    for (i = 0; i < PARTY_SIZE; i++)
         gSaveBlock1Ptr->playerParty[i] = gPlayerParty[i];
 }
 
@@ -166,7 +166,7 @@ void LoadPlayerParty(void)
 
     gPlayerPartyCount = gSaveBlock1Ptr->playerPartyCount;
 
-    for (i = 0; i < PLAYER_PARTY_SIZE; i++)
+    for (i = 0; i < PARTY_SIZE; i++)
     {
         u32 data;
         gPlayerParty[i] = gSaveBlock1Ptr->playerParty[i];

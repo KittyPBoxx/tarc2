@@ -1856,9 +1856,13 @@ static void BattleMainCB1(void)
 {
     u32 battler;
 
+    // TODO: TARC ADD SAFTY CHECK HERE
     gBattleMainFunc();
     for (battler = 0; battler < gBattlersCount; battler++)
+    {
+        // TODO: TARC ADD SAFTY CHECK HERE
         gBattlerControllerFuncs[battler](battler);
+    }
 }
 
 static void ClearSetBScriptingStruct(void)
@@ -4333,35 +4337,6 @@ static void HandleEndTurn_FinishBattle(void)
 
     if (gCurrentActionFuncId == B_ACTION_TRY_FINISH || gCurrentActionFuncId == B_ACTION_FINISHED)
     {
-        if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK
-                                  | BATTLE_TYPE_RECORDED_LINK
-                                  | BATTLE_TYPE_FIRST_BATTLE
-                                  | BATTLE_TYPE_SAFARI
-                                  | BATTLE_TYPE_EREADER_TRAINER
-                                  | BATTLE_TYPE_WALLY_TUTORIAL
-                                  | BATTLE_TYPE_FRONTIER)))
-        {
-            for (battler = 0; battler < gBattlersCount; battler++)
-            {
-                if (IsOnPlayerSide(battler))
-                {
-                    if (gBattleResults.playerMon1Species == SPECIES_NONE)
-                    {
-                        gBattleResults.playerMon1Species = GetMonData(GetBattlerMon(battler), MON_DATA_SPECIES, NULL);
-                        GetMonData(GetBattlerMon(battler), MON_DATA_NICKNAME, gBattleResults.playerMon1Name);
-                    }
-                    else
-                    {
-                        gBattleResults.playerMon2Species = GetMonData(GetBattlerMon(battler), MON_DATA_SPECIES, NULL);
-                        GetMonData(GetBattlerMon(battler), MON_DATA_NICKNAME, gBattleResults.playerMon2Name);
-                    }
-                }
-                else if (!IsOnPlayerSide(battler))
-                {
-                    HandleSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[battler].species), FLAG_SET_SEEN, gBattleMons[battler].personality);
-                }
-            }
-        }
 
         if (gTestRunnerEnabled)
             TestRunner_Battle_AfterLastTurn();
@@ -4408,6 +4383,8 @@ static void HandleEndTurn_FinishBattle(void)
     }
     else
     {
+        DebugPrintfLevel(MGBA_LOG_ERROR, "TODO: TARC ADD SAFETY CHECK HERE - BOTH FUNCTION AND ARRAY END %x", gBattlescriptCurrInstr[0]);
+
         if (gBattleControllerExecFlags == 0)
             gBattleScriptingCommandsTable[gBattlescriptCurrInstr[0]]();
     }
@@ -4517,11 +4494,13 @@ void RunBattleScriptCommands_PopCallbacksStack(void)
     if (gCurrentActionFuncId == B_ACTION_TRY_FINISH || gCurrentActionFuncId == B_ACTION_FINISHED)
     {
         if (gBattleResources->battleCallbackStack->size != 0)
-            gBattleResources->battleCallbackStack->size--;
+            gBattleResources->battleCallbackStack->size--;   
         gBattleMainFunc = gBattleResources->battleCallbackStack->function[gBattleResources->battleCallbackStack->size];
+        DebugPrintfLevel(MGBA_LOG_ERROR, "TODO: TARC ADD SAFETY CHECK HERE %x", gBattleMainFunc);
     }
     else
     {
+        DebugPrintfLevel(MGBA_LOG_ERROR, "TODO: TARC ADD SAFETY CHECK HERE %x", gBattlescriptCurrInstr[0]);
         if (gBattleControllerExecFlags == 0)
             gBattleScriptingCommandsTable[gBattlescriptCurrInstr[0]]();
     }
@@ -4529,6 +4508,7 @@ void RunBattleScriptCommands_PopCallbacksStack(void)
 
 void RunBattleScriptCommands(void)
 {
+    DebugPrintfLevel(MGBA_LOG_ERROR, "TODO: TARC ADD SAFETY CHECK HERE %x", gBattlescriptCurrInstr[0]);
     if (gBattleControllerExecFlags == 0)
         gBattleScriptingCommandsTable[gBattlescriptCurrInstr[0]]();
 }

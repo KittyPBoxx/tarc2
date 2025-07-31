@@ -835,6 +835,8 @@ void (*const gBattleScriptingCommandsTable[])(void) =
     Cmd_removescreens,                           //0xEE
     Cmd_handleballthrow,                         //0xEF
     Cmd_givecaughtmon,                           //0xF0
+    Cmd_pause,                                   //0xF1
+    Cmd_pause,                                   //0xF2
     Cmd_trygivecaughtmonnick,                    //0xF3
     Cmd_subattackerhpbydmg,                      //0xF4
     Cmd_removeattackerstatus1,                   //0xF5
@@ -16350,6 +16352,9 @@ static void Cmd_tryworryseed(void)
 static void Cmd_callnative(void)
 {
     CMD_ARGS(void (*func)(void));
+
+    DebugPrintfLevel(MGBA_LOG_ERROR, "TODO: TARC ADD SAFETY CHECK HERE %x", cmd->func);
+
     void (*func)(void) = cmd->func;
     func();
 }

@@ -28,6 +28,7 @@ static void HBlankIntr(void);
 static void VCountIntr(void);
 static void SerialIntr(void);
 static void IntrDummy(void);
+static void GamePakCrashHandler(void);
 
 // Defined in the linker script so that the test build can override it.
 extern void gInitialMainCB2(void);
@@ -61,7 +62,7 @@ const IntrFunc gIntrTableTemplate[] =
     IntrDummy,  // DMA 2 interrupt
     IntrDummy,  // DMA 3 interrupt
     IntrDummy,  // Key interrupt
-    IntrDummy,  // Game Pak interrupt
+    GamePakCrashHandler,  // Game Pak interrupt
 };
 
 #define INTR_COUNT ((int)(sizeof(gIntrTableTemplate)/sizeof(IntrFunc)))
@@ -103,6 +104,12 @@ static void WaitForVBlank(void);
 void EnableVCountIntrAtLine150(void);
 
 #define B_START_SELECT (B_BUTTON | START_BUTTON | SELECT_BUTTON)
+
+static void GamePakCrashHandler(void)
+{
+    DebugPrintfLevel(MGBA_LOG_ERROR, "GamePak crash interrupt triggered!");
+    DoSoftReset();
+}
 
 void AgbMain(void)
 {

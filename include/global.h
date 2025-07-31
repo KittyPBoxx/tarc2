@@ -272,7 +272,7 @@ struct SaveBlock1
     /*0x32*/ u16 mapLayoutId;
     /*0x34*/ u16 mapView[0x100];
     /*0x234*/ u8 playerPartyCount;
-    /*0x238*/ struct Pokemon playerParty[PLAYER_PARTY_SIZE];
+    /*0x238*/ struct Pokemon playerParty[PARTY_SIZE];
     /*0x498*/ struct ItemSlot pcItems[PC_ITEMS_COUNT];
     /*0x560*/ struct ItemSlot bagPocket_Items[BAG_ITEMS_COUNT];
     /*0x5D8*/ struct ItemSlot bagPocket_KeyItems[BAG_KEYITEMS_COUNT];

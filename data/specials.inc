@@ -97,8 +97,6 @@ gSpecials::
 	def_special UpdateCyclingRoadState
 	def_special GetLeadMonFriendshipScore
 	def_special StopMapMusic
-	def_special ChoosePartyForBattleFrontier
-	def_special ReducePlayerPartyToSelectedMons
 	def_special FieldShowRegionMap
 	def_special GetWeekCount
 	def_special ResetTrickHouseNuggetFlag

@@ -51,11 +51,6 @@ static const u8* const sTrainerSlides[DIFFICULTY_COUNT][TRAINERS_COUNT][TRAINER_
     },
 };
 
-static const u8* const sTestTrainerSlides[DIFFICULTY_COUNT][TRAINERS_COUNT][TRAINER_SLIDE_COUNT] =
-{
-#include "../test/battle/trainer_slides.h"
-};
-
 static u32 BattlerHPPercentage(u32 battler, u32 operation, u32 threshold)
 {
     switch (operation)

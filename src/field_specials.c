@@ -3072,18 +3072,6 @@ static void BufferFanClubTrainerName_(u8 whichLinkTrainer, u8 whichNPCTrainer)
 }
 #endif //FREE_LINK_BATTLE_RECORDS
 
-void UpdateTrainerFansAfterLinkBattle(void)
-{
-    if (VarGet(VAR_LILYCOVE_FAN_CLUB_STATE) == 2)
-    {
-        TryLoseFansFromPlayTimeAfterLinkBattle();
-        if (gBattleOutcome == B_OUTCOME_WON)
-            PlayerGainRandomTrainerFan();
-        else
-            PlayerLoseRandomTrainerFan();
-    }
-}
-
 static bool8 DidPlayerGetFirstFans(void)
 {
     return GET_TRAINER_FAN_CLUB_FLAG(FANCLUB_GOT_FIRST_FANS);

@@ -3408,7 +3408,7 @@ BattleScript_EffectConfuse::
 	jumpifability BS_TARGET, ABILITY_OWN_TEMPO, BattleScript_OwnTempoPrevents
 	jumpifsubstituteblocks BattleScript_ButItFailed
 	jumpifstatus2 BS_TARGET, STATUS2_CONFUSION, BattleScript_AlreadyConfused
-	jumpifterrainaffected BS_TARGET, STATUS_FIELD_MISTY_TERRAIN, BattleScript_MistyTerrainPrevents
+	@ jumpifterrainaffected BS_TARGET, STATUS_FIELD_MISTY_TERRAIN, BattleScript_MistyTerrainPrevents @ TODO: TARC broken stuff
 	accuracycheck BattleScript_ButItFailed, ACC_CURR_MOVE
 	jumpifsafeguard BattleScript_SafeguardProtected
 	attackanimation
@@ -5221,7 +5221,7 @@ BattleScript_EffectCamouflage::
 
 BattleScript_FaintAttacker::
 	tryillusionoff BS_ATTACKER
-	tryactivategulpmissile
+	@ tryactivategulpmissile @ TODO: TARC broken stuff
 	playfaintcry BS_ATTACKER
 	pause B_WAIT_TIME_LONG
 	dofaintanimation BS_ATTACKER
@@ -5234,8 +5234,8 @@ BattleScript_FaintAttacker::
 
 BattleScript_FaintTarget::
 	tryillusionoff BS_TARGET
-	tryactivategulpmissile
-	tryupdateleaderscresttracker
+	@ tryactivategulpmissile @ TODO: TARC broken stuff
+	@ tryupdateleaderscresttracker @ TODO: TARC broken stuff
 	playfaintcry BS_TARGET
 	pause B_WAIT_TIME_LONG
 	dofaintanimation BS_TARGET
@@ -7329,7 +7329,7 @@ BattleScript_DoRecoil::
 	datahpupdate BS_ATTACKER
 	printstring STRINGID_PKMNHITWITHRECOIL
 	waitmessage B_WAIT_TIME_LONG
-	tryupdaterecoiltracker
+	@ tryupdaterecoiltracker
 	tryfaintmon BS_ATTACKER
 BattleScript_RecoilEnd::
 	return

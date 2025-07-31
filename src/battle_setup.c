@@ -125,6 +125,8 @@ static const u8 sBattleTransitionTable_BattleDome[] =
 static void Task_BattleStart(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
+    
+    HealPlayerParty();
 
     switch (tState)
     {
@@ -157,36 +159,9 @@ static void CreateBattleStartTask(u8 transition, u16 song)
     PlayMapChosenOrBattleBGM(song);
 }
 
-static void Task_BattleStart_Debug(u8 taskId)
-{
-    s16 *data = gTasks[taskId].data;
-
-    switch (tState)
-    {
-    case 0:
-        if (!FldEffPoison_IsActive()) // is poison not active?
-        {
-            BattleTransition_StartOnField(tTransition);
-            ClearMirageTowerPulseBlendEffect();
-            tState++; // go to case 1.
-        }
-        break;
-    case 1:
-        if (IsBattleTransitionDone() == TRUE)
-        {
-            CleanupOverworldWindowsAndTilemaps();
-            SetMainCallback2(CB2_InitBattle);
-            RestartWildEncounterImmunitySteps();
-            ClearPoisonStepCounter();
-            DestroyTask(taskId);
-        }
-        break;
-    }
-}
-
 static void CreateBattleStartTask_Debug(u8 transition, u16 song)
 {
-    u8 taskId = CreateTask(Task_BattleStart_Debug, 1);
+    u8 taskId = CreateTask(Task_BattleStart, 1);
 
     gTasks[taskId].tTransition = transition;
     PlayMapChosenOrBattleBGM(song);

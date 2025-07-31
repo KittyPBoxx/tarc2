@@ -129,31 +129,6 @@ void ScriptSetMonMoveSlot(u8 monIndex, u16 move, u8 slot)
     SetMonMoveSlot(&gPlayerParty[monIndex], move, slot);
 }
 
-void ChoosePartyForBattleFrontier(void)
-{
-}
-
-void ReducePlayerPartyToSelectedMons(void)
-{
-    struct Pokemon party[MAX_FRONTIER_PARTY_SIZE];
-    int i;
-
-    CpuFill32(0, party, sizeof party);
-
-    // copy the selected Pokémon according to the order.
-    for (i = 0; i < PLAYER_PARTY_SIZE; i++)
-        if (gSelectedOrderFromParty[i]) // as long as the order keeps going (did the player select 1 mon? 2? 3?), do not stop
-            party[i] = gPlayerParty[gSelectedOrderFromParty[i] - 1]; // index is 0 based, not literal
-
-    CpuFill32(0, gPlayerParty, sizeof gPlayerParty);
-
-    // overwrite the first 4 with the order copied to.
-    for (i = 0; i < PLAYER_PARTY_SIZE; i++)
-        gPlayerParty[i] = party[i];
-
-    CalculatePlayerPartyCount();
-}
-
 void CanHyperTrain(struct ScriptContext *ctx)
 {
     u32 stat = ScriptReadByte(ctx);

@@ -43,7 +43,6 @@
 #define GAME_LANGUAGE (LANGUAGE_ENGLISH)
 
 // party sizes
-#define PLAYER_PARTY_SIZE 1
 #define PARTY_SIZE 6
 #define MULTI_PARTY_SIZE (PARTY_SIZE / 2)
 #define FRONTIER_PARTY_SIZE         3
