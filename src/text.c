@@ -59,6 +59,9 @@ COMMON_DATA bool8 gDisableTextPrinters = 0;
 COMMON_DATA struct TextGlyph gCurGlyph = {0};
 COMMON_DATA TextFlags gTextFlags = {0};
 
+static const u8 sDownArrowFrameSequence[] = { 0, 1, 2, 1 };
+#define ARROW_FRAME_COUNT ARRAY_COUNT(sDownArrowFrameSequence)
+
 static const u8 sFontHalfRowOffsets[] =
 {
     0x00, 0x01, 0x02, 0x00, 0x03, 0x04, 0x05, 0x03, 0x06, 0x07, 0x08, 0x06, 0x00, 0x01, 0x02, 0x00,
@@ -911,7 +914,7 @@ void TextPrinterDrawDownArrow(struct TextPrinter *textPrinter)
                 textPrinter->printerTemplate.windowId,
                 arrowTiles,
                 0,
-                sDownArrowYCoords[subStruct->downArrowYPosIdx],
+                16 * sDownArrowFrameSequence[subStruct->downArrowYPosIdx % ARROW_FRAME_COUNT],
                 8,
                 16,
                 textPrinter->printerTemplate.currentX,
@@ -1023,7 +1026,7 @@ void DrawDownArrow(u8 windowId, u16 x, u16 y, u8 bgColor, bool32 drawArrow, u8 *
                 break;
             }
 
-            BlitBitmapRectToWindow(windowId, arrowTiles, 0, sDownArrowYCoords[*yCoordIndex & 3], 8, 16, x, y - 2, 8, 16);
+            BlitBitmapRectToWindow(windowId, arrowTiles, 0, 16 * sDownArrowFrameSequence[*yCoordIndex % ARROW_FRAME_COUNT], 8, 16, x, y - 2, 8, 16);
             CopyWindowToVram(windowId, COPYWIN_GFX);
             *counter = 8;
             ++*yCoordIndex;
