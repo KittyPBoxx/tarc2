@@ -22,6 +22,7 @@
 #include "test_runner.h"
 #include "constants/rgb.h"
 #include "main_menu.h"
+#include "AgbAccuracy.h"
 
 static void VBlankIntr(void);
 static void HBlankIntr(void);
@@ -33,6 +34,7 @@ static void GamePakCrashHandler(void);
 // Defined in the linker script so that the test build can override it.
 extern void gInitialMainCB2(void);
 extern void CB2_FlashNotDetectedScreen(void);
+extern void CB2_TestResultCallback(void);
 
 const u8 gGameVersion = GAME_VERSION;
 
@@ -79,6 +81,7 @@ COMMON_DATA void *gAgbMainLoop_sp = NULL;
 static EWRAM_DATA u16 sTrainerId = 0;
 
 EWRAM_DATA u8 gSoftResetFlag;
+EWRAM_DATA u8 gTestResult;
 
 asm(".arm\n"
     "SetSoftResetVariable:\n"
@@ -123,7 +126,11 @@ void AgbMain(void)
     InitKeys();
     InitIntrHandlers();
 
+    u8 testLocal = 0xFF;
+    
     // TODO: TARC accuracy tests
+    if (!gSoftResetFlag)
+        testLocal = RunAgbAccuracyTests();
 
     m4aSoundInit();
     EnableVCountIntrAtLine150();
@@ -153,6 +160,9 @@ void AgbMain(void)
     AGBPrintInit();
 #endif
 #endif
+
+    gTestResult = testLocal;
+
     gAgbMainLoop_sp = __builtin_frame_address(0);
     AgbMainLoop();
 }
@@ -485,3 +495,4 @@ static void CB2_PostSoftResetInit(void)
     SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
     SetMainCallback2(CB2_InitMainMenu);
 }
+
