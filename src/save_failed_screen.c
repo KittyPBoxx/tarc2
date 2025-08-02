@@ -510,17 +510,17 @@ void CB2_TestResultCallback(void)
     InitWindows(textWin);
     DrawStdFrameWithCustomTileAndPalette(0, TRUE, 0x214, 0xE);
 
-    static const u8 disclaimer[] =_("{COLOR DARK_GRAY}This mini-hack was made for a jam\nwith the theme 'Myths'.\nIt should NOT be distributed for profit!");
+    static const u8 disclaimer[] =_("{COLOR DARK_GRAY}This mini-hack was for a jam themed on\n'Myths'. It should NOT be distributed for\nprofit or as a ROM file!");
     SaveFailedScreenTextPrint(disclaimer, 1, 1);
 
     // TODO: TARC Make this some kind of useful message
-    static const u8 resultText[] =_("{COLOR RED}Emu Test Result");
+    static const u8 resultText[] =_("{COLOR RED}Device Accuracy Result");
     SaveFailedScreenTextPrint(resultText, 1, 9);
     
     ConvertIntToDecimalStringN(&gStringVar1[4], gTestResult, 0, 3);
     gStringVar1[10] = 0xFF;
     DebugPrintfLevel(MGBA_LOG_ERROR, "TEST RESULTS %x", gTestResult);
-    SaveFailedScreenTextPrint(gStringVar1, 10, 9);
+    SaveFailedScreenTextPrint(gStringVar1, 15, 9);
 
     static const u8 continueMessage[] =_("{COLOR DARK_GRAY}Press {START_BUTTON} to continue...");
     SaveFailedScreenTextPrint(continueMessage, 1, 13);
