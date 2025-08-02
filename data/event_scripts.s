@@ -29,6 +29,7 @@
 #include "constants/script_menu.h"
 #include "constants/siirtc.h"
 #include "constants/songs.h"
+#include "constants/sliding_puzzles.h"
 #include "constants/sound.h"
 #include "constants/species.h"
 #include "constants/trainers.h"

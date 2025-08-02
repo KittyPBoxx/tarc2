@@ -1060,12 +1060,10 @@ static u8 InitMenu(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 
 
 static void UpdateCursorSprite(struct Sprite *sprite)
 {
-    DebugPrintfLevel(MGBA_LOG_ERROR, "UpdateCursorSprite %x", sprite->y);
     sprite->y = ReadComfyAnimValueSmooth(&gComfyAnims[sprite->data[0]]);
     sprite->x = 180;
     gComfyAnims[sprite->data[0]].config.data.spring.to = Q_24_8(25 + 16 * sMenu.cursorPos);
     TryAdvanceComfyAnim(&gComfyAnims[sprite->data[2]]);
-    DebugPrintfLevel(MGBA_LOG_ERROR, "cursorPos %x",  sMenu.cursorPos);
 }
 
 // There is no muted version of this, so the version that plays sound when A is pressed is the "Normal" one.

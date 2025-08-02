@@ -150,8 +150,18 @@ Debug_EventScript_Script_1_Text_WildEncounter:
     .string "Test Battle Starting$"
 
 Debug_EventScript_Script_2::
+	lockall
+	msgbox Debug_EventScript_Script_1_Text_TilePuzzle, MSGBOX_DEFAULT
+    waitbuttonpress
+	setvar VAR_0x8004, 1 @ puzzleId
+	setvar VAR_0x8005, 0 @ solved
+	special DoSlidingPuzzle
+	waitstate
 	release
 	end
+
+Debug_EventScript_Script_1_Text_TilePuzzle:
+    .string "Test Sliding Tile Puzzle Starting$"
 
 Debug_EventScript_Script_3::
 	release
