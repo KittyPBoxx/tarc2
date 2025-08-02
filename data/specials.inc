@@ -191,7 +191,6 @@ gSpecials::
 	def_special CloseFrontierExchangeCornerItemIconWindow
 	def_special ShowFrontierGamblerLookingMessage
 	def_special ShowFrontierGamblerGoMessage
-	def_special ScriptMenu_CreateStartMenuForPokenavTutorial
 	def_special BufferBattleFrontierTutorMoveName
 	def_special CloseBattleFrontierTutorWindow
 	def_special ScrollableMultichoice_RedrawPersistentMenu

@@ -1639,6 +1639,8 @@ static const u16 sEmptyPal[16] = {0};
 const u16 gMessageBox_Pal[] = INCBIN_U16("graphics/text_window/message_box.gbapal");
 const u8 gMessageBox_Gfx[] = INCBIN_U8("graphics/text_window/message_box.4bpp");
 const u8 gSignpostWindow_Gfx[] = INCBIN_U8("graphics/text_window/signpost.4bpp");
+const u8 gMessageBoxCursor_Pal[] = INCBIN_U8("graphics/text_window/cursor.gbapal");
+const u8 gMessageBoxCursor_Gfx[] = INCBIN_U8("graphics/text_window/cursor.4bpp");
 
 const u16 gMonIconPalettes[][16] =
 {

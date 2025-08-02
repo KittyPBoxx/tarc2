@@ -22,6 +22,8 @@
 #include "window.h"
 #include "config/overworld.h"
 #include "constants/songs.h"
+#include "sprite.h"
+#include "comfy_anim.h"
 
 struct MenuInfoIcon
 {
@@ -44,6 +46,8 @@ struct Menu
     u8 columns;
     u8 rows;
     bool8 APressMuted;
+    bool8 useSpriteCursor;
+    u8 cursorSpriteId;
 };
 
 static u16 AddWindowParameterized(u8, u8, u8, u8, u8, u8, u16);
@@ -140,6 +144,38 @@ static const struct MenuInfoIcon sMenuInfoIcons[] =
     [MENU_INFO_ICON_EFFECT]    = { 42, 12, 0xE8 }, // Unused
     [MENU_INFO_ICON_BALL_RED]  = {  8,  8, 0xAE }, // For placed decorations in Secret Base
     [MENU_INFO_ICON_BALL_BLUE] = {  8,  8, 0xAF }, // For placed decorations in player's room
+};
+
+
+static void UpdateCursorSprite(struct Sprite *sprite);
+
+#define TAG_MENU_CURSOR 0x4321
+
+static const struct SpriteSheet sSpriteSheet_Cursor = { gMessageBoxCursor_Gfx, 0x40, TAG_MENU_CURSOR };
+static const struct SpritePalette sSpritePal_Cursor = { gMessageBoxCursor_Pal, TAG_MENU_CURSOR };
+static const struct OamData sOam_Cursor =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_DOUBLE,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(8x16),
+    .x = 0,
+    .size = SPRITE_SIZE(8x16),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_Cursor =
+{
+    .tileTag = TAG_MENU_CURSOR,
+    .paletteTag = TAG_MENU_CURSOR,
+    .oam = &sOam_Cursor,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateCursorSprite,
 };
 
 void InitStandardTextBoxWindows(void)
@@ -611,6 +647,12 @@ void RemoveStartMenuWindow(void)
     {
         RemoveWindow(sStartMenuWindowId);
         sStartMenuWindowId = WINDOW_NONE;
+
+        if (sMenu.useSpriteCursor)
+        {
+            ReleaseComfyAnim(gSprites[sMenu.cursorSpriteId].data[2]);
+            DestroySprite(&gSprites[sMenu.cursorSpriteId]);
+        }
     }
 }
 
@@ -974,7 +1016,7 @@ void HofPCTopBar_RemoveWindow(void)
     }
 }
 
-static u8 InitMenu(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 numChoices, u8 initialCursorPos, bool8 muteAPress)
+static u8 InitMenu(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 numChoices, u8 initialCursorPos, bool8 muteAPress, bool8 useSpriteCursor)
 {
     s32 pos;
 
@@ -986,6 +1028,7 @@ static u8 InitMenu(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 
     sMenu.fontId = fontId;
     sMenu.optionHeight = cursorHeight;
     sMenu.APressMuted = muteAPress;
+    sMenu.useSpriteCursor = useSpriteCursor;
 
     pos = initialCursorPos;
 
@@ -994,14 +1037,46 @@ static u8 InitMenu(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 
     else
         sMenu.cursorPos = pos;
 
+    if (sMenu.useSpriteCursor)
+    {
+        s16 x = 180;
+        s16 y = 25 + 16 * sMenu.cursorPos;
+        struct ComfyAnimSpringConfig yTranslateConfig = {
+            .mass = Q_24_8(50),
+            .tension = Q_24_8(285), .friction = Q_24_8(1150),
+            .clampAfter = 0,
+            .from = Q_24_8(y),
+            .to = Q_24_8(y),
+        };
+        LoadSpriteSheet(&sSpriteSheet_Cursor);
+        LoadSpritePalette(&sSpritePal_Cursor);
+        sMenu.cursorSpriteId = CreateSprite(&sSpriteTemplate_Cursor, x, y, 3);
+        gSprites[sMenu.cursorSpriteId].data[0] = CreateComfyAnim_Spring(&yTranslateConfig);
+    }
+
     Menu_MoveCursor(0);
     return sMenu.cursorPos;
+}
+
+static void UpdateCursorSprite(struct Sprite *sprite)
+{
+    DebugPrintfLevel(MGBA_LOG_ERROR, "UpdateCursorSprite %x", sprite->y);
+    sprite->y = ReadComfyAnimValueSmooth(&gComfyAnims[sprite->data[0]]);
+    sprite->x = 180;
+    gComfyAnims[sprite->data[0]].config.data.spring.to = Q_24_8(25 + 16 * sMenu.cursorPos);
+    TryAdvanceComfyAnim(&gComfyAnims[sprite->data[2]]);
+    DebugPrintfLevel(MGBA_LOG_ERROR, "cursorPos %x",  sMenu.cursorPos);
 }
 
 // There is no muted version of this, so the version that plays sound when A is pressed is the "Normal" one.
 u8 InitMenuNormal(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 numChoices, u8 initialCursorPos)
 {
-    return InitMenu(windowId, fontId, left, top, cursorHeight, numChoices, initialCursorPos, FALSE);
+    return InitMenu(windowId, fontId, left, top, cursorHeight, numChoices, initialCursorPos, FALSE, FALSE);
+}
+
+u8 InitMenuWithSpriteCursor(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 numChoices, u8 initialCursorPos)
+{
+    return InitMenu(windowId, fontId, left, top, cursorHeight, numChoices, initialCursorPos, FALSE, TRUE);
 }
 
 void RedrawMenuCursor(u8 oldPos, u8 newPos)
@@ -1011,7 +1086,10 @@ void RedrawMenuCursor(u8 oldPos, u8 newPos)
     width = GetMenuCursorDimensionByFont(sMenu.fontId, 0);
     height = GetMenuCursorDimensionByFont(sMenu.fontId, 1);
     FillWindowPixelRect(sMenu.windowId, PIXEL_FILL(1), sMenu.left, sMenu.optionHeight * oldPos + sMenu.top, width, height);
-    AddTextPrinterParameterized(sMenu.windowId, sMenu.fontId, gText_SelectorArrow3, sMenu.left, sMenu.optionHeight * newPos + sMenu.top, 0, 0);
+    if (sMenu.useSpriteCursor)
+        CopyWindowToVram(sMenu.windowId, COPYWIN_GFX);
+    else
+        AddTextPrinterParameterized(sMenu.windowId, sMenu.fontId, gText_SelectorArrow3, sMenu.left, sMenu.optionHeight * newPos + sMenu.top, 0, 0);
 }
 
 u8 Menu_MoveCursor(s8 cursorDelta)
