@@ -8,9 +8,11 @@
 #include "script.h"
 #include "field_mugshot.h"
 #include "sprite.h"
+#include "event_data.h"
 
 static EWRAM_DATA u8 sFieldMessageBoxMode = 0;
 EWRAM_DATA u8 gWalkAwayFromSignpostTimer = 0;
+EWRAM_DATA const u8* gSpeakerName = NULL;
 
 static void ExpandStringAndStartDrawFieldMessage(const u8 *, bool32);
 static void StartDrawFieldMessage(void);
@@ -40,9 +42,13 @@ static void Task_DrawFieldMessage(u8 taskId)
             task->tState++;
             break;
         case 1:
-           DrawDialogueFrame(0, TRUE);
-           task->tState++;
-           break;
+            DrawDialogueFrame(0, TRUE);
+            if (gSpeakerName != NULL)
+            {
+                DrawNamePlate(1, TRUE);
+            }
+            task->tState++;
+            break;
         case 2:
             if (RunTextPrintersAndIsPrinter0Active() != TRUE)
             {
@@ -100,8 +106,34 @@ bool8 ShowFieldMessageFromBuffer(void)
     return TRUE;
 }
 
+extern void FillDialogFramePlate();
+extern int GetDialogFramePlateWidth();
 static void ExpandStringAndStartDrawFieldMessage(const u8 *str, bool32 allowSkippingDelayWithButtonPress)
 {
+    if (gSpeakerName != NULL)
+    {
+        int strLen;
+        const u8 colors[3] = {0, 1, 14};
+
+        StringExpandPlaceholders(gStringVar4, gSpeakerName);
+        strLen = GetStringWidth(FONT_SMALL, gStringVar4, -1);
+
+        if (strLen > 0)
+        {
+            strLen = GetDialogFramePlateWidth() / 2 - strLen / 2;
+            gNamePlateBuffer[0] = EXT_CTRL_CODE_BEGIN;
+            gNamePlateBuffer[1] = EXT_CTRL_CODE_CLEAR_TO;
+            gNamePlateBuffer[2] = strLen;
+            StringExpandPlaceholders(&gNamePlateBuffer[3], gStringVar4);
+        }
+        else
+        {
+            StringExpandPlaceholders(&gNamePlateBuffer[0], gStringVar4);
+        }
+
+        FillDialogFramePlate();
+        AddTextPrinterParameterized3(1, FONT_SMALL, 0, 0, colors, 0, gNamePlateBuffer);
+    }
     StringExpandPlaceholders(gStringVar4, str);
     AddTextPrinterForMessage(allowSkippingDelayWithButtonPress);
     CreateTask_DrawFieldMessage();
@@ -127,6 +159,7 @@ void HideFieldMessageBox(void)
         gSprites[GetFieldMugshotSpriteId()].data[0] = FALSE;
         RemoveFieldMugshot();
     }
+    gSpeakerName = NULL;
 }
 
 u8 GetFieldMessageBoxMode(void)
@@ -145,4 +178,9 @@ void StopFieldMessage(void)
 {
     DestroyTask_DrawFieldMessage();
     sFieldMessageBoxMode = FIELD_MESSAGE_BOX_HIDDEN;
+}
+
+void SetSpeakerName(const u8* name)
+{
+    gSpeakerName = name;
 }

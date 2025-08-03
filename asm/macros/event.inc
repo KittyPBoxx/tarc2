@@ -2417,3 +2417,9 @@
 	.macro removefieldmugshot
 	callnative RemoveFieldMugshot
 	.endm
+
+	@ Sets the text of the name box in the next-shown message box.
+	.macro setspeaker text:req
+	.byte SCR_OP_SETSPEAKER
+	.4byte \text
+	.endm

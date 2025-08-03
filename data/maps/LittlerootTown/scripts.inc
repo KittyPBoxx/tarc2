@@ -238,7 +238,11 @@ LittlerootTown_EventScript_FatMan::
 	msgbox LittlerootTown_Text_CanUsePCToStoreItems, MSGBOX_NPC
 	end
 
+LittlerootTown_EventScript_BoyName::
+.string "BOY$"
+
 LittlerootTown_EventScript_Boy::
+	setspeaker LittlerootTown_EventScript_BoyName
 	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
 	msgbox LittlerootTown_Text_BirchSpendsDaysInLab, MSGBOX_NPC
 	removefieldmugshot
