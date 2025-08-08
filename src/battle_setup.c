@@ -344,6 +344,9 @@ static void CB2_EndWildBattle(void)
     CpuFill16(0, (void *)(BG_PLTT), BG_PLTT_SIZE);
     ResetOamRange(0, 128);
 
+    FlagSet(GetObjectEventFlagIdByLocalIdAndMap(gObjectEvents[gSelectedObjectEvent].localId, gObjectEvents[gSelectedObjectEvent].mapNum, gObjectEvents[gSelectedObjectEvent].mapGroup));
+    RemoveObjectEvent(&gObjectEvents[gSelectedObjectEvent]);
+
     HealPlayerParty();
 
     if (IsPlayerDefeated(gBattleOutcome) == TRUE)

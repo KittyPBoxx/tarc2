@@ -437,3 +437,6 @@ EventScript_UseDefog::
 	waitstate
 	releaseall
 	end
+
+EventScript_Script_WildEncounter::
+	end

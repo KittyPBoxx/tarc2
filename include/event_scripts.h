@@ -47,6 +47,7 @@ extern const u8 EventScript_UseRockSmash[];
 extern const u8 EventScript_UseDig[];
 extern const u8 EventScript_UseCutGrass[];
 extern const u8 EventScript_UseDefog[];
+extern const u8 EventScript_Script_WildEncounter[];
 
 // Mauville Old Man (Giddy)
 extern const u8 GiddyText_Is[];

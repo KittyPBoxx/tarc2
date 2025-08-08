@@ -31,6 +31,7 @@
 #include "constants/songs.h"
 #include "constants/trainer_types.h"
 #include "field_control_avatar.h"
+#include "battle_setup.h"
 
 #define NUM_FORCED_MOVEMENTS 18
 
@@ -95,6 +96,7 @@ static bool8 CanStopSurfing(s16, s16, u8);
 static bool8 ShouldJumpLedge(s16, s16, u8);
 static bool8 TryPushBoulder(s16, s16, u8);
 static bool8 TryStopForInteraction(s16, s16, u8);
+static bool8 TryWildBattleCollision(s16, s16, u8);
 
 static void DoPlayerAvatarTransition(void);
 static void PlayerAvatarTransition_Dummy(struct ObjectEvent *);
@@ -846,7 +848,15 @@ u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u
         return COLLISION_PUSHED_BOULDER;
 
     if (collision == COLLISION_OBJECT_EVENT && TryStopForInteraction(x, y, direction))
-        return COLLISION_INTERACTABLE;    
+        return COLLISION_INTERACTABLE;
+
+    if (collision == COLLISION_OBJECT_EVENT && TryWildBattleCollision(x, y, direction))
+    {
+        LockPlayerFieldControls();
+        FreezeObjectEvents();
+        BattleSetup_StartWildBattle();
+        return COLLISION_INTERACTABLE;
+    }
 
     return collision;
 }
@@ -946,6 +956,20 @@ static bool8 TryStopForInteraction(s16 x, s16 y, u8 direction)
     return FALSE;
 }
 
+static bool8 TryWildBattleCollision(s16 x, s16 y, u8 direction)
+{
+    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+    u8 objectEventId = GetObjectEventIdByXY(x, y);
+    if (objectEventId != OBJECT_EVENTS_COUNT && gObjectEvents[objectEventId].graphicsId > OBJ_EVENT_GFX_SPECIES(NONE) && gObjectEvents[objectEventId].graphicsId < OBJ_EVENT_GFX_SPECIES(EGG))
+    {
+        PlayCry_Script(gObjectEvents[objectEventId].graphicsId - OBJ_EVENT_MON, 2);
+        ObjectEventTurn(playerObjEvent, direction);
+        CreateWildMon(gObjectEvents[objectEventId].graphicsId - OBJ_EVENT_MON, min(100, max(1, gObjectEvents[objectEventId].trainerRange_berryTreeId)));  
+        gSelectedObjectEvent = objectEventId;
+        return TRUE;
+    }
+    return FALSE;
+}
 
 bool8 IsPlayerCollidingWithFarawayIslandMew(u8 direction)
 {
@@ -2703,7 +2727,7 @@ static u8 CheckForCollision(s16 x, s16 y, u8 direction)
             return TRUE;
         case COLLISION_INTERACTABLE:
             return TRUE;
-        case COLLISION_WHEELIE_HOP:
+        case COLLISION_WILD_BATTLE:
             return TRUE;
         case COLLISION_ISOLATED_VERTICAL_RAIL:
             return TRUE;

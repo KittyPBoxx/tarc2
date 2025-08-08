@@ -233,7 +233,7 @@ void SetNextWeather(u8 weather)
 
     if (gWeatherPtr->nextWeather != weather && gWeatherPtr->currWeather == weather)
     {
-        sWeatherFuncs[weather].initVars();
+        sWeatherFuncs[WEATHER_NONE].initVars();
     }
 
     gWeatherPtr->weatherChangeComplete = FALSE;
@@ -282,7 +282,7 @@ static void Task_WeatherInit(u8 taskId)
     if (gWeatherPtr->readyForInit)
     {
         UpdateCameraPanning();
-        sWeatherFuncs[gWeatherPtr->currWeather].initAll();
+        sWeatherFuncs[WEATHER_NONE].initAll();
         gTasks[taskId].func = Task_WeatherMain;
     }
 }
@@ -291,11 +291,11 @@ static void Task_WeatherMain(u8 taskId)
 {
     if (gWeatherPtr->currWeather != gWeatherPtr->nextWeather)
     {
-        if (!sWeatherFuncs[gWeatherPtr->currWeather].finish()
+        if (!sWeatherFuncs[WEATHER_NONE].finish()
             && gWeatherPtr->palProcessingState != WEATHER_PAL_STATE_SCREEN_FADING_OUT)
         {
             // Finished cleaning up previous weather. Now transition to next weather.
-            sWeatherFuncs[gWeatherPtr->nextWeather].initVars();
+            sWeatherFuncs[WEATHER_NONE].initVars();
             gWeatherPtr->colorMapStepCounter = 0;
             gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_CHANGING_WEATHER;
             gWeatherPtr->currWeather = gWeatherPtr->nextWeather;
@@ -305,7 +305,7 @@ static void Task_WeatherMain(u8 taskId)
     }
     else
     {
-        sWeatherFuncs[gWeatherPtr->currWeather].main();
+        sWeatherFuncs[WEATHER_NONE].main();
     }
 
     gWeatherPalStateFuncs[gWeatherPtr->palProcessingState]();

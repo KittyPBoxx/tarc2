@@ -327,7 +327,21 @@ static u16 GetPlayerCurMetatileBehavior(int runningState)
 static bool8 TryStartInteractionScript(struct MapPosition *position, u16 metatileBehavior, u8 direction)
 {
     const u8 *script = GetInteractionScript(position, metatileBehavior, direction);
-    if (script == NULL || Script_HasNoEffect(script))
+
+    if (script == EventScript_Script_WildEncounter)
+    {
+        if (gSelectedObjectEvent != OBJECT_EVENTS_COUNT && gObjectEvents[gSelectedObjectEvent].graphicsId > OBJ_EVENT_GFX_SPECIES(NONE) && gObjectEvents[gSelectedObjectEvent].graphicsId < OBJ_EVENT_GFX_SPECIES(EGG))
+        {
+            PlayCry_Script(gObjectEvents[gSelectedObjectEvent].graphicsId - OBJ_EVENT_MON, 2);
+            CreateWildMon(gObjectEvents[gSelectedObjectEvent].graphicsId - OBJ_EVENT_MON, min(100, max(1, gObjectEvents[gSelectedObjectEvent].trainerRange_berryTreeId)));  
+            LockPlayerFieldControls();
+            FreezeObjectEvents();
+            BattleSetup_StartWildBattle();
+            return FALSE;
+        }
+    }
+
+    if (script == NULL || Script_HasNoEffect(script) || script == EventScript_Script_WildEncounter)
         return FALSE;
 
     PlaySE(SE_SELECT);
