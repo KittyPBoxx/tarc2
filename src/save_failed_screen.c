@@ -467,9 +467,6 @@ void CB2_FlashNotDetectedScreen(void)
     gMain.state++;
 }
 
-// TODO: TARC pic an intro frame
-static const u8 sTextWindowFrame9_Gfx[] = INCBIN_U8("graphics/text_window/2.4bpp");
-
 void CB2_TestResultCallback(void)
 {
     static const struct WindowTemplate textWin[] =
@@ -501,11 +498,11 @@ void CB2_TestResultCallback(void)
     DmaFill16(3, 0, PLTT, PLTT_SIZE);
     ResetBgsAndClearDma3BusyFlags(0);
     InitBgsFromTemplates(0, sBgTemplates, ARRAY_COUNT(sBgTemplates));
-    LoadBgTiles(0, sTextWindowFrame9_Gfx, 0x120, 0x214);
+    LoadBgTiles(0, gTextWindowFrame3_Gfx, 0x120, 0x214);
     DeactivateAllTextPrinters();
     ResetTasks();
     ResetPaletteFade();
-    LoadPalette(gTextWindowFrame1_Pal, 0xE0, 0x20);
+    LoadPalette(gTextWindowFrame3_Pal, 0xE0, 0x20);
     LoadPalette(gStandardMenuPalette, 0xF0, 0x20);
     InitWindows(textWin);
     DrawStdFrameWithCustomTileAndPalette(0, TRUE, 0x214, 0xE);
