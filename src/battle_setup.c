@@ -58,6 +58,7 @@ static void CB2_EndFirstBattle(void);
 static void SaveChangesToPlayerParty(void);
 static void CB2_EndTrainerBattle(void);
 static bool32 IsPlayerDefeated(u32 battleOutcome);
+static bool32 IsMonDefeated(u32 battleOutcome);
 static void RegisterTrainerInMatchCall(void);
 static void HandleRematchVarsOnBattleEnd(void);
 static const u8 *GetIntroSpeechOfApproachingTrainer(void);
@@ -344,8 +345,11 @@ static void CB2_EndWildBattle(void)
     CpuFill16(0, (void *)(BG_PLTT), BG_PLTT_SIZE);
     ResetOamRange(0, 128);
 
-    FlagSet(GetObjectEventFlagIdByLocalIdAndMap(gObjectEvents[gSelectedObjectEvent].localId, gObjectEvents[gSelectedObjectEvent].mapNum, gObjectEvents[gSelectedObjectEvent].mapGroup));
-    RemoveObjectEvent(&gObjectEvents[gSelectedObjectEvent]);
+    if (IsMonDefeated(gBattleOutcome))
+    {
+        FlagSet(GetObjectEventFlagIdByLocalIdAndMap(gObjectEvents[gSelectedObjectEvent].localId, gObjectEvents[gSelectedObjectEvent].mapNum, gObjectEvents[gSelectedObjectEvent].mapGroup));
+        RemoveObjectEvent(&gObjectEvents[gSelectedObjectEvent]);
+    }
 
     HealPlayerParty();
 
@@ -631,6 +635,24 @@ static bool32 IsPlayerDefeated(u32 battleOutcome)
     case B_OUTCOME_PLAYER_TELEPORTED:
     case B_OUTCOME_MON_FLED:
     case B_OUTCOME_CAUGHT:
+        return FALSE;
+    default:
+        return FALSE;
+    }
+}
+
+static bool32 IsMonDefeated(u32 battleOutcome)
+{
+    switch (battleOutcome)
+    {
+    case B_OUTCOME_WON:    
+    case B_OUTCOME_DREW:
+    case B_OUTCOME_CAUGHT:
+        return TRUE;
+    case B_OUTCOME_RAN:
+    case B_OUTCOME_PLAYER_TELEPORTED:
+    case B_OUTCOME_MON_FLED:
+    case B_OUTCOME_LOST:
         return FALSE;
     default:
         return FALSE;
