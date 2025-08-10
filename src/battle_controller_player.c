@@ -41,6 +41,7 @@
 #include "menu.h"
 #include "pokemon_summary_screen.h"
 #include "type_icons.h"
+#include "battle_mon_info.h"
 
 static void PlayerBufferExecCompleted(u32 battler);
 static void PlayerHandleLoadMonSprite(u32 battler);
@@ -75,6 +76,7 @@ static void PlayerHandleLinkStandbyMsg(u32 battler);
 static void PlayerHandleResetActionMoveSelection(u32 battler);
 static void PlayerHandleEndLinkBattle(u32 battler);
 static void PlayerHandleBattleDebug(u32 battler);
+static void PlayerHandleBattleMonInfo(u32 battler);
 
 static void PlayerBufferRunCommand(u32 battler);
 static void MoveSelectionDisplayPpNumber(u32 battler);
@@ -148,6 +150,7 @@ static void (*const sPlayerBufferCommands[CONTROLLER_CMDS_COUNT])(u32 battler) =
     [CONTROLLER_RESETACTIONMOVESELECTION] = PlayerHandleResetActionMoveSelection,
     [CONTROLLER_ENDLINKBATTLE]            = PlayerHandleEndLinkBattle,
     [CONTROLLER_DEBUGMENU]                = PlayerHandleBattleDebug,
+    [CONTROLLER_MONINFO]                  = PlayerHandleBattleMonInfo,
     [CONTROLLER_TERMINATOR_NOP]           = BtlController_TerminatorNop
 };
 
@@ -307,7 +310,7 @@ static void HandleInputChooseAction(u32 battler)
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_USE_MOVE, 0);
             break;
         case 1: // Top right
-            BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_DEBUG, 0);
+            BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_MON_INFO, 0);
             PlayerBufferExecCompleted(battler);
             break;
         case 2: // Bottom left
@@ -2064,6 +2067,21 @@ static void PlayerHandleBattleDebug(u32 battler)
     BeginNormalPaletteFade(-1, 0, 0, 0x10, 0);
     SetMainCallback2(CB2_BattleDebugMenu);
     gBattlerControllerFuncs[battler] = Controller_WaitForDebug;
+}
+
+static void Controller_WaitForInfo(u32 battler)
+{
+    if (gMain.callback2 == BattleMainCB2 && !gPaletteFade.active)
+    {
+        PlayerBufferExecCompleted(battler);
+    }
+}
+
+static void PlayerHandleBattleMonInfo(u32 battler)
+{
+    BeginNormalPaletteFade(-1, 0, 0, 0x10, 0);
+    SetMainCallback2(CB2_BattleInfoMenu);
+    gBattlerControllerFuncs[battler] = Controller_WaitForInfo;
 }
 
 // Order based numerically, with EFFECTIVENESS_CANNOT_VIEW at 0 to always prioritize any other effectiveness during comparison

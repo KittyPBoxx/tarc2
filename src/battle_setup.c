@@ -355,7 +355,14 @@ static void CB2_EndWildBattle(void)
 
     if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
-        SetMainCallback2(CB2_WhiteOut);
+        if (B_FLAG_NO_WHITEOUT)
+        {
+            SetMainCallback2(CB2_ReturnToField);
+            DowngradeBadPoison();
+            gFieldCallback = FieldCB_ReturnToFieldNoScriptCheckMusic;
+        }
+        else
+            SetMainCallback2(CB2_WhiteOut);
     }
     else
     {
@@ -372,7 +379,13 @@ static void CB2_EndScriptedWildBattle(void)
 
     if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
-        SetMainCallback2(CB2_WhiteOut);
+        if (B_FLAG_NO_WHITEOUT)
+        {
+            DowngradeBadPoison();
+            SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+        }
+        else
+            SetMainCallback2(CB2_WhiteOut);
     }
     else
     {
@@ -927,20 +940,28 @@ static void CB2_EndTrainerBattle(void)
     }
     else if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
-        if (FlagGet(B_FLAG_NO_WHITEOUT))
+        if (B_FLAG_NO_WHITEOUT)
+        {
             SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+            DowngradeBadPoison();
+        }
         else
             SetMainCallback2(CB2_WhiteOut);
     }
     else if (DidPlayerForfeitNormalTrainerBattle())
     {
+        if (B_FLAG_NO_WHITEOUT)
+        {
+            SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+            DowngradeBadPoison();
+        }
+        else
             SetMainCallback2(CB2_WhiteOut);
     }
     else
     {
         SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
         DowngradeBadPoison();
-        RegisterTrainerInMatchCall();
         SetBattledTrainersFlags();
     }
 }
@@ -954,7 +975,10 @@ static void CB2_EndRematchBattle(void)
     }
     else if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
-        SetMainCallback2(CB2_WhiteOut);
+        if (B_FLAG_NO_WHITEOUT)
+            SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+        else
+            SetMainCallback2(CB2_WhiteOut);
     }
     else
     {
