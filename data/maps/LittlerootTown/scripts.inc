@@ -29,10 +29,10 @@ LittlerootTown_EventScript_FatMan::
 	end
 
 LittlerootTown_EventScript_BoyName::
-.string "BOY$"
+.string "Berus$"
 
 LittlerootTown_EventScript_Boy::
-	setspeaker LittlerootTown_EventScript_BoyName
+	@ setspeaker LittlerootTown_EventScript_BoyName
 	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
 	msgbox LittlerootTown_Text_BirchSpendsDaysInLab, MSGBOX_NPC
 	removefieldmugshot

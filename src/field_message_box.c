@@ -43,6 +43,7 @@ static void Task_DrawFieldMessage(u8 taskId)
             break;
         case 1:
             DrawDialogueFrame(0, TRUE);
+            // This is baked into the sprite now
             if (gSpeakerName != NULL)
             {
                 DrawNamePlate(1, TRUE);
@@ -110,10 +111,11 @@ extern void FillDialogFramePlate();
 extern int GetDialogFramePlateWidth();
 static void ExpandStringAndStartDrawFieldMessage(const u8 *str, bool32 allowSkippingDelayWithButtonPress)
 {
+    // This is baked into the sprite now
     if (gSpeakerName != NULL)
     {
         int strLen;
-        const u8 colors[3] = {0, 1, 14};
+        const u8 colors[3] = {0, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY};
 
         StringExpandPlaceholders(gStringVar4, gSpeakerName);
         strLen = GetStringWidth(FONT_SMALL, gStringVar4, -1);
