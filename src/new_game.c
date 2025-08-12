@@ -19,6 +19,7 @@
 #include "constants/items.h"
 #include "difficulty.h"
 #include "script_pokemon_util.h"
+#include "constants/moves.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
 
@@ -99,7 +100,20 @@ void NewGameInitData(void)
     ResetGameStats();
     gPlayerPartyCount = 1;
     ZeroPlayerPartyMons();
-    ScriptGiveMon(SPECIES_DITTO, 5, ITEM_NONE);
+    //ScriptGiveMon(SPECIES_DITTO, 5, ITEM_BOTTLE_CAP);
+
+    u16 monData;
+    CreateMon(&gPlayerParty[0], SPECIES_DITTO, 7, 0, FALSE, 0, OT_ID_PLAYER_ID, 0);
+    monData = TRUE;
+    SetMonData(&gPlayerParty[0], MON_DATA_ABILITY_NUM, &monData);
+    monData = MOVE_SPLASH;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_BOTTLE_CAP;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+
     ClearBag();
     ResetFanClub();
     InitialWarp();

@@ -367,6 +367,7 @@ static void (*const sTurnActionsFuncsTable[])(void) =
     [B_ACTION_FINISHED]               = HandleAction_ActionFinished,
     [B_ACTION_NOTHING_FAINTED]        = HandleAction_NothingIsFainted,
     [B_ACTION_THROW_BALL]             = HandleAction_ThrowBall,
+    [B_ACTION_PRAYER]                 = HandleAction_UseMove,
 };
 
 static void (*const sEndTurnFuncsTable[])(void) =
@@ -3097,6 +3098,8 @@ static void HandleTurnActionSelectionState(void)
                 switch (gBattleResources->bufferB[battler][1])
                 {
                 case B_ACTION_USE_MOVE:
+                    gBattleStruct->isPrayer = FALSE;
+
                     if (AreAllMovesUnusable(battler))
                     {
                         gBattleCommunication[battler] = STATE_SELECTION_SCRIPT;
@@ -3135,6 +3138,36 @@ static void HandleTurnActionSelectionState(void)
                         BtlController_EmitChooseMove(battler, B_COMM_TO_CONTROLLER, IsDoubleBattle() != 0, FALSE, &moveInfo);
                         MarkBattlerForControllerExec(battler);
                     }
+                    break;
+                case B_ACTION_PRAYER:
+                    struct ChooseMoveStruct moveInfo;
+
+                    moveInfo.zmove = gBattleStruct->zmove;
+                    moveInfo.species = gBattleMons[battler].species;
+                    moveInfo.monTypes[0] = gBattleMons[battler].types[0];
+                    moveInfo.monTypes[1] = gBattleMons[battler].types[1];
+                    moveInfo.monTypes[2] = gBattleMons[battler].types[2];
+
+                    moveInfo.moves[0] = MOVE_SKETCH;
+                    moveInfo.currentPp[0] = 100;
+                    moveInfo.maxPp[0] = 100;
+
+                    moveInfo.moves[1] = MOVE_TRANSFORM;
+                    moveInfo.currentPp[1] = 100;
+                    moveInfo.maxPp[1] = 100;
+
+                    moveInfo.moves[2] = MOVE_SKILL_SWAP;
+                    moveInfo.currentPp[2] = 100;
+                    moveInfo.maxPp[2] = 100;
+
+                    moveInfo.moves[3] = MOVE_SWITCHEROO;
+                    moveInfo.currentPp[3] = 100;
+                    moveInfo.maxPp[3] = 100;
+
+                    gBattleStruct->isPrayer = TRUE;
+
+                    BtlController_EmitChooseMove(battler, B_COMM_TO_CONTROLLER, IsDoubleBattle() != 0, FALSE, &moveInfo);
+                    MarkBattlerForControllerExec(battler);
                     break;
                 case B_ACTION_USE_ITEM:
                     if (FlagGet(B_FLAG_NO_BAG_USE))
@@ -3316,11 +3349,48 @@ static void HandleTurnActionSelectionState(void)
                                 gBattleStruct->dynamax.baseMoves[battler] = gBattleMons[battler].moves[gBattleStruct->chosenMovePositions[battler]];
                             }
                             gBattleCommunication[battler]++;
+                        }
+                        break;
+                    }
+                    break;
+                case B_ACTION_PRAYER:
+                    switch (gBattleResources->bufferB[battler][1])
+                    {
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                        gChosenActionByBattler[battler] = gBattleResources->bufferB[battler][1];
+                        return;
+                    case 15:
+                        gChosenActionByBattler[battler] = B_ACTION_SWITCH;
+                        UpdateBattlerPartyOrdersOnSwitch(battler);
+                        return;
+                    default:
+                        if ((gBattleResources->bufferB[battler][2] | (gBattleResources->bufferB[battler][3] << 8)) == 0xFFFF)
+                        {
+                            gBattleCommunication[battler] = STATE_BEFORE_ACTION_CHOSEN;
+                        }
+                        else
+                        {
+                            // Get the chosen move position (and thus the chosen move) and target from the returned buffer.
+                            gBattleStruct->chosenMovePositions[battler] = gBattleResources->bufferB[battler][2] & ~RET_GIMMICK;
+                            gChosenMoveByBattler[battler] = gBattleMons[battler].moves[gBattleStruct->chosenMovePositions[battler]];
+                            gBattleStruct->moveTarget[battler] = gBattleResources->bufferB[battler][3];
 
-                            if (gTestRunnerEnabled)
+                            // Check to see if any gimmicks need to be prepared.
+                            if (gBattleResources->bufferB[battler][2] & RET_GIMMICK)
+                                gBattleStruct->gimmick.toActivate |= 1u << battler;
+
+                            // Max Move check
+                            if (GetActiveGimmick(battler) == GIMMICK_DYNAMAX || IsGimmickSelected(battler, GIMMICK_DYNAMAX))
                             {
-                                TestRunner_Battle_CheckChosenMove(battler, gChosenMoveByBattler[battler], gBattleStruct->moveTarget[battler]);
+                                gBattleStruct->dynamax.baseMoves[battler] = gBattleMons[battler].moves[gBattleStruct->chosenMovePositions[battler]];
                             }
+                            gBattleCommunication[battler]++;
                         }
                         break;
                     }
@@ -3733,9 +3803,9 @@ s32 GetWhichBattlerFasterOrTies(u32 battler1, u32 battler2, bool32 ignoreChosenM
 
     if (!ignoreChosenMoves)
     {
-        if (gChosenActionByBattler[battler1] == B_ACTION_USE_MOVE)
+        if (gChosenActionByBattler[battler1] == B_ACTION_USE_MOVE || gChosenActionByBattler[battler1] == B_ACTION_PRAYER)
             priority1 = GetChosenMovePriority(battler1, ability1);
-        if (gChosenActionByBattler[battler2] == B_ACTION_USE_MOVE)
+        if (gChosenActionByBattler[battler2] == B_ACTION_USE_MOVE || gChosenActionByBattler[battler2] == B_ACTION_PRAYER)
             priority2 = GetChosenMovePriority(battler2, ability2);
     }
 
@@ -4053,8 +4123,12 @@ static void TryChangeTurnOrder(void)
             u32 battler1 = gBattlerByTurnOrder[i];
             u32 battler2 = gBattlerByTurnOrder[j];
 
-            if (gActionsByTurnOrder[i] == B_ACTION_USE_MOVE
-                && gActionsByTurnOrder[j] == B_ACTION_USE_MOVE)
+            if (gActionsByTurnOrder[i] == B_ACTION_USE_MOVE && gActionsByTurnOrder[j] == B_ACTION_USE_MOVE)
+            {
+                if (GetWhichBattlerFaster(battler1, battler2, FALSE) == -1)
+                    SwapTurnOrder(i, j);
+            }
+            else if (gActionsByTurnOrder[i] == B_ACTION_PRAYER && gActionsByTurnOrder[j] == B_ACTION_PRAYER)
             {
                 if (GetWhichBattlerFaster(battler1, battler2, FALSE) == -1)
                     SwapTurnOrder(i, j);
@@ -4101,7 +4175,7 @@ static void CheckChangingTurnOrderEffects(void)
         {
             battler = gBattlerAttacker = gBattleStruct->quickClawBattlerId;
             gBattleStruct->quickClawBattlerId++;
-            if (gChosenActionByBattler[battler] == B_ACTION_USE_MOVE
+            if ((gChosenActionByBattler[battler] == B_ACTION_USE_MOVE || gChosenActionByBattler[battler] == B_ACTION_PRAYER)
              && gChosenMoveByBattler[battler] != MOVE_FOCUS_PUNCH   // quick claw message doesn't need to activate here
              && (gProtectStructs[battler].usedCustapBerry || gProtectStructs[battler].quickDraw)
              && !(gBattleMons[battler].status1 & STATUS1_SLEEP)
@@ -4162,7 +4236,7 @@ static void RunTurnActionsFunctions(void)
         gCurrentActionFuncId = B_ACTION_FINISHED;
 
     // Mega Evolve / Focus Punch-like moves after switching, items, running, but before using a move.
-    if (gCurrentActionFuncId == B_ACTION_USE_MOVE && !gBattleStruct->effectsBeforeUsingMoveDone)
+    if ((gCurrentActionFuncId == B_ACTION_USE_MOVE || gCurrentActionFuncId == B_ACTION_PRAYER) && !gBattleStruct->effectsBeforeUsingMoveDone)
     {
         if (!IsPursuitTargetSet())
         {

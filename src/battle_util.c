@@ -358,7 +358,33 @@ void HandleAction_UseMove(void)
     gCurrMovePos = gChosenMovePos = gBattleStruct->chosenMovePositions[gBattlerAttacker];
 
     // choose move
-    if (gProtectStructs[gBattlerAttacker].noValidMoves)
+    if (IsOnPlayerSide(gBattlerAttacker) && gBattleStruct->isPrayer)
+    {
+        gBattleStruct->isPrayer = FALSE;
+        gHitMarker |= HITMARKER_NO_PPDEDUCT;
+
+        if (gCurrMovePos == 0)
+        {
+            gCurrentMove = gChosenMove = MOVE_SKETCH;
+            gBattleStruct->moveTarget[gBattlerAttacker] = GetBattleMoveTarget(MOVE_STRUGGLE, NO_TARGET_OVERRIDE);
+        }
+        else if (gCurrMovePos == 1)
+        {
+            gCurrentMove = gChosenMove = MOVE_TRANSFORM;
+            gBattleStruct->moveTarget[gBattlerAttacker] = GetBattleMoveTarget(MOVE_STRUGGLE, NO_TARGET_OVERRIDE);
+        }
+        else if (gCurrMovePos == 2)
+        {
+            gCurrentMove = gChosenMove = MOVE_SKILL_SWAP;
+            gBattleStruct->moveTarget[gBattlerAttacker] = GetBattleMoveTarget(MOVE_STRUGGLE, NO_TARGET_OVERRIDE);
+        }
+        else
+        {
+            gCurrentMove = gChosenMove = MOVE_SWITCHEROO;
+            gBattleStruct->moveTarget[gBattlerAttacker] = GetBattleMoveTarget(MOVE_STRUGGLE, NO_TARGET_OVERRIDE);
+        }
+    }
+    else if (gProtectStructs[gBattlerAttacker].noValidMoves)
     {
         gProtectStructs[gBattlerAttacker].noValidMoves = FALSE;
         gCurrentMove = gChosenMove = MOVE_STRUGGLE;
@@ -817,6 +843,11 @@ void HandleAction_ActionFinished(void)
                 // We recalculate order only for action of the same priority. If any action other than switch/move has been taken, they should
                 // have been executed before. The only recalculation needed is for moves/switch. Mega evolution is handled in src/battle_main.c/TryChangeOrder
                 if((gActionsByTurnOrder[i] == B_ACTION_USE_MOVE && gActionsByTurnOrder[j] == B_ACTION_USE_MOVE))
+                {
+                    if (GetWhichBattlerFaster(battler1, battler2, FALSE) == -1)
+                        SwapTurnOrder(i, j);
+                }
+                else if((gActionsByTurnOrder[i] == B_ACTION_PRAYER && gActionsByTurnOrder[j] == B_ACTION_PRAYER))
                 {
                     if (GetWhichBattlerFaster(battler1, battler2, FALSE) == -1)
                         SwapTurnOrder(i, j);
@@ -5287,7 +5318,7 @@ static inline bool32 CanBreakThroughAbility(u32 battlerAtk, u32 battlerDef, u32 
          && battlerDef != battlerAtk
          && gAbilitiesInfo[gBattleMons[battlerDef].ability].breakable
          && gBattlerByTurnOrder[gCurrentTurnActionNumber] == battlerAtk
-         && gActionsByTurnOrder[gCurrentTurnActionNumber] == B_ACTION_USE_MOVE
+         && (gActionsByTurnOrder[gCurrentTurnActionNumber] == B_ACTION_USE_MOVE || gActionsByTurnOrder[gCurrentTurnActionNumber] == B_ACTION_PRAYER)
          && gCurrentTurnActionNumber < gBattlersCount);
 }
 

@@ -258,8 +258,8 @@ const struct TypeInfo gTypesInfo[NUMBER_OF_MON_TYPES] =
     },
     [TYPE_MYSTERY] =
     {
-        .name = _("???"),
-        .generic = _("a ??? move"),
+        .name = _("Divine"),
+        .generic = _("a divine move"),
         .palette = 15,
         .teraTypeRGBValue = RGB_WHITE,
         .damageCategory = DAMAGE_CATEGORY_SPECIAL,

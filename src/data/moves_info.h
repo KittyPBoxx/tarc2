@@ -3265,17 +3265,17 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
 
     [MOVE_TRANSFORM] =
     {
-        .name = COMPOUND_STRING("Transform"),
+        .name = COMPOUND_STRING("Transmute"),
         .description = COMPOUND_STRING(
-            "Alters the user's cells to\n"
-            "become a copy of the foe."),
+            "Copies the foes species\n"
+            "permanently."),
         .effect = EFFECT_TRANSFORM,
         .power = 0,
-        .type = TYPE_NORMAL,
+        .type = TYPE_MYSTERY,
         .accuracy = 0,
-        .pp = 10,
+        .pp = 100,
         .target = MOVE_TARGET_SELECTED,
-        .priority = 0,
+        .priority = 5,
         .category = DAMAGE_CATEGORY_STATUS,
         .zMove = { .effect = Z_EFFECT_RECOVER_HP },
         .ignoresProtect = TRUE,
@@ -3768,11 +3768,11 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
             "permanently."),
         .effect = EFFECT_SKETCH,
         .power = 0,
-        .type = TYPE_NORMAL,
+        .type = TYPE_MYSTERY,
         .accuracy = 0,
-        .pp = 1,
+        .pp = 100,
         .target = MOVE_TARGET_SELECTED,
-        .priority = 0,
+        .priority = 5,
         .category = DAMAGE_CATEGORY_STATUS,
         .zMove = { .effect = Z_EFFECT_ALL_STATS_UP_1 },
         .ignoresProtect = TRUE,
@@ -6402,17 +6402,17 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
 
     [MOVE_SKILL_SWAP] =
     {
-        .name = COMPOUND_STRING("Skill Swap"),
+        .name = COMPOUND_STRING("Transference"),
         .description = COMPOUND_STRING(
             "The user swaps special\n"
-            "abilities with the target."),
+            "abilities permanently."),
         .effect = EFFECT_SKILL_SWAP,
         .power = 0,
-        .type = TYPE_PSYCHIC,
+        .type = TYPE_MYSTERY,
         .accuracy = 0,
-        .pp = 10,
+        .pp = 100,
         .target = MOVE_TARGET_SELECTED,
-        .priority = 0,
+        .priority = 5,
         .category = DAMAGE_CATEGORY_STATUS,
         .zMove = { .effect = Z_EFFECT_SPD_UP_1 },
         .ignoresSubstitute = TRUE,
@@ -9143,17 +9143,17 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
 
     [MOVE_SWITCHEROO] =
     {
-        .name = COMPOUND_STRING("Switcheroo"),
+        .name = COMPOUND_STRING("Barter"),
         .description = COMPOUND_STRING(
             "Swaps items with the foe\n"
-            "faster than the eye can see."),
+            "permanently."),
         .effect = EFFECT_TRICK,
         .power = 0,
-        .type = TYPE_DARK,
-        .accuracy = 100,
-        .pp = 10,
+        .type = TYPE_MYSTERY,
+        .accuracy = 0,
+        .pp = 100,
         .target = MOVE_TARGET_SELECTED,
-        .priority = 0,
+        .priority = 5,
         .category = DAMAGE_CATEGORY_STATUS,
         .zMove = { .effect = Z_EFFECT_SPD_UP_2 },
         .metronomeBanned = TRUE,

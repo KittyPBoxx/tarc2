@@ -8285,7 +8285,7 @@ static bool32 DoSwitchInEffectsForBattler(u32 battler)
         // There is a hack here to ensure the truant counter will be 0 when the battler's next turn starts.
         // The truant counter is not updated in the case where a mon switches in after a lost judgment in the battle arena.
         if (battlerAbility == ABILITY_TRUANT
-            && gCurrentActionFuncId != B_ACTION_USE_MOVE
+            && (gCurrentActionFuncId != B_ACTION_USE_MOVE && gCurrentActionFuncId != B_ACTION_PRAYER)
             && !gDisableStructs[battler].truantSwitchInHack)
             gDisableStructs[battler].truantCounter = 1;
 
@@ -14186,7 +14186,7 @@ static bool32 SetTargetToNextPursuiter(u32 battlerDef)
     for (i = gCurrentTurnActionNumber + 1; i < gBattlersCount; i++)
     {
         u32 battler = gBattlerByTurnOrder[i];
-        if (gChosenActionByBattler[battler] == B_ACTION_USE_MOVE
+        if ((gChosenActionByBattler[battler] == B_ACTION_USE_MOVE || gChosenActionByBattler[battler] == B_ACTION_PRAYER)
         && GetMoveEffect(gChosenMoveByBattler[battler]) == EFFECT_PURSUIT
         && IsBattlerAlive(battlerDef)
         && IsBattlerAlive(battler)
@@ -15539,7 +15539,7 @@ static void Cmd_pursuitdoubles(void)
 
     if (IsDoubleBattle()
         && !(gAbsentBattlerFlags & (1u << battler))
-        && gChosenActionByBattler[battler] == B_ACTION_USE_MOVE
+        && (gChosenActionByBattler[battler] == B_ACTION_USE_MOVE || gChosenActionByBattler[battler] == B_ACTION_PRAYER)
         && GetMoveEffect(gChosenMoveByBattler[battler]) == EFFECT_PURSUIT)
     {
         gActionsByTurnOrder[battler] = B_ACTION_TRY_FINISH;
@@ -17234,7 +17234,7 @@ void BS_SetPledge(void)
 
         gBattleCommunication[MSG_DISPLAY] = 0;
     }
-    else if ((gChosenActionByBattler[partner] == B_ACTION_USE_MOVE)
+    else if ((gChosenActionByBattler[partner] == B_ACTION_USE_MOVE || gChosenActionByBattler[partner] == B_ACTION_PRAYER)
           && IsDoubleBattle()
           && IsBattlerAlive(partner)
           && GetBattlerTurnOrderNum(gBattlerAttacker) < GetBattlerTurnOrderNum(partner)
