@@ -2344,7 +2344,7 @@ static void DoBattleIntro(void)
                 gBattleMons[battler].types[0] = gSpeciesInfo[gBattleMons[battler].species].types[0];
                 gBattleMons[battler].types[1] = gSpeciesInfo[gBattleMons[battler].species].types[1];
                 gBattleMons[battler].types[2] = TYPE_MYSTERY;
-                gBattleMons[battler].ability = GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum);
+                gBattleMons[battler].ability = GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum, GetMonData(GetBattlerMon(battler), MON_DATA_OVERWRITTEN_ABILITY, NULL));
                 gBattleStruct->hpOnSwitchout[GetBattlerSide(battler)] = gBattleMons[battler].hp;
                 gBattleMons[battler].status2 = 0;
                 for (i = 0; i < NUM_BATTLE_STATS; i++)
@@ -4423,8 +4423,8 @@ static void HandleEndTurn_FinishBattle(void)
             TestRunner_Battle_AfterLastTurn();
         BeginFastPaletteFade(3);
         FadeOutMapMusic(5);
-        if (B_TRAINERS_KNOCK_OFF_ITEMS == TRUE || B_RESTORE_HELD_BATTLE_ITEMS >= GEN_9)
-            TryRestoreHeldItems();
+        // if (B_TRAINERS_KNOCK_OFF_ITEMS == TRUE || B_RESTORE_HELD_BATTLE_ITEMS >= GEN_9)
+        //     TryRestoreHeldItems();
 
         // Undo Dynamax HP multiplier before recalculating stats.
         for (battler = 0; battler < gBattlersCount; ++battler)

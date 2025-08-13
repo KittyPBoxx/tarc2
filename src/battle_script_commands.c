@@ -7605,7 +7605,7 @@ static void Cmd_switchindataupdate(void)
     gBattleMons[battler].types[0] = gSpeciesInfo[gBattleMons[battler].species].types[0];
     gBattleMons[battler].types[1] = gSpeciesInfo[gBattleMons[battler].species].types[1];
     gBattleMons[battler].types[2] = TYPE_MYSTERY;
-    gBattleMons[battler].ability = GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum);
+    gBattleMons[battler].ability = GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum, GetMonData(GetBattlerMon(battler), MON_DATA_OVERWRITTEN_ABILITY, NULL));
     #if TESTING
     if (gTestRunnerEnabled)
     {
@@ -13129,18 +13129,32 @@ static void Cmd_transformdataexecution(void)
         battleMonAttacker = (u8 *)(&gBattleMons[gBattlerAttacker]);
         battleMonTarget = (u8 *)(&gBattleMons[gBattlerTarget]);
 
-        for (i = 0; i < offsetof(struct BattlePokemon, pp); i++)
+        for (i = 0; i < 0x0C; i++) // BattlePokemon.species -> BattlePokemon.spDefense
             battleMonAttacker[i] = battleMonTarget[i];
 
-        gDisableStructs[gBattlerAttacker].overwrittenAbility = GetBattlerAbility(gBattlerTarget);
-        for (i = 0; i < MAX_MON_MOVES; i++)
-        {
-            u32 pp = GetMovePP(gBattleMons[gBattlerAttacker].moves[i]);
-            if (pp < 5)
-                gBattleMons[gBattlerAttacker].pp[i] = pp;
-            else
-                gBattleMons[gBattlerAttacker].pp[i] = 5;
-        }
+        // Dont copy moves
+
+        for (i = 0x14; i < 0x20; i++) // BattlePokemon.hpIV -> BattlePokemon.statStages
+            battleMonAttacker[i] = battleMonTarget[i];
+
+        // Don't copy ability
+
+        for (i = 0x22; i < 0x25; i++) // BattlePokemon.types -> BattlePokemon.types
+            battleMonAttacker[i] = battleMonTarget[i];
+
+        // Copy species back to player party
+        SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &gBattleMons[gBattlerTarget].species);
+
+        // gDisableStructs[gBattlerAttacker].overwrittenAbility = GetBattlerAbility(gBattlerTarget);
+
+        // for (i = 0; i < MAX_MON_MOVES; i++)
+        // {
+        //     u32 pp = GetMovePP(gBattleMons[gBattlerAttacker].moves[i]);
+        //     if (pp < 5)
+        //         gBattleMons[gBattlerAttacker].pp[i] = pp;
+        //     else
+        //         gBattleMons[gBattlerAttacker].pp[i] = 5;
+        // }
 
         // update AI knowledge
         RecordAllMoves(gBattlerAttacker);
@@ -13571,9 +13585,7 @@ static void Cmd_copymovepermanently(void)
 
     gChosenMove = MOVE_UNAVAILABLE;
 
-    if (!(gBattleMons[gBattlerAttacker].status2 & STATUS2_TRANSFORMED)
-        && gLastPrintedMoves[gBattlerTarget] != MOVE_UNAVAILABLE
-        && !IsMoveSketchBanned(gLastPrintedMoves[gBattlerTarget]))
+    if (gLastPrintedMoves[gBattlerTarget] != MOVE_UNAVAILABLE && !IsMoveSketchBanned(gLastPrintedMoves[gBattlerTarget]))
     {
         s32 i;
 
@@ -13870,7 +13882,7 @@ static void Cmd_healpartystatus(void)
                 ability = GetBattlerAbility(partner);
             else
             {
-                ability = GetAbilityBySpecies(species, abilityNum);
+                ability = GetAbilityBySpecies(species, abilityNum, GetMonData(GetBattlerMon(partner), MON_DATA_OVERWRITTEN_ABILITY, NULL));
                 #if TESTING
                 if (gTestRunnerEnabled)
                 {
@@ -15047,6 +15059,11 @@ static void Cmd_tryswapabilities(void)
         }
         else
         {
+            if (IsOnPlayerSide(gBattlerAttacker))
+            {
+                SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &gBattleMons[gBattlerTarget].ability);
+            }
+
             if (!IsBattlerAlly(gBattlerAttacker, gBattlerTarget))
                 gBattleScripting.abilityPopupOverwrite = gBattleMons[gBattlerAttacker].ability;
             gLastUsedAbility = gBattleMons[gBattlerTarget].ability;
@@ -17910,7 +17927,7 @@ static void UpdatePokeFlutePartyStatus(struct Pokemon* party, u8 position)
         if (species != SPECIES_NONE
             && species != SPECIES_EGG
             && status & AILMENT_FNT
-            && GetAbilityBySpecies(species, abilityNum) != ABILITY_SOUNDPROOF)
+            && GetAbilityBySpecies(species, abilityNum, ABILITY_NONE) != ABILITY_SOUNDPROOF)
             monToCheck |= (1 << i);
     }
     if (monToCheck)

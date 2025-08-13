@@ -2204,11 +2204,8 @@ u32 GetBoxMonData3(struct BoxPokemon *boxMon, s32 field, u8 *data)
         case MON_DATA_SPDEF_EV:
             retVal = substruct2->spDefenseEV;
             break;
-        case MON_DATA_COOL:
-            retVal = substruct2->cool;
-            break;
-        case MON_DATA_BEAUTY:
-            retVal = substruct2->beauty;
+        case MON_DATA_OVERWRITTEN_ABILITY:
+            retVal = substruct2->overwrittenAbility;
             break;
         case MON_DATA_CUTE:
             retVal = substruct2->cute;
@@ -2699,11 +2696,8 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
         case MON_DATA_SPDEF_EV:
             SET8(substruct2->spDefenseEV);
             break;
-        case MON_DATA_COOL:
-            SET8(substruct2->cool);
-            break;
-        case MON_DATA_BEAUTY:
-            SET8(substruct2->beauty);
+        case MON_DATA_OVERWRITTEN_ABILITY:
+            SET16(substruct2->overwrittenAbility);
             break;
         case MON_DATA_CUTE:
             SET8(substruct2->cute);
@@ -3065,9 +3059,15 @@ u8 GetMonsStateToDoubles_2(void)
     return (aliveCount > 1) ? PLAYER_HAS_TWO_USABLE_MONS : PLAYER_HAS_ONE_USABLE_MON;
 }
 
-u16 GetAbilityBySpecies(u16 species, u8 abilityNum)
+u16 GetAbilityBySpecies(u16 species, u8 abilityNum, u16 overwrittenAbility)
 {
     int i;
+
+    if (overwrittenAbility != ABILITY_NONE)
+    {
+        gLastUsedAbility = overwrittenAbility;
+        return overwrittenAbility;
+    }
 
     if (abilityNum < NUM_ABILITY_SLOTS)
         gLastUsedAbility = gSpeciesInfo[species].abilities[abilityNum];
@@ -3094,7 +3094,7 @@ u16 GetMonAbility(struct Pokemon *mon)
 {
     u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
     u8 abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
-    return GetAbilityBySpecies(species, abilityNum);
+    return GetAbilityBySpecies(species, abilityNum, ABILITY_NONE);
 }
 
 u8 GetSecretBaseTrainerPicIndex(void)
@@ -3232,7 +3232,7 @@ void PokemonToBattleMon(struct Pokemon *src, struct BattlePokemon *dst)
     dst->types[1] = gSpeciesInfo[dst->species].types[1];
     dst->types[2] = TYPE_MYSTERY;
     dst->isShiny = IsMonShiny(src);
-    dst->ability = GetAbilityBySpecies(dst->species, dst->abilityNum);
+    dst->ability = GetAbilityBySpecies(dst->species, dst->abilityNum, GetMonData(src, MON_DATA_OVERWRITTEN_ABILITY, NULL));
     GetMonData(src, MON_DATA_NICKNAME, nickname);
     StringCopy_Nickname(dst->nickname, nickname);
     GetMonData(src, MON_DATA_OT_NAME, dst->otName);
@@ -4088,14 +4088,14 @@ bool32 DoesMonMeetAdditionalConditions(struct Pokemon *mon, const struct Evoluti
             break;
         case IF_MIN_BEAUTY:
         {
-            u32 beauty = GetMonData(mon, MON_DATA_BEAUTY, 0);
+            u32 beauty = GetMonData(mon, MON_DATA_CUTE, 0);
             if (beauty >= params[i].arg1)
                 currentCondition = TRUE;
             break;
         }
         case IF_MIN_COOLNESS:
         {
-            u32 coolness = GetMonData(mon, MON_DATA_COOL, 0);
+            u32 coolness = GetMonData(mon, MON_DATA_CUTE, 0);
             if (coolness >= params[i].arg1)
                 currentCondition = TRUE;
             break;
@@ -5738,7 +5738,7 @@ u32 GetFormChangeTargetSpeciesBoxMon(struct BoxPokemon *boxMon, enum FormChanges
     if (formChanges != NULL)
     {
         heldItem = GetBoxMonData(boxMon, MON_DATA_HELD_ITEM, NULL);
-        ability = GetAbilityBySpecies(species, GetBoxMonData(boxMon, MON_DATA_ABILITY_NUM, NULL));
+        ability = GetAbilityBySpecies(species, GetBoxMonData(boxMon, MON_DATA_ABILITY_NUM, NULL), ABILITY_NONE);
 
         for (i = 0; formChanges[i].method != FORM_CHANGE_TERMINATOR; i++)
         {

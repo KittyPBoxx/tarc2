@@ -10595,10 +10595,7 @@ void TrySaveExchangedItem(u32 battler, u16 stolenItem)
     if (B_TRAINERS_KNOCK_OFF_ITEMS == FALSE)
         return;
     // If regular trainer battle and mon's original item matches what is being stolen, save it to be restored at end of battle
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER
-      && !(gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
-      && IsOnPlayerSide(battler)
-      && stolenItem == gBattleStruct->itemLost[B_SIDE_PLAYER][gBattlerPartyIndexes[battler]].originalItem)
+    if (IsOnPlayerSide(battler))
         gBattleStruct->itemLost[B_SIDE_PLAYER][gBattlerPartyIndexes[battler]].stolen = TRUE;
 }
 

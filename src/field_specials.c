@@ -987,16 +987,16 @@ void ResetTrickHouseNuggetFlag(void)
 
 bool8 CheckLeadMonCool(void)
 {
-    if (GetMonData(&gPlayerParty[GetLeadMonIndex()], MON_DATA_COOL) < 200)
-        return FALSE;
+    // if (GetMonData(&gPlayerParty[GetLeadMonIndex()], MON_DATA_COOL) < 200)
+    //     return FALSE;
 
     return TRUE;
 }
 
 bool8 CheckLeadMonBeauty(void)
 {
-    if (GetMonData(&gPlayerParty[GetLeadMonIndex()], MON_DATA_BEAUTY) < 200)
-        return FALSE;
+    // if (GetMonData(&gPlayerParty[GetLeadMonIndex()], MON_DATA_BEAUTY) < 200)
+    //     return FALSE;
 
     return TRUE;
 }

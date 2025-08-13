@@ -1266,11 +1266,11 @@ static u32 GetBattlerMonData(u32 battler, struct Pokemon *party, u32 monId, u8 *
         size = 2;
         break;
     case REQUEST_COOL_BATTLE:
-        dst[0] = GetMonData(&party[monId], MON_DATA_COOL);
+        dst[0] = GetMonData(&party[monId], MON_DATA_CUTE);
         size = 1;
         break;
     case REQUEST_BEAUTY_BATTLE:
-        dst[0] = GetMonData(&party[monId], MON_DATA_BEAUTY);
+        dst[0] = GetMonData(&party[monId], MON_DATA_CUTE);
         size = 1;
         break;
     case REQUEST_CUTE_BATTLE:
@@ -1495,10 +1495,10 @@ static void SetBattlerMonData(u32 battler, struct Pokemon *party, u32 monId)
         SetMonData(&party[monId], MON_DATA_SPDEF, &gBattleResources->bufferA[battler][3]);
         break;
     case REQUEST_COOL_BATTLE:
-        SetMonData(&party[monId], MON_DATA_COOL, &gBattleResources->bufferA[battler][3]);
+        SetMonData(&party[monId], MON_DATA_CUTE, &gBattleResources->bufferA[battler][3]);
         break;
     case REQUEST_BEAUTY_BATTLE:
-        SetMonData(&party[monId], MON_DATA_BEAUTY, &gBattleResources->bufferA[battler][3]);
+        SetMonData(&party[monId], MON_DATA_CUTE, &gBattleResources->bufferA[battler][3]);
         break;
     case REQUEST_CUTE_BATTLE:
         SetMonData(&party[monId], MON_DATA_CUTE, &gBattleResources->bufferA[battler][3]);

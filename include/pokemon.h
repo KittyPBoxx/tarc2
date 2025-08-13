@@ -43,8 +43,7 @@ enum {
     MON_DATA_PP3,
     MON_DATA_PP4,
     MON_DATA_PP_BONUSES,
-    MON_DATA_COOL,
-    MON_DATA_BEAUTY,
+    MON_DATA_OVERWRITTEN_ABILITY,
     MON_DATA_CUTE,
     MON_DATA_EXP,
     MON_DATA_HP_EV,
@@ -166,8 +165,7 @@ struct PokemonSubstruct2
     u8 speedEV;
     u8 spAttackEV;
     u8 spDefenseEV;
-    u8 cool;
-    u8 beauty;
+    u16 overwrittenAbility;
     u8 cute;
     u8 smart;
     u8 tough;
@@ -700,7 +698,7 @@ u8 CalculateEnemyPartyCount(void);
 u8 CalculateEnemyPartyCountInSide(u32 battler);
 u8 GetMonsStateToDoubles(void);
 u8 GetMonsStateToDoubles_2(void);
-u16 GetAbilityBySpecies(u16 species, u8 abilityNum);
+u16 GetAbilityBySpecies(u16 species, u8 abilityNum, u16 overwrittenAbility);
 u16 GetMonAbility(struct Pokemon *mon);
 u8 GetSecretBaseTrainerPicIndex(void);
 u8 GetSecretBaseTrainerClass(void);
