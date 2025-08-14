@@ -813,7 +813,7 @@ static u8 CheckForPlayerAvatarCollision(u8 direction)
         return COLLISION_STAIR_WARP;
 
     MoveCoords(direction, &x, &y);
-    return CheckForObjectEventCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y));
+    return CheckForObjectEventCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y), FALSE);
 }
 
 static u8 CheckForPlayerAvatarStaticCollision(u8 direction)
@@ -827,7 +827,7 @@ static u8 CheckForPlayerAvatarStaticCollision(u8 direction)
     return GetCollisionAtCoords(playerObjEvent, x, y, direction);
 }
 
-u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 direction, u8 metatileBehavior)
+u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 direction, u8 metatileBehavior, bool8 isGrinding)
 {
     u8 collision = GetCollisionAtCoords(objectEvent, x, y, direction);
 
@@ -850,7 +850,7 @@ u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u
     if (collision == COLLISION_OBJECT_EVENT && TryStopForInteraction(x, y, direction))
         return COLLISION_INTERACTABLE;
 
-    if (collision == COLLISION_OBJECT_EVENT && TryWildBattleCollision(x, y, direction))
+    if (collision == COLLISION_OBJECT_EVENT && TryWildBattleCollision(x, y, direction) && !isGrinding)
     {
         LockPlayerFieldControls();
         FreezeObjectEvents();
@@ -2707,7 +2707,7 @@ static u8 CheckForCollision(s16 x, s16 y, u8 direction)
     struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
 
     MoveCoords(direction, &x, &y);
-    collision = CheckForObjectEventCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y));
+    collision = CheckForObjectEventCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y), TRUE);
 
     switch (collision)
     {

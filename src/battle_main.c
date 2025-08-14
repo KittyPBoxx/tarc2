@@ -2283,7 +2283,16 @@ const u8* FaintClearSetData(u32 battler)
                     || gBattleMons[otherSkyDropper].status2 & STATUS2_CONFUSION
                     || IsBattlerTerrainAffected(otherSkyDropper, STATUS_FIELD_MISTY_TERRAIN)))
                 {
-                    gBattleMons[otherSkyDropper].status2 |= STATUS2_CONFUSION_TURN(((Random()) % 4) + 2);
+                    // gBattleMons[otherSkyDropper].status2 |= STATUS2_CONFUSION_TURN(((Random()) % 4) + 2);
+                    if (IsOnPlayerSide(otherSkyDropper))
+                    {
+                        gBattleMons[otherSkyDropper].status2 |= STATUS2_CONFUSION_TURN(5);
+                    }
+                    else 
+                    {
+                        gBattleMons[otherSkyDropper].status2 |= STATUS2_CONFUSION_TURN(2);
+                    }
+                    
                     gBattlerAttacker = otherSkyDropper;
                     result = BattleScript_ThrashConfuses;
                 }
@@ -2654,6 +2663,7 @@ static void TryDoEventsBeforeFirstTurn(void)
         }
         #endif // TESTING
 
+        // Rng for the sides is overwritten in GetWhichBattlerFaster
         gBattleStruct->speedTieBreaks = RandomUniform(RNG_SPEED_TIE, 0, Factorial(MAX_BATTLERS_COUNT) - 1);
         gBattleTurnCounter = 0;
 
@@ -2823,6 +2833,7 @@ void BattleTurnPassed(void)
 {
     s32 i;
 
+    // Rng for the sides is overwritten in GetWhichBattlerFaster
     gBattleStruct->speedTieBreaks = RandomUniform(RNG_SPEED_TIE, 0, Factorial(MAX_BATTLERS_COUNT) - 1);
 
     TurnValuesCleanUp(TRUE);
@@ -3855,12 +3866,22 @@ s32 GetWhichBattlerFaster(u32 battler1, u32 battler2, bool32 ignoreChosenMoves)
     s32 strikesFirst = GetWhichBattlerFasterOrTies(battler1, battler2, ignoreChosenMoves);
     if (strikesFirst == 0)
     {
-        s32 order1 = sBattlerOrders[gBattleStruct->speedTieBreaks][battler1];
-        s32 order2 = sBattlerOrders[gBattleStruct->speedTieBreaks][battler2];
-        if (order1 < order2)
-            strikesFirst = 1;
-        else
+
+        // s32 order1 = sBattlerOrders[gBattleStruct->speedTieBreaks][battler1];
+        // s32 order2 = sBattlerOrders[gBattleStruct->speedTieBreaks][battler2];
+        // if (order1 < order2)
+        //     strikesFirst = 1;
+        // else
+        //     strikesFirst = -1;
+
+        if (IsOnPlayerSide(battler1))
+        {
             strikesFirst = -1;
+        }
+        else
+        {
+            strikesFirst = 1;
+        }
     }
     return strikesFirst;
 }
@@ -3945,8 +3966,18 @@ static void SetActionsAndBattlersTurnOrder(void)
                 {
                     gActionsByTurnOrder[turnOrderId] = gChosenActionByBattler[battler];
                     gBattlerByTurnOrder[turnOrderId] = battler;
-                    quickClawRandom[battler] = RandomPercentage(RNG_QUICK_CLAW, GetBattlerHoldEffectParam(battler));
-                    quickDrawRandom[battler] = RandomPercentage(RNG_QUICK_DRAW, 30);
+
+                    if (!IsOnPlayerSide(gEffectBattler))
+                    {
+                        quickClawRandom[battler] = 100;
+                        quickDrawRandom[battler] = 100;
+                    }
+                    else 
+                    {
+                        quickClawRandom[battler] = 0;
+                        quickDrawRandom[battler] = 0;
+                    }
+
                     turnOrderId++;
                 }
             }

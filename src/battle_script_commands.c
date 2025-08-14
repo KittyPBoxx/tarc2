@@ -1749,7 +1749,8 @@ static void AccuracyCheck(bool32 recalcDragonDarts, const u8 *nextInstr, const u
                                             holdEffectAtk,
                                             GetBattlerHoldEffect(battlerDef, TRUE));
 
-            if (!RandomPercentage(RNG_ACCURACY, accuracy))
+            //if (!RandomPercentage(RNG_ACCURACY, accuracy))
+            if (accuracy == 0 || (IsOnPlayerSide(gBattlerAttacker) && accuracy < 100))
             {
                 gBattleStruct->moveResultFlags[battlerDef] = MOVE_RESULT_MISSED;
                 gBattleStruct->missStringId[battlerDef] = gBattleCommunication[MISS_TYPE] = B_MSG_MISSED;
@@ -1965,6 +1966,18 @@ s32 CalcCritChanceStage(u32 battlerAtk, u32 battlerDef, u32 move, bool32 recordA
         critChance = CRITICAL_HIT_BLOCKED;
     }
 
+    if (!(critChance == CRITICAL_HIT_BLOCKED || critChance == CRITICAL_HIT_ALWAYS))
+    {
+        if (IsOnPlayerSide(battlerAtk) && !IsOnPlayerSide(battlerDef))
+        {
+            critChance = CRITICAL_HIT_BLOCKED;
+        }
+        else if (IsOnPlayerSide(battlerDef))
+        {
+            critChance = CRITICAL_HIT_ALWAYS;
+        }
+    }
+
     return critChance;
 }
 
@@ -2164,7 +2177,7 @@ static void Cmd_adjustdamage(void)
     enum ItemHoldEffect holdEffect;
     u8 param;
     u32 battlerDef;
-    u32 rand = Random() % 100;
+    u32 rand = 0;//Random() % 100;
     u32 affectionScore = GetBattlerAffectionHearts(gBattlerTarget);
     u32 moveTarget = GetBattlerMoveTargetType(gBattlerAttacker, gCurrentMove);
     enum BattleMoveEffects moveEffect = GetMoveEffect(gCurrentMove);
@@ -3202,9 +3215,30 @@ void SetNonVolatileStatusCondition(u32 effectBattler, enum MoveEffects effect)
     if (sStatusFlagsForMoveEffects[effect] == STATUS1_SLEEP)
     {
         if (B_SLEEP_TURNS >= GEN_5)
-            gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + RandomUniform(RNG_SLEEP_TURNS, 1, 3));
+        {
+            // gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + RandomUniform(RNG_SLEEP_TURNS, 1, 3));
+            if (IsOnPlayerSide(effectBattler))
+            {
+                gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + 3);
+            }
+            else
+            {
+                gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + 1);
+            }
+            
+        }
         else
-            gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + RandomUniform(RNG_SLEEP_TURNS, 2, 5));
+        {
+            // gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + RandomUniform(RNG_SLEEP_TURNS, 2, 5));
+            if (IsOnPlayerSide(effectBattler))
+            {
+                gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + 5);
+            }
+            else 
+            {
+                gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + 2);
+            }
+        }
 
         TryActivateSleepClause(effectBattler, gBattlerPartyIndexes[effectBattler]);
     }
@@ -3363,7 +3397,15 @@ void SetMoveEffect(bool32 primary, bool32 certain)
                 }
                 else
                 {
-                    gBattleMons[gEffectBattler].status2 |= STATUS2_CONFUSION_TURN(((Random()) % 4) + 2); // 2-5 turns
+                    // gBattleMons[gEffectBattler].status2 |= STATUS2_CONFUSION_TURN(((Random()) % 4) + 2); // 2-5 turns
+                    if (IsOnPlayerSide(gEffectBattler))
+                    {
+                        gBattleMons[gEffectBattler].status2 |= STATUS2_CONFUSION_TURN(5);
+                    }
+                    else 
+                    {
+                        gBattleMons[gEffectBattler].status2 |= STATUS2_CONFUSION_TURN(2);
+                    }
 
                     // If the confusion is activating due to being released from Sky Drop, go to "confused due to fatigue" script.
                     // Otherwise, do normal confusion script.
@@ -3413,7 +3455,16 @@ void SetMoveEffect(bool32 primary, bool32 certain)
                 {
                     gBattleMons[gEffectBattler].status2 |= STATUS2_MULTIPLETURNS;
                     gLockedMoves[gEffectBattler] = gCurrentMove;
-                    gBattleMons[gEffectBattler].status2 |= STATUS2_UPROAR_TURN(B_UPROAR_TURNS >= GEN_5 ? 3 : (Random() & 3) + 2);
+
+                    // gBattleMons[gEffectBattler].status2 |= STATUS2_UPROAR_TURN(B_UPROAR_TURNS >= GEN_5 ? 3 : (Random() & 3) + 2);
+                    if (IsOnPlayerSide(gEffectBattler))
+                    {
+                        gBattleMons[gEffectBattler].status2 |= STATUS2_UPROAR_TURN(B_UPROAR_TURNS >= GEN_5 ? 3 : 2);
+                    }
+                    else 
+                    {
+                        gBattleMons[gEffectBattler].status2 |= STATUS2_UPROAR_TURN(B_UPROAR_TURNS >= GEN_5 ? 3 : 5);
+                    }
 
                     BattleScriptPush(gBattlescriptCurrInstr + 1);
                     gBattlescriptCurrInstr = sMoveEffectBS_Ptrs[gBattleScripting.moveEffect];
@@ -3463,13 +3514,16 @@ void SetMoveEffect(bool32 primary, bool32 certain)
                 }
                 else
                 {
-                    static const u8 sTriAttackEffects[] =
+                    // static const u8 sTriAttackEffects[] =
+                    // {
+                    //     MOVE_EFFECT_BURN,
+                    //     MOVE_EFFECT_FREEZE_OR_FROSTBITE,
+                    //     MOVE_EFFECT_PARALYSIS
+                    // };
+                    if (IsOnPlayerSide(gEffectBattler))
                     {
-                        MOVE_EFFECT_BURN,
-                        MOVE_EFFECT_FREEZE_OR_FROSTBITE,
-                        MOVE_EFFECT_PARALYSIS
-                    };
-                    gBattleScripting.moveEffect = RandomElement(RNG_TRI_ATTACK, sTriAttackEffects);
+                        gBattleScripting.moveEffect = MOVE_EFFECT_FREEZE_OR_FROSTBITE;
+                    }
                     SetMoveEffect(primary, certain);
                 }
                 break;
@@ -3490,7 +3544,17 @@ void SetMoveEffect(bool32 primary, bool32 certain)
                     if (GetBattlerHoldEffect(gBattlerAttacker, TRUE) == HOLD_EFFECT_GRIP_CLAW)
                         gDisableStructs[gEffectBattler].wrapTurns = B_BINDING_TURNS >= GEN_5 ? 7 : 5;
                     else
-                        gDisableStructs[gEffectBattler].wrapTurns = B_BINDING_TURNS >= GEN_5 ? (Random() % 2) + 4 : (Random() % 4) + 2;
+                    {
+                        //gDisableStructs[gEffectBattler].wrapTurns = B_BINDING_TURNS >= GEN_5 ? (Random() % 2) + 4 : (Random() % 4) + 2;
+                        if (IsOnPlayerSide(gEffectBattler))
+                        {
+                            gDisableStructs[gEffectBattler].wrapTurns = 5;  
+                        }
+                        else 
+                        {
+                            gDisableStructs[gEffectBattler].wrapTurns = 4;
+                        }
+                    }
 
                     gBattleStruct->wrappedMove[gEffectBattler] = gCurrentMove;
                     gBattleStruct->wrappedBy[gEffectBattler] = gBattlerAttacker;
@@ -3703,7 +3767,15 @@ void SetMoveEffect(bool32 primary, bool32 certain)
                 {
                     gBattleMons[gEffectBattler].status2 |= STATUS2_MULTIPLETURNS;
                     gLockedMoves[gEffectBattler] = gCurrentMove;
-                    gBattleMons[gEffectBattler].status2 |= STATUS2_LOCK_CONFUSE_TURN(RandomUniform(RNG_RAMPAGE_TURNS, 2, 3));
+                    // gBattleMons[gEffectBattler].status2 |= STATUS2_LOCK_CONFUSE_TURN(RandomUniform(RNG_RAMPAGE_TURNS, 2, 3));
+                    if (IsOnPlayerSide(gEffectBattler))
+                    {
+                        gBattleMons[gEffectBattler].status2 |= STATUS2_LOCK_CONFUSE_TURN(3);
+                    }
+                    else 
+                    {
+                        gBattleMons[gEffectBattler].status2 |= STATUS2_LOCK_CONFUSE_TURN(3);
+                    }
                 }
                 break;
             case MOVE_EFFECT_CLEAR_SMOG:
@@ -3845,8 +3917,11 @@ void SetMoveEffect(bool32 primary, bool32 certain)
             case MOVE_EFFECT_DIRE_CLAW:
                 if (!gBattleMons[gEffectBattler].status1)
                 {
-                    static const u8 sDireClawEffects[] = { MOVE_EFFECT_POISON, MOVE_EFFECT_PARALYSIS, MOVE_EFFECT_SLEEP };
-                    gBattleScripting.moveEffect = RandomElement(RNG_DIRE_CLAW, sDireClawEffects);
+                    if (IsOnPlayerSide(gEffectBattler))
+                    {
+                        //static const u8 sDireClawEffects[] = { MOVE_EFFECT_POISON, MOVE_EFFECT_PARALYSIS, MOVE_EFFECT_SLEEP };
+                        gBattleScripting.moveEffect = MOVE_EFFECT_PARALYSIS; //RandomElement(RNG_DIRE_CLAW, sDireClawEffects);
+                    }
                     SetMoveEffect(primary, certain);
                 }
                 break;
@@ -4338,7 +4413,18 @@ void SetMoveEffect(bool32 primary, bool32 certain)
                         if (GetBattlerHoldEffect(gBattlerAttacker, TRUE) == HOLD_EFFECT_GRIP_CLAW)
                             gDisableStructs[battler].wrapTurns = (B_BINDING_TURNS >= GEN_5) ? 7 : 5;
                         else
-                            gDisableStructs[battler].wrapTurns = (Random() % 2) + 4;
+                        {
+                            // gDisableStructs[battler].wrapTurns = (Random() % 2) + 4;
+                            if (IsOnPlayerSide(battler))
+                            {
+                                gDisableStructs[battler].wrapTurns = 5;
+                            }
+                            else 
+                            {
+                                gDisableStructs[battler].wrapTurns = 4;
+                            }
+                            
+                        }
                         // The Wrap effect does not expire when the user switches, so here's some cheese.
                         gBattleStruct->wrappedBy[battler] = gBattlerTarget;
                         if (gBattleScripting.moveEffect == MOVE_EFFECT_SANDBLAST_SIDE)
@@ -5061,7 +5147,7 @@ static void Cmd_getexp(void)
 
                     if (B_EXP_CAP_TYPE == EXP_CAP_HARD && gBattleStruct->battlerExpReward != 0)
                     {
-                        u32 growthRate = gSpeciesInfo[GetMonData(&gPlayerParty[*expMonId], MON_DATA_SPECIES)].growthRate;
+                        u32 growthRate = GROWTH_SLOW;
                         u32 currentExp = GetMonData(&gPlayerParty[*expMonId], MON_DATA_EXP);
                         u32 levelCap = GetCurrentLevelCap();
 
@@ -11260,7 +11346,16 @@ static void Cmd_various(void)
             {
                 gBattleMons[gEffectBattler].status2 &= ~(STATUS2_LOCK_CONFUSE);
                 gBattlerAttacker = gEffectBattler;
-                gBattleMons[gBattlerTarget].status2 |= STATUS2_CONFUSION_TURN(((Random()) % 4) + 2);
+                //gBattleMons[gBattlerTarget].status2 |= STATUS2_CONFUSION_TURN(((Random()) % 4) + 2);
+                if (IsOnPlayerSide(gBattlerTarget))
+                {
+                    gBattleMons[gBattlerTarget].status2 |= STATUS2_CONFUSION_TURN(5);
+                }
+                else 
+                {
+                    gBattleMons[gBattlerTarget].status2 |= STATUS2_CONFUSION_TURN(2);
+                }
+
                 gBattlescriptCurrInstr = BattleScript_ThrashConfuses;
                 return;
             }
@@ -11600,7 +11695,8 @@ static void Cmd_setprotectlike(void)
     if (gCurrentTurnActionNumber == (gBattlersCount - 1))
         notLastTurn = FALSE;
 
-    if ((sProtectSuccessRates[gDisableStructs[gBattlerAttacker].protectUses] >= Random() && notLastTurn)
+    //if ((sProtectSuccessRates[gDisableStructs[gBattlerAttacker].protectUses] >= Random() && notLastTurn)
+    if ((sProtectSuccessRates[gDisableStructs[gBattlerAttacker].protectUses] >= 1 && IsOnPlayerSide(gBattlerAttacker) && notLastTurn)
      || (protectMethod == PROTECT_WIDE_GUARD && B_WIDE_GUARD != GEN_5)
      || (protectMethod == PROTECT_QUICK_GUARD && B_QUICK_GUARD != GEN_5))
     {
@@ -12874,8 +12970,7 @@ static void Cmd_tryKO(void)
     }
 
     gPotentialItemEffectBattler = gBattlerTarget;
-    if (holdEffect == HOLD_EFFECT_FOCUS_BAND
-        && (Random() % 100) < GetBattlerHoldEffectParam(gBattlerTarget))
+    if (holdEffect == HOLD_EFFECT_FOCUS_BAND && !IsOnPlayerSide(gEffectBattler))//&& (Random() % 100) < GetBattlerHoldEffectParam(gBattlerTarget))
     {
         endured = FOCUS_BANDED;
         RecordItemEffectBattle(gBattlerTarget, holdEffect);
@@ -12915,7 +13010,7 @@ static void Cmd_tryKO(void)
             u16 odds = GetMoveAccuracy(gCurrentMove) + (gBattleMons[gBattlerAttacker].level - gBattleMons[gBattlerTarget].level);
             if (B_SHEER_COLD_ACC >= GEN_7 && gCurrentMove == MOVE_SHEER_COLD && !IS_BATTLER_OF_TYPE(gBattlerAttacker, TYPE_ICE))
                 odds -= 10;
-            if (RandomPercentage(RNG_ACCURACY, odds) && gBattleMons[gBattlerAttacker].level >= gBattleMons[gBattlerTarget].level)
+            if (!IsOnPlayerSide(gBattlerAttacker))
                 lands = TRUE;
         }
 
@@ -13278,7 +13373,40 @@ static void Cmd_metronome(void)
     u32 moveCount = MOVES_COUNT_GEN1;
 #endif
 
-    gCurrentMove = RandomUniformExcept(RNG_METRONOME, 1, moveCount - 1, InvalidMetronomeMove);
+    if (IsOnPlayerSide(gBattlerAttacker))
+    {
+        gCurrentMove = MOVE_SPLASH;
+    }
+    else 
+    {
+        // Try and land a 1 hit ko move
+        gCurrentMove = MOVE_SHEER_COLD;
+
+        if (IsBattlerProtected(gBattlerAttacker, gBattlerTarget, gCurrentMove) || IsSemiInvulnerable(gBattlerTarget, gCurrentMove) || DoesBattlerHaveAbilityImmunity(gBattlerAttacker, gBattlerTarget, TYPE_ICE))
+        {
+            gCurrentMove = MOVE_FISSURE;
+        }
+
+        if (IsBattlerProtected(gBattlerAttacker, gBattlerTarget, gCurrentMove) || IsSemiInvulnerable(gBattlerTarget, gCurrentMove) || DoesBattlerHaveAbilityImmunity(gBattlerAttacker, gBattlerTarget, TYPE_GROUND))
+        {
+            gCurrentMove = MOVE_FISSURE;
+        }
+
+        if (IsBattlerProtected(gBattlerAttacker, gBattlerTarget, gCurrentMove) || IsSemiInvulnerable(gBattlerTarget, gCurrentMove) || DoesBattlerHaveAbilityImmunity(gBattlerAttacker, gBattlerTarget, TYPE_NORMAL))
+        {
+            gCurrentMove = MOVE_GUILLOTINE;
+        }
+
+        // TODO: TARC we could do better here.
+        // We could do a multi hit move like population bomb for sturdy/disguise/focus_band
+        // Specific move targeting dive,fly,dig
+        // specific moves targeting pokemon using protect like shadow force or feint
+        // Some kind of wander guard counter
+        gCurrentMove = RandomUniformExcept(RNG_METRONOME, 1, moveCount - 1, InvalidMetronomeMove);
+    }
+
+
+    // gCurrentMove = RandomUniformExcept(RNG_METRONOME, 1, moveCount - 1, InvalidMetronomeMove);
     PrepareStringBattle(STRINGID_WAGGLINGAFINGER, gBattlerAttacker);
     gBattlescriptCurrInstr = GetMoveBattleScript(gCurrentMove);
     gBattlerTarget = GetBattleMoveTarget(gCurrentMove, NO_TARGET_OVERRIDE);
@@ -13366,9 +13494,30 @@ static void Cmd_disablelastusedattack(void)
         if (B_DISABLE_TURNS >= GEN_5)
             gDisableStructs[gBattlerTarget].disableTimer = 4;
         else if (B_DISABLE_TURNS >= GEN_4)
-            gDisableStructs[gBattlerTarget].disableTimer = (Random() & 3) + 4; // 4-7 turns
+        {
+            //gDisableStructs[gBattlerTarget].disableTimer = (Random() & 3) + 4; // 4-7 turns
+            if (IsOnPlayerSide(gBattlerTarget))
+            {
+                gDisableStructs[gBattlerTarget].disableTimer = 7;
+            }
+            else 
+            {
+                gDisableStructs[gBattlerTarget].disableTimer = 4;
+            }
+        }
         else
-            gDisableStructs[gBattlerTarget].disableTimer = (Random() & 3) + 2; // 2-5 turns
+        {
+            //gDisableStructs[gBattlerTarget].disableTimer = (Random() & 3) + 2; // 2-5 turns
+            if (IsOnPlayerSide(gBattlerTarget))
+            {
+                gDisableStructs[gBattlerTarget].disableTimer = 5;
+            }
+            else 
+            {
+                gDisableStructs[gBattlerTarget].disableTimer = 2;
+            }
+            
+        }
         gBattlescriptCurrInstr = cmd->nextInstr;
     }
     else
@@ -13772,7 +13921,16 @@ static void Cmd_tryspiteppreduce(void)
 
         if (i != MAX_MON_MOVES && gBattleMons[gBattlerTarget].pp[i] > (B_CAN_SPITE_FAIL >= GEN_4 ? 0 : 1))
         {
-            s32 ppToDeduct = B_PP_REDUCED_BY_SPITE >= GEN_4 ? 4 : (Random() & 3) + 2;
+            // s32 ppToDeduct = B_PP_REDUCED_BY_SPITE >= GEN_4 ? 4 : (Random() & 3) + 2;
+            s32 ppToDeduct; 
+            if (IsOnPlayerSide(gBattlerTarget))
+            {
+                ppToDeduct = B_PP_REDUCED_BY_SPITE >= GEN_4 ? 4 : 5;
+            }
+            else 
+            {
+                ppToDeduct = B_PP_REDUCED_BY_SPITE >= GEN_4 ? 4 : 2;
+            }
             // G-Max Depletion only deducts 2 PP.
             if (IsMaxMove(gCurrentMove) && MoveHasAdditionalEffect(gCurrentMove, MOVE_EFFECT_SPITE))
                 ppToDeduct = 2;
@@ -14070,7 +14228,7 @@ static void Cmd_presentdamagecalculation(void)
 {
     CMD_ARGS();
 
-    u32 rand = Random() & 0xFF;
+    // u32 rand = Random() & 0xFF;
 
     /* Don't reroll present effect/power for the second hit of Parental Bond.
      * Not sure if this is the correct behaviour, but bulbapedia states
@@ -14080,15 +14238,19 @@ static void Cmd_presentdamagecalculation(void)
      */
     if (gSpecialStatuses[gBattlerAttacker].parentalBondState != PARENTAL_BOND_2ND_HIT)
     {
-        if (rand < 102)
-        {
-            gBattleStruct->presentBasePower = 40;
-        }
-        else if (rand < 178)
-        {
-            gBattleStruct->presentBasePower = 80;
-        }
-        else if (rand < 204)
+        // if (rand < 102)
+        // {
+        //     gBattleStruct->presentBasePower = 40;
+        // }
+        // else if (rand < 178)
+        // {
+        //     gBattleStruct->presentBasePower = 80;
+        // }
+        // else if (rand < 204)
+        // {
+        //     gBattleStruct->presentBasePower = 120;
+        // }
+        if (!IsOnPlayerSide(gBattlerAttacker))
         {
             gBattleStruct->presentBasePower = 120;
         }
@@ -14143,37 +14305,48 @@ static void Cmd_magnitudedamagecalculation(void)
 
     u32 magnitude = Random() % 100;
 
-    if (magnitude < 5)
+    // if (magnitude < 5)
+    // {
+    //     gBattleStruct->magnitudeBasePower = 10;
+    //     magnitude = 4;
+    // }
+    // else if (magnitude < 15)
+    // {
+    //     gBattleStruct->magnitudeBasePower = 30;
+    //     magnitude = 5;
+    // }
+    // else if (magnitude < 35)
+    // {
+    //     gBattleStruct->magnitudeBasePower = 50;
+    //     magnitude = 6;
+    // }
+    // else if (magnitude < 65)
+    // {
+    //     gBattleStruct->magnitudeBasePower = 70;
+    //     magnitude = 7;
+    // }
+    // else if (magnitude < 85)
+    // {
+    //     gBattleStruct->magnitudeBasePower = 90;
+    //     magnitude = 8;
+    // }
+    // else if (magnitude < 95)
+    // {
+    //     gBattleStruct->magnitudeBasePower = 110;
+    //     magnitude = 9;
+    // }
+    // else
+    // {
+    //     gBattleStruct->magnitudeBasePower = 150;
+    //     magnitude = 10;
+    // }
+
+    if (IsOnPlayerSide(gBattlerAttacker))
     {
         gBattleStruct->magnitudeBasePower = 10;
         magnitude = 4;
     }
-    else if (magnitude < 15)
-    {
-        gBattleStruct->magnitudeBasePower = 30;
-        magnitude = 5;
-    }
-    else if (magnitude < 35)
-    {
-        gBattleStruct->magnitudeBasePower = 50;
-        magnitude = 6;
-    }
-    else if (magnitude < 65)
-    {
-        gBattleStruct->magnitudeBasePower = 70;
-        magnitude = 7;
-    }
-    else if (magnitude < 85)
-    {
-        gBattleStruct->magnitudeBasePower = 90;
-        magnitude = 8;
-    }
-    else if (magnitude < 95)
-    {
-        gBattleStruct->magnitudeBasePower = 110;
-        magnitude = 9;
-    }
-    else
+    else 
     {
         gBattleStruct->magnitudeBasePower = 150;
         magnitude = 10;
@@ -14730,7 +14903,14 @@ static void Cmd_settaunt(void)
         }
         else if (B_TAUNT_TURNS >= GEN_4)
         {
-            turns = (Random() & 2) + 3;
+            if (IsOnPlayerSide(gBattlerTarget))
+            {
+                turns = 4;
+            }
+            else 
+            {
+                turns = 3;
+            }
         }
         else
         {
@@ -15319,59 +15499,59 @@ static void Cmd_pickup(void)
 {
     CMD_ARGS();
 
-    u32 i, j;
-    u16 species, heldItem, ability;
-    u8 lvlDivBy10;
+    // u32 i, j;
+    // u16 species, heldItem, ability;
+    // u8 lvlDivBy10;
 
-    for (i = 0; i < PARTY_SIZE; i++)
-    {
-        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
-        heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
-        lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL)-1) / 10; //Moving this here makes it easier to add in abilities like Honey Gather.
-        if (lvlDivBy10 > 9)
-            lvlDivBy10 = 9;
+    // for (i = 0; i < PARTY_SIZE; i++)
+    // {
+    //     species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
+    //     heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+    //     lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL)-1) / 10; //Moving this here makes it easier to add in abilities like Honey Gather.
+    //     if (lvlDivBy10 > 9)
+    //         lvlDivBy10 = 9;
 
-        ability = gSpeciesInfo[species].abilities[GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM)];
+        //ability = gSpeciesInfo[species].abilities[GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM)];
 
-        if (ability == ABILITY_PICKUP
-            && species != SPECIES_NONE
-            && species != SPECIES_EGG
-            && heldItem == ITEM_NONE
-            && (Random() % 10) == 0)
-        {
-            u32 rand = Random() % 100;
-            u32 percentTotal = 0;
+        // if (ability == ABILITY_PICKUP
+        //     && species != SPECIES_NONE
+        //     && species != SPECIES_EGG
+        //     && heldItem == ITEM_NONE
+        //     && (Random() % 10) == 0)
+        // {
+        //     u32 rand = Random() % 100;
+        //     u32 percentTotal = 0;
 
-            for (j = 0; j < ARRAY_COUNT(sPickupTable); j++)
-            {
-                percentTotal += sPickupTable[j].percentage[lvlDivBy10];
-                if (rand < percentTotal)
-                {
-                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupTable[j].itemId);
-                    break;
-                }
-            }
-        }
-        else if (ability == ABILITY_HONEY_GATHER
-            && species != 0
-            && species != SPECIES_EGG
-            && heldItem == ITEM_NONE)
-        {
-            if ((lvlDivBy10 + 1 ) * 5 > Random() % 100)
-            {
-                heldItem = ITEM_HONEY;
-                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-            }
-        }
-        else if (P_SHUCKLE_BERRY_JUICE == GEN_2
-            && species == SPECIES_SHUCKLE
-            && heldItem == ITEM_ORAN_BERRY
-            && (Random() % 16) == 0)
-        {
-            heldItem = ITEM_BERRY_JUICE;
-            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-        }
-    }
+        //     for (j = 0; j < ARRAY_COUNT(sPickupTable); j++)
+        //     {
+        //         percentTotal += sPickupTable[j].percentage[lvlDivBy10];
+        //         if (rand < percentTotal)
+        //         {
+        //             SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupTable[j].itemId);
+        //             break;
+        //         }
+        //     }
+        // }
+        // else if (ability == ABILITY_HONEY_GATHER
+        //     && species != 0
+        //     && species != SPECIES_EGG
+        //     && heldItem == ITEM_NONE)
+        // {
+        //     if ((lvlDivBy10 + 1 ) * 5 > Random() % 100)
+        //     {
+        //         heldItem = ITEM_HONEY;
+        //         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+        //     }
+        // }
+        // else if (P_SHUCKLE_BERRY_JUICE == GEN_2
+        //     && species == SPECIES_SHUCKLE
+        //     && heldItem == ITEM_ORAN_BERRY
+        //     && (Random() % 16) == 0)
+        // {
+        //     heldItem = ITEM_BERRY_JUICE;
+        //     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+        // }
+    // }
 
     gBattlescriptCurrInstr = cmd->nextInstr;
 }
@@ -15891,7 +16071,7 @@ static void Cmd_handleballthrow(void)
             {
                 odds = Sqrt(Sqrt(16711680 / odds));
                 odds = 1048560 / odds;
-                for (shakes = 0; shakes < maxShakes && Random() < odds; shakes++);
+                for (shakes = 0; shakes < maxShakes && 0 < odds; shakes++);
             }
 
             BtlController_EmitBallThrowAnim(gBattlerAttacker, B_COMM_TO_CONTROLLER, shakes);
@@ -17715,7 +17895,7 @@ void BS_FickleBeamDamageCalculation(void)
     NATIVE_ARGS();
     gBattleStruct->fickleBeamBoosted = FALSE;
 
-    if (RandomPercentage(RNG_FICKLE_BEAM, 30))
+    if (IsOnPlayerSide(gBattlerAttacker))
     {
         gBattleStruct->fickleBeamBoosted = TRUE;
         gBattlescriptCurrInstr = BattleScript_FickleBeamDoubled;
@@ -18166,10 +18346,25 @@ static void TrySetSleep(const u8 *nextInstr, const u8 *failInstr)
 {
     if (CanBeSlept(gBattlerAttacker, gBattlerTarget, GetBattlerAbility(gBattlerTarget), BLOCKED_BY_SLEEP_CLAUSE))
     {
-        if (B_SLEEP_TURNS >= GEN_5)
-            gBattleMons[gBattlerTarget].status1 |=  STATUS1_SLEEP_TURN((Random() % 3) + 2);
-        else
-            gBattleMons[gBattlerTarget].status1 |=  STATUS1_SLEEP_TURN((Random() % 4) + 3);
+        // if (B_SLEEP_TURNS >= GEN_5)
+        //     gBattleMons[gBattlerTarget].status1 |=  STATUS1_SLEEP_TURN((Random() % 3) + 2);
+        // else
+        //     gBattleMons[gBattlerTarget].status1 |=  STATUS1_SLEEP_TURN((Random() % 4) + 3);
+
+        if (IsOnPlayerSide(gEffectBattler))
+        {
+            if (B_SLEEP_TURNS >= GEN_5)
+                gBattleMons[gBattlerTarget].status1 |=  STATUS1_SLEEP_TURN(4);
+            else
+                gBattleMons[gBattlerTarget].status1 |=  STATUS1_SLEEP_TURN(6);
+        }
+        else 
+        {
+            if (B_SLEEP_TURNS >= GEN_5)
+                gBattleMons[gBattlerTarget].status1 |=  STATUS1_SLEEP_TURN(2);
+            else
+                gBattleMons[gBattlerTarget].status1 |=  STATUS1_SLEEP_TURN(3);
+        }
 
         TryActivateSleepClause(gBattlerTarget, gBattlerPartyIndexes[gBattlerTarget]);
         gBattleCommunication[MULTISTRING_CHOOSER] = 4;
@@ -18230,7 +18425,15 @@ void BS_TrySetConfusion(void)
 
     if (CanBeConfused(gBattlerTarget))
     {
-        gBattleMons[gBattlerTarget].status2 |= STATUS2_CONFUSION_TURN(((Random()) % 4) + 2);
+        // gBattleMons[gBattlerTarget].status2 |= STATUS2_CONFUSION_TURN(((Random()) % 4) + 2);
+        if (IsOnPlayerSide(gBattlerTarget))
+        {
+            gBattleMons[gBattlerTarget].status2 |= STATUS2_CONFUSION_TURN(5);
+        }
+        else 
+        {
+            gBattleMons[gBattlerTarget].status2 |= STATUS2_CONFUSION_TURN(2);
+        }
         gBattleCommunication[MULTISTRING_CHOOSER] = 0;
         gBattleCommunication[MULTIUSE_STATE] = 1;
         gEffectBattler = gBattlerTarget;
