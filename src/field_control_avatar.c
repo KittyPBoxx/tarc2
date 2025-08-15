@@ -30,6 +30,7 @@
 #include "constants/metatile_behaviors.h"
 #include "constants/songs.h"
 #include "constants/game_stat.h"
+#include "map_preview_screen.h"
 
 static EWRAM_DATA u8 sWildEncounterImmunitySteps = 0;
 static EWRAM_DATA u16 sPrevMetatileBehavior = 0;
@@ -269,7 +270,8 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
             return TRUE;
     }
 
-    if (input->pressedStartButton)
+    // TODO: TARC start should close the preview
+    if (input->pressedStartButton && !ForestMapPreviewScreenIsRunning())
     {
         PlaySE(SE_WIN_OPEN);
         ShowStartMenu();

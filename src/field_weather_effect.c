@@ -15,6 +15,8 @@
 #include "trig.h"
 #include "gpu_regs.h"
 #include "palette.h"
+#include "map_preview_screen.h"
+#include "constants/expansion.h"
 
 EWRAM_DATA static u8 sCurrentAbnormalWeather = 0;
 
@@ -158,6 +160,10 @@ void Sunny_InitVars(void)
 {
     gWeatherPtr->targetColorMapIndex = 0;
     gWeatherPtr->colorMapStepDelay = 20;
+    if (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_FADE_IN) == FALSE)
+    {
+        Weather_SetBlendCoeffs(8, 12);
+    }
     Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
     gWeatherPtr->noShadows = FALSE;
 }
@@ -486,8 +492,13 @@ void Rain_InitVars(void)
     gWeatherPtr->targetColorMapIndex = 3;
     gWeatherPtr->colorMapStepDelay = 20;
     SetRainStrengthFromSoundEffect(SE_RAIN);
-    Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
-    gWeatherPtr->noShadows = FALSE;
+    if (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_FADE_IN) == FALSE)
+    {
+        Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
+        gWeatherPtr->noShadows = FALSE;
+    }
+    // Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
+    // gWeatherPtr->noShadows = FALSE;
 }
 
 void Rain_InitAll(void)
@@ -781,8 +792,13 @@ void Snow_InitVars(void)
     gWeatherPtr->colorMapStepDelay = 20;
     gWeatherPtr->targetSnowflakeSpriteCount = NUM_SNOWFLAKE_SPRITES;
     gWeatherPtr->snowflakeVisibleCounter = 0;
-    Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
-    gWeatherPtr->noShadows = FALSE;
+    if (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_FADE_IN) == FALSE)
+    {
+        Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
+        gWeatherPtr->noShadows = FALSE;
+    }
+    // Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
+    // gWeatherPtr->noShadows = FALSE;
 }
 
 void Snow_InitAll(void)
@@ -1060,8 +1076,13 @@ void Downpour_InitVars(void)
     gWeatherPtr->colorMapStepDelay = 20;
     gWeatherPtr->weatherGfxLoaded = FALSE;  // duplicate assignment
     SetRainStrengthFromSoundEffect(SE_DOWNPOUR);
-    Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
-    gWeatherPtr->noShadows = FALSE;
+    if (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_FADE_IN) == FALSE)
+    {
+        Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
+        gWeatherPtr->noShadows = FALSE;
+    }
+    // Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
+    // gWeatherPtr->noShadows = FALSE;
 }
 
 void Downpour_InitAll(void)

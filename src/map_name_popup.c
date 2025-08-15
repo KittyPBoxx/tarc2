@@ -473,6 +473,11 @@ void HideMapNamePopUpWindow(void)
     }
 }
 
+void Script_MapPopUp(void)
+{
+    ShowMapNamePopup();
+}
+
 // static void UpdateSecondaryPopUpWindow(u8 secondaryPopUpWindowId)
 // {
 //     u8 mapDisplayHeader[24];

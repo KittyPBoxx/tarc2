@@ -10,6 +10,16 @@
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/LittlerootTown/border.bin",
       "blockdata_filepath": "data/layouts/LittlerootTown/map.bin"
+    },
+    {
+      "id": "LAYOUT_FOREST",
+      "name": "Forest_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/Forest/border.bin",
+      "blockdata_filepath": "data/layouts/Forest/map.bin"
     }
   ]
 }
