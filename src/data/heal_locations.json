@@ -2,7 +2,7 @@
   "heal_locations": [
     {
       "id": "HEAL_LOCATION_LITTLEROOT_TOWN",
-      "map": "MAP_LITTLEROOT_TOWN",
+      "map": "0",
       "x": 8,
       "y": 14
     }

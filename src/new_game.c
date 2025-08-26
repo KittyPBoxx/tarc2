@@ -17,7 +17,6 @@
 #include "field_specials.h"
 #include "constants/map_groups.h"
 #include "constants/items.h"
-#include "difficulty.h"
 #include "script_pokemon_util.h"
 #include "constants/moves.h"
 
@@ -65,7 +64,7 @@ static void SetDefaultOptions(void)
 
 static void InitialWarp(void)
 {
-    SetWarpDestination(MAP_GROUP(MAP_LITTLEROOT_TOWN), MAP_NUM(MAP_LITTLEROOT_TOWN), WARP_ID_NONE, -1, -1);
+    SetWarpDestination(MAP_GROUP(MAP_BRIDGE), MAP_NUM(MAP_BRIDGE), WARP_ID_NONE, -1, -1);
     WarpIntoMap();
 }
 
@@ -121,6 +120,5 @@ void NewGameInitData(void)
     AddBagItem(ITEM_TERA_ORB, 1);
 
     RunScriptImmediately(EventScript_ResetAllMapFlags);
-    SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     RtcInitLocalTimeOffset(0, 0);
 }

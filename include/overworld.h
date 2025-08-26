@@ -47,7 +47,6 @@ struct LinkPlayerObjectEvent
 
 // Exported RAM declarations
 extern struct WarpData gLastUsedWarp;
-extern struct LinkPlayerObjectEvent gLinkPlayerObjectEvents[4];
 
 extern u16 *gOverworldTilemapBuffer_Bg2;
 extern u16 *gOverworldTilemapBuffer_Bg1;
@@ -88,8 +87,6 @@ void SetDynamicWarp(s32 unused, s8 mapGroup, s8 mapNum, s8 warpId);
 void SetDynamicWarpWithCoords(s32 unused, s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y);
 void SetWarpDestinationToDynamicWarp(u8 unusedWarpId);
 void SetWarpDestinationToHealLocation(u8 healLocationId);
-void SetWarpDestinationToLastHealLocation(void);
-void SetLastHealLocationWarp(u8 healLocationId);
 void UpdateEscapeWarp(s16 x, s16 y);
 void SetEscapeWarp(s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y);
 void SetWarpDestinationToEscapeWarp(void);
@@ -165,7 +162,6 @@ bool32 Overworld_IsRecvQueueAtMax(void);
 bool32 Overworld_RecvKeysFromLinkIsRunning(void);
 bool32 Overworld_SendKeysToLinkIsRunning(void);
 bool32 IsSendingKeysOverCable(void);
-void ClearLinkPlayerObjectEvents(void);
 bool16 SetTimeOfDay(u16 hours);
 u8 GetLastUsedWarpMapSectionId(void);
 u8 GetDestinationWarpMapSectionId(void);

@@ -1491,6 +1491,8 @@ void StartHealthboxSlideIn(u8 battler)
 
     struct Sprite *healthboxSprite = &gSprites[gHealthboxSpriteIds[battler]];
 
+    DebugPrintfLevel(MGBA_LOG_ERROR, "StartHealthboxSlideIn %x", battler);
+
     healthboxSprite->sSpeedX = 5;
     healthboxSprite->sSpeedY = 0;
     healthboxSprite->x2 = 0x73;

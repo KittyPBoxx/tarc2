@@ -2,14 +2,14 @@
   "layouts_table_label": "gMapLayouts",
   "layouts": [
     {
-      "id": "LAYOUT_LITTLEROOT_TOWN",
-      "name": "LittlerootTown_Layout",
+      "id": "LAYOUT_BRIDGE",
+      "name": "Bridge_Layout",
       "width": 20,
       "height": 20,
       "primary_tileset": "gTileset_woodPrimary1",
       "secondary_tileset": "gTileset_Petalburg",
-      "border_filepath": "data/layouts/LittlerootTown/border.bin",
-      "blockdata_filepath": "data/layouts/LittlerootTown/map.bin"
+      "border_filepath": "data/layouts/Bridge/border.bin",
+      "blockdata_filepath": "data/layouts/Bridge/map.bin"
     },
     {
       "id": "LAYOUT_FOREST",
@@ -20,6 +20,56 @@
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/Forest/border.bin",
       "blockdata_filepath": "data/layouts/Forest/map.bin"
+    },
+    {
+      "id": "LAYOUT_MANOR",
+      "name": "Manor_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/Manor/border.bin",
+      "blockdata_filepath": "data/layouts/Manor/map.bin"
+    },
+    {
+      "id": "LAYOUT_CAVE_BOTTOM",
+      "name": "CaveBottom_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/CaveBottom/border.bin",
+      "blockdata_filepath": "data/layouts/CaveBottom/map.bin"
+    },
+    {
+      "id": "LAYOUT_CAVE_TOP",
+      "name": "CaveTop_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/CaveTop/border.bin",
+      "blockdata_filepath": "data/layouts/CaveTop/map.bin"
+    },
+    {
+      "id": "LAYOUT_RETURN_PASS",
+      "name": "ReturnPass_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/ReturnPass/border.bin",
+      "blockdata_filepath": "data/layouts/ReturnPass/map.bin"
+    },
+    {
+      "id": "LAYOUT_SUMMIT",
+      "name": "Summit_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/Summit/border.bin",
+      "blockdata_filepath": "data/layouts/Summit/map.bin"
     }
   ]
 }

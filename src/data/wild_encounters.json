@@ -77,7 +77,7 @@
       ],
       "encounters": [
         {
-          "map": "MAP_LITTLEROOT_TOWN",
+          "map": "MAP_BRIDGE",
           "base_label": "gLittlerootTown",
           "land_mons": {
             "encounter_rate": 20,

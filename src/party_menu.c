@@ -116,14 +116,14 @@ enum {
 // In CursorCb_FieldMove, field moves <= FIELD_MOVE_WATERFALL are assumed to line up with the badge flags.
 // Badge flag names are commented here for people searching for references to remove the badge requirement.
 enum {
-    FIELD_MOVE_CUT,         // FLAG_BADGE01_GET
-    FIELD_MOVE_FLASH,       // FLAG_BADGE02_GET
-    FIELD_MOVE_ROCK_SMASH,  // FLAG_BADGE03_GET
-    FIELD_MOVE_STRENGTH,    // FLAG_BADGE04_GET
-    FIELD_MOVE_SURF,        // FLAG_BADGE05_GET
-    FIELD_MOVE_FLY,         // FLAG_BADGE06_GET
-    FIELD_MOVE_DIVE,        // FLAG_BADGE07_GET
-    FIELD_MOVE_WATERFALL,   // FLAG_BADGE08_GET
+    FIELD_MOVE_CUT,         
+    FIELD_MOVE_FLASH,       
+    FIELD_MOVE_ROCK_SMASH,  
+    FIELD_MOVE_STRENGTH,    
+    FIELD_MOVE_SURF,        
+    FIELD_MOVE_FLY,         
+    FIELD_MOVE_DIVE,        
+    FIELD_MOVE_WATERFALL,   
     FIELD_MOVE_TELEPORT,
     FIELD_MOVE_DIG,
     FIELD_MOVE_SECRET_POWER,
@@ -3576,12 +3576,7 @@ static void CursorCb_FieldMove(u8 taskId)
     else
     {
         // All field moves before WATERFALL are HMs.
-        if (fieldMove <= FIELD_MOVE_WATERFALL && FlagGet(FLAG_BADGE01_GET + fieldMove) != TRUE)
-        {
-            DisplayPartyMenuMessage(gText_CantUseUntilNewBadge, TRUE);
-            gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
-        }
-        else if (sFieldMoveCursorCallbacks[fieldMove].fieldMoveFunc() == TRUE)
+        if (sFieldMoveCursorCallbacks[fieldMove].fieldMoveFunc() == TRUE)
         {
             gPartyMenu.exitCallback = CB2_ReturnToField;
             Task_ClosePartyMenu(taskId);
@@ -3653,10 +3648,7 @@ static void Task_CancelAfterAorBPress(u8 taskId)
 
 static void DisplayCantUseFlashMessage(void)
 {
-    if (FlagGet(FLAG_SYS_USE_FLASH) == TRUE)
-        DisplayPartyMenuStdMessage(PARTY_MSG_ALREADY_IN_USE);
-    else
-        DisplayPartyMenuStdMessage(PARTY_MSG_CANT_USE_HERE);
+    DisplayPartyMenuStdMessage(PARTY_MSG_CANT_USE_HERE);
 }
 
 static void FieldCallback_Surf(void)

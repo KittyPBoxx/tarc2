@@ -97,7 +97,6 @@ static void InitObjectEventsReturnToField(void);
 static void InitViewGraphics(void);
 static void ResetAllPlayerLinkStates(void);
 static u8 FlipVerticalAndClearForced(u8, u8);
-static u8 LinkPlayerGetCollision(u8, u8, s16, s16);
 static u16 KeyInterCB_SelfIdle(u32);
 static u16 KeyInterCB_DeferToEventScript(u32);
 static void SetKeyInterceptCallback(u16 (*func)(u32));
@@ -133,7 +132,6 @@ EWRAM_DATA static struct InitialPlayerAvatarState sInitialPlayerAvatarState = {0
 EWRAM_DATA static u16 sAmbientCrySpecies = 0;
 EWRAM_DATA static bool8 sIsAmbientCryWaterMon = FALSE;
 EWRAM_DATA static u8 sHoursOverride = 0; // used to override apparent time of day hours
-EWRAM_DATA struct LinkPlayerObjectEvent gLinkPlayerObjectEvents[4] = {0};
 EWRAM_DATA bool8 gExitStairsMovementDisabled = FALSE;
 
 static const struct WarpData sDummyWarpData =
@@ -296,39 +294,23 @@ void DoWhiteOut(void)
     RunScriptImmediately(EventScript_WhiteOut);
     HealPlayerParty();
     Overworld_ResetStateAfterWhiteOut();
-    SetWarpDestinationToLastHealLocation();
     WarpIntoMap();
 }
 
 void Overworld_ResetStateAfterFly(void)
 {
     ResetInitialPlayerAvatarState();
-    FlagClear(FLAG_SYS_CYCLING_ROAD);
-    FlagClear(FLAG_SYS_CRUISE_MODE);
-    FlagClear(FLAG_SYS_SAFARI_MODE);
-    FlagClear(FLAG_SYS_USE_STRENGTH);
-    FlagClear(FLAG_SYS_USE_FLASH);
 }
 
 void Overworld_ResetStateAfterTeleport(void)
 {
     ResetInitialPlayerAvatarState();
-    FlagClear(FLAG_SYS_CYCLING_ROAD);
-    FlagClear(FLAG_SYS_CRUISE_MODE);
-    FlagClear(FLAG_SYS_SAFARI_MODE);
-    FlagClear(FLAG_SYS_USE_STRENGTH);
-    FlagClear(FLAG_SYS_USE_FLASH);
     RunScriptImmediately(EventScript_ResetMrBriney);
 }
 
 void Overworld_ResetStateAfterDigEscRope(void)
 {
     ResetInitialPlayerAvatarState();
-    FlagClear(FLAG_SYS_CYCLING_ROAD);
-    FlagClear(FLAG_SYS_CRUISE_MODE);
-    FlagClear(FLAG_SYS_SAFARI_MODE);
-    FlagClear(FLAG_SYS_USE_STRENGTH);
-    FlagClear(FLAG_SYS_USE_FLASH);
 }
 
 #if B_RESET_FLAGS_VARS_AFTER_WHITEOUT  == TRUE
@@ -361,11 +343,6 @@ void Overworld_ResetBattleFlagsAndVars(void)
 static void Overworld_ResetStateAfterWhiteOut(void)
 {
     ResetInitialPlayerAvatarState();
-    FlagClear(FLAG_SYS_CYCLING_ROAD);
-    FlagClear(FLAG_SYS_CRUISE_MODE);
-    FlagClear(FLAG_SYS_SAFARI_MODE);
-    FlagClear(FLAG_SYS_USE_STRENGTH);
-    FlagClear(FLAG_SYS_USE_FLASH);
     if (B_RESET_FLAGS_VARS_AFTER_WHITEOUT == TRUE)
         Overworld_ResetBattleFlagsAndVars();
     // If you were defeated by Kyogre/Groudon and the step counter has
@@ -379,7 +356,6 @@ static void Overworld_ResetStateAfterWhiteOut(void)
 
 static void UpdateMiscOverworldStates(void)
 {
-    FlagClear(FLAG_SYS_SAFARI_MODE);
     ChooseAmbientCrySpecies();
     ResetCyclingRoadChallengeData();
 }
@@ -616,40 +592,20 @@ static bool32 IsFRLGWhiteout(void)
 {
     if (!OW_FRLG_WHITEOUT)
         return FALSE;
-    return GetHealNpcLocalId(GetHealLocationIndexByWarpData(&gSaveBlock1Ptr->lastHealLocation)) > 0;
-}
-
-void SetWarpDestinationToLastHealLocation(void)
-{
-    if (IsFRLGWhiteout())
-        SetWhiteoutRespawnWarpAndHealerNPC(&sWarpDestination);
-    else
-        sWarpDestination = gSaveBlock1Ptr->lastHealLocation;
-}
-
-void SetLastHealLocationWarp(u8 healLocationId)
-{
-    const struct HealLocation *healLocation = GetHealLocation(healLocationId);
-    if (healLocation)
-        SetWarpData(&gSaveBlock1Ptr->lastHealLocation, healLocation->mapGroup, healLocation->mapNum, WARP_ID_NONE, healLocation->x, healLocation->y);
+    return GetHealNpcLocalId(GetHealLocationIndexByWarpData(&gSaveBlock1Ptr->continueGameWarp)) > 0;
 }
 
 void UpdateEscapeWarp(s16 x, s16 y)
 {
-    u8 currMapType = GetCurrentMapType();
-    u8 destMapType = GetMapTypeByGroupAndId(sWarpDestination.mapGroup, sWarpDestination.mapNum);
-    if (IsMapTypeOutdoors(currMapType) && IsMapTypeOutdoors(destMapType) != TRUE)
-        SetEscapeWarp(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum, WARP_ID_NONE, x - MAP_OFFSET, y - MAP_OFFSET + 1);
 }
 
 void SetEscapeWarp(s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y)
 {
-    SetWarpData(&gSaveBlock1Ptr->escapeWarp, mapGroup, mapNum, warpId, x, y);
 }
 
 void SetWarpDestinationToEscapeWarp(void)
 {
-    sWarpDestination = gSaveBlock1Ptr->escapeWarp;
+    sWarpDestination = gSaveBlock1Ptr->continueGameWarp;
 }
 
 void SetFixedDiveWarp(s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y)
@@ -789,15 +745,11 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
 
 static void LoadMapFromWarp(bool32 a1)
 {
-    bool8 isOutdoors;
-
     LoadCurrentMapData();
     if (!(sObjectEventLoadFlag & SKIP_OBJECT_EVENT_LOAD))
     {
         LoadObjEventTemplatesFromHeader();
     }
-
-    isOutdoors = IsMapTypeOutdoors(gMapHeader.mapType);
 
     TrySetMapSaveWarpStatus();
     ClearTempFieldEventData();
@@ -810,8 +762,6 @@ static void LoadMapFromWarp(bool32 a1)
         DoTimeBasedEvents();
     SetSavedWeatherFromCurrMapHeader();
     ChooseAmbientCrySpecies();
-    if (isOutdoors)
-        FlagClear(FLAG_SYS_USE_FLASH);
     SetDefaultFlashLevel();
     Overworld_ClearSavedMusic();
     RunOnTransitionMapScript();
@@ -852,9 +802,7 @@ static struct InitialPlayerAvatarState *GetInitialPlayerAvatarState(void)
 
 static u8 GetAdjustedInitialTransitionFlags(struct InitialPlayerAvatarState *playerStruct, u16 metatileBehavior, u8 mapType)
 {
-    if (mapType != MAP_TYPE_INDOOR && FlagGet(FLAG_SYS_CRUISE_MODE))
-        return PLAYER_AVATAR_FLAG_ON_FOOT;
-    else if (mapType == MAP_TYPE_UNDERWATER)
+    if (mapType == MAP_TYPE_UNDERWATER)
         return PLAYER_AVATAR_FLAG_UNDERWATER;
     else if (MetatileBehavior_IsSurfableWaterOrUnderwater(metatileBehavior) == TRUE)
         return PLAYER_AVATAR_FLAG_SURFING;
@@ -868,9 +816,7 @@ static u8 GetAdjustedInitialTransitionFlags(struct InitialPlayerAvatarState *pla
 
 static u8 GetAdjustedInitialDirection(struct InitialPlayerAvatarState *playerStruct, u8 transitionFlags, u16 metatileBehavior, u8 mapType)
 {
-    if (FlagGet(FLAG_SYS_CRUISE_MODE) && mapType == MAP_TYPE_OCEAN_ROUTE)
-        return DIR_EAST;
-    else if (MetatileBehavior_IsDeepSouthWarp(metatileBehavior) == TRUE)
+    if (MetatileBehavior_IsDeepSouthWarp(metatileBehavior) == TRUE)
         return DIR_NORTH;
     else if (MetatileBehavior_IsNonAnimDoor(metatileBehavior) == TRUE || MetatileBehavior_IsDoor(metatileBehavior) == TRUE)
         return DIR_SOUTH;
@@ -1982,11 +1928,6 @@ bool32 IsSendingKeysOverCable(void)
     return FALSE;
 }
 
-void ClearLinkPlayerObjectEvents(void)
-{
-    memset(gLinkPlayerObjectEvents, 0, sizeof(gLinkPlayerObjectEvents));
-}
-
 // Note: Emerald reuses the direction and range variables during Link mode
 // as special gender and direction values. The types and placement
 // conflict with the usual Event Object struct, thus the definitions.
@@ -2022,17 +1963,10 @@ static bool8 FacingHandler_DpadMovement(struct LinkPlayerObjectEvent *linkPlayer
     linkDirection(objEvent) = FlipVerticalAndClearForced(dir, linkDirection(objEvent));
     ObjectEventMoveDestCoords(objEvent, linkDirection(objEvent), &x, &y);
 
-    if (LinkPlayerGetCollision(linkPlayerObjEvent->objEventId, linkDirection(objEvent), x, y))
-    {
-        return FALSE;
-    }
-    else
-    {
-        objEvent->directionSequenceIndex = 16;
-        ShiftObjectEventCoords(objEvent, x, y);
-        ObjectEventUpdateElevation(objEvent, NULL);
-        return TRUE;
-    }
+    objEvent->directionSequenceIndex = 16;
+    ShiftObjectEventCoords(objEvent, x, y);
+    ObjectEventUpdateElevation(objEvent, NULL);
+    return TRUE;
 }
 
 static bool8 FacingHandler_ForcedFacingChange(struct LinkPlayerObjectEvent *linkPlayerObjEvent, struct ObjectEvent *objEvent, u8 dir)
@@ -2080,23 +2014,6 @@ static u8 FlipVerticalAndClearForced(u8 newFacing, u8 oldFacing)
         return DIR_EAST;
     }
     return oldFacing;
-}
-
-static u8 LinkPlayerGetCollision(u8 selfObjEventId, u8 direction, s16 x, s16 y)
-{
-    u8 i;
-    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
-    {
-        if (i != selfObjEventId)
-        {
-            if ((gObjectEvents[i].currentCoords.x == x && gObjectEvents[i].currentCoords.y == y)
-             || (gObjectEvents[i].previousCoords.x == x && gObjectEvents[i].previousCoords.y == y))
-            {
-                return 1;
-            }
-        }
-    }
-    return MapGridGetCollisionAt(x, y);
 }
 
 // ----------------

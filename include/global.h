@@ -260,29 +260,22 @@ struct TrainerNameRecord
 
 struct SaveBlock1
 {
-    /*0x00*/ struct Coords16 pos;
-    /*0x04*/ struct WarpData location;
-    /*0x0C*/ struct WarpData continueGameWarp;
-    /*0x14*/ struct WarpData dynamicWarp;
-    /*0x1C*/ struct WarpData lastHealLocation; // used by white-out and teleport
-    /*0x24*/ struct WarpData escapeWarp; // used by Dig and Escape Rope
-    /*0x2C*/ u16 savedMusic;
-    /*0x2E*/ u8 weather;
-    /*0x2F*/ u8 weatherCycleStage;
-    /*0x32*/ u16 mapLayoutId;
-    /*0x34*/ u16 mapView[0x100];
-    /*0x234*/ u8 playerPartyCount;
-    /*0x238*/ struct Pokemon playerParty[PARTY_SIZE];
-    /*0x498*/ struct ItemSlot pcItems[PC_ITEMS_COUNT];
-    /*0x560*/ struct ItemSlot bagPocket_Items[BAG_ITEMS_COUNT];
-    /*0x5D8*/ struct ItemSlot bagPocket_KeyItems[BAG_KEYITEMS_COUNT];
-    /*0x650*/ struct ItemSlot bagPocket_PokeBalls[BAG_POKEBALLS_COUNT];
-    /*0x690*/ struct ItemSlot bagPocket_TMHM[BAG_TMHM_COUNT];
-    /*0x790*/ struct ItemSlot bagPocket_Berries[BAG_BERRIES_COUNT];
-    /*0xA30*/ struct ObjectEvent objectEvents[OBJECT_EVENTS_COUNT];
-    /*0xC70*/ struct ObjectEventTemplate objectEventTemplates[OBJECT_EVENT_TEMPLATES_COUNT];
-    /*0x1270*/ u8 flags[NUM_FLAG_BYTES];
-    /*0x139C*/ u16 vars[VARS_COUNT];
+    struct Coords16 pos;
+    struct WarpData location;
+    struct WarpData continueGameWarp;
+    struct WarpData dynamicWarp;
+    u16 savedMusic;
+    u8 weather;
+    u8 weatherCycleStage;
+    u16 mapLayoutId;
+    u16 mapView[0x100];
+    u8 playerPartyCount;
+    struct Pokemon playerParty[PARTY_SIZE];
+    struct ItemSlot bagPocket_KeyItems[BAG_KEYITEMS_COUNT];
+    struct ObjectEvent objectEvents[OBJECT_EVENTS_COUNT];
+    struct ObjectEventTemplate objectEventTemplates[OBJECT_EVENT_TEMPLATES_COUNT];
+    u8 flags[NUM_FLAG_BYTES];
+    u16 vars[VARS_COUNT];
 };
 
 extern struct SaveBlock1 *gSaveBlock1Ptr;

@@ -160,6 +160,7 @@ string generate_map_header_text(Json map_data, Json layouts_data) {
 
     text << "\t.2byte " << json_to_string(map_data, "music") << "\n"
          << "\t.2byte " << json_to_string(layout, "id") << "\n"
+         << "\t.byte "  << json_to_string(map_data, "region_map_section") << "\n"
          << "\t.byte "  << json_to_string(map_data, "requires_flash") << "\n"
          << "\t.byte "  << json_to_string(map_data, "weather") << "\n"
          << "\t.byte "  << json_to_string(map_data, "map_type") << "\n";
@@ -316,18 +317,18 @@ string generate_map_events_text(Json map_data) {
                      << json_to_string(bg_event, "script") << "\n";
             }
             else if (type == "hidden_item") {
-                text << "\tbg_hidden_item_event "
-                     << json_to_string(bg_event, "x") << ", "
-                     << json_to_string(bg_event, "y") << ", "
-                     << json_to_string(bg_event, "elevation") << ", "
-                     << json_to_string(bg_event, "item") << ", "
-                     << json_to_string(bg_event, "flag");
-                if (version == "firered") {
-                    text << ", "
-                         << json_to_string(bg_event, "quantity") << ", "
-                         << json_to_string(bg_event, "underfoot");
-                }
-                text << "\n";
+                // text << "\tbg_hidden_item_event "
+                //      << json_to_string(bg_event, "x") << ", "
+                //      << json_to_string(bg_event, "y") << ", "
+                //      << json_to_string(bg_event, "elevation") << ", "
+                //      << json_to_string(bg_event, "item") << ", "
+                //      << json_to_string(bg_event, "flag");
+                // if (version == "firered") {
+                //     text << ", "
+                //          << json_to_string(bg_event, "quantity") << ", "
+                //          << json_to_string(bg_event, "underfoot");
+                // }
+                // text << "\n";
             }
             else if (type == "secret_base") {
                 text << "\tbg_secret_base_event "

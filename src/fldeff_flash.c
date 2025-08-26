@@ -29,8 +29,6 @@ struct FlashStruct
     void (*func)(void);
 };
 
-static void FieldCallback_Flash(void);
-static void FldEff_UseFlash(void);
 static bool8 TryDoMapTransition(void);
 static void DoExitCaveTransition(void);
 static void Task_ExitCaveTransition1(u8 taskId);
@@ -77,29 +75,7 @@ static const u32 sCaveTransitionTiles[] = INCBIN_U32("graphics/cave_transition/t
 
 bool8 SetUpFieldMove_Flash(void)
 {
-    if (gMapHeader.cave == TRUE && !FlagGet(FLAG_SYS_USE_FLASH))
-    {
-        gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
-        gPostMenuFieldCallback = FieldCallback_Flash;
-        return TRUE;
-    }
-
     return FALSE;
-}
-
-static void FieldCallback_Flash(void)
-{
-    u8 taskId = CreateFieldMoveTask();
-    gFieldEffectArguments[0] = GetCursorSelectionMonId();
-    gTasks[taskId].data[8] = (uintptr_t)FldEff_UseFlash >> 16;
-    gTasks[taskId].data[9] = (uintptr_t)FldEff_UseFlash;
-}
-
-static void FldEff_UseFlash(void)
-{
-    PlaySE(SE_M_REFLECT);
-    FlagSet(FLAG_SYS_USE_FLASH);
-    ScriptContext_SetupScript(EventScript_UseFlash);
 }
 
 static void CB2_ChangeMapMain(void)

@@ -184,13 +184,6 @@ static void RemoveSaveInfoWindow(void);
 static void HideStartMenuWindow(void);
 static void HideStartMenuDebug(void);
 
-void SetDexPokemonPokenavFlags(void) // unused
-{
-    FlagSet(FLAG_SYS_POKEDEX_GET);
-    FlagSet(FLAG_SYS_POKEMON_GET);
-    FlagSet(FLAG_SYS_POKENAV_GET);
-}
-
 static void BuildStartMenuActions(void)
 {
     sNumStartMenuActions = 0;
@@ -208,9 +201,6 @@ static void AddStartMenuAction(u8 action)
 
 static void BuildNormalStartMenu(void)
 {
-    if (FlagGet(FLAG_SYS_POKEMON_GET) == TRUE)
-        AddStartMenuAction(MENU_ACTION_POKEMON);
-
     AddStartMenuAction(MENU_ACTION_SAVE);
     AddStartMenuAction(MENU_ACTION_OPTION);
     AddStartMenuAction(MENU_ACTION_EXIT);
@@ -219,8 +209,6 @@ static void BuildNormalStartMenu(void)
 static void BuildDebugStartMenu(void)
 {
     AddStartMenuAction(MENU_ACTION_DEBUG);
-    if (FlagGet(FLAG_SYS_POKEMON_GET) == TRUE)
-        AddStartMenuAction(MENU_ACTION_POKEMON);
     AddStartMenuAction(MENU_ACTION_SAVE);
     AddStartMenuAction(MENU_ACTION_OPTION);
 }
@@ -773,10 +761,7 @@ static void ShowSaveInfoWindow(void)
     u32 xOffset;
     u32 yOffset;
 
-    if (!FlagGet(FLAG_SYS_POKEDEX_GET))
-    {
-        saveInfoWindow.height -= 2;
-    }
+    saveInfoWindow.height -= 2;
 
     sSaveInfoWindowId = AddWindow(&saveInfoWindow);
     DrawStdWindowFrame(sSaveInfoWindowId, FALSE);
@@ -807,16 +792,6 @@ static void ShowSaveInfoWindow(void)
     BufferSaveMenuText(SAVE_MENU_BADGES, gStringVar4, color);
     xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
     AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
-
-    if (FlagGet(FLAG_SYS_POKEDEX_GET) == TRUE)
-    {
-        // Print Pokédex count
-        yOffset += 16;
-        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingPokedex, 0, yOffset, TEXT_SKIP_DRAW, NULL);
-        BufferSaveMenuText(SAVE_MENU_CAUGHT, gStringVar4, color);
-        xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
-        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
-    }
 
     // Print play time
     yOffset += 16;

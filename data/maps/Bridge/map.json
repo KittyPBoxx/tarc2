@@ -1,0 +1,48 @@
+{
+  "id": "MAP_BRIDGE",
+  "name": "Bridge",
+  "layout": "LAYOUT_BRIDGE",
+  "music": "MUS_LITTLEROOT",
+  "region_map_section": "0",
+  "requires_flash": false,
+  "weather": "WEATHER_NONE",
+  "map_type": "MAP_TYPE_NONE",
+  "allow_cycling": true,
+  "allow_escaping": false,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": null,
+  "object_events": [
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BOY_2",
+      "x": 8,
+      "y": 14,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "movement_range_x": 2,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "Bridge_EventScript_Berus",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_LITTLEROOT_WILD_1",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(PICHU)",
+      "x": 13,
+      "y": 7,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_range_x": 1,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "10",
+      "script": "EventScript_Script_WildEncounter",
+      "flag": "FLAG_TEMP_11"
+    }
+  ],
+  "warp_events": [],
+  "coord_events": [],
+  "bg_events": []
+}

@@ -135,9 +135,6 @@ struct Trainer
     struct String starting_status;
     int starting_status_line;
 
-    struct String difficulty;
-    int difficulty_line;
-
     int party_size;
     int party_size_line;
 
@@ -1244,13 +1241,6 @@ static bool parse_trainer(struct Parser *p, const struct Parsed *parsed, struct 
             trainer->starting_status_line = value.location.line;
             trainer->starting_status = token_string(&value);
         }
-        else if (is_literal_token(&key, "Difficulty"))
-        {
-            if (trainer->difficulty_line)
-                any_error = !set_show_parse_error(p, key.location, "duplicate 'Difficulty'");
-            trainer->difficulty_line = value.location.line;
-            trainer->difficulty = token_string(&value);
-        }
         else if (is_literal_token(&key, "Party Size"))
         {
             if (trainer->party_size_line)
@@ -1282,7 +1272,7 @@ static bool parse_trainer(struct Parser *p, const struct Parsed *parsed, struct 
         }
         else
         {
-            any_error = !set_show_parse_error(p, key.location, "expected one of 'Name', 'Class', 'Pic', 'Gender', 'Music', 'Items', 'Battle Type', 'Difficulty', 'Party Size', 'Pool Rules', 'Pool Pick Functions', 'Pool Prune' or 'AI'");
+            any_error = !set_show_parse_error(p, key.location, "expected one of 'Name', 'Class', 'Pic', 'Gender', 'Music', 'Items', 'Battle Type', 'Party Size', 'Pool Rules', 'Pool Pick Functions', 'Pool Prune' or 'AI'");
         }
     }
     if (!trainer->pic_line)
@@ -1720,12 +1710,6 @@ static void fprint_trainers(const char *output_path, FILE *f, struct Parsed *par
     {
         struct Trainer *trainer = &parsed->trainers[i];
         fprintf(f, "#line %d\n", trainer->id_line);
-        if (is_empty_string(trainer->difficulty))
-            trainer->difficulty = literal_string("Normal");
-        else
-            fprintf(f, "#line %d\n", trainer->difficulty_line);
-        fprint_constant(f, "    [DIFFICULTY",trainer->difficulty);
-        fprintf(f, "]");
 
         fprintf(f, "[");
         fprint_string(f, trainer->id);

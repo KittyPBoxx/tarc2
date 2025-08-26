@@ -162,7 +162,8 @@ static void DoRippleFieldEffect(struct ObjectEvent *, struct Sprite *);
 static void DoGroundEffects_OnSpawn(struct ObjectEvent *, struct Sprite *);
 static void DoGroundEffects_OnBeginStep(struct ObjectEvent *, struct Sprite *);
 static void DoGroundEffects_OnFinishStep(struct ObjectEvent *, struct Sprite *);
-static void VirtualObject_UpdateAnim(struct Sprite *);
+static int GetVirtualObjectSpriteId(u8 virtualObjId);
+//static void VirtualObject_UpdateAnim(struct Sprite *);
 static void ApplyLevitateMovement(u8);
 static bool8 MovementType_Disguise_Callback(struct ObjectEvent *, struct Sprite *);
 static bool8 MovementType_Buried_Callback(struct ObjectEvent *, struct Sprite *);
@@ -1164,7 +1165,6 @@ static void ClearAllObjectEvents(void)
 
 void ResetObjectEvents(void)
 {
-    ClearLinkPlayerObjectEvents();
     ClearAllObjectEvents();
     ClearPlayerAvatarInfo();
     CreateReflectionEffectSprites();
@@ -1743,8 +1743,8 @@ u8 CreateVirtualObject(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevati
 
     graphicsInfo = GetObjectEventGraphicsInfo(graphicsId);
     CopyObjectGraphicsInfoToSpriteTemplate(graphicsId, SpriteCB_VirtualObject, &spriteTemplate, &subspriteTables);
-    x += MAP_OFFSET;
-    y += MAP_OFFSET;
+    // x += MAP_OFFSET;
+    // y += MAP_OFFSET;
     SetSpritePosToOffsetMapCoords(&x, &y, 8, 16);
     if (spriteTemplate.paletteTag != TAG_NONE)
         LoadObjectEventPalette(spriteTemplate.paletteTag);
@@ -1768,7 +1768,7 @@ u8 CreateVirtualObject(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevati
         }
         InitObjectPriorityByElevation(sprite, elevation);
         SetObjectSubpriorityByElevation(elevation, sprite, 1);
-        StartSpriteAnim(sprite, GetFaceDirectionAnimNum(direction));
+        //StartSpriteAnim(sprite, GetFaceDirectionAnimNum(direction));
     }
     return spriteId;
 }
@@ -2519,6 +2519,12 @@ void TrySpawnLightSprites(s16 camX, s16 camY)
     }
 }
 
+void TrySpawnSpriteTile(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, s16 camX, s16 camY)
+{
+    if (GetVirtualObjectSpriteId(virtualObjId) == MAX_SPRITES)
+        CreateVirtualObject(graphicsId, virtualObjId, x, y, 0, DIR_NONE);
+}
+
 void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 {
     u8 i;
@@ -2541,7 +2547,9 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
             if (top <= npcY && bottom >= npcY && left <= npcX && right >= npcX && !FlagGet(template->flagId))
             {
-                if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE)
+                if (template->graphicsId == OBJ_EVENT_GFX_TRUCK)
+                    TrySpawnSpriteTile(template->graphicsId, template->trainerRange_berryTreeId, npcX, npcY, cameraX, cameraY); // isometric tile sprite instead
+                else if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE)
                     SpawnLightSprite(npcX, npcY, cameraX, cameraY, template->trainerRange_berryTreeId); // light sprite instead
                 else
                     TrySpawnObjectEventTemplate(template, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY);
@@ -2552,25 +2560,18 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
 void RemoveObjectEventsOutsideView(void)
 {
-    u8 i, j;
-    bool8 isActiveLinkPlayer;
+    u8 i;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
-        for (j = 0, isActiveLinkPlayer = FALSE; j < ARRAY_COUNT(gLinkPlayerObjectEvents); j++)
-        {
-            if (gLinkPlayerObjectEvents[j].active && i == gLinkPlayerObjectEvents[j].objEventId)
-                isActiveLinkPlayer = TRUE;
-        }
-        if (!isActiveLinkPlayer)
-        {
-            struct ObjectEvent *objectEvent = &gObjectEvents[i];
+        struct ObjectEvent *objectEvent = &gObjectEvents[i];
 
             // Followers should not go OOB, or their sprites may be freed early during a cross-map scripting event,
             // such as Wally's Ralts catch sequence
-            if (objectEvent->active && !objectEvent->isPlayer && objectEvent->localId != OBJ_EVENT_ID_FOLLOWER
-             && objectEvent->localId != OBJ_EVENT_ID_NPC_FOLLOWER)
-                RemoveObjectEventIfOutsideView(objectEvent);
+        if (objectEvent->active && !objectEvent->isPlayer && objectEvent->localId != OBJ_EVENT_ID_FOLLOWER
+            && objectEvent->localId != OBJ_EVENT_ID_NPC_FOLLOWER)
+        {
+            RemoveObjectEventIfOutsideView(objectEvent);
         }
     }
 }
@@ -2614,12 +2615,6 @@ static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
     struct SpriteFrameImage spriteFrameImage;
     const struct SubspriteTable *subspriteTables;
     const struct ObjectEventGraphicsInfo *graphicsInfo;
-
-    for (i = 0; i < ARRAY_COUNT(gLinkPlayerObjectEvents); i++)
-    {
-        if (gLinkPlayerObjectEvents[i].active && objectEventId == gLinkPlayerObjectEvents[i].objEventId)
-            return;
-    }
 
     objectEvent = &gObjectEvents[objectEventId];
     subspriteTables = NULL;
@@ -9922,9 +9917,9 @@ void UpdateObjectEventSpriteInvisibility(struct Sprite *sprite, bool8 invisible)
 
 static void SpriteCB_VirtualObject(struct Sprite *sprite)
 {
-    VirtualObject_UpdateAnim(sprite);
+    //VirtualObject_UpdateAnim(sprite);
     SetObjectSubpriorityByElevation(sprite->sVirtualObjElev, sprite, 1);
-    UpdateObjectEventSpriteInvisibility(sprite, sprite->sInvisible);
+    //UpdateObjectEventSpriteInvisibility(sprite, sprite->sInvisible);
 }
 
 static int GetVirtualObjectSpriteId(u8 virtualObjId)
@@ -10014,17 +10009,17 @@ void SetVirtualObjectSpriteAnim(u8 virtualObjId, u8 animNum)
     }
 }
 
-static void VirtualObject_UpdateAnim(struct Sprite *sprite)
-{
-    switch(sprite->sAnimNum)
-    {
-    case 0:
-        break;
-    default:
-        sprite->sAnimNum = 0;
-        break;
-    }
-}
+// static void VirtualObject_UpdateAnim(struct Sprite *sprite)
+// {
+//     switch(sprite->sAnimNum)
+//     {
+//     case 0:
+//         break;
+//     default:
+//         sprite->sAnimNum = 0;
+//         break;
+//     }
+// }
 
 bool32 IsVirtualObjectAnimating(u8 virtualObjId)
 {

@@ -19,7 +19,7 @@
 static void CB2_ReshowBattleScreenAfterMenu(void);
 static void CB2_ReshowBlankBattleScreenAfterMenu(void);
 static bool8 LoadBattlerSpriteGfx(u32 battler);
-static void CreateHealthboxSprite(u32 battler);
+//static void CreateHealthboxSprite(u32 battler);
 static void ClearBattleBgCntBaseBlocks(void);
 static void CreateCaughtMonSprite(void);
 
@@ -348,7 +348,7 @@ void CreateBattlerSprite(u32 battler)
     }
 }
 
-static void CreateHealthboxSprite(u32 battler)
+void CreateHealthboxSprite(u32 battler)
 {
     if (battler < gBattlersCount)
     {

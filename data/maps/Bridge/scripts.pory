@@ -1,0 +1,107 @@
+raw `
+Bridge_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Bridge_OnTransition
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, Bridge_OnFrame
+	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, Bridge_OnWarp
+	.byte 0
+
+Bridge_OnTransition:
+	end
+
+Bridge_EventScript_HideMapNamePopup::
+	setflag FLAG_HIDE_MAP_NAME_POPUP
+	return
+
+Bridge_OnFrame:
+	.2byte 0
+
+Bridge_OnWarp:
+	.2byte 0
+
+Bridge_EventScript_BerusName::
+.string "Berus$"
+
+
+Bridge_EventScript_Berus::
+	@ setspeaker Bridge_EventScript_BerusName
+	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	msgbox Bridge_Text_YoureLate, MSGBOX_NPC
+	removefieldmugshot
+	msgbox Bridge_Text_TellTheTruth, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, Bridge_EventScript_Truth
+	goto_if_eq VAR_RESULT, NO, Bridge_EventScript_Lie
+	end
+
+Bridge_EventScript_Lie::
+	@ setspeaker Bridge_EventScript_BerusName
+	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	msgbox Bridge_Text_Lie, MSGBOX_NPC
+	end
+
+Bridge_EventScript_Truth::
+	@ setspeaker Bridge_EventScript_BerusName
+	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	msgbox Bridge_Text_Truth, MSGBOX_NPC
+	end
+
+
+@ TEXT @
+
+Bridge_Text_YoureLate:
+	.string "Decided to finally show up, did we?\n"
+	.string "Is there a good reason you're four\l"
+	.string "hours late?$"
+
+Bridge_Text_TellTheTruth:
+	.string "Tell the truth?$"
+
+Bridge_Text_Truth:
+	.string "Well, the truth is... I didn't hear my\n"
+	.string "alarm clock and-$"
+
+Bridge_Text_Lie:
+	.string "Well, the truth is... I had to... er... give\n" 
+	.string "my train seat to a grandma... who was\n" 
+	.string "in a wheelchair... and uh... also\n"
+	.string "pregnant? But I dropped my ticket so-$"
+
+Bridge_Text_TellMeYourName:
+	.string "Enough! Tell me your name so I can mark\n"
+	.string "you down$"
+
+@ // BERUS: Ah you must be Thya's child. I heard she's sponsored by that trickster god now. How is she?
+
+@ // PLAYER: I'm not sure, she rarely come home from work
+
+@ // BERUS: An inspiration to us all. Well they say the apple dosn't fall far from the tree but in my experience fruit that lands in the shade of it's bearer tends to spoil fast.
+@ // Unfortunately, {PLAYER} you arrived too late to take the test this year but I wish you all the best in future attempts
+
+@ // CONTROL COMES BACK TO THE PLAYER
+
+@ // BERUS: I know the exam runs untill sunset but you can't possibly expect to start four hours late and still pass. No one has ever passed it that fast before
+@ // Did you even prepare? Fine, If you can prove you at least know how to save the game I guess I can let you take the test
+
+@ // PLAYER MUST SAVE THE GAME:
+@	- if not Saved 
+@		If you can prove you at least know how to save the game I guess I can let you take the test
+@	- if saved
+
+
+@ // BERUS DROPS BAG LETS YOU CHOSE A MON - THERE IS ONLY ONE 
+
+@ // PLAYER: there was only one left
+
+@ // BERUS: A good trainer makes the best choice for their situation. A great trainer makes sure they always have a good choice to make. 
+@ // You were late so you get the mon that none of the other students wanted. Still, you don't have you're own divine sponsor yet 
+@ // but you should be able to use the prayers of your mums sponsor untill you get one of your own. Do you know what that means?
+
+@ - Yes 
+@ // BERUS: Well then, better hurry you don't have much time
+
+
+@ - No
+@ // BERUS: Ha, I knew you didn't prepare. Prayers are like moves 
+
+
+@ - Talk to berus again
+@ // BERUS: better hurry you don't have much time`

@@ -67,7 +67,6 @@ gSpecials::
 	def_special TryLoseFansFromPlayTimeAfterLinkBattle
 	def_special TryLoseFansFromPlayTime
 	def_special SetPlayerGotFirstFans
-	def_special UpdateTrainerFanClubGameClear
 	def_special Script_TryGainNewFanFromCounter
 	def_special RockSmashWildEncounter
 	def_special GetBattleOutcome
@@ -99,8 +98,6 @@ gSpecials::
 	def_special StopMapMusic
 	def_special FieldShowRegionMap
 	def_special GetWeekCount
-	def_special ResetTrickHouseNuggetFlag
-	def_special SetTrickHouseNuggetFlag
 	def_special ScriptMenu_CreatePCMultichoice
 	def_special Special_ShowDiploma
 	def_special CheckLeadMonCool
@@ -120,10 +117,6 @@ gSpecials::
 	def_special WaitWeather
 	def_special GetSlotMachineId
 	def_special GetPlayerFacingDirection, requests_effects=TRUE
-	def_special FoundAbandonedShipRoom1Key
-	def_special FoundAbandonedShipRoom2Key
-	def_special FoundAbandonedShipRoom4Key
-	def_special FoundAbandonedShipRoom6Key
 	def_special LeadMonHasEffortRibbon
 	def_special GiveLeadMonEffortRibbon
 	def_special Special_AreLeadMonEVsMaxedOut
@@ -141,7 +134,6 @@ gSpecials::
 	def_special BattleSetup_StartLegendaryBattle
 	def_special StartRegiBattle
 	def_special SetTrainerFacingDirection
-	def_special FoundBlackGlasses
 	def_special StartDroughtWeatherBlend
 	def_special DoDiveWarp
 	def_special DoFallWarp
@@ -166,7 +158,6 @@ gSpecials::
 	def_special ShowMapNamePopup
 	def_special ShowMapNamePopup
 	def_special DoMirageTowerCeilingCrumble
-	def_special SetMirageTowerVisibility
 	def_special BufferTMHMMoveName
 	def_special ChooseMonForWirelessMinigame
 	def_special IsBadEggInParty
@@ -209,7 +200,6 @@ gSpecials::
 	def_special GetMartEmployeeObjectEventId
 	def_special SaveForBattleTowerLink
 	def_special Unused_SetWeatherSunny
-	def_special SetUnlockedPokedexFlags
 	def_special IsTrainerRegistered
 	def_special EnableNationalPokedex
 	def_special ScriptMenu_CreateLilycoveSSTidalMultichoice

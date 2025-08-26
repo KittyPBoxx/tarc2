@@ -315,41 +315,6 @@ enum Gimmick
             return TRUE;
 ```
 
-When an enum is used, the enum type is used instead of a regular number type to prevent incorrectly set values.
-
-```c
-// Incorrect
-bool32 CanActivateGimmick(u32 battler, u32 gimmick)
-{
-    return gGimmicksInfo[gimmick].CanActivate != NULL && gGimmicksInfo[gimmick].CanActivate(battler);
-}
-
-u32 GetCurrentDifficultyLevel(void)
-{
-    if (!B_VAR_DIFFICULTY)
-        return DIFFICULTY_NORMAL;
-
-    return VarGet(B_VAR_DIFFICULTY);
-}
-```
-
-```c
-//Correct
-
-bool32 CanActivateGimmick(u32 battler, enum Gimmick gimmick)
-{
-    return gGimmicksInfo[gimmick].CanActivate != NULL && gGimmicksInfo[gimmick].CanActivate(battler);
-}
-
-enum DifficultyLevel GetCurrentDifficultyLevel(void)
-{
-    if (!B_VAR_DIFFICULTY)
-        return DIFFICULTY_NORMAL;
-
-    return VarGet(B_VAR_DIFFICULTY);
-}
-```
-
 ### Data file format
 
 External data files should use JSON.

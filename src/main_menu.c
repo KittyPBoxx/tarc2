@@ -2023,28 +2023,13 @@ static void MainMenu_FormatSavegameTime(void)
 
 static void MainMenu_FormatSavegamePokedex(void)
 {
-    u8 str[0x20];
-
-    if (FlagGet(FLAG_SYS_POKEDEX_GET) == TRUE)
-    {
-        StringExpandPlaceholders(gStringVar4, gText_ContinueMenuPokedex);
-        AddTextPrinterParameterized3(2, FONT_NORMAL, 0, 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
-        ConvertIntToDecimalStringN(str, 1, STR_CONV_MODE_LEFT_ALIGN, 4);
-        AddTextPrinterParameterized3(2, FONT_NORMAL, GetStringRightAlignXOffset(FONT_NORMAL, str, 100), 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, str);
-    }
 }
 
 static void MainMenu_FormatSavegameBadges(void)
 {
     u8 str[0x20];
     u8 badgeCount = 0;
-    u32 i;
 
-    for (i = FLAG_BADGE01_GET; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
-    {
-        if (FlagGet(i))
-            badgeCount++;
-    }
     StringExpandPlaceholders(gStringVar4, gText_ContinueMenuBadges);
     AddTextPrinterParameterized3(2, FONT_NORMAL, 0x6C, 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
     ConvertIntToDecimalStringN(str, badgeCount, STR_CONV_MODE_LEADING_ZEROS, 1);

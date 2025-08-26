@@ -11,48 +11,11 @@
 #include "wallclock.h"
 #include "constants/form_change_types.h"
 
-static void UpdatePerDay(struct Time *localTime);
-static void UpdatePerMinute(struct Time *localTime);
-
 void InitTimeBasedEvents(void)
 {
-    FlagSet(FLAG_SYS_CLOCK_SET);
-    RtcCalcLocalTime();
-    VarSet(VAR_DAYS, gLocalTime.days);
 }
 
 void DoTimeBasedEvents(void)
-{
-    if (FlagGet(FLAG_SYS_CLOCK_SET) && !InPokemonCenter())
-    {
-        RtcCalcLocalTime();
-        UpdatePerDay(&gLocalTime);
-        UpdatePerMinute(&gLocalTime);
-    }
-}
-
-static void UpdatePerDay(struct Time *localTime)
-{
-    u16 *days = GetVarPointer(VAR_DAYS);
-    u16 daysSince;
-
-    if (*days != localTime->days && *days <= localTime->days)
-    {
-        daysSince = localTime->days - *days;
-        ClearDailyFlags();
-        UpdateWeatherPerDay(daysSince);
-        UpdatePartyPokerusTime(daysSince);
-        UpdateMirageRnd(daysSince);
-        UpdateBirchState(daysSince);
-        UpdateFrontierManiac(daysSince);
-        UpdateFrontierGambler(daysSince);
-        SetShoalItemFlag(daysSince);
-        UpdateDaysPassedSinceFormChange(daysSince);
-        *days = localTime->days;
-    }
-}
-
-static void UpdatePerMinute(struct Time *localTime)
 {
 }
 

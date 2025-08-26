@@ -117,7 +117,6 @@ static void PlayCollisionSoundIfNotFacingWarp(u8);
 
 static void HideShowWarpArrow(struct ObjectEvent *);
 
-static void StartStrengthAnim(u8, u8);
 static void Task_PushBoulder(u8);
 static bool8 PushBoulder_Start(struct Task *, struct ObjectEvent *, struct ObjectEvent *);
 static bool8 PushBoulder_Move(struct Task *, struct ObjectEvent *, struct ObjectEvent *);
@@ -924,23 +923,6 @@ static bool8 ShouldJumpLedge(s16 x, s16 y, u8 direction)
 
 static bool8 TryPushBoulder(s16 x, s16 y, u8 direction)
 {
-    if (FlagGet(FLAG_SYS_USE_STRENGTH))
-    {
-        u8 objectEventId = GetObjectEventIdByXY(x, y);
-
-        if (objectEventId != OBJECT_EVENTS_COUNT && gObjectEvents[objectEventId].graphicsId == OBJ_EVENT_GFX_PUSHABLE_BOULDER)
-        {
-            x = gObjectEvents[objectEventId].currentCoords.x;
-            y = gObjectEvents[objectEventId].currentCoords.y;
-            MoveCoords(direction, &x, &y);
-            if (GetCollisionAtCoords(&gObjectEvents[objectEventId], x, y, direction) == COLLISION_NONE
-             && MetatileBehavior_IsNonAnimDoor(MapGridGetMetatileBehaviorAt(x, y)) == FALSE)
-            {
-                StartStrengthAnim(objectEventId, direction);
-                return TRUE;
-            }
-        }
-    }
     return FALSE;
 }
 
@@ -1537,15 +1519,6 @@ static void HideShowWarpArrow(struct ObjectEvent *objectEvent)
 #define tState        data[0]
 #define tBoulderObjId data[1]
 #define tDirection    data[2]
-
-static void StartStrengthAnim(u8 objectEventId, u8 direction)
-{
-    u8 taskId = CreateTask(Task_PushBoulder, 0xFF);
-
-    gTasks[taskId].tBoulderObjId = objectEventId;
-    gTasks[taskId].tDirection = direction;
-    Task_PushBoulder(taskId);
-}
 
 static void Task_PushBoulder(u8 taskId)
 {

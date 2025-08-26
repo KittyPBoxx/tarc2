@@ -1066,15 +1066,6 @@ bool8 ScrCmd_setholewarp(struct ScriptContext *ctx)
 
 bool8 ScrCmd_setescapewarp(struct ScriptContext *ctx)
 {
-    u8 mapGroup = ScriptReadByte(ctx);
-    u8 mapNum = ScriptReadByte(ctx);
-    u8 warpId = ScriptReadByte(ctx);
-    u16 x = VarGet(ScriptReadHalfword(ctx));
-    u16 y = VarGet(ScriptReadHalfword(ctx));
-
-    Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
-
-    SetEscapeWarp(mapGroup, mapNum, warpId, x, y);
     return FALSE;
 }
 
@@ -2266,11 +2257,6 @@ bool8 ScrCmd_waitfieldeffect(struct ScriptContext *ctx)
 
 bool8 ScrCmd_setrespawn(struct ScriptContext *ctx)
 {
-    u16 healLocationId = VarGet(ScriptReadHalfword(ctx));
-
-    Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
-
-    SetLastHealLocationWarp(healLocationId);
     return FALSE;
 }
 

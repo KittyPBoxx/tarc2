@@ -10,11 +10,6 @@
 int GameClear(void)
 {
     int i;
-    bool32 ribbonGet;
-    struct RibbonCounter {
-        u8 partyIndex;
-        u8 count;
-    } ribbonCounts[6];
 
     HealPlayerParty();
 
@@ -32,14 +27,9 @@ int GameClear(void)
 
     SetContinueGameWarpToHealLocation(HEAL_LOCATION_LITTLEROOT_TOWN);
 
-    ribbonGet = FALSE;
-
     for (i = 0; i < PARTY_SIZE; i++)
     {
         struct Pokemon *mon = &gPlayerParty[i];
-
-        ribbonCounts[i].partyIndex = i;
-        ribbonCounts[i].count = 0;
 
         if (GetMonData(mon, MON_DATA_SANITY_HAS_SPECIES)
          && !GetMonData(mon, MON_DATA_SANITY_IS_EGG)
@@ -47,22 +37,6 @@ int GameClear(void)
         {
             u8 val[1] = {TRUE};
             SetMonData(mon, MON_DATA_CHAMPION_RIBBON, val);
-            ribbonGet = TRUE;
-        }
-    }
-
-    if (ribbonGet == TRUE)
-    {
-        FlagSet(FLAG_SYS_RIBBON_GET);
-
-        for (i = 1; i < 6; i++)
-        {
-            if (ribbonCounts[i].count > ribbonCounts[0].count)
-            {
-                struct RibbonCounter prevBest = ribbonCounts[0];
-                ribbonCounts[0] = ribbonCounts[i];
-                ribbonCounts[i] = prevBest;
-            }
         }
     }
 

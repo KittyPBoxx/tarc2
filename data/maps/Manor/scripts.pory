@@ -1,0 +1,4 @@
+raw `
+Manor_MapScripts::
+	.byte 0
+`

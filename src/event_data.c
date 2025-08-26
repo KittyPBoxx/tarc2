@@ -35,18 +35,6 @@ EWRAM_DATA static u16 sTestVars[TEST_VARS_SIZE] = {0};
 
 extern u16 *const gSpecialVars[];
 
-const u16 gBadgeFlags[NUM_BADGES] =
-{
-    FLAG_BADGE01_GET,
-    FLAG_BADGE02_GET,
-    FLAG_BADGE03_GET,
-    FLAG_BADGE04_GET,
-    FLAG_BADGE05_GET,
-    FLAG_BADGE06_GET,
-    FLAG_BADGE07_GET,
-    FLAG_BADGE08_GET,
-};
-
 void InitEventData(void)
 {
     memset(gSaveBlock1Ptr->flags, 0, sizeof(gSaveBlock1Ptr->flags));
@@ -58,16 +46,11 @@ void ClearTempFieldEventData(void)
 {
     memset(&gSaveBlock1Ptr->flags[TEMP_FLAGS_START / 8], 0, TEMP_FLAGS_SIZE);
     memset(&gSaveBlock1Ptr->vars[TEMP_VARS_START - VARS_START], 0, TEMP_VARS_SIZE);
-    FlagClear(FLAG_SYS_ENC_UP_ITEM);
-    FlagClear(FLAG_SYS_ENC_DOWN_ITEM);
-    FlagClear(FLAG_SYS_USE_STRENGTH);
     FlagClear(FLAG_SYS_CTRL_OBJ_DELETE);
-    FlagClear(FLAG_NURSE_UNION_ROOM_REMINDER);
 }
 
 void ClearDailyFlags(void)
 {
-    memset(&gSaveBlock1Ptr->flags[DAILY_FLAGS_START / 8], 0, DAILY_FLAGS_SIZE);
 }
 
 void DisableNationalPokedex(void)
@@ -87,22 +70,15 @@ bool32 IsNationalPokedexEnabled(void)
 
 void DisableResetRTC(void)
 {
-    VarSet(VAR_RESET_RTC_ENABLE, 0);
-    FlagClear(FLAG_SYS_RESET_RTC_ENABLE);
 }
 
 void EnableResetRTC(void)
 {
-    VarSet(VAR_RESET_RTC_ENABLE, 0x920);
-    FlagSet(FLAG_SYS_RESET_RTC_ENABLE);
 }
 
 bool32 CanResetRTC(void)
 {
-    if (FlagGet(FLAG_SYS_RESET_RTC_ENABLE) && VarGet(VAR_RESET_RTC_ENABLE) == 0x920)
-        return TRUE;
-    else
-        return FALSE;
+    return FALSE;
 }
 
 u16 *GetVarPointer(u16 id)

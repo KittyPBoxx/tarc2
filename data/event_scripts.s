@@ -5,7 +5,6 @@
 #include "constants/battle.h"
 #include "constants/battle_setup.h"
 #include "constants/berry.h"
-#include "constants/difficulty.h"
 #include "constants/event_objects.h"
 #include "constants/event_object_movement.h"
 #include "constants/field_effects.h"
@@ -82,7 +81,7 @@ gStdScripts::
 	.4byte Std_MsgboxGetPoints         @ MSGBOX_GETPOINTS
 gStdScripts_End::
 
-	.include "data/maps/LittlerootTown/scripts.inc"
+	.include "data/maps/Bridge/scripts.inc"
 
 	.include "data/scripts/std_msgbox.inc"
 	.include "data/scripts/trainer_battle.inc"
@@ -100,9 +99,6 @@ EventScript_WhiteOut::
 EventScript_AfterWhiteOutHeal::
 	lockall
 	msgbox gText_FirstShouldRestoreMonsHealth
-	call EventScript_PkmnCenterNurse_TakeAndHealPkmn
-	call_if_unset FLAG_DEFEATED_RUSTBORO_GYM, EventScript_AfterWhiteOutHealMsgPreRoxanne
-	call_if_set FLAG_DEFEATED_RUSTBORO_GYM, EventScript_AfterWhiteOutHealMsg
 	applymovement VAR_LAST_TALKED, Movement_PkmnCenterNurse_Bow
 	waitmovement 0
 	fadedefaultbgm
@@ -124,51 +120,19 @@ EventScript_ResetMrBriney::
 	end
 
 EventScript_MoveMrBrineyToHouse::
-	setflag FLAG_HIDE_MR_BRINEY_DEWFORD_TOWN
-	setflag FLAG_HIDE_MR_BRINEY_BOAT_DEWFORD_TOWN
-	setflag FLAG_HIDE_ROUTE_109_MR_BRINEY
-	setflag FLAG_HIDE_ROUTE_109_MR_BRINEY_BOAT
-	clearflag FLAG_HIDE_ROUTE_104_MR_BRINEY_BOAT
-	clearflag FLAG_HIDE_BRINEYS_HOUSE_MR_BRINEY
-	clearflag FLAG_HIDE_BRINEYS_HOUSE_PEEKO
 	end
 
 EventScript_MoveMrBrineyToDewford::
-	setflag FLAG_HIDE_ROUTE_109_MR_BRINEY
-	setflag FLAG_HIDE_ROUTE_109_MR_BRINEY_BOAT
-	setflag FLAG_HIDE_ROUTE_104_MR_BRINEY
-	setflag FLAG_HIDE_ROUTE_104_MR_BRINEY_BOAT
-	setflag FLAG_HIDE_BRINEYS_HOUSE_MR_BRINEY
-	setflag FLAG_HIDE_BRINEYS_HOUSE_PEEKO
-	clearflag FLAG_HIDE_MR_BRINEY_DEWFORD_TOWN
-	clearflag FLAG_HIDE_MR_BRINEY_BOAT_DEWFORD_TOWN
 	end
 
 EventScript_MoveMrBrineyToRoute109::
-	setflag FLAG_HIDE_ROUTE_104_MR_BRINEY
-	setflag FLAG_HIDE_ROUTE_104_MR_BRINEY_BOAT
-	setflag FLAG_HIDE_BRINEYS_HOUSE_MR_BRINEY
-	setflag FLAG_HIDE_BRINEYS_HOUSE_PEEKO
-	setflag FLAG_HIDE_MR_BRINEY_DEWFORD_TOWN
-	setflag FLAG_HIDE_MR_BRINEY_BOAT_DEWFORD_TOWN
-	clearflag FLAG_HIDE_ROUTE_109_MR_BRINEY
-	clearflag FLAG_HIDE_ROUTE_109_MR_BRINEY_BOAT
 	end
 
 EverGrandeCity_HallOfFame_EventScript_ResetEliteFour::
-	clearflag FLAG_DEFEATED_ELITE_4_SIDNEY
-	clearflag FLAG_DEFEATED_ELITE_4_PHOEBE
-	clearflag FLAG_DEFEATED_ELITE_4_GLACIA
-	clearflag FLAG_DEFEATED_ELITE_4_DRAKE
 	setvar VAR_ELITE_4_STATE, 0
 	return
 
 Common_EventScript_UpdateBrineyLocation::
-	goto_if_unset FLAG_RECEIVED_POKENAV, Common_EventScript_NopReturn
-	goto_if_set FLAG_DEFEATED_PETALBURG_GYM, Common_EventScript_NopReturn
-	goto_if_unset FLAG_HIDE_ROUTE_104_MR_BRINEY_BOAT, EventScript_SetBrineyLocation_House
-	goto_if_unset FLAG_HIDE_MR_BRINEY_DEWFORD_TOWN, EventScript_SetBrineyLocation_Dewford
-	goto_if_unset FLAG_HIDE_ROUTE_109_MR_BRINEY, EventScript_SetBrineyLocation_Route109
 	return
 
 EventScript_SetBrineyLocation_House::
@@ -197,8 +161,6 @@ Common_EventScript_ShowPokemonCenterSign::
 	end
 
 Common_EventScript_ReadyPetalburgGymForBattle::
-	clearflag FLAG_HIDE_PETALBURG_GYM_GREETER
-	setflag FLAG_PETALBURG_MART_EXPANDED_ITEMS
 	return
 
 EventScript_BackupMrBrineyLocation::
@@ -498,3 +460,13 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/birch_speech.inc"
 
 	.include "data/maps/Forest/scripts.inc"
+
+	.include "data/maps/Manor/scripts.inc"
+
+	.include "data/maps/CaveBottom/scripts.inc"
+
+	.include "data/maps/CaveTop/scripts.inc"
+
+	.include "data/maps/ReturnPass/scripts.inc"
+
+	.include "data/maps/Summit/scripts.inc"

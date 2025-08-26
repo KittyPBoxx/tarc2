@@ -2718,10 +2718,7 @@ u32 BattleStringExpandPlaceholders(const u8 *src, u8 *dst, u32 dstSize)
                 toCpy = text;
                 break;
             case B_TXT_PC_CREATOR_NAME: // lanette pc
-                if (FlagGet(FLAG_SYS_PC_LANETTE))
-                    toCpy = sText_Lanettes;
-                else
-                    toCpy = sText_Someones;
+                toCpy = sText_Someones;
                 break;
             case B_TXT_ATK_PREFIX2:
                 if (IsOnPlayerSide(gBattlerAttacker))

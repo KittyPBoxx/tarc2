@@ -3,38 +3,7 @@
 
 We are going to add a Trainer Slide to Wally's first Victory Road battle, before he Mega Evolves his Gallade. This battle takes place outside a Battle Facility, so `sTrainerSlides` must be edited.
 
-### `src/trainer_slide.c`
-```diff
-+ const u8 gText_ThatsTheWay[] = _("That's the way, Gallade! Go!{PAUSE_UNTIL_PRESS}");
-
-static const u8* const sTrainerSlides[DIFFICULTY_COUNT][TRAINERS_COUNT][TRAINER_SLIDE_COUNT] =
-{
-    [DIFFICULTY_NORMAL] =
-    {
-+        [TRAINER_WALLY_VR_1] = // use the Trainer's Id from include/constants/opponents.h
-+        {
-+            [TRAINER_SLIDE_MEGA_EVOLUTION] = COMPOUND_STRING("That's the way, Gallade! Go!{PAUSE_UNTIL_PRESS}"), // find the id for the slide to be used.
-+            //[TRAINER_SLIDE_MEGA_EVOLUTION] = gText_ThatsTheWay, // You can use globals or COMPOUND_STRING to define text here.
-+        }
-    },
-};
-```
-
 If we were to edit a Trainer that appears in a Battle Facility, `sFrontierTrainerSlides` would be edited instead. Here, we'll give Anabel a line before she uses a Z-Move.
-
-### `src/trainer_slide.c`
-```diff
-static const u8* const sFrontierTrainerSlides[DIFFICULTY_COUNT][FRONTIER_TRAINERS_COUNT][TRAINER_SLIDE_COUNT] =
-{
-    [DIFFICULTY_NORMAL] =
-    {
-+        [TRAINER_ANABEL] =
-+        {
-+            [TRAINER_SLIDE_Z_MOVE] = COMPOUND_STRING("Victory...is ours!"), //{PAUSE_UNTIL_PRESS} is omitted, so the battle will continue as soon as the next is finished printing.
-+        }
-    },
-};
-```
 
 ## Add New Slides
 * [Example Commit](<https://github.com/rh-hideout/pokeemerald-expansion/commit/d6424688007cbd923c861cfd35272e5ebfaa4016>)

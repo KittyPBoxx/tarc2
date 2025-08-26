@@ -358,7 +358,7 @@ bool8 CheckForTrainersWantingBattle(void)
 {
     u8 i;
 
-    if (FlagGet(OW_FLAG_NO_TRAINER_SEE))
+    if (OW_FLAG_NO_TRAINER_SEE)
         return FALSE;
 
     gNoOfApproachingTrainers = 0;

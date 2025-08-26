@@ -8824,66 +8824,11 @@ static void Cmd_hitanimation(void)
     gBattlescriptCurrInstr = cmd->nextInstr;
 }
 
-static u32 GetTrainerMoneyToGive(u16 trainerId)
-{
-    u32 lastMonLevel = 0;
-    u32 moneyReward;
-    u8 trainerMoney = 0;
-
-    const struct TrainerMon *party = GetTrainerPartyFromId(trainerId);
-    if (party == NULL)
-        return 20;
-    lastMonLevel = party[GetTrainerPartySizeFromId(trainerId) - 1].lvl;
-    trainerMoney = gTrainerClasses[GetTrainerClassFromId(trainerId)].money ?: 5;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
-        moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * trainerMoney;
-    else if (IsDoubleBattle())
-        moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * 2 * trainerMoney;
-    else
-        moneyReward = 4 * lastMonLevel * gBattleStruct->moneyMultiplier * trainerMoney;
-
-    return moneyReward;
-}
-
 static void Cmd_getmoneyreward(void)
 {
     CMD_ARGS();
 
-    u32 money;
-    u8 sPartyLevel = 1;
-
-    if (gBattleOutcome == B_OUTCOME_WON)
-    {
-        money = GetTrainerMoneyToGive(TRAINER_BATTLE_PARAM.opponentA);
-        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
-            money += GetTrainerMoneyToGive(TRAINER_BATTLE_PARAM.opponentB);
-    }
-    else
-    {
-        if (B_WHITEOUT_MONEY <= GEN_3)
-        {
-        }
-        else
-        {
-            s32 i, count;
-            for (i = 0; i < PARTY_SIZE; i++)
-            {
-                if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG) != SPECIES_NONE
-                && GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG) != SPECIES_EGG)
-                {
-                    if (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) > sPartyLevel)
-                        sPartyLevel = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
-                }
-            }
-            for (count = 0, i = 0; i < ARRAY_COUNT(gBadgeFlags); i++)
-            {
-                if (FlagGet(gBadgeFlags[i]) == TRUE)
-                    ++count;
-            }
-            money = sWhiteOutBadgeMoney[count] * sPartyLevel;
-        }
-    }
+    u32 money = 0;
 
     PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 5, money);
     gBattlescriptCurrInstr = cmd->nextInstr;
@@ -13343,35 +13288,35 @@ static void Cmd_mimicattackcopy(void)
     }
 }
 
-static bool32 InvalidMetronomeMove(u32 move)
-{
-    return GetMoveEffect(move) == EFFECT_PLACEHOLDER
-        || IsMoveMetronomeBanned(move);
-}
+// static bool32 InvalidMetronomeMove(u32 move)
+// {
+//     return GetMoveEffect(move) == EFFECT_PLACEHOLDER
+//         || IsMoveMetronomeBanned(move);
+// }
 
 static void Cmd_metronome(void)
 {
     CMD_ARGS();
 
-#if B_METRONOME_MOVES >= GEN_9
-    u32 moveCount = MOVES_COUNT_GEN9;
-#elif B_METRONOME_MOVES >= GEN_8
-    u32 moveCount = MOVES_COUNT_GEN8;
-#elif B_METRONOME_MOVES >= GEN_7
-    u32 moveCount = MOVES_COUNT_GEN7;
-#elif B_METRONOME_MOVES >= GEN_6
-    u32 moveCount = MOVES_COUNT_GEN6;
-#elif B_METRONOME_MOVES >= GEN_5
-    u32 moveCount = MOVES_COUNT_GEN5;
-#elif B_METRONOME_MOVES >= GEN_4
-    u32 moveCount = MOVES_COUNT_GEN4;
-#elif B_METRONOME_MOVES >= GEN_3
-    u32 moveCount = MOVES_COUNT_GEN3;
-#elif B_METRONOME_MOVES >= GEN_2
-    u32 moveCount = MOVES_COUNT_GEN2;
-#else
-    u32 moveCount = MOVES_COUNT_GEN1;
-#endif
+// #if B_METRONOME_MOVES >= GEN_9
+//     u32 moveCount = MOVES_COUNT_GEN9;
+// #elif B_METRONOME_MOVES >= GEN_8
+//     u32 moveCount = MOVES_COUNT_GEN8;
+// #elif B_METRONOME_MOVES >= GEN_7
+//     u32 moveCount = MOVES_COUNT_GEN7;
+// #elif B_METRONOME_MOVES >= GEN_6
+//     u32 moveCount = MOVES_COUNT_GEN6;
+// #elif B_METRONOME_MOVES >= GEN_5
+//     u32 moveCount = MOVES_COUNT_GEN5;
+// #elif B_METRONOME_MOVES >= GEN_4
+//     u32 moveCount = MOVES_COUNT_GEN4;
+// #elif B_METRONOME_MOVES >= GEN_3
+//     u32 moveCount = MOVES_COUNT_GEN3;
+// #elif B_METRONOME_MOVES >= GEN_2
+//     u32 moveCount = MOVES_COUNT_GEN2;
+// #else
+//     u32 moveCount = MOVES_COUNT_GEN1;
+// #endif
 
     if (IsOnPlayerSide(gBattlerAttacker))
     {
@@ -13382,27 +13327,27 @@ static void Cmd_metronome(void)
         // Try and land a 1 hit ko move
         gCurrentMove = MOVE_SHEER_COLD;
 
-        if (IsBattlerProtected(gBattlerAttacker, gBattlerTarget, gCurrentMove) || IsSemiInvulnerable(gBattlerTarget, gCurrentMove) || DoesBattlerHaveAbilityImmunity(gBattlerAttacker, gBattlerTarget, TYPE_ICE))
-        {
-            gCurrentMove = MOVE_FISSURE;
-        }
-
-        if (IsBattlerProtected(gBattlerAttacker, gBattlerTarget, gCurrentMove) || IsSemiInvulnerable(gBattlerTarget, gCurrentMove) || DoesBattlerHaveAbilityImmunity(gBattlerAttacker, gBattlerTarget, TYPE_GROUND))
-        {
-            gCurrentMove = MOVE_FISSURE;
-        }
-
-        if (IsBattlerProtected(gBattlerAttacker, gBattlerTarget, gCurrentMove) || IsSemiInvulnerable(gBattlerTarget, gCurrentMove) || DoesBattlerHaveAbilityImmunity(gBattlerAttacker, gBattlerTarget, TYPE_NORMAL))
+        if (CalcTypeEffectivenessMultiplier(gCurrentMove, GetBattleMoveType(gCurrentMove), gBattlerAttacker, gBattlerTarget, GetBattlerAbility(gBattlerTarget), TRUE) == 0)
         {
             gCurrentMove = MOVE_GUILLOTINE;
         }
+
+        if (CalcTypeEffectivenessMultiplier(gCurrentMove, GetBattleMoveType(gCurrentMove), gBattlerAttacker, gBattlerTarget, GetBattlerAbility(gBattlerTarget), TRUE) == 0)
+        {
+            gCurrentMove = MOVE_FISSURE;
+        }
+
+        // if (CalcTypeEffectivenessMultiplier(gCurrentMove, GetBattleMoveType(gCurrentMove), gBattlerAttacker, gBattlerTarget, GetBattlerAbility(gBattlerTarget), TRUE) == 0)
+        // {
+        //     gCurrentMove = MOVE_GLARE;
+        // }
 
         // TODO: TARC we could do better here.
         // We could do a multi hit move like population bomb for sturdy/disguise/focus_band
         // Specific move targeting dive,fly,dig
         // specific moves targeting pokemon using protect like shadow force or feint
         // Some kind of wander guard counter
-        gCurrentMove = RandomUniformExcept(RNG_METRONOME, 1, moveCount - 1, InvalidMetronomeMove);
+        // gCurrentMove = RandomUniformExcept(RNG_METRONOME, 1, moveCount - 1, InvalidMetronomeMove);
     }
 
 
@@ -16210,14 +16155,6 @@ static void Cmd_givecaughtmon(void)
             u16 lostItem = gBattleStruct->itemLost[B_SIDE_OPPONENT][gBattlerPartyIndexes[GetCatchingBattler()]].originalItem;
             if (lostItem != ITEM_NONE && GetItemPocket(lostItem) != POCKET_BERRIES)
                 SetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_HELD_ITEM, &lostItem);  // Restore non-berry items
-        }
-
-        if (GiveMonToPlayer(GetBattlerMon(GetCatchingBattler())) != MON_GIVEN_TO_PARTY
-         && gBattleCommunication[MULTISTRING_CHOOSER] != B_MSG_SWAPPED_INTO_PARTY)
-        {
-            // Change to B_MSG_SENT_LANETTES_PC or B_MSG_LANETTES_BOX_FULL
-            if (FlagGet(FLAG_SYS_PC_LANETTE))
-                gBattleCommunication[MULTISTRING_CHOOSER]++;
         }
 
         gBattleResults.caughtMonSpecies = GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_SPECIES, NULL);

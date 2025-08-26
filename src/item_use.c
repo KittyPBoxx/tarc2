@@ -47,11 +47,9 @@ static void Task_StandingOnHiddenItem(u8);
 static bool8 ItemfinderCheckForHiddenItems(const struct MapEvents *, u8);
 static u8 GetDirectionToHiddenItem(s16, s16);
 static void PlayerFaceHiddenItem(u8);
-static void CheckForHiddenItemsInMapConnection(u8);
 static void ItemUseOnFieldCB_Rod(u8);
 static void ItemUseOnFieldCB_Itemfinder(u8);
 static void Task_CloseCantUseKeyItemMessage(u8);
-static void SetDistanceOfClosestHiddenItem(u8, s16, s16);
 
 static const u8 sText_CantDismountBike[] = _("You can't dismount your BIKE here.{PAUSE_UNTIL_PRESS}");
 static const u8 sText_ItemFinderNearby[] = _("Huh?\nThe ITEMFINDER's responding!\pThere's an item buried around here!{PAUSE_UNTIL_PRESS}");
@@ -271,183 +269,11 @@ static void Task_CloseItemfinderMessage(u8 taskId)
 
 static bool8 ItemfinderCheckForHiddenItems(const struct MapEvents *events, u8 taskId)
 {
-    int itemX, itemY;
-    s16 playerX, playerY, i, distanceX, distanceY;
-    PlayerGetDestCoords(&playerX, &playerY);
-    gTasks[taskId].tItemFound = FALSE;
-
-    for (i = 0; i < events->bgEventCount; i++)
-    {
-        // Check if there are any hidden items on the current map that haven't been picked up
-        if (events->bgEvents[i].kind == BG_EVENT_HIDDEN_ITEM && !FlagGet(events->bgEvents[i].bgUnion.hiddenItem.hiddenItemId + FLAG_HIDDEN_ITEMS_START))
-        {
-            itemX = (u16)events->bgEvents[i].x + MAP_OFFSET;
-            distanceX = itemX - playerX;
-            itemY = (u16)events->bgEvents[i].y + MAP_OFFSET;
-            distanceY = itemY - playerY;
-
-            // Player can see 7 metatiles on either side horizontally
-            // and 5 metatiles on either side vertically
-            if (distanceX >= -7 && distanceX <= 7 && distanceY >= -5 && distanceY <= 5)
-                SetDistanceOfClosestHiddenItem(taskId, distanceX, distanceY);
-        }
-    }
-
-    CheckForHiddenItemsInMapConnection(taskId);
-    if (gTasks[taskId].tItemFound == TRUE)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-static bool8 IsHiddenItemPresentAtCoords(const struct MapEvents *events, s16 x, s16 y)
-{
-    u8 bgEventCount = events->bgEventCount;
-    const struct BgEvent *bgEvent = events->bgEvents;
-    int i;
-
-    for (i = 0; i < bgEventCount; i++)
-    {
-        if (bgEvent[i].kind == BG_EVENT_HIDDEN_ITEM && x == (u16)bgEvent[i].x && y == (u16)bgEvent[i].y) // hidden item and coordinates matches x and y passed?
-        {
-            if (!FlagGet(bgEvent[i].bgUnion.hiddenItem.hiddenItemId + FLAG_HIDDEN_ITEMS_START))
-                return TRUE;
-            else
-                return FALSE;
-        }
-    }
     return FALSE;
-}
-
-static bool8 IsHiddenItemPresentInConnection(const struct MapConnection *connection, int x, int y)
-{
-    s16 connectionX, connectionY;
-    struct MapHeader const *const connectionHeader = GetMapHeaderFromConnection(connection);
-
-// To convert our x/y into coordinates that are relative to the connected map, we must:
-//  - Subtract the virtual offset used for the border buffer (MAP_OFFSET).
-//  - Subtract the horizontal offset between North/South connections, or the vertical offset for East/West
-//  - Account for map size. (0,0) is in the NW corner of our map, so when looking North/West we have to add the height/width of the connected map,
-//     and when looking South/East we have to subtract the height/width of our current map.
-#define localX (x - MAP_OFFSET)
-#define localY (y - MAP_OFFSET)
-    switch (connection->direction)
-    {
-    case CONNECTION_NORTH:
-        connectionX = localX - connection->offset;
-        connectionY = connectionHeader->mapLayout->height + localY;
-        break;
-    case CONNECTION_SOUTH:
-        connectionX = localX - connection->offset;
-        connectionY = localY - gMapHeader.mapLayout->height;
-        break;
-    case CONNECTION_WEST:
-        connectionX = connectionHeader->mapLayout->width + localX;
-        connectionY = localY - connection->offset;
-        break;
-    case CONNECTION_EAST:
-        connectionX = localX - gMapHeader.mapLayout->width;
-        connectionY = localY - connection->offset;
-        break;
-    default:
-        return FALSE;
-    }
-    return IsHiddenItemPresentAtCoords(connectionHeader->events, connectionX, connectionY);
 }
 
 #undef localX
 #undef localY
-
-static void CheckForHiddenItemsInMapConnection(u8 taskId)
-{
-    s16 playerX, playerY;
-    s16 x, y;
-    s16 width = gMapHeader.mapLayout->width + MAP_OFFSET;
-    s16 height = gMapHeader.mapLayout->height + MAP_OFFSET;
-
-    s16 var1 = MAP_OFFSET;
-    s16 var2 = MAP_OFFSET;
-
-    PlayerGetDestCoords(&playerX, &playerY);
-
-    // Player can see 7 metatiles on either side horizontally
-    // and 5 metatiles on either side vertically
-    for (x = playerX - 7; x <= playerX + 7; x++)
-    {
-        for (y = playerY - 5; y <= playerY + 5; y++)
-        {
-            if (var1 > x
-             || x >= width
-             || var2 > y
-             || y >= height)
-            {
-                const struct MapConnection *conn = GetMapConnectionAtPos(x, y);
-                if (conn && IsHiddenItemPresentInConnection(conn, x, y) == TRUE)
-                    SetDistanceOfClosestHiddenItem(taskId, x - playerX, y - playerY);
-            }
-        }
-    }
-}
-
-static void SetDistanceOfClosestHiddenItem(u8 taskId, s16 itemDistanceX, s16 itemDistanceY)
-{
-    s16 *data = gTasks[taskId].data;
-    s16 oldItemAbsX, oldItemAbsY, newItemAbsX, newItemAbsY;
-
-    if (tItemFound == FALSE)
-    {
-        // No other items found yet, set this one
-        tItemDistanceX = itemDistanceX;
-        tItemDistanceY = itemDistanceY;
-        tItemFound = TRUE;
-    }
-    else
-    {
-        // Other items have been found, check if this one is closer
-
-        // Get absolute x distance of the already-found item
-        if (tItemDistanceX < 0)
-            oldItemAbsX = tItemDistanceX * -1; // WEST
-        else
-            oldItemAbsX = tItemDistanceX;      // EAST
-
-        // Get absolute y distance of the already-found item
-        if (tItemDistanceY < 0)
-            oldItemAbsY = tItemDistanceY * -1; // NORTH
-        else
-            oldItemAbsY = tItemDistanceY;      // SOUTH
-
-        // Get absolute x distance of the newly-found item
-        if (itemDistanceX < 0)
-            newItemAbsX = itemDistanceX * -1;
-        else
-            newItemAbsX = itemDistanceX;
-
-        // Get absolute y distance of the newly-found item
-        if (itemDistanceY < 0)
-            newItemAbsY = itemDistanceY * -1;
-        else
-            newItemAbsY = itemDistanceY;
-
-
-        if (oldItemAbsX + oldItemAbsY > newItemAbsX + newItemAbsY)
-        {
-            // New item is closer
-            tItemDistanceX = itemDistanceX;
-            tItemDistanceY = itemDistanceY;
-        }
-        else
-        {
-            if (oldItemAbsX + oldItemAbsY == newItemAbsX + newItemAbsY
-            && (oldItemAbsY > newItemAbsY || (oldItemAbsY == newItemAbsY && tItemDistanceY < itemDistanceY)))
-            {
-                // If items are equal distance, use whichever is closer on the Y axis or further south
-                tItemDistanceX = itemDistanceX;
-                tItemDistanceY = itemDistanceY;
-            }
-        }
-    }
-}
 
 static u8 GetDirectionToHiddenItem(s16 itemDistanceX, s16 itemDistanceY)
 {

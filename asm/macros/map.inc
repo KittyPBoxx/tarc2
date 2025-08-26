@@ -107,9 +107,9 @@
 	.endm
 
 	@ Defines a background hidden item event for map data
-	.macro bg_hidden_item_event x:req, y:req, elevation:req, item:req, flag:req
-	bg_event \x, \y, \elevation, BG_EVENT_HIDDEN_ITEM, \item, ((\flag) - FLAG_HIDDEN_ITEMS_START)
-	.endm
+	@ .macro bg_hidden_item_event x:req, y:req, elevation:req, item:req, flag:req
+	@ bg_event \x, \y, \elevation, BG_EVENT_HIDDEN_ITEM, \item, ((\flag) - FLAG_HIDDEN_ITEMS_START)
+	@ .endm
 
 	@ Defines a background secret base event for map data
 	.macro bg_secret_base_event x:req, y:req, elevation:req, secret_base_id:req

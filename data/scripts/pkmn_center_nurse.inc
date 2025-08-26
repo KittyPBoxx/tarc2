@@ -17,7 +17,6 @@ EventScript_PkmnCenterNurse_HealPkmn::
 	call_if_eq VAR_0x8004, 1, EventScript_PkmnCenterNurse_IllTakeYourPkmn2
 	waitmessage
 	call EventScript_PkmnCenterNurse_TakeAndHealPkmn
-	goto_if_unset FLAG_POKERUS_EXPLAINED, EventScript_PkmnCenterNurse_CheckPokerus
 	goto EventScript_PkmnCenterNurse_CheckTrainerHillAndUnionRoom
 	end
 
@@ -34,11 +33,6 @@ EventScript_PkmnCenterNurse_TakeAndHealPkmn::
 	applymovement VAR_0x800B, Movement_PkmnCenterNurse_Turn
 	waitmovement 0
 	dofieldeffect FLDEFF_POKECENTER_HEAL
-.if OW_UNION_DISABLE_CHECK == FALSE && OW_FLAG_MOVE_UNION_ROOM_CHECK != 0
-	setflag OW_FLAG_MOVE_UNION_ROOM_CHECK
-	call CableClub_OnResume
-	clearflag OW_FLAG_MOVE_UNION_ROOM_CHECK
-.endif
 	waitfieldeffect FLDEFF_POKECENTER_HEAL
 	applymovement VAR_0x800B, Common_Movement_WalkInPlaceFasterDown
 	waitmovement 0
@@ -78,12 +72,9 @@ EventScript_PkmnCenterNurse_CheckPokerus::
 
 EventScript_PkmnCenterNurse_ExplainPokerus::
 	message gText_PokerusExplanation
-	setflag FLAG_POKERUS_EXPLAINED
 	return
 
 EventScript_PkmnCenterNurse_GoldCard::
-	goto_if_set FLAG_NURSE_MENTIONS_GOLD_CARD, EventScript_PkmnCenterNurse_AskForUsual
-	setflag FLAG_NURSE_MENTIONS_GOLD_CARD
 	msgbox gText_WelcomeCutShort, MSGBOX_DEFAULT
 	playse SE_PIN
 	applymovement VAR_0x800B, Common_Movement_ExclamationMark

@@ -1,0 +1,4 @@
+raw `
+CaveBottom_MapScripts::
+	.byte 0
+`

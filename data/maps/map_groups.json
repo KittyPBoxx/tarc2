@@ -3,7 +3,12 @@
     "gMapGroup_TownsAndRoutes"
   ],
   "gMapGroup_TownsAndRoutes": [
-    "LittlerootTown",
-    "Forest"
+    "Bridge",
+    "Forest",
+    "CaveBottom",
+    "CaveTop",
+    "Summit",
+    "ReturnPass",
+    "Manor"
   ]
 }

@@ -737,7 +737,7 @@ void SetMapVarsToTrainerA(void)
     }
     if (TRAINER_BATTLE_PARAM.opponentA != 0) 
     {
-        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA]->trainerName;
+        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
     }
 }
 
@@ -750,7 +750,7 @@ void SetMapVarsToTrainerB(void)
     }
     if (TRAINER_BATTLE_PARAM.opponentA != 0) 
     {
-        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA]->trainerName;
+        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
     }
 }
 
@@ -1112,12 +1112,12 @@ static const u8 *GetIntroSpeechOfApproachingTrainer(void)
 {
     if (gApproachingTrainerId == 0)
     {
-        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA]->trainerName;
+        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
         return ReturnEmptyStringIfNull(TRAINER_BATTLE_PARAM.introTextA);
     }
     else
     {
-        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA]->trainerName;
+        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
         return ReturnEmptyStringIfNull(TRAINER_BATTLE_PARAM.introTextB);
     }
 }
@@ -1165,12 +1165,7 @@ s32 TrainerIdToRematchTableId(const struct RematchTrainer *table, u16 trainerId)
 // This applies to the Elite Four and Victory Road Wally (if he's not been defeated yet)
 static inline bool32 IsRematchForbidden(s32 rematchTableId)
 {
-    if (rematchTableId >= REMATCH_ELITE_FOUR_ENTRIES)
-        return TRUE;
-    else if (rematchTableId == REMATCH_WALLY_VR)
-        return !FlagGet(FLAG_DEFEATED_WALLY_VICTORY_ROAD);
-    else
-        return FALSE;
+    return TRUE;
 }
 
 static inline bool32 DoesCurrentMapMatchRematchTrainerMap(s32 i, const struct RematchTrainer *table, u16 mapGroup, u16 mapNum)
@@ -1180,7 +1175,7 @@ static inline bool32 DoesCurrentMapMatchRematchTrainerMap(s32 i, const struct Re
 
 bool32 TrainerIsMatchCallRegistered(s32 i)
 {
-    return FlagGet(TRAINER_REGISTERED_FLAGS_START + i);
+    return FALSE;
 }
 
 void UpdateRematchIfDefeated(s32 rematchTableId)
@@ -1209,21 +1204,8 @@ u16 GetRematchTrainerIdFromTable(const struct RematchTrainer *table, u16 firstBa
     return trainerEntry->trainerIds[REMATCHES_COUNT - 1]; // already beaten at max stage
 }
 
-static u32 GetTrainerMatchCallFlag(u32 trainerId)
-{
-    // TODO: remove
-
-    return 0xFFFF;
-}
-
 static void RegisterTrainerInMatchCall(void)
 {
-    if (FlagGet(FLAG_HAS_MATCH_CALL))
-    {
-        u32 matchCallFlagId = GetTrainerMatchCallFlag(TRAINER_BATTLE_PARAM.opponentA);
-        if (matchCallFlagId != 0xFFFF)
-            FlagSet(matchCallFlagId);
-    }
 }
 
 #define STEP_COUNTER_MAX 255

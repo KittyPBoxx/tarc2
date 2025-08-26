@@ -4507,9 +4507,7 @@ s32 GetBattlerMultiplayerId(u16 id)
 u8 GetTrainerEncounterMusicId(u16 trainerOpponentId)
 {
     u32 sanitizedTrainerId = SanitizeTrainerId(trainerOpponentId);
-    enum DifficultyLevel difficulty = GetTrainerDifficultyLevel(sanitizedTrainerId);
-
-    return gTrainers[difficulty][sanitizedTrainerId].encounterMusic_gender & (F_TRAINER_FEMALE - 1);
+    return gTrainers[sanitizedTrainerId].encounterMusic_gender & (F_TRAINER_FEMALE - 1);
 }
 
 u16 ModifyStatByNature(u8 nature, u16 stat, u8 statIndex)

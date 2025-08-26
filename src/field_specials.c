@@ -108,12 +108,10 @@ static void ScrollableMultichoice_RemoveScrollArrows(u8);
 static void Task_ScrollableMultichoice_WaitReturnToList(u8);
 static void Task_ScrollableMultichoice_ReturnToList(u8);
 static void Task_DeoxysRockInteraction(u8);
-static void ChangeDeoxysRockLevel(u8);
 static void Task_LinkRetireStatusWithBattleTowerPartner(u8);
 static void Task_LoopWingFlapSE(u8);
 static void Task_CloseBattlePikeCurtain(u8);
 static u8 DidPlayerGetFirstFans(void);
-static void SetInitialFansOfPlayer(void);
 static u16 PlayerGainRandomTrainerFan(void);
 #if FREE_LINK_BATTLE_RECORDS == FALSE
 static void BufferFanClubTrainerName_(struct LinkBattleRecords *, u8, u8);
@@ -246,21 +244,16 @@ void UpdateCyclingRoadState(void)
 
 void SetSSTidalFlag(void)
 {
-    FlagSet(FLAG_SYS_CRUISE_MODE);
     *GetVarPointer(VAR_CRUISE_STEP_COUNT) = 0;
 }
 
 void ResetSSTidalFlag(void)
 {
-    FlagClear(FLAG_SYS_CRUISE_MODE);
 }
 
 // Returns TRUE if the Cruise is over
 bool32 CountSSTidalStep(u16 delta)
 {
-    if (!FlagGet(FLAG_SYS_CRUISE_MODE) || (*GetVarPointer(VAR_CRUISE_STEP_COUNT) += delta) < SS_TIDAL_MAX_STEPS)
-        return FALSE;
-
     return TRUE;
 }
 
@@ -272,127 +265,27 @@ u8 GetSSTidalLocation(s8 *mapGroup, s8 *mapNum, s16 *x, s16 *y)
 
 bool32 ShouldDoWallyCall(void)
 {
-    if (FlagGet(FLAG_ENABLE_FIRST_WALLY_POKENAV_CALL))
-    {
-        switch (gMapHeader.mapType)
-        {
-        case MAP_TYPE_TOWN:
-        case MAP_TYPE_CITY:
-        case MAP_TYPE_ROUTE:
-        case MAP_TYPE_OCEAN_ROUTE:
-            if (++(*GetVarPointer(VAR_WALLY_CALL_STEP_COUNTER)) < 250)
-                return FALSE;
-            break;
-        default:
-            return FALSE;
-        }
-    }
-    else
-    {
-        return FALSE;
-    }
-
-    return TRUE;
+    return FALSE;
 }
 
 bool32 ShouldDoScottFortreeCall(void)
 {
-    if (FlagGet(FLAG_SCOTT_CALL_FORTREE_GYM))
-    {
-        switch (gMapHeader.mapType)
-        {
-        case MAP_TYPE_TOWN:
-        case MAP_TYPE_CITY:
-        case MAP_TYPE_ROUTE:
-        case MAP_TYPE_OCEAN_ROUTE:
-            if (++(*GetVarPointer(VAR_SCOTT_FORTREE_CALL_STEP_COUNTER)) < 10)
-                return FALSE;
-            break;
-        default:
-            return FALSE;
-        }
-    }
-    else
-    {
-        return FALSE;
-    }
-
-    return TRUE;
+    return FALSE;
 }
 
 bool32 ShouldDoScottBattleFrontierCall(void)
 {
-    if (FlagGet(FLAG_SCOTT_CALL_BATTLE_FRONTIER))
-    {
-        switch (gMapHeader.mapType)
-        {
-        case MAP_TYPE_TOWN:
-        case MAP_TYPE_CITY:
-        case MAP_TYPE_ROUTE:
-        case MAP_TYPE_OCEAN_ROUTE:
-            if (++(*GetVarPointer(VAR_SCOTT_BF_CALL_STEP_COUNTER)) < 10)
-                return FALSE;
-            break;
-        default:
-            return FALSE;
-        }
-    }
-    else
-    {
-        return FALSE;
-    }
-
-    return TRUE;
+    return FALSE;
 }
 
 bool32 ShouldDoRoxanneCall(void)
 {
-    if (FlagGet(FLAG_ENABLE_ROXANNE_FIRST_CALL))
-    {
-        switch (gMapHeader.mapType)
-        {
-        case MAP_TYPE_TOWN:
-        case MAP_TYPE_CITY:
-        case MAP_TYPE_ROUTE:
-        case MAP_TYPE_OCEAN_ROUTE:
-            if (++(*GetVarPointer(VAR_ROXANNE_CALL_STEP_COUNTER)) < 250)
-                return FALSE;
-            break;
-        default:
-            return FALSE;
-        }
-    }
-    else
-    {
-        return FALSE;
-    }
-
-    return TRUE;
+    return FALSE;
 }
 
 bool32 ShouldDoRivalRayquazaCall(void)
 {
-    if (FlagGet(FLAG_DEFEATED_MAGMA_SPACE_CENTER))
-    {
-        switch (gMapHeader.mapType)
-        {
-        case MAP_TYPE_TOWN:
-        case MAP_TYPE_CITY:
-        case MAP_TYPE_ROUTE:
-        case MAP_TYPE_OCEAN_ROUTE:
-            if (++(*GetVarPointer(VAR_RIVAL_RAYQUAZA_CALL_STEP_COUNTER)) < 250)
-                return FALSE;
-            break;
-        default:
-            return FALSE;
-        }
-    }
-    else
-    {
-        return FALSE;
-    }
-
-    return TRUE;
+    return FALSE;
 }
 
 u8 GetLinkPartnerNames(void)
@@ -969,22 +862,6 @@ void EndLotteryCornerComputerEffect(void)
 #undef tTimer
 #undef tIsScreenOn
 
-void SetTrickHouseNuggetFlag(void)
-{
-    u16 *specVar = &gSpecialVar_0x8004;
-    u16 flag = FLAG_HIDDEN_ITEM_TRICK_HOUSE_NUGGET;
-    *specVar = flag;
-    FlagSet(flag);
-}
-
-void ResetTrickHouseNuggetFlag(void)
-{
-    u16 *specVar = &gSpecialVar_0x8004;
-    u16 flag = FLAG_HIDDEN_ITEM_TRICK_HOUSE_NUGGET;
-    *specVar = flag;
-    FlagClear(flag);
-}
-
 bool8 CheckLeadMonCool(void)
 {
     // if (GetMonData(&gPlayerParty[GetLeadMonIndex()], MON_DATA_COOL) < 200)
@@ -1069,50 +946,6 @@ u16 GetSlotMachineId(void)
     return 0;
 }
 
-bool8 FoundAbandonedShipRoom1Key(void)
-{
-    u16 *specVar = &gSpecialVar_0x8004;
-    u16 flag = FLAG_HIDDEN_ITEM_ABANDONED_SHIP_RM_1_KEY;
-    *specVar = flag;
-    if (!FlagGet(flag))
-        return FALSE;
-
-    return TRUE;
-}
-
-bool8 FoundAbandonedShipRoom2Key(void)
-{
-    u16 *specVar = &gSpecialVar_0x8004;
-    u16 flag = FLAG_HIDDEN_ITEM_ABANDONED_SHIP_RM_2_KEY;
-    *specVar = flag;
-    if (!FlagGet(flag))
-        return FALSE;
-
-    return TRUE;
-}
-
-bool8 FoundAbandonedShipRoom4Key(void)
-{
-    u16 *specVar = &gSpecialVar_0x8004;
-    u16 flag = FLAG_HIDDEN_ITEM_ABANDONED_SHIP_RM_4_KEY;
-    *specVar = flag;
-    if (!FlagGet(flag))
-        return FALSE;
-
-    return TRUE;
-}
-
-bool8 FoundAbandonedShipRoom6Key(void)
-{
-    u16 *specVar = &gSpecialVar_0x8004;
-    u16 flag = FLAG_HIDDEN_ITEM_ABANDONED_SHIP_RM_6_KEY;
-    *specVar = flag;
-    if (!FlagGet(flag))
-        return FALSE;
-
-    return TRUE;
-}
-
 bool8 LeadMonHasEffortRibbon(void)
 {
     return GetMonData(&gPlayerParty[GetLeadMonIndex()], MON_DATA_EFFORT_RIBBON, NULL);
@@ -1120,12 +953,6 @@ bool8 LeadMonHasEffortRibbon(void)
 
 void GiveLeadMonEffortRibbon(void)
 {
-    bool8 ribbonSet;
-    struct Pokemon *leadMon;
-    FlagSet(FLAG_SYS_RIBBON_GET);
-    ribbonSet = TRUE;
-    leadMon = &gPlayerParty[GetLeadMonIndex()];
-    SetMonData(leadMon, MON_DATA_EFFORT_RIBBON, &ribbonSet);
 }
 
 bool8 Special_AreLeadMonEVsMaxedOut(void)
@@ -1140,11 +967,6 @@ u8 TryUpdateRusturfTunnelState(void)
 {
     // TODO: remove
     return FALSE;
-}
-
-void SetShoalItemFlag(u16 unused)
-{
-    FlagSet(FLAG_SYS_SHOAL_ITEM);
 }
 
 void LoadWallyZigzagoon(void)
@@ -1232,11 +1054,6 @@ static void StopCameraShake(u8 taskId)
 #undef tNumShakes
 #undef tDelay
 #undef tVerticalPan
-
-bool8 FoundBlackGlasses(void)
-{
-    return FlagGet(FLAG_HIDDEN_ITEM_ROUTE_116_BLACK_GLASSES);
-}
 
 void SetRoute119Weather(void)
 {
@@ -2456,49 +2273,6 @@ static const u8 sDeoxysRockCoords[DEOXYS_ROCK_LEVELS][2] = {
 
 static void Task_DeoxysRockInteraction(u8 taskId)
 {
-    static const u8 sStoneMaxStepCounts[DEOXYS_ROCK_LEVELS - 1] = { 4, 8, 8, 8, 4, 4, 4, 6, 3, 3 };
-
-    if (FlagGet(FLAG_DEOXYS_ROCK_COMPLETE) == TRUE)
-    {
-        gSpecialVar_Result = DEOXYS_ROCK_COMPLETE;
-        ScriptContext_Enable();
-        DestroyTask(taskId);
-    }
-    else
-    {
-        u16 rockLevel = VarGet(VAR_DEOXYS_ROCK_LEVEL);
-        u16 stepCount = VarGet(VAR_DEOXYS_ROCK_STEP_COUNT);
-
-        VarSet(VAR_DEOXYS_ROCK_STEP_COUNT, 0);
-        if (rockLevel != 0 && sStoneMaxStepCounts[rockLevel - 1] < stepCount)
-        {
-            // Player failed to take the shortest path to the stone, so it resets.
-            ChangeDeoxysRockLevel(0);
-            VarSet(VAR_DEOXYS_ROCK_LEVEL, 0);
-            gSpecialVar_Result = DEOXYS_ROCK_FAILED;
-            DestroyTask(taskId);
-        }
-        else if (rockLevel == DEOXYS_ROCK_LEVELS - 1)
-        {
-            FlagSet(FLAG_DEOXYS_ROCK_COMPLETE);
-            gSpecialVar_Result = DEOXYS_ROCK_SOLVED;
-            ScriptContext_Enable();
-            DestroyTask(taskId);
-        }
-        else
-        {
-            rockLevel++;
-            ChangeDeoxysRockLevel(rockLevel);
-            VarSet(VAR_DEOXYS_ROCK_LEVEL, rockLevel);
-            gSpecialVar_Result = DEOXYS_ROCK_PROGRESSED;
-            DestroyTask(taskId);
-        }
-    }
-}
-
-static void ChangeDeoxysRockLevel(u8 rockLevel)
-{
-    // TODO: remove
 }
 
 void IncrementBirthIslandRockStepCount(void)
@@ -2527,7 +2301,6 @@ u16 GetPCBoxToSendMon(void)
 
 bool8 ShouldShowBoxWasFullMessage(void)
 {
-    FlagSet(FLAG_SHOWN_BOX_WAS_FULL_MESSAGE);
     return TRUE;
 }
 
@@ -2540,25 +2313,7 @@ void CreateAbnormalWeatherEvent(void)
 {
     u16 randomValue = Random();
     VarSet(VAR_ABNORMAL_WEATHER_STEP_COUNTER, 0);
-
-    if (FlagGet(FLAG_DEFEATED_KYOGRE) == TRUE)
-    {
-        VarSet(VAR_ABNORMAL_WEATHER_LOCATION, (randomValue % TERRA_CAVE_LOCATIONS) + TERRA_CAVE_LOCATIONS_START);
-    }
-    else if (FlagGet(FLAG_DEFEATED_GROUDON) == TRUE)
-    {
-        VarSet(VAR_ABNORMAL_WEATHER_LOCATION, (randomValue % MARINE_CAVE_LOCATIONS) + MARINE_CAVE_LOCATIONS_START);
-    }
-    else if ((randomValue & 1) == 0)
-    {
-        randomValue = Random();
-        VarSet(VAR_ABNORMAL_WEATHER_LOCATION, (randomValue % TERRA_CAVE_LOCATIONS) + TERRA_CAVE_LOCATIONS_START);
-    }
-    else
-    {
-        randomValue = Random();
-        VarSet(VAR_ABNORMAL_WEATHER_LOCATION, (randomValue % MARINE_CAVE_LOCATIONS) + MARINE_CAVE_LOCATIONS_START);
-    }
+    VarSet(VAR_ABNORMAL_WEATHER_LOCATION, (randomValue % MARINE_CAVE_LOCATIONS) + MARINE_CAVE_LOCATIONS_START);
 }
 
 // Saves the map name for the current abnormal weather location in gStringVar1, then
@@ -2778,22 +2533,6 @@ void TryLoseFansFromPlayTimeAfterLinkBattle(void)
     }
 }
 
-void UpdateTrainerFanClubGameClear(void)
-{
-    if (!GET_TRAINER_FAN_CLUB_FLAG(FANCLUB_GOT_FIRST_FANS))
-    {
-        SetPlayerGotFirstFans();
-        SetInitialFansOfPlayer();
-        gSaveBlock1Ptr->vars[VAR_FANCLUB_LOSE_FAN_TIMER - VARS_START] = gSaveBlock2Ptr->playTimeHours;
-        FlagClear(FLAG_HIDE_FANCLUB_OLD_LADY);
-        FlagClear(FLAG_HIDE_FANCLUB_BOY);
-        FlagClear(FLAG_HIDE_FANCLUB_LITTLE_BOY);
-        FlagClear(FLAG_HIDE_FANCLUB_LADY);
-        FlagClear(FLAG_HIDE_LILYCOVE_FAN_CLUB_INTERVIEWER);
-        VarSet(VAR_LILYCOVE_FAN_CLUB_STATE, 1);
-    }
-}
-
 // If the player has < 3 fans, gain a new fan whenever the counter reaches 20+
 // Defeating Drake or participating in a Contest increments the counter by 2
 // Participating at Battle Tower or in a Secret Base battle increments the counter by 1
@@ -2955,13 +2694,6 @@ void TryLoseFansFromPlayTime(void)
 bool8 IsFanClubMemberFanOfPlayer(void)
 {
     return GET_TRAINER_FAN_CLUB_FLAG(gSpecialVar_0x8004);
-}
-
-static void SetInitialFansOfPlayer(void)
-{
-    SET_TRAINER_FAN_CLUB_FLAG(FANCLUB_MEMBER6);
-    SET_TRAINER_FAN_CLUB_FLAG(FANCLUB_MEMBER1);
-    SET_TRAINER_FAN_CLUB_FLAG(FANCLUB_MEMBER3);
 }
 
 void BufferFanClubTrainerName(void)

@@ -38,16 +38,6 @@ static void SetBagItemQuantity(u16 *quantity, u16 newValue)
     *quantity =  newValue ^ gSaveBlock2Ptr->encryptionKey;
 }
 
-static u16 GetPCItemQuantity(u16 *quantity)
-{
-    return *quantity;
-}
-
-static void SetPCItemQuantity(u16 *quantity, u16 newValue)
-{
-    *quantity = newValue;
-}
-
 void ApplyNewEncryptionKeyToBagItems(u32 newKey)
 {
     u32 pocket, item;
@@ -65,20 +55,8 @@ void ApplyNewEncryptionKeyToBagItems_(u32 newKey) // really GF?
 
 void SetBagItemsPointers(void)
 {
-    gBagPockets[ITEMS_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_Items;
-    gBagPockets[ITEMS_POCKET].capacity = BAG_ITEMS_COUNT;
-
     gBagPockets[KEYITEMS_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_KeyItems;
     gBagPockets[KEYITEMS_POCKET].capacity = BAG_KEYITEMS_COUNT;
-
-    gBagPockets[BALLS_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_PokeBalls;
-    gBagPockets[BALLS_POCKET].capacity = BAG_POKEBALLS_COUNT;
-
-    gBagPockets[TMHM_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_TMHM;
-    gBagPockets[TMHM_POCKET].capacity = BAG_TMHM_COUNT;
-
-    gBagPockets[BERRIES_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_Berries;
-    gBagPockets[BERRIES_POCKET].capacity = BAG_BERRIES_COUNT;
 }
 
 u8 *CopyItemName(u16 itemId, u8 *dst)
@@ -333,127 +311,27 @@ void ClearItemSlots(struct ItemSlot *itemSlots, u8 itemCount)
     }
 }
 
-static s32 FindFreePCItemSlot(void)
-{
-    s8 i;
-
-    for (i = 0; i < PC_ITEMS_COUNT; i++)
-    {
-        if (gSaveBlock1Ptr->pcItems[i].itemId == ITEM_NONE)
-            return i;
-    }
-    return -1;
-}
-
 u8 CountUsedPCItemSlots(void)
 {
-    u8 usedSlots = 0;
-    u8 i;
-
-    for (i = 0; i < PC_ITEMS_COUNT; i++)
-    {
-        if (gSaveBlock1Ptr->pcItems[i].itemId != ITEM_NONE)
-            usedSlots++;
-    }
-    return usedSlots;
+    return 0;
 }
 
 bool8 CheckPCHasItem(u16 itemId, u16 count)
 {
-    u8 i;
-
-    for (i = 0; i < PC_ITEMS_COUNT; i++)
-    {
-        if (gSaveBlock1Ptr->pcItems[i].itemId == itemId && GetPCItemQuantity(&gSaveBlock1Ptr->pcItems[i].quantity) >= count)
-            return TRUE;
-    }
     return FALSE;
 }
 
 bool8 AddPCItem(u16 itemId, u16 count)
 {
-    u8 i;
-    s8 freeSlot;
-    u16 ownedCount;
-    struct ItemSlot *newItems;
-
-    // Copy PC items
-    newItems = AllocZeroed(sizeof(gSaveBlock1Ptr->pcItems));
-    memcpy(newItems, gSaveBlock1Ptr->pcItems, sizeof(gSaveBlock1Ptr->pcItems));
-
-    // Use any item slots that already contain this item
-    for (i = 0; i < PC_ITEMS_COUNT; i++)
-    {
-        if (newItems[i].itemId == itemId)
-        {
-            ownedCount = GetPCItemQuantity(&newItems[i].quantity);
-            if (ownedCount + count <= MAX_PC_ITEM_CAPACITY)
-            {
-                SetPCItemQuantity(&newItems[i].quantity, ownedCount + count);
-                memcpy(gSaveBlock1Ptr->pcItems, newItems, sizeof(gSaveBlock1Ptr->pcItems));
-                Free(newItems);
-                return TRUE;
-            }
-            count += ownedCount - MAX_PC_ITEM_CAPACITY;
-            SetPCItemQuantity(&newItems[i].quantity, MAX_PC_ITEM_CAPACITY);
-            if (count == 0)
-            {
-                memcpy(gSaveBlock1Ptr->pcItems, newItems, sizeof(gSaveBlock1Ptr->pcItems));
-                Free(newItems);
-                return TRUE;
-            }
-        }
-    }
-
-    // Put any remaining items into a new item slot.
-    if (count > 0)
-    {
-        freeSlot = FindFreePCItemSlot();
-        if (freeSlot == -1)
-        {
-            Free(newItems);
-            return FALSE;
-        }
-        else
-        {
-            newItems[freeSlot].itemId = itemId;
-            SetPCItemQuantity(&newItems[freeSlot].quantity, count);
-        }
-    }
-
-    // Copy items back to the PC
-    memcpy(gSaveBlock1Ptr->pcItems, newItems, sizeof(gSaveBlock1Ptr->pcItems));
-    Free(newItems);
-    return TRUE;
+    return FALSE;
 }
 
 void RemovePCItem(u8 index, u16 count)
 {
-    gSaveBlock1Ptr->pcItems[index].quantity -= count;
-    if (gSaveBlock1Ptr->pcItems[index].quantity == 0)
-    {
-        gSaveBlock1Ptr->pcItems[index].itemId = ITEM_NONE;
-        CompactPCItems();
-    }
 }
 
 void CompactPCItems(void)
 {
-    u16 i;
-    u16 j;
-
-    for (i = 0; i < PC_ITEMS_COUNT - 1; i++)
-    {
-        for (j = i + 1; j < PC_ITEMS_COUNT; j++)
-        {
-            if (gSaveBlock1Ptr->pcItems[i].itemId == 0)
-            {
-                struct ItemSlot temp = gSaveBlock1Ptr->pcItems[i];
-                gSaveBlock1Ptr->pcItems[i] = gSaveBlock1Ptr->pcItems[j];
-                gSaveBlock1Ptr->pcItems[j] = temp;
-            }
-        }
-    }
 }
 
 void SwapRegisteredBike(void)

@@ -4,8 +4,8 @@ static const struct HealLocation sHealLocationsPokemonCenter[NUM_HEAL_LOCATIONS 
 {
     [HEAL_LOCATION_LITTLEROOT_TOWN - 1] =
     {
-        .mapGroup = MAP_GROUP(MAP_LITTLEROOT_TOWN),
-        .mapNum = MAP_NUM(MAP_LITTLEROOT_TOWN),
+        .mapGroup = MAP_GROUP(MAP_BRIDGE),
+        .mapNum = MAP_NUM(MAP_BRIDGE),
         .x = 2,
         .y = 7,
     }

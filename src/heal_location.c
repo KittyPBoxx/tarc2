@@ -63,15 +63,9 @@ u32 GetHealNpcLocalId(u32 healLocationId)
 
 void SetWhiteoutRespawnWarpAndHealerNPC(struct WarpData *warp)
 {
-    u32 healLocationId = GetHealLocationIndexByWarpData(&gSaveBlock1Ptr->lastHealLocation);
+    u32 healLocationId = GetHealLocationIndexByWarpData(&gSaveBlock1Ptr->continueGameWarp);
     u32 healNpcLocalId = GetHealNpcLocalId(healLocationId);
     struct HealLocation pkmCenterHealLocation;
-
-    if (!healNpcLocalId)
-    {
-        *(warp) = gSaveBlock1Ptr->lastHealLocation;
-        return;
-    }
 
     pkmCenterHealLocation = sHealLocationsPokemonCenter[healLocationId - 1];
     warp->mapGroup = pkmCenterHealLocation.mapGroup;

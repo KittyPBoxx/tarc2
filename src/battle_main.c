@@ -293,7 +293,7 @@ const struct TrainerClass gTrainerClasses[TRAINER_CLASS_COUNT] =
     [TRAINER_CLASS_COLLECTOR] = { _("COLLECTOR"), 15, BALL_PREMIER },
     [TRAINER_CLASS_SWIMMER_M] = { _("SWIMMER♂"), 2, BALL_DIVE },
     [TRAINER_CLASS_TEAM_MAGMA] = { _("TEAM MAGMA") },
-    [TRAINER_CLASS_EXPERT] = { _("EXPERT"), 10 },
+    [TRAINER_CLASS_EXPERT] = { _("DEITY"), 10 },
     [TRAINER_CLASS_AQUA_ADMIN] = { _("AQUA ADMIN"), 10 },
     [TRAINER_CLASS_BLACK_BELT] = { _("BLACK BELT"), 8, BALL_ULTRA },
     [TRAINER_CLASS_AQUA_LEADER] = { _("AQUA LEADER"), 20, BALL_MASTER },
@@ -313,7 +313,7 @@ const struct TrainerClass gTrainerClasses[TRAINER_CLASS_COUNT] =
     [TRAINER_CLASS_PICNICKER] = { _("PICNICKER"), 4 },
     [TRAINER_CLASS_BUG_MANIAC] = { _("BUG MANIAC"), 15 },
     [TRAINER_CLASS_PSYCHIC] = { _("PSYCHIC"), 6 },
-    [TRAINER_CLASS_GENTLEMAN] = { _("GENTLEMAN"), 20, BALL_LUXURY },
+    [TRAINER_CLASS_GENTLEMAN] = { _("SIR"), 20, BALL_LUXURY },
     [TRAINER_CLASS_ELITE_FOUR] = { _("ELITE FOUR"), 25, BALL_ULTRA },
     [TRAINER_CLASS_LEADER] = { _("LEADER"), 25 },
     [TRAINER_CLASS_SCHOOL_KID] = { _("SCHOOL KID") },
@@ -2311,6 +2311,7 @@ static void DoBattleIntro(void)
     switch ((enum BattleIntroStates)gBattleStruct->introState)
     {
     case BATTLE_INTRO_STATE_GET_MON_DATA:
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_GET_MON_DATA");
         battler = gBattleCommunication[1];
         BtlController_EmitGetMonData(battler, B_COMM_TO_CONTROLLER, REQUEST_ALL_BATTLE, 0);
         MarkBattlerForControllerExec(battler);
@@ -2326,6 +2327,7 @@ static void DoBattleIntro(void)
         }
         break;
     case BATTLE_INTRO_STATE_PREPARE_BG_SLIDE:
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_PREPARE_BG_SLIDE");
         if (!gBattleControllerExecFlags)
         {
             battler = GetBattlerAtPosition(0);
@@ -2337,10 +2339,12 @@ static void DoBattleIntro(void)
         }
         break;
     case BATTLE_INTRO_STATE_WAIT_FOR_BG_SLIDE:
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_WAIT_FOR_BG_SLIDE");
         if (!gBattleControllerExecFlags)
             gBattleStruct->introState++;
         break;
     case BATTLE_INTRO_STATE_DRAW_SPRITES:
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_DRAW_SPRITES");
         for (battler = 0; battler < gBattlersCount; battler++)
         {
             if ((gBattleTypeFlags & BATTLE_TYPE_SAFARI) && IsOnPlayerSide(battler))
@@ -2373,14 +2377,17 @@ static void DoBattleIntro(void)
             switch (GetBattlerPosition(battler))
             {
             case B_POSITION_PLAYER_LEFT: // player sprite
+                DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro B_POSITION_PLAYER_LEFT");
                 BtlController_EmitDrawTrainerPic(battler, B_COMM_TO_CONTROLLER);
                 MarkBattlerForControllerExec(battler);
                 break;
             case B_POSITION_OPPONENT_LEFT:
+                DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro B_POSITION_OPPONENT_LEFT");
+                // TODO: TARC fix battle intros
                 if (gBattleTypeFlags & BATTLE_TYPE_TRAINER) // opponent 1 sprite
                 {
-                    BtlController_EmitDrawTrainerPic(battler, B_COMM_TO_CONTROLLER);
-                    MarkBattlerForControllerExec(battler);
+                    // BtlController_EmitDrawTrainerPic(battler, B_COMM_TO_CONTROLLER);
+                    // MarkBattlerForControllerExec(battler);
                 }
                 else // wild mon 1
                 {
@@ -2390,6 +2397,7 @@ static void DoBattleIntro(void)
                 }
                 break;
             case B_POSITION_PLAYER_RIGHT:
+                DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro B_POSITION_PLAYER_RIGHT");
                 if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER)) // partner sprite
                 {
                     BtlController_EmitDrawTrainerPic(battler, B_COMM_TO_CONTROLLER);
@@ -2397,6 +2405,7 @@ static void DoBattleIntro(void)
                 }
                 break;
             case B_POSITION_OPPONENT_RIGHT:
+                DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro B_POSITION_OPPONENT_RIGHT");
                 if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                 {
                     if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_TWO_OPPONENTS) && !BATTLE_TWO_VS_ONE_OPPONENT) // opponent 2 if exists
@@ -2416,12 +2425,15 @@ static void DoBattleIntro(void)
 
         }
 
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_DRAW_SPRITES end");
+
         if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
-            gBattleStruct->introState++;
+           gBattleStruct->introState++;
         else // Skip party summary since it is a wild battle.
             gBattleStruct->introState = BATTLE_INTRO_STATE_INTRO_TEXT;
         break;
     case BATTLE_INTRO_STATE_DRAW_PARTY_SUMMARY:
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_DRAW_PARTY_SUMMARY");
         if (!gBattleControllerExecFlags)
         {
             struct HpAndStatus hpStatus[PARTY_SIZE];
@@ -2468,10 +2480,12 @@ static void DoBattleIntro(void)
         }
         break;
     case BATTLE_INTRO_STATE_WAIT_FOR_PARTY_SUMMARY:
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_WAIT_FOR_PARTY_SUMMARY");
         if (!gBattleControllerExecFlags)
             gBattleStruct->introState++;
         break;
     case BATTLE_INTRO_STATE_INTRO_TEXT:
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_INTRO_TEXT");
         if (!IsBattlerMarkedForControllerExec(GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)))
         {
             PrepareStringBattle(STRINGID_INTROMSG, GetBattlerAtPosition(B_POSITION_PLAYER_LEFT));
@@ -2479,6 +2493,7 @@ static void DoBattleIntro(void)
         }
         break;
     case BATTLE_INTRO_STATE_WAIT_FOR_INTRO_TEXT:
+        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_WAIT_FOR_INTRO_TEXT");
         if (!IsBattlerMarkedForControllerExec(GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)))
         {
             if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)

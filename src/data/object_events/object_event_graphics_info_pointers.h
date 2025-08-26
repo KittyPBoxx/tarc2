@@ -297,6 +297,7 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_MART_EMPLOYEE] =            &gObjectEventGraphicsInfo_MartEmployee,
     [OBJ_EVENT_GFX_ROOFTOP_SALE_WOMAN] =       &gObjectEventGraphicsInfo_RooftopSaleWoman,
     [OBJ_EVENT_GFX_TEALA] =                    &gObjectEventGraphicsInfo_Teala,
+    [OBJ_EVENT_GFX_TRUCK] =                    &gObjectEventGraphicsInfo_Truck,
     [OBJ_EVENT_GFX_BREAKABLE_ROCK] =           &gObjectEventGraphicsInfo_BreakableRock,
     [OBJ_EVENT_GFX_PUSHABLE_BOULDER] =         &gObjectEventGraphicsInfo_PushableBoulder,
     [OBJ_EVENT_GFX_MR_BRINEYS_BOAT] =          &gObjectEventGraphicsInfo_MrBrineysBoat,
