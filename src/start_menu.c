@@ -100,7 +100,6 @@ static u8 SaveReturnErrorCallback(void);
 // Task callbacks
 static void StartMenuTask(u8 taskId);
 static void SaveGameTask(u8 taskId);
-static void Task_WaitForBattleTowerLinkSave(u8 taskId);
 static bool8 FieldCB_ReturnToFieldStartMenu(void);
 
 static const struct WindowTemplate sWindowTemplate_SafariBalls = {
@@ -808,26 +807,6 @@ static void RemoveSaveInfoWindow(void)
     ClearStdWindowAndFrame(sSaveInfoWindowId, FALSE);
     RemoveWindow(sSaveInfoWindowId);
 }
-
-static void Task_WaitForBattleTowerLinkSave(u8 taskId)
-{
-    if (!FuncIsActiveTask(Task_LinkFullSave))
-    {
-        DestroyTask(taskId);
-        ScriptContext_Enable();
-    }
-}
-
-#define tInBattleTower data[2]
-
-void SaveForBattleTowerLink(void)
-{
-    u8 taskId = CreateTask(Task_LinkFullSave, 5);
-    gTasks[taskId].tInBattleTower = TRUE;
-    gTasks[CreateTask(Task_WaitForBattleTowerLinkSave, 6)].data[1] = taskId;
-}
-
-#undef tInBattleTower
 
 static void HideStartMenuWindow(void)
 {

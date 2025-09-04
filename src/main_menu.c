@@ -625,11 +625,6 @@ static void Task_MainMenuCheckSaveFile(u8 taskId)
                 tMenuType = HAS_NO_SAVED_GAME;
                 gTasks[taskId].func = Task_MainMenuCheckBattery;
                 break;
-            case SAVE_STATUS_NO_FLASH:
-                CreateMainMenuErrorWindow(gText_No1MSubCircuit);
-                gTasks[taskId].tMenuType = HAS_NO_SAVED_GAME;
-                gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
-                break;
         }
         if (sCurrItemAndOptionMenuCheck & OPTION_MENU_FLAG)   // are we returning from the options menu?
         {

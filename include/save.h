@@ -5,46 +5,18 @@
 #define SECTOR_DATA_SIZE 3968
 #define SAVE_BLOCK_3_CHUNK_SIZE 116
 #define SECTOR_FOOTER_SIZE 12
-#define SECTOR_SIZE (SECTOR_DATA_SIZE + SAVE_BLOCK_3_CHUNK_SIZE + SECTOR_FOOTER_SIZE)
-
-#define NUM_SAVE_SLOTS 2
-
-// If the sector's signature field is not this value then the sector is either invalid or empty.
-#define SECTOR_SIGNATURE 0x8012025
-
-#define SPECIAL_SECTOR_SENTINEL 0xB39D
-
-#define SECTOR_ID_SAVEBLOCK2          0
-#define SECTOR_ID_SAVEBLOCK1_START    1
-#define SECTOR_ID_SAVEBLOCK1_END      4
-#define SECTOR_ID_PKMN_STORAGE_START  5
-#define SECTOR_ID_PKMN_STORAGE_END   13
-#define NUM_SECTORS_PER_SLOT         14
-// Save Slot 1: 0-13;  Save Slot 2: 14-27
-#define SECTOR_ID_HOF_1              28
-#define SECTOR_ID_HOF_2              29
-#define SECTOR_ID_TRAINER_HILL       30
-#define SECTOR_ID_RECORDED_BATTLE    31
-#define SECTORS_COUNT                32
-
-#define NUM_HOF_SECTORS 2
 
 #define SAVE_STATUS_EMPTY    0
 #define SAVE_STATUS_OK       1
 #define SAVE_STATUS_CORRUPT  2
-#define SAVE_STATUS_NO_FLASH 4
 #define SAVE_STATUS_ERROR    0xFF
 
-// Special sector id value for certain save functions to
-// indicate that no specific sector should be used.
-#define FULL_SAVE_SLOT 0xFFFF
+#define SLOT_INVALID 0xFF
 
-// SetDamagedSectorBits states
 enum
 {
     ENABLE,
     DISABLE,
-    CHECK // unused
 };
 
 // Do save types
@@ -54,55 +26,81 @@ enum
     SAVE_OVERWRITE_DIFFERENT_FILE
 };
 
-// A save sector location holds a pointer to the data for a particular sector
-// and the size of that data. Size cannot be greater than SECTOR_DATA_SIZE.
-struct SaveSectorLocation
+#define FRAM_BASE   ((vu8*)0x0E000000)
+#define FRAM_SIZE   0x2000  // 8kb is the smallest save chip that actually works. Most emus will create a 32kb file anyway for compatibility 
+#define GLOBAL_HEADER_SIZE 0x02
+#define GLOBAL_HEADER_ADDR  ((vu8*)FRAM_BASE)
+#define SAVE_SLOT_SIZE   0x100
+#define SAVE_SLOT_COUNT  5
+
+// Fixed field offsets, relative to slot base
+#define SLOT_OFF_NAME            (SAVE_HEADER_SIZE + 0x00)
+#define SLOT_SZ_NAME             8
+
+#define SLOT_OFF_NICK            (SAVE_HEADER_SIZE + 0x08)
+#define SLOT_SZ_NICK             12
+
+#define SLOT_OFF_MOVE1           (SAVE_HEADER_SIZE + 0x14)
+#define SLOT_OFF_MOVE2           (SAVE_HEADER_SIZE + 0x16)
+#define SLOT_OFF_MOVE3           (SAVE_HEADER_SIZE + 0x18)
+#define SLOT_OFF_MOVE4           (SAVE_HEADER_SIZE + 0x1A)
+#define SLOT_OFF_ITEM            (SAVE_HEADER_SIZE + 0x1C)
+#define SLOT_OFF_ABILITY         (SAVE_HEADER_SIZE + 0x1E)
+#define SLOT_OFF_SPECIES         (SAVE_HEADER_SIZE + 0x20)
+
+#define SLOT_OFF_MAPNUM          (SAVE_HEADER_SIZE + 0x22)
+#define SLOT_OFF_POSX            (SAVE_HEADER_SIZE + 0x23)
+#define SLOT_OFF_POSY            (SAVE_HEADER_SIZE + 0x25)
+
+#define SLOT_OFF_PLAY_H          (SAVE_HEADER_SIZE + 0x27)
+#define SLOT_OFF_PLAY_M          (SAVE_HEADER_SIZE + 0x29)
+#define SLOT_OFF_PLAY_S          (SAVE_HEADER_SIZE + 0x2A)
+#define SLOT_OFF_PLAY_VB         (SAVE_HEADER_SIZE + 0x2B)
+
+#define SLOT_OFF_FLAGS           (SAVE_HEADER_SIZE + 0x2C)
+
+#define SAVE_SLOT_ADDR(slot)  (GLOBAL_HEADER_SIZE + FRAM_BASE + (SAVE_SLOT_SIZE * (slot)))
+
+enum 
 {
-    void *data;
-    u16 size;
+    SAVE_AUTO_1,
+    SAVE_AUTO_2,
+    SAVE_MANUAL_1,
+    SAVE_MANUAL_2,
+    SAVE_MANUAL_3
 };
 
-struct SaveSector
-{
-    u8 data[SECTOR_DATA_SIZE];
-    u8 saveBlock3Chunk[SAVE_BLOCK_3_CHUNK_SIZE];
-    u16 id;
+typedef struct {
+    u8 lastAutosaveSlot;
+    u8 lastSaveSlot;
+    // --- new section for options ---
+    u8  optionsButtonMode;  // OPTIONS_BUTTON_MODE_[NORMAL/LR/L_EQUALS_A]
+    u16 optionsPacked;      // bitfield storage:
+                            //   bits 0–2 = text speed
+                            //   bits 3–7 = window frame type
+                            //   bit 8    = sound
+                            //   bit 9    = battle scene off
+                            // (upper bits unused)
+} GlobalSaveHeader;
+
+typedef struct {
+    u16 magic;        // marker (e.g. 0x7A2C)
     u16 checksum;
-    u32 signature;
-    u32 counter;
-}; // size is SECTOR_SIZE (0x1000)
+    u16 slotId;       // which logical slot this is (manual #1, autosave #2, etc.)
+} SaveSlotHeader;
 
-#define SECTOR_SIGNATURE_OFFSET offsetof(struct SaveSector, signature)
-#define SECTOR_COUNTER_OFFSET   offsetof(struct SaveSector, counter)
+#define SAVE_HEADER_SIZE  sizeof(SaveSlotHeader)
 
-extern u16 gLastWrittenSector;
-extern u32 gLastSaveCounter;
-extern u16 gLastKnownGoodSector;
-extern u32 gDamagedSaveSectors;
-extern u32 gSaveCounter;
-extern struct SaveSector *gFastSaveSector;
-extern u16 gIncrementalSectorId;
 extern u16 gSaveFileStatus;
 extern void (*gGameContinueCallback)(void);
-extern struct SaveSectorLocation gRamSaveSectorLocations[];
-
-extern struct SaveSector gSaveDataBuffer;
 
 void ClearSaveData(void);
-void Save_ResetSaveCounters(void);
-u8 HandleSavingData(u8 saveType);
+void ClearSaveSlot(u8 slotId);
+
 u8 TrySavingData(u8 saveType);
-bool8 LinkFullSave_Init(void);
-bool8 LinkFullSave_WriteSector(void);
-bool8 LinkFullSave_ReplaceLastSector(void);
-bool8 LinkFullSave_SetLastSectorSignature(void);
-bool8 WriteSaveBlock2(void);
-bool8 WriteSaveBlock1Sector(void);
 u8 LoadGameSave(u8 saveType);
-u16 GetSaveBlocksPointersBaseOffset(void);
-u32 TryReadSpecialSaveSector(u8 sector, u8 *dst);
-u32 TryWriteSpecialSaveSector(u8 sector, u8 *src);
-void Task_LinkFullSave(u8 taskId);
+
+u16 GetSaveBlocksPointersBaseOffset(void); // Always 0
 
 // save_failed_screen.c
 void DoSaveFailedScreen(u8 saveType);

@@ -198,8 +198,6 @@ gSpecials::
 	def_special CreateAbnormalWeatherEvent
 	def_special GetAbnormalWeatherMapNameAndType
 	def_special GetMartEmployeeObjectEventId
-	def_special SaveForBattleTowerLink
-	def_special Unused_SetWeatherSunny
 	def_special IsTrainerRegistered
 	def_special EnableNationalPokedex
 	def_special ScriptMenu_CreateLilycoveSSTidalMultichoice

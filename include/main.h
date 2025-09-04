@@ -47,7 +47,6 @@ extern const u8 RomHeaderGameCode[GAME_CODE_LENGTH];
 extern const u8 RomHeaderSoftwareVersion;
 
 extern u16 gKeyRepeatStartDelay;
-extern bool8 gLinkTransferringData;
 extern struct Main gMain;
 extern u16 gKeyRepeatContinueDelay;
 extern bool8 gSoftResetDisabled;
@@ -62,7 +61,6 @@ void SetVBlankCallback(IntrCallback callback);
 void SetHBlankCallback(IntrCallback callback);
 void SetVCountCallback(IntrCallback callback);
 void SetSerialCallback(IntrCallback callback);
-void InitFlashTimer(void);
 void SetTrainerHillVBlankCounter(u32 *counter);
 void ClearTrainerHillVBlankCounter(void);
 void DoSoftReset(void);

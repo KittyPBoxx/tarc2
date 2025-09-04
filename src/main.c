@@ -9,10 +9,8 @@
 #include "play_time.h"
 #include "random.h"
 #include "dma3.h"
-#include "gba/flash_internal.h"
 #include "load_save.h"
 #include "gpu_regs.h"
-#include "agb_flash.h"
 #include "sound.h"
 #include "battle.h"
 #include "battle_controllers.h"
@@ -40,7 +38,10 @@ const u8 gGameVersion = GAME_VERSION;
 
 const u8 gGameLanguage = GAME_LANGUAGE; // English
 
-const char BuildDateTime[] = "2005 02 21 11:10";
+const char BuildDateTime[] = "2025 09 28 23:59";
+
+__attribute__((used))
+static const char sSaveTypeId[] __attribute__((aligned(4))) = "SRAM_V130"; // Some emulators and flash carts will look for magic strings to determain save type 
 
 // This won't actually be used
 void Timer3Intr(void)
@@ -70,7 +71,6 @@ const IntrFunc gIntrTableTemplate[] =
 #define INTR_COUNT ((int)(sizeof(gIntrTableTemplate)/sizeof(IntrFunc)))
 
 COMMON_DATA u16 gKeyRepeatStartDelay = 0;
-COMMON_DATA bool8 gLinkTransferringData = 0;
 COMMON_DATA struct Main gMain = {0};
 COMMON_DATA u16 gKeyRepeatContinueDelay = 0;
 COMMON_DATA bool8 gSoftResetDisabled = 0;
@@ -94,7 +94,6 @@ asm(".arm\n"
 extern const void *SetSoftResetVariable(void);
 extern const void *SetSoftResetVariableEnd(void);
 
-static void UpdateLinkAndCallCallbacks(void);
 static void InitMainCallbacks(void);
 static void CallCallbacks(void);
 #ifdef BUGFIX
@@ -135,7 +134,6 @@ void AgbMain(void)
     m4aSoundInit();
     EnableVCountIntrAtLine150();
     RtcInit();
-    CheckForFlashMemory();
     InitMainCallbacks();
     InitMapMusic();
 #ifdef BUGFIX
@@ -147,11 +145,6 @@ void AgbMain(void)
     InitHeap(gHeap, HEAP_SIZE);
 
     gSoftResetDisabled = FALSE;
-
-    if (gFlashMemoryPresent != TRUE)
-        SetMainCallback2((SAVE_TYPE_ERROR_SCREEN) ? CB2_FlashNotDetectedScreen : NULL);
-
-    gLinkTransferringData = FALSE;
 
 #ifndef NDEBUG
 #if (LOG_HANDLER == LOG_HANDLER_MGBA_PRINT)
@@ -180,36 +173,12 @@ void AgbMainLoop(void)
             DoSoftReset();
         }
 
-        if (Overworld_SendKeysToLinkIsRunning() == TRUE)
-        {
-            gLinkTransferringData = TRUE;
-            UpdateLinkAndCallCallbacks();
-            gLinkTransferringData = FALSE;
-        }
-        else
-        {
-            gLinkTransferringData = FALSE;
-            UpdateLinkAndCallCallbacks();
-
-            if (Overworld_RecvKeysFromLinkIsRunning() == TRUE)
-            {
-                gMain.newKeys = 0;
-                ClearSpriteCopyRequests();
-                gLinkTransferringData = TRUE;
-                UpdateLinkAndCallCallbacks();
-                gLinkTransferringData = FALSE;
-            }
-        }
+        CallCallbacks();
 
         PlayTimeCounter_Update();
         MapMusicMain();
         WaitForVBlank();
     }
-}
-
-static void UpdateLinkAndCallCallbacks(void)
-{
-    CallCallbacks();
 }
 
 static void InitMainCallbacks(void)
@@ -410,11 +379,6 @@ static void VBlankIntr(void)
 
     INTR_CHECK |= INTR_FLAG_VBLANK;
     gMain.intrCheck |= INTR_FLAG_VBLANK;
-}
-
-void InitFlashTimer(void)
-{
-    SetFlashTimerIntr(2, gIntrTable + 0x7);
 }
 
 static void HBlankIntr(void)

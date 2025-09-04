@@ -12,7 +12,6 @@
 #include "menu.h"
 #include "save.h"
 #include "starter_choose.h"
-#include "gba/flash_internal.h"
 #include "text_window.h"
 #include "constants/rgb.h"
 #include "string_util.h"
@@ -140,12 +139,9 @@ static const u32 sSaveFailedClockGfx[] = INCBIN_U32("graphics/misc/clock_small.4
 
 static void CB2_SaveFailedScreen(void);
 static void CB2_WipeSave(void);
-static void CB2_GameplayCannotBeContinued(void);
 static void CB2_FadeAndReturnToTitleScreen(void);
 static void CB2_ReturnToTitleScreen(void);
 static void VBlankCB_UpdateClockGraphics(void);
-static bool8 VerifySectorWipe(u16 sector);
-static bool8 WipeSectors(u32);
 
 // Although this is a general text printer, it's only used in this file.
 static void SaveFailedScreenTextPrint(const u8 *text, u8 x, u8 y)
@@ -258,62 +254,8 @@ static void CB2_SaveFailedScreen(void)
 
 static void CB2_WipeSave(void)
 {
-    u8 wipeTries = 0;
-
     sClockInfo[CLOCK_RUNNING] = TRUE;
-
-    while (gDamagedSaveSectors != 0 && wipeTries < 3)
-    {
-        if (WipeSectors(gDamagedSaveSectors))
-        {
-            FillWindowPixelBuffer(sWindowIds[TEXT_WIN_ID], PIXEL_FILL(1));
-            SaveFailedScreenTextPrint(gText_BackupMemoryDamaged, 1, 0);
-            SetMainCallback2(CB2_GameplayCannotBeContinued);
-            return;
-        }
-
-        FillWindowPixelBuffer(sWindowIds[TEXT_WIN_ID], PIXEL_FILL(1));
-        SaveFailedScreenTextPrint(gText_CheckCompleted, 1, 0);
-        HandleSavingData(sSaveFailedType);
-
-        if (gDamagedSaveSectors != 0)
-        {
-            FillWindowPixelBuffer(sWindowIds[TEXT_WIN_ID], PIXEL_FILL(1));
-            SaveFailedScreenTextPrint(gText_SaveFailedCheckingBackup, 1, 0);
-        }
-
-        wipeTries++;
-    }
-
-    if (wipeTries == 3)
-    {
-        FillWindowPixelBuffer(sWindowIds[TEXT_WIN_ID], PIXEL_FILL(1));
-        SaveFailedScreenTextPrint(gText_BackupMemoryDamaged, 1, 0);
-    }
-    else
-    {
-        FillWindowPixelBuffer(sWindowIds[TEXT_WIN_ID], PIXEL_FILL(1));
-
-        if (gGameContinueCallback == NULL)
-            SaveFailedScreenTextPrint(gText_SaveCompleteGameCannotContinue, 1, 0);
-        else
-            SaveFailedScreenTextPrint(gText_SaveCompletePressA, 1, 0);
-    }
-
     SetMainCallback2(CB2_FadeAndReturnToTitleScreen);
-}
-
-static void CB2_GameplayCannotBeContinued(void)
-{
-    sClockInfo[CLOCK_RUNNING] = FALSE;
-
-    if (JOY_NEW(A_BUTTON))
-    {
-        FillWindowPixelBuffer(sWindowIds[TEXT_WIN_ID], PIXEL_FILL(1));
-        SaveFailedScreenTextPrint(gText_GamePlayCannotBeContinued, 1, 0);
-        SetVBlankCallback(VBlankCB);
-        SetMainCallback2(CB2_FadeAndReturnToTitleScreen);
-    }
 }
 
 static void CB2_FadeAndReturnToTitleScreen(void)
@@ -367,52 +309,6 @@ static void VBlankCB_UpdateClockGraphics(void)
 
     if (sClockInfo[DEBUG_TIMER])
         sClockInfo[DEBUG_TIMER]--;
-}
-
-static bool8 VerifySectorWipe(u16 sector)
-{
-    u32 *ptr = (u32 *)&gSaveDataBuffer;
-    u16 i;
-
-    ReadFlash(sector, 0, (u8 *)ptr, SECTOR_SIZE);
-
-    // 1/4 because ptr is u32
-    for (i = 0; i < SECTOR_SIZE / 4; i++, ptr++)
-        if (*ptr)
-            return TRUE; // Sector has nonzero data, failed
-
-    return FALSE;
-}
-
-static bool8 WipeSector(u16 sector)
-{
-    u16 i, j;
-    bool8 failed = TRUE;
-
-    // Attempt to wipe sector with an arbitrary attempt limit of 130
-    for (i = 0; failed && i < 130; i++)
-    {
-        for (j = 0; j < SECTOR_SIZE; j++)
-            ProgramFlashByte(sector, j, 0);
-
-        failed = VerifySectorWipe(sector);
-    }
-
-    return failed;
-}
-
-static bool8 WipeSectors(u32 sectorBits)
-{
-    u16 i;
-
-    for (i = 0; i < SECTORS_COUNT; i++)
-        if ((sectorBits & (1 << i)) && !WipeSector(i))
-            sectorBits &= ~(1 << i);
-
-    if (sectorBits == 0)
-        return FALSE;
-    else
-        return TRUE;
 }
 
 void CB2_FlashNotDetectedScreen(void)

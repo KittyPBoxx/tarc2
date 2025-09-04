@@ -89,7 +89,6 @@ static bool32 LoadMapInStepsLocal(u8 *, bool32);
 static bool32 ReturnToFieldLocal(u8 *);
 static void InitObjectEventsLocal(void);
 static void InitOverworldGraphicsRegisters(void);
-static void ResetMirageTowerAndSaveBlockPtrs(void);
 static void ResetScreenForMapLoad(void);
 static void ResumeMap(bool32);
 static void SetCameraToTrackPlayer(void);
@@ -629,11 +628,6 @@ void SetWarpDestinationToFixedHoleWarp(s16 x, s16 y)
         sWarpDestination = gLastUsedWarp;
     else
         SetWarpDestination(sFixedHoleWarp.mapGroup, sFixedHoleWarp.mapNum, WARP_ID_NONE, x, y);
-}
-
-static void SetWarpDestinationToContinueGameWarp(void)
-{
-    sWarpDestination = gSaveBlock1Ptr->continueGameWarp;
 }
 
 void SetContinueGameWarp(s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y)
@@ -1515,11 +1509,6 @@ void CB2_ReturnToFieldFadeFromBlack(void)
     CB2_ReturnToField();
 }
 
-static void FieldCB_FadeTryShowMapPopup(void)
-{
-    FieldCB_WarpExitFadeFromBlack();
-}
-
 void CB2_ContinueSavedGame(void)
 {
     FieldClearVBlankHBlankCallbacks();
@@ -1532,25 +1521,16 @@ void CB2_ContinueSavedGame(void)
     UnfreezeObjectEvents();
     DoTimeBasedEvents();
     UpdateMiscOverworldStates();
-    InitMapFromSavedGame();
 
     PlayTimeCounter_Start();
     ScriptContext_Init();
     UnlockPlayerFieldControls();
     gExitStairsMovementDisabled = TRUE;
-    if (UseContinueGameWarp() == TRUE)
-    {
-        ClearContinueGameWarpStatus();
-        SetWarpDestinationToContinueGameWarp();
-        WarpIntoMap();
-        SetMainCallback2(CB2_LoadMap);
-    }
-    else
-    {
-        gFieldCallback = FieldCB_FadeTryShowMapPopup;
-        SetMainCallback1(CB1_Overworld);
-        CB2_ReturnToField();
-    }
+
+    // Set warp from save 
+    SetWarpDestination(0, gSaveBlock1Ptr->location.mapNum, WARP_ID_NONE, gSaveBlock1Ptr->pos.x, gSaveBlock1Ptr->pos.y);
+    WarpIntoMap();
+    SetMainCallback2(CB2_LoadMap);
 }
 
 static void FieldClearVBlankHBlankCallbacks(void)
@@ -1601,7 +1581,6 @@ static bool32 LoadMapInStepsLocal(u8 *state, bool32 a2)
         (*state)++;
         break;
     case 1:
-        ResetMirageTowerAndSaveBlockPtrs();
         ResetScreenForMapLoad();
         (*state)++;
         break;
@@ -1671,7 +1650,6 @@ static bool32 ReturnToFieldLocal(u8 *state)
     switch (*state)
     {
     case 0:
-        ResetMirageTowerAndSaveBlockPtrs();
         ResetScreenForMapLoad();
         ResumeMap(FALSE);
         InitObjectEventsReturnToField();
@@ -1700,12 +1678,6 @@ static bool32 ReturnToFieldLocal(u8 *state)
 static void DoMapLoadLoop(u8 *state)
 {
     while (!LoadMapInStepsLocal(state, FALSE));
-}
-
-static void ResetMirageTowerAndSaveBlockPtrs(void)
-{
-    ClearMirageTowerPulseBlend();
-    MoveSaveBlocks_ResetHeap();
 }
 
 static void ResetScreenForMapLoad(void)

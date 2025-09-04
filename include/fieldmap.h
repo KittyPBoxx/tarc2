@@ -40,7 +40,6 @@ bool8 CameraMove(int x, int y);
 void SaveMapView(void);
 void SetCameraFocusCoords(u16 x, u16 y);
 void InitMap(void);
-void InitMapFromSavedGame(void);
 void CopyMapTilesetsToVram(struct MapLayout const *mapLayout);
 void LoadMapTilesetPalettes(struct MapLayout const *mapLayout);
 void LoadSecondaryTilesetPalette(struct MapLayout const *mapLayout, bool8 skipFaded);

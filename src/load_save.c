@@ -9,22 +9,14 @@
 #include "random.h"
 #include "save_location.h"
 #include "script_pokemon_util.h"
-#include "gba/flash_internal.h"
-#include "agb_flash.h"
 #include "event_data.h"
 #include "constants/event_objects.h"
 
-static void ApplyNewEncryptionKeyToAllEncryptedData(u32 encryptionKey);
-
-#define SAVEBLOCK_MOVE_RANGE    128
+#define SAVEBLOCK_MOVE_RANGE    0
 
 struct LoadedSaveData
 {
- /*0x0000*/ struct ItemSlot items[BAG_ITEMS_COUNT];
- /*0x0078*/ struct ItemSlot keyItems[BAG_KEYITEMS_COUNT];
- /*0x00F0*/ struct ItemSlot pokeBalls[BAG_POKEBALLS_COUNT];
- /*0x0130*/ struct ItemSlot TMsHMs[BAG_TMHM_COUNT];
- /*0x0230*/ struct ItemSlot berries[BAG_BERRIES_COUNT];
+    struct ItemSlot keyItems[BAG_KEYITEMS_COUNT];
 };
 
 // EWRAM DATA
@@ -35,23 +27,8 @@ EWRAM_DATA struct LoadedSaveData gLoadedSaveData = {0};
 EWRAM_DATA u32 gLastEncryptionKey = 0;
 
 // IWRAM common
-COMMON_DATA bool32 gFlashMemoryPresent = 0;
 COMMON_DATA struct SaveBlock1 *gSaveBlock1Ptr = NULL;
 COMMON_DATA struct SaveBlock2 *gSaveBlock2Ptr = NULL;
-
-// code
-void CheckForFlashMemory(void)
-{
-    if (!IdentifyFlash())
-    {
-        gFlashMemoryPresent = TRUE;
-        InitFlashTimer();
-    }
-    else
-    {
-        gFlashMemoryPresent = FALSE;
-    }
-}
 
 void ClearSav3(void)
 {
@@ -73,7 +50,7 @@ void SetSaveBlocksPointers(u16 offset)
 {
     struct SaveBlock1 **sav1_LocalVar = &gSaveBlock1Ptr;
 
-    offset = (offset + Random()) & (SAVEBLOCK_MOVE_RANGE - 4);
+    offset = 0;
 
     gSaveBlock2Ptr = (void *)(&gSaveblock2) + offset;
     *sav1_LocalVar = (void *)(&gSaveblock1) + offset;
@@ -119,8 +96,7 @@ void MoveSaveBlocks_ResetHeap(void)
     gMain.vblankCallback = vblankCB;
 
     // create a new encryption key
-    encryptionKey = Random32();
-    ApplyNewEncryptionKeyToAllEncryptedData(encryptionKey);
+    encryptionKey = 0;
     gSaveBlock2Ptr->encryptionKey = encryptionKey;
 }
 
@@ -250,32 +226,10 @@ void LoadPlayerBag(void)
 void SavePlayerBag(void)
 {
     int i;
-    u32 encryptionKeyBackup;
 
     // save player key items.
     for (i = 0; i < BAG_KEYITEMS_COUNT; i++)
         gSaveBlock1Ptr->bagPocket_KeyItems[i] = gLoadedSaveData.keyItems[i];
 
-    encryptionKeyBackup = gSaveBlock2Ptr->encryptionKey;
-    gSaveBlock2Ptr->encryptionKey = gLastEncryptionKey;
-    ApplyNewEncryptionKeyToBagItems(encryptionKeyBackup);
-    gSaveBlock2Ptr->encryptionKey = encryptionKeyBackup; // updated twice?
-}
-
-void ApplyNewEncryptionKeyToHword(u16 *hWord, u32 newKey)
-{
-    *hWord ^= gSaveBlock2Ptr->encryptionKey;
-    *hWord ^= newKey;
-}
-
-void ApplyNewEncryptionKeyToWord(u32 *word, u32 newKey)
-{
-    *word ^= gSaveBlock2Ptr->encryptionKey;
-    *word ^= newKey;
-}
-
-static void ApplyNewEncryptionKeyToAllEncryptedData(u32 encryptionKey)
-{
-    ApplyNewEncryptionKeyToGameStats(encryptionKey);
-    ApplyNewEncryptionKeyToBagItems_(encryptionKey);
+    gSaveBlock2Ptr->encryptionKey = 0;
 }

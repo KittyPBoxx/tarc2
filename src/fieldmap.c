@@ -36,8 +36,6 @@ static void FillNorthConnection(struct MapHeader const *mapHeader, struct MapHea
 static void FillWestConnection(struct MapHeader const *mapHeader, struct MapHeader const *connectedMapHeader, s32 offset);
 static void FillEastConnection(struct MapHeader const *mapHeader, struct MapHeader const *connectedMapHeader, s32 offset);
 static void InitBackupMapLayoutConnections(struct MapHeader *mapHeader);
-static void LoadSavedMapView(void);
-static bool8 SkipCopyingMetatileFromSavedMap(u16 *mapBlock, u16 mapWidth, u8 yMode);
 static const struct MapConnection *GetIncomingConnection(u8 direction, int x, int y);
 static bool8 IsPosInIncomingConnectingMap(u8 direction, int x, int y, const struct MapConnection *connection);
 static bool8 IsCoordInIncomingConnectingMap(int coord, int srcMax, int destMax, int offset);
@@ -61,13 +59,6 @@ const struct MapHeader *const GetMapHeaderFromConnection(const struct MapConnect
 void InitMap(void)
 {
     InitMapLayoutData(&gMapHeader);
-    RunOnLoadMapScript();
-}
-
-void InitMapFromSavedGame(void)
-{
-    InitMapLayoutData(&gMapHeader);
-    LoadSavedMapView();
     RunOnLoadMapScript();
 }
 
@@ -414,138 +405,6 @@ void SaveMapView(void)
     }
 }
 
-static bool32 SavedMapViewIsEmpty(void)
-{
-    u16 i;
-    u32 marker = 0;
-
-#ifndef UBFIX
-    // BUG: This loop extends past the bounds of the mapView array. Its size is only 0x100.
-    for (i = 0; i < 0x200; i++)
-        marker |= gSaveBlock1Ptr->mapView[i];
-#else
-    // UBFIX: Only iterate over 0x100
-    for (i = 0; i < ARRAY_COUNT(gSaveBlock1Ptr->mapView); i++)
-        marker |= gSaveBlock1Ptr->mapView[i];
-#endif
-
-
-    if (marker == 0)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-static void ClearSavedMapView(void)
-{
-    CpuFill16(0, gSaveBlock1Ptr->mapView, sizeof(gSaveBlock1Ptr->mapView));
-}
-
-static void LoadSavedMapView(void)
-{
-    u8 yMode;
-    int i, j;
-    int x, y;
-    u16 *mapView;
-    int width;
-    mapView = gSaveBlock1Ptr->mapView;
-    if (!SavedMapViewIsEmpty())
-    {
-        width = gBackupMapLayout.width;
-        x = gSaveBlock1Ptr->pos.x;
-        y = gSaveBlock1Ptr->pos.y;
-        for (i = y; i < y + MAP_OFFSET_H; i++)
-        {
-            if (i == y && i != 0)
-                yMode = 0;
-            else if (i == y + MAP_OFFSET_H - 1 && i != gMapHeader.mapLayout->height - 1)
-                yMode = 1;
-            else
-                yMode = 0xFF;
-
-            for (j = x; j < x + MAP_OFFSET_W; j++)
-            {
-                if (!SkipCopyingMetatileFromSavedMap(&sBackupMapData[j + width * i], width, yMode))
-                    sBackupMapData[j + width * i] = *mapView;
-                mapView++;
-            }
-        }
-        for (j = x; j < x + MAP_OFFSET_W; j++)
-        {
-            if (y != 0)
-                FixLongGrassMetatilesWindowTop(j, y - 1);
-            if (i < gMapHeader.mapLayout->height - 1)
-                FixLongGrassMetatilesWindowBottom(j, y + MAP_OFFSET_H - 1);
-        }
-        ClearSavedMapView();
-    }
-}
-
-static void MoveMapViewToBackup(u8 direction, s8 xoffset, s8 yoffset)
-{
-    int width = gBackupMapLayout.width;
-    u16 *mapView = gSaveBlock1Ptr->mapView;
-
-    int x0, y0;
-    int x2, y2;
-    u16 *src, *dest;
-    int srci, desti;
-    int r9, r8;
-    int x, y;
-    int i, j;
-
-    r9 = 0;
-    r8 = 0;
-    x0 = gSaveBlock1Ptr->pos.x;
-    y0 = gSaveBlock1Ptr->pos.y;
-    x2 = 15;
-    y2 = 14;
-
-    switch (direction)
-    {
-    case CONNECTION_NORTH:
-        x0 -= xoffset;
-        y0 += 1;
-        y2 = 13;
-        break;
-    case CONNECTION_SOUTH:
-        x0 -= xoffset;
-        r8 = 1;
-        y2 = 13;
-        break;
-    case CONNECTION_WEST:
-        y0 -= yoffset;
-        x0 += 1;
-        x2 = 14;
-        break;
-    case CONNECTION_EAST:
-        y0 -= yoffset;
-        r9 = 1;
-        x2 = 14;
-        break;
-    }
-    if (x0 < 0)
-        x0 = 0;
-    if (y0 < 0)
-        y0 = 0;
-    for (y = 0; y < y2; y++)
-    {
-        i = 0;
-        j = 0;
-        for (x = 0; x < x2; x++)
-        {
-            desti = width * (y + y0);
-            srci = (y + r8) * 15 + r9;
-            src = &mapView[srci + i];
-            dest = &sBackupMapData[x0 + desti + j];
-            *dest = *src;
-            i++;
-            j++;
-        }
-    }
-    ClearSavedMapView();
-}
-
 int GetMapBorderIdAt(int x, int y)
 {
     if (GetMapGridBlockAt(x, y) == MAPGRID_UNDEFINED)
@@ -658,7 +517,6 @@ bool8 CameraMove(int x, int y)
             gCamera.y = old_y - gSaveBlock1Ptr->pos.y;
             gSaveBlock1Ptr->pos.x += x;
             gSaveBlock1Ptr->pos.y += y;
-            MoveMapViewToBackup(direction, x, y);
         }
         else
         {
@@ -808,21 +666,6 @@ void MapGridSetMetatileImpassabilityAt(int x, int y, bool32 impassable)
         else
             gBackupMapLayout.map[x + gBackupMapLayout.width * y] &= ~MAPGRID_COLLISION_MASK;
     }
-}
-
-static bool8 SkipCopyingMetatileFromSavedMap(u16 *mapBlock, u16 mapWidth, u8 yMode)
-{
-    if (yMode == 0xFF)
-        return FALSE;
-
-    if (yMode == 0)
-        mapBlock -= mapWidth;
-    else
-        mapBlock += mapWidth;
-
-    if (IsLargeBreakableDecoration(*mapBlock & MAPGRID_METATILE_ID_MASK, yMode) == TRUE)
-        return TRUE;
-    return FALSE;
 }
 
 static void CopyTilesetToVram(struct Tileset const *tileset, u16 numTiles, u16 offset)

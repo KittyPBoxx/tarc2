@@ -1,7 +1,7 @@
 # GBA rom header
-TITLE       := POKEMON EMER
-GAME_CODE   := BPEE
-MAKER_CODE  := 01
+TITLE       := TARC2PKM PAL
+GAME_CODE   := TARC
+MAKER_CODE  := KT
 REVISION    := 0
 KEEP_TEMPS  ?= 0
 
@@ -382,7 +382,7 @@ ifeq ($(COMPETITIVE_PARTY_SYNTAX),1)
 %.h: %.party ; $(CPP) $(CPPFLAGS) -traditional-cpp - < $< | $(TRAINERPROC) -o $@ -i $< -
 endif
 
-$(C_BUILDDIR)/agb_flash.o: override CFLAGS += -fno-toplevel-reorder
+# $(C_BUILDDIR)/agb_flash.o: override CFLAGS += -fno-toplevel-reorder
 # Annoyingly we can't turn this on just for src/data/trainers.h
 $(C_BUILDDIR)/data.o: CFLAGS += -fno-show-column -fno-diagnostics-show-caret
 

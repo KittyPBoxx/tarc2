@@ -3,7 +3,7 @@
 
 #include "save.h"
 
-#define SAVEBLOCK_MOVE_RANGE    128
+#define SAVEBLOCK_MOVE_RANGE    0
 
 /**
  * These structs are to prevent them from being reordered on newer or modern
@@ -23,11 +23,9 @@ struct SaveBlock1ASLR {
 extern struct SaveBlock1ASLR gSaveblock1;
 extern struct SaveBlock2ASLR gSaveblock2;
 
-extern bool32 gFlashMemoryPresent;
 extern struct SaveBlock1 *gSaveBlock1Ptr;
 extern struct SaveBlock2 *gSaveBlock2Ptr;
 
-void CheckForFlashMemory(void);
 void ClearSav3(void);
 void ClearSav2(void);
 void ClearSav1(void);
@@ -46,7 +44,5 @@ void CopyPartyAndObjectsToSave(void);
 void CopyPartyAndObjectsFromSave(void);
 void LoadPlayerBag(void);
 void SavePlayerBag(void);
-void ApplyNewEncryptionKeyToHword(u16 *hWord, u32 newKey);
-void ApplyNewEncryptionKeyToWord(u32 *word, u32 newKey);
 
 #endif // GUARD_LOAD_SAVE_H

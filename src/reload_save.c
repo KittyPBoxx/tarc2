@@ -22,7 +22,6 @@ void ReloadSave(void)
     gMain.inBattle = FALSE;
     SetSaveBlocksPointers(GetSaveBlocksPointersBaseOffset());
     ResetMenuAndMonGlobals();
-    Save_ResetSaveCounters();
     LoadGameSave(SAVE_NORMAL);
     if (gSaveFileStatus == SAVE_STATUS_EMPTY || gSaveFileStatus == SAVE_STATUS_CORRUPT)
         Sav2_ClearSetDefault();
