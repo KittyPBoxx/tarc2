@@ -11,6 +11,7 @@
 #include "constants/rgb.h"
 #include "constants/metatile_behaviors.h"
 #include "wild_encounter.h"
+#include "gpu_regs.h"
 
 struct ConnectionFlags
 {
@@ -60,6 +61,7 @@ void InitMap(void)
 {
     InitMapLayoutData(&gMapHeader);
     RunOnLoadMapScript();
+    //EnableInterrupts(INTR_FLAG_HBLANK);
 }
 
 static void InitMapLayoutData(struct MapHeader *mapHeader)

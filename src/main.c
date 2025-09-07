@@ -372,7 +372,6 @@ static void VBlankIntr(void)
     gPcmDmaCounter = gSoundInfo.pcmDmaCounter;
 
     m4aSoundMain();
-    TryReceiveLinkBattleData();
 
     if (!gTestRunnerEnabled && (!gMain.inBattle || !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_RECORDED))))
         AdvanceRandom();
@@ -381,8 +380,142 @@ static void VBlankIntr(void)
     gMain.intrCheck |= INTR_FLAG_VBLANK;
 }
 
+/*
+function gbaToRgb(color) {
+  let r = (color & 0x1F) << 3;
+  let g = ((color >> 5) & 0x1F) << 3;
+  let b = ((color >> 10) & 0x1F) << 3;
+  return [r, g, b];
+}
+
+function rgbToGba(r, g, b) {
+  let rr = Math.round(r / 8);
+  let gg = Math.round(g / 8);
+  let bb = Math.round(b / 8);
+  return (bb << 10) | (gg << 5) | rr;
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  let max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) {
+    h = s = 0;
+  } else {
+    let d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return [h * 360, s, l];
+}
+
+function hslToRgb(h, s, l) {
+  h /= 360;
+  let r, g, b;
+  if (s === 0) {
+    r = g = b = l;
+  } else {
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    }
+    let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    let p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+let base = [0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2];
+let palettes = [];
+let adjustmentAmount = 8;
+
+for (let shift = 0; shift < 7; shift++) {
+  let row = base.map(color => {
+    let [r, g, b] = gbaToRgb(color);
+    let [h, s, l] = rgbToHsl(r, g, b);
+    h = (h + shift * adjustmentAmount) % 360; // shift hue by 15° per row
+    let [nr, ng, nb] = hslToRgb(h, s, l);
+    return rgbToGba(nr, ng, nb);
+  });
+  palettes.push(row);
+}
+
+// Print nicely formatted for C
+console.log("static const u16 baseColors[7][7] = {");
+for (let row of palettes) {
+  let formatted = row.map(c => "0x" + c.toString(16).padStart(4, "0"));
+  console.log("    {" + formatted.join(", ") + "},");
+}
+console.log("};");
+*/
+
+// #define BG_PALETTE ((volatile u16*)0x5000000)
+// #define PALETTE_1 0x51 
+// #define PALETTE_2 0x52 
+// #define PALETTE_3 0x53 
+// #define PALETTE_4 0x54 
+// #define PALETTE_5 0x55 
+// #define PALETTE_6 0x56 
+// #define PALETTE_7 0x57
+
+// // 7 palette entries × 7 shades each
+// // static const u16 baseColors[7][7] = {
+// //     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2},
+// //     {0x1629, 0x15a7, 0x0ecd, 0x0b53, 0x1125, 0x0ce3, 0x08a2},
+// //     {0x1628, 0x15a7, 0x0ecc, 0x0b51, 0x1124, 0x10e3, 0x0ca2},
+// //     {0x1627, 0x15a6, 0x0eca, 0x0b4f, 0x1124, 0x10e3, 0x0ca2},
+// //     {0x1626, 0x15a5, 0x0ec9, 0x0b4d, 0x1524, 0x10e3, 0x0ca2},
+// //     {0x1625, 0x15a5, 0x0ec7, 0x0b4b, 0x1524, 0x14e3, 0x0ca2},
+// //     {0x1a25, 0x19a5, 0x0ec6, 0x0b49, 0x1924, 0x14e3, 0x10a2},
+// // };
+
+// static const u16 baseColors[7][7] = {
+//     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2}, 
+//     {0x1628, 0x15a7, 0x0ecd, 0x0b52, 0x1124, 0x10e3, 0x08a2}, 
+//     {0x1627, 0x15a6, 0x0eca, 0x0b4f, 0x1124, 0x10e3, 0x0ca2}, 
+//     {0x1625, 0x15a5, 0x0ec7, 0x0b4b, 0x1524, 0x14e3, 0x0ca2}, 
+//     {0x1a25, 0x19a5, 0x0ec5, 0x0b48, 0x1924, 0x14e3, 0x10a2}, 
+//     {0x2225, 0x1da5, 0x12c3, 0x0b45, 0x1924, 0x18e3, 0x10a2}, 
+//     {0x2a25, 0x21a5, 0x1ac3, 0x0b42, 0x1d24, 0x18e3, 0x10a2}, 
+// };
+
+// static inline uint32_t fast_hash32(uint32_t x)
+// {
+//     x ^= x >> 15;
+//     x *= 0x2c1b3c6d;
+//     x ^= x >> 12;
+//     x *= 0x297a2d39;
+//     x ^= x >> 15;
+//     return x;
+// }
+
+// #define NUM_BANDS 8
+// #define BAND_SHIFT 3
+
+
 static void HBlankIntr(void)
 {
+    // u16 line = REG_VCOUNT + gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
+    // BG_PALETTE[PALETTE_1] = baseColors[fast_hash32(line + 0) & 0x6][0];
+    // BG_PALETTE[PALETTE_2] = baseColors[fast_hash32(line + 1) & 0x6][1];
+    // BG_PALETTE[PALETTE_3] = baseColors[fast_hash32(line + 2) & 0x6][2];
+    // BG_PALETTE[PALETTE_4] = baseColors[fast_hash32(line + 3) & 0x6][3];
+    // BG_PALETTE[PALETTE_5] = baseColors[fast_hash32(line + 4) & 0x6][4];
+    // BG_PALETTE[PALETTE_6] = baseColors[fast_hash32(line + 5) & 0x6][5];
+    // BG_PALETTE[PALETTE_7] = baseColors[fast_hash32(line + 6) & 0x6][6];
+
     if (gMain.hblankCallback)
         gMain.hblankCallback();
 

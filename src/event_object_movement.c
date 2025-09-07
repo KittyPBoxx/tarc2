@@ -1770,6 +1770,10 @@ u8 CreateVirtualObject(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevati
         SetObjectSubpriorityByElevation(elevation, sprite, 1);
         //StartSpriteAnim(sprite, GetFaceDirectionAnimNum(direction));
     }
+    else 
+    {
+        DebugPrintfLevel(MGBA_LOG_ERROR, "Hit Sprite Limit");
+    }
     return spriteId;
 }
 
@@ -2519,12 +2523,6 @@ void TrySpawnLightSprites(s16 camX, s16 camY)
     }
 }
 
-void TrySpawnSpriteTile(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, s16 camX, s16 camY)
-{
-    if (GetVirtualObjectSpriteId(virtualObjId) == MAX_SPRITES)
-        CreateVirtualObject(graphicsId, virtualObjId, x, y, 0, DIR_NONE);
-}
-
 void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 {
     u8 i;
@@ -2547,9 +2545,7 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
             if (top <= npcY && bottom >= npcY && left <= npcX && right >= npcX && !FlagGet(template->flagId))
             {
-                if (template->graphicsId == OBJ_EVENT_GFX_TRUCK)
-                    TrySpawnSpriteTile(template->graphicsId, template->trainerRange_berryTreeId, npcX, npcY, cameraX, cameraY); // isometric tile sprite instead
-                else if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE)
+                if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE)
                     SpawnLightSprite(npcX, npcY, cameraX, cameraY, template->trainerRange_berryTreeId); // light sprite instead
                 else
                     TrySpawnObjectEventTemplate(template, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY);
