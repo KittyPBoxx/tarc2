@@ -8,10 +8,6 @@ Bridge_MapScripts::
 Bridge_OnTransition:
 	end
 
-Bridge_EventScript_HideMapNamePopup::
-	setflag FLAG_HIDE_MAP_NAME_POPUP
-	return
-
 Bridge_OnFrame:
 	.2byte 0
 
