@@ -126,8 +126,15 @@ void AgbMain(void)
     InitIntrHandlers();
 
     u8 testLocal = 0xFF;
+
+    #ifndef NDEBUG
+    #if (LOG_HANDLER == LOG_HANDLER_MGBA_PRINT)
+        (void) MgbaOpen();
+    #elif (LOG_HANDLER == LOG_HANDLER_AGB_PRINT)
+        AGBPrintInit();
+    #endif
+    #endif
     
-    // TODO: TARC accuracy tests
     if (!gSoftResetFlag)
         testLocal = RunAgbAccuracyTests();
 
@@ -146,13 +153,7 @@ void AgbMain(void)
 
     gSoftResetDisabled = FALSE;
 
-#ifndef NDEBUG
-#if (LOG_HANDLER == LOG_HANDLER_MGBA_PRINT)
-    (void) MgbaOpen();
-#elif (LOG_HANDLER == LOG_HANDLER_AGB_PRINT)
-    AGBPrintInit();
-#endif
-#endif
+
 
     gTestResult = testLocal;
 

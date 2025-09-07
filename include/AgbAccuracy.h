@@ -10,6 +10,8 @@ struct TestSpec {
     TestFunc func;
 };
 
+#define ACC_TEST_COUNT 5
+
 u8 RunAgbAccuracyTests();
 
 #endif // _AGB_ACCURACY_H

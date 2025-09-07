@@ -2,7 +2,8 @@
 #include "global.h"
 #include <stdarg.h>
 #include "AgbAccuracy.h"
-
+#include "main.h"
+#include "gpu_regs.h"
 
 // Standalone emulator test in a single file/header. Can be compiled stand alone, just run 
 // RunAgbAccuracyTests to get the result as a return. Read the header file for the
@@ -188,24 +189,169 @@ static s32 TimingTest(void)
     return failMask == 0;
 }
 
+// Missing libagb BIOS wrappers
+s16 ArcTan(s16 x)
+{
+    register s16 result asm("r0") = x;
+    asm("swi 0x09" : "+r"(result) :: "r1","r2","r3","lr","memory","cc");
+    return result;
+}
+
+s32 DivRemainder(s32 numerator, s32 denominator)
+{
+    register s32 r0 asm("r0") = numerator;
+    register s32 r1 asm("r1") = denominator;
+    s32 quotient, remainder;
+
+    asm volatile(
+        "swi 0x06"
+        : "=r"(quotient), "=r"(remainder)   // outputs
+        : "r"(r0), "r"(r1)                  // inputs
+        : "r2","r3","lr","memory","cc"
+    );
+
+    return remainder;
+}
+
+u16 Bios_ArcTan2(s32 x, s32 y)
+{
+    register s32 r0 asm("r0") = x;
+    register s32 r1 asm("r1") = y;
+    u16 result;
+
+    asm volatile(
+        "swi 0x0A"
+        : "=r"(result)
+        : "r"(r0), "r"(r1)
+        : "r2", "r3", "lr", "memory", "cc"
+    );
+
+    return result;
+}
+
+struct MathTest {
+    const char *name;
+    u32 args[8];
+};
+
+static const struct MathTest mathTests[] = {
+    // ArcTan: simple zero, positive, negative, and max values
+    { "ArcTan 00000000", { 0x9, 0x00000000, 0, 0, 0, 0xEF090000, 0xA2F9, 0x0000001F } },
+    { "ArcTan 00004000", { 0x9, 0x00004000, 0, 0x2000, 0xFFFFC000, 0xEF090000, 0x8000, 0x0000001F } },
+    { "ArcTan FFFF8000", { 0x9, 0xFFFF8000, 0, 0xFFFFE95D, 0xFFFF0000, 0xEF090000, 0x22D45, 0x0000001F } },
+    { "ArcTan FFFFFFFF", { 0x9, 0xFFFFFFFF, 0, 0xFFFFFFFF, 0, 0xEF090000, 0xA2F9, 0x0000001F } },
+
+    // ArcTan2: minimal quadrant coverage
+    { "ArcTan2 00000001,00000000", { 0xA, 0x00000001, 0x00000000, 0, 0, 0xEF0A0000, 0x0170, 0x0000001F } },
+    { "ArcTan2 00000001,00000001", { 0xA, 0x00000001, 0x00000001, 0xC000, 0, 0xEF0A0000, 0x0170, 0x0000001F } },
+    { "ArcTan2 FFFF8000,00008000", { 0xA, 0xFFFF8000, 0x00008000, 0xC000, 0, 0xEF0A0000, 0x0170, 0x0000001F } },
+    { "ArcTan2 FFFFFFFF,FFFF0000", { 0xA, 0xFFFFFFFF, 0xFFFF0000, 0x0000, 0, 0xEF0A0000, 0x0170, 0x0000001F } },
+
+    // // Div: zero, divide by zero, signed division
+    { "Div 00000000/00000000", { 0x6, 0x00000000, 0x00000000, 1, 0, 0xEF060000, 1, 0x0000001F } },
+    { "Div 00000001/00000000", { 0x6, 0x00000001, 0x00000000, 1, 1, 0xEF060000, 1, 0x0000001F } },
+    { "Div FFFFFFFF/00000000", { 0x6, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0xEF060000, 1, 0x0000001F } },
+    { "Div 80000000/FFFFFFFF", { 0x6, 0x80000000, 0xFFFFFFFF, 0x80000000, 0, 0xEF060000, 0x80000000, 0x0001F } },
+};
+
+static bool8 RunSingleMathTest(const struct MathTest *test)
+{
+    u32 callNum = test->args[0];
+    u32 r0in    = test->args[1];
+    u32 r1in    = test->args[2];
+    u32 r0exp   = test->args[3];
+    u32 r1exp   = test->args[4];
+
+    u32 r0out = 0, r1out = 0;
+
+    switch (callNum)
+    {
+    case 0x9: // ArcTan
+        r0out = ArcTan(r0in); // BIOS swi 0x09
+        break;
+    case 0xA: // ArcTan2
+        r0out = Bios_ArcTan2(r0in, r1in); // BIOS swi 0x0A
+        break;
+    case 0x6: // Div
+        r0out = Div(r0in, r1in); // quotient in r0
+        r1out = DivRemainder(r0in, r1in); // remainder in r1
+        break;
+    default:
+        return FALSE; // unknown test
+    }
+
+    if (r0out != r0exp) {
+        DebugPrintfLevel(MGBA_LOG_ERROR, "Maths Test Failed Expecting %x got %x", r0exp, r0out);
+        return FALSE;
+    }
+    if ((callNum == 0x6) && r1out != r1exp) {
+        DebugPrintfLevel(MGBA_LOG_ERROR, "Maths Test Failed Expecting %x got %x", r0exp, r0out);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static s32 RunAllMathTests(void)
+{
+    u32 failures = 0;
+    for (u32 i = 0; i < ARRAY_COUNT(mathTests); i++)
+    {
+        if (!RunSingleMathTest(&mathTests[i]))
+            failures |= (1u << i);
+    }
+    return failures == 0;
+}
+
+
+volatile u16 irqTestVBlankCounter = 0;
+volatile u16 irqTestHBlankCounter = 0;
+
+void Test_VBlank_IRQ_Handler(void)
+{
+    irqTestVBlankCounter++;
+}
+
+void Test_HBlank_IRQ_Handler(void)
+{
+    irqTestHBlankCounter++;
+}
+
+static s32 RunIRQTimerTest(void)
+{
+    EnableInterrupts(INTR_FLAG_HBLANK | INTR_FLAG_VBLANK);
+    SetHBlankCallback(Test_HBlank_IRQ_Handler);
+    SetVBlankCallback(Test_VBlank_IRQ_Handler);
+
+    u32 timeout = 1000000;
+
+    while (irqTestVBlankCounter < 5 && irqTestHBlankCounter < 5 && timeout--)
+    {
+        // Wait for interrupts
+    }
+
+    return timeout != 0;
+}
 
 enum TestList {
     TEST_PREFETCH_BUFFER,
     TEST_TIMER_PRESCALER,
-    TEST_INSN_PREFETCH
+    TEST_INSN_PREFETCH,
+    TEST_BIOS_MATHS,
+    TEST_IRQ_TIMER
 };
 
 const struct TestSpec gTestSpecs[] = {
     [TEST_PREFETCH_BUFFER]            = {TRUE, "Prefetch Buffer", PrefetchBufferTest},
     [TEST_TIMER_PRESCALER]            = {TRUE, "Timer Prescaler", TimingTest},
-    [TEST_INSN_PREFETCH]              = {TRUE, "Inst Prefetch",   NESPipelineTest},
+    [TEST_INSN_PREFETCH]              = {TRUE, "Inst Prefetch"  , NESPipelineTest},
+    [TEST_BIOS_MATHS]                 = {TRUE, "Bios Maths"     , RunAllMathTests},
+    [TEST_IRQ_TIMER]                  = {TRUE, "IRQ Timer"      , RunIRQTimerTest},
 };
 
 // Make sure you run this before any sound drivers such as m4a is initialized or you
 // will get sound corruption due to manipulating the timers for these tests.
 // 
-// Pass -1 to run all tests. The result is the bitfield array of which failed.
-// Read the Agb header for more information.
 u8 RunAgbAccuracyTests()
 {
     u8 failureCount = 0;
@@ -214,6 +360,7 @@ u8 RunAgbAccuracyTests()
     {
         if (!gTestSpecs[i].func()) 
         {
+            DebugPrintfLevel(MGBA_LOG_ERROR, "Test Failed: %s", gTestSpecs[i].name);
             failureCount++;
         }
     }

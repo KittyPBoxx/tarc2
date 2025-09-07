@@ -15,6 +15,7 @@
 #include "text_window.h"
 #include "constants/rgb.h"
 #include "string_util.h"
+#include "AgbAccuracy.h"
 
 #define MSG_WIN_TOP 12
 #define CLOCK_WIN_TOP (MSG_WIN_TOP - 4)
@@ -363,6 +364,22 @@ void CB2_FlashNotDetectedScreen(void)
     gMain.state++;
 }
 
+static const u8 gDeviceAccuracy0[] = _("{COLOR RED}Device Accuracy: 0/5  {LEFT_ARROW_2} Awful {EMOJI_ANGRY}");
+static const u8 gDeviceAccuracy1[] = _("{COLOR RED}Device Accuracy: 1/5  {LEFT_ARROW_2} Awful {EMOJI_ANGRY}");
+static const u8 gDeviceAccuracy2[] = _("{COLOR RED}Device Accuracy: 2/5  {LEFT_ARROW_2} Bad {EMOJI_ANGRY}");
+static const u8 gDeviceAccuracy3[] = _("{COLOR RED}Device Accuracy: 3/5  {LEFT_ARROW_2} Bad {EMOJI_ANGRY}");
+static const u8 gDeviceAccuracy4[] = _("{COLOR LIGHT_RED}Device Accuracy: 4/5  {LEFT_ARROW_2}  It's OK  {EMOJI_NEUTRAL}");
+static const u8 gDeviceAccuracy5[] = _("{COLOR BLUE}Device Accuracy: 5/5  {LEFT_ARROW_2}  Perfect {EMOJI_BIGSMILE}");
+
+static const u8* const deviceAccuracyStrings[6] = {
+    gDeviceAccuracy0,
+    gDeviceAccuracy1,
+    gDeviceAccuracy2,
+    gDeviceAccuracy3,
+    gDeviceAccuracy4,
+    gDeviceAccuracy5
+};
+
 void CB2_TestResultCallback(void)
 {
     static const struct WindowTemplate textWin[] =
@@ -406,14 +423,9 @@ void CB2_TestResultCallback(void)
     static const u8 disclaimer[] =_("{COLOR DARK_GRAY}This mini-hack was for a jam themed on\n'Myths'. It should NOT be distributed for\nprofit or as a ROM file!");
     SaveFailedScreenTextPrint(disclaimer, 1, 1);
 
-    // TODO: TARC Make this some kind of useful message
-    static const u8 resultText[] =_("{COLOR RED}Device Accuracy Result");
-    SaveFailedScreenTextPrint(resultText, 1, 9);
-    
-    ConvertIntToDecimalStringN(&gStringVar1[4], gTestResult, 0, 3);
-    gStringVar1[10] = 0xFF;
-    DebugPrintfLevel(MGBA_LOG_ERROR, "TEST RESULTS %x", gTestResult);
-    SaveFailedScreenTextPrint(gStringVar1, 15, 9);
+    u8 passed = ACC_TEST_COUNT - gTestResult;
+    SaveFailedScreenTextPrint(deviceAccuracyStrings[passed], 1, 9);
+
 
     static const u8 continueMessage[] =_("{COLOR DARK_GRAY}Press {START_BUTTON} to continue...");
     SaveFailedScreenTextPrint(continueMessage, 1, 13);
