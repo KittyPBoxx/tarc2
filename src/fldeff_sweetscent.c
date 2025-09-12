@@ -100,7 +100,6 @@ static void TrySweetScentEncounter(u8 taskId)
             {
                 gTasks[taskId].func = FailSweetScentEncounter;
                 BeginNormalPaletteFade(~(1 << (gSprites[GetPlayerAvatarSpriteId()].oam.paletteNum + 16)), 4, 8, 0, RGB_RED);
-                TryStartMirageTowerPulseBlendEffect();
             }
         }
         else

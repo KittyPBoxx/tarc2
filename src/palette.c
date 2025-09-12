@@ -7,6 +7,7 @@
 #include "gpu_regs.h"
 #include "task.h"
 #include "constants/rgb.h"
+#include "palette_effects.h"
 
 enum
 {
@@ -108,6 +109,7 @@ u32 PrevPaletteFadeResult(void)
 
 void ResetPaletteFade(void)
 {
+    PauseMapPaletteEffects();
     ResetPaletteFadeControl();
 }
 

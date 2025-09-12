@@ -26,7 +26,6 @@ const u8 gWeatherFogDiagonalTiles[] = INCBIN_U8("graphics/weather/fog_diagonal.4
 const u8 gWeatherFogHorizontalTiles[] = INCBIN_U8("graphics/weather/fog_horizontal.4bpp");
 const u8 gWeatherCloudTiles[] = INCBIN_U8("graphics/weather/cloud.4bpp");
 const u8 gWeatherSnow1Tiles[] = INCBIN_U8("graphics/weather/snow0.4bpp");
-const u8 gWeatherSnow2Tiles[] = INCBIN_U8("graphics/weather/snow1.4bpp");
 const u8 gWeatherBubbleTiles[] = INCBIN_U8("graphics/weather/bubble.4bpp");
 const u8 gWeatherAshTiles[] = INCBIN_U8("graphics/weather/ash.4bpp");
 const u8 gWeatherRainTiles[] = INCBIN_U8("graphics/weather/rain.4bpp");
@@ -794,7 +793,7 @@ void Snow_InitVars(void)
     gWeatherPtr->snowflakeVisibleCounter = 0;
     if (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_FADE_IN) == FALSE)
     {
-        Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
+        //Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
         gWeatherPtr->noShadows = FALSE;
     }
     // Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY); // preserve shadow darkness
@@ -880,8 +879,10 @@ static const struct OamData sSnowflakeSpriteOamData =
 
 static const struct SpriteFrameImage sSnowflakeSpriteImages[] =
 {
-    {gWeatherSnow1Tiles, sizeof(gWeatherSnow1Tiles)},
-    {gWeatherSnow2Tiles, sizeof(gWeatherSnow2Tiles)},
+    {gWeatherSnow1Tiles + 0x00, 0x20}, // first 8×8
+    {gWeatherSnow1Tiles + 0x20, 0x20}, // second 8×8
+    {gWeatherSnow1Tiles + 0x40, 0x20}, // third 8×8
+    {gWeatherSnow1Tiles + 0x60, 0x20}, // fourth 8×8
 };
 
 static const union AnimCmd sSnowflakeAnimCmd0[] =
@@ -896,10 +897,24 @@ static const union AnimCmd sSnowflakeAnimCmd1[] =
     ANIMCMD_END,
 };
 
+static const union AnimCmd sSnowflakeAnimCmd2[] =
+{
+    ANIMCMD_FRAME(2, 16),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sSnowflakeAnimCmd3[] =
+{
+    ANIMCMD_FRAME(3, 16),
+    ANIMCMD_END,
+};
+
 static const union AnimCmd *const sSnowflakeAnimCmds[] =
 {
     sSnowflakeAnimCmd0,
     sSnowflakeAnimCmd1,
+    sSnowflakeAnimCmd2,
+    sSnowflakeAnimCmd3
 };
 
 static const struct SpriteTemplate sSnowflakeSpriteTemplate =
@@ -958,11 +973,14 @@ static void InitSnowflakeSpriteMovement(struct Sprite *sprite)
     rand = Random();
     sprite->tDeltaY = (rand & 3) * 5 + 64;
     sprite->tDeltaY2 = sprite->tDeltaY;
-    StartSpriteAnim(sprite, (rand & 1) ? 0 : 1);
+    StartSpriteAnim(sprite, Random() & 3); 
     sprite->tWaveIndex = 0;
     sprite->tWaveDelta = ((rand & 3) == 0) ? 2 : 1;
     sprite->tFallDuration = (rand & 0x1F) + 210;
     sprite->tFallCounter = 0;
+
+    sprite->oam.affineMode = ST_OAM_AFFINE_NORMAL;
+    sprite->oam.matrixNum = 2 + gWeatherPtr->snowflakeSpriteCount;
 }
 
 static void UNUSED WaitSnowflakeSprite(struct Sprite *sprite)
@@ -977,6 +995,15 @@ static void UNUSED WaitSnowflakeSprite(struct Sprite *sprite)
     }
 }
 
+#define OBJ_ROT_SCALE_SET(matrix, pa, pb, pc, pd) \
+    do { \
+        gOamMatrices[matrix].a = (pa); \
+        gOamMatrices[matrix].b = (pb); \
+        gOamMatrices[matrix].c = (pc); \
+        gOamMatrices[matrix].d = (pd); \
+    } while(0)
+
+
 static void UpdateSnowflakeSprite(struct Sprite *sprite)
 {
     s16 x;
@@ -985,7 +1012,18 @@ static void UpdateSnowflakeSprite(struct Sprite *sprite)
     sprite->y = sprite->tPosY >> 7;
     sprite->tWaveIndex += sprite->tWaveDelta;
     sprite->tWaveIndex &= 0xFF;
-    sprite->x2 = gSineTable[sprite->tWaveIndex] / 64;
+    
+    sprite->tDeltaY2 += -((sprite->tSnowflakeId & 3) * 40); // accumulate leftward drift
+    sprite->x2 = gSineTable[sprite->tWaveIndex] / 64 + (sprite->tDeltaY2 >> 7);
+
+    u16 angle = sprite->tWaveIndex * ((sprite->tSnowflakeId & 3) + 1);
+    angle &= 0xFF;
+    s16 pa =  Cos(angle, 256);
+    s16 pb = -Sin(angle, 256) / 2;
+    s16 pc =  Sin(angle, 256) / 2;
+    s16 pd =  Cos(angle, 256);
+    OBJ_ROT_SCALE_SET(sprite->oam.matrixNum, pa, pb, pc, pd);
+
 
     x = (sprite->x + sprite->centerToCornerVecX + gSpriteCoordOffsetX) & 0x1FF;
     if (x & 0x100)

@@ -21,6 +21,7 @@
 #include "constants/rgb.h"
 #include "main_menu.h"
 #include "AgbAccuracy.h"
+#include "palette_effects.h"
 
 static void VBlankIntr(void);
 static void HBlankIntr(void);
@@ -358,29 +359,6 @@ void SetSerialCallback(IntrCallback callback)
     gMain.serialCallback = callback;
 }
 
-static void VBlankIntr(void)
-{
-    gMain.vblankCounter1++;
-
-    if (gMain.vblankCallback)
-        gMain.vblankCallback();
-
-    gMain.vblankCounter2++;
-
-    CopyBufferedValuesToGpuRegs();
-    ProcessDma3Requests();
-
-    gPcmDmaCounter = gSoundInfo.pcmDmaCounter;
-
-    m4aSoundMain();
-
-    if (!gTestRunnerEnabled && (!gMain.inBattle || !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_RECORDED))))
-        AdvanceRandom();
-
-    INTR_CHECK |= INTR_FLAG_VBLANK;
-    gMain.intrCheck |= INTR_FLAG_VBLANK;
-}
-
 /*
 function gbaToRgb(color) {
   let r = (color & 0x1F) << 3;
@@ -462,60 +440,135 @@ for (let row of palettes) {
 console.log("};");
 */
 
-// #define BG_PALETTE ((volatile u16*)0x5000000)
-// #define PALETTE_1 0x51 
-// #define PALETTE_2 0x52 
-// #define PALETTE_3 0x53 
-// #define PALETTE_4 0x54 
-// #define PALETTE_5 0x55 
-// #define PALETTE_6 0x56 
-// #define PALETTE_7 0x57
+#define BG_PALETTE ((volatile u16*)0x5000000)
+#define PALETTE_1 0x51 
+#define PALETTE_2 0x52 
+#define PALETTE_3 0x53 
+#define PALETTE_4 0x54 
+#define PALETTE_5 0x55 
+#define PALETTE_6 0x56 
+#define PALETTE_7 0x57
 
-// // 7 palette entries × 7 shades each
-// // static const u16 baseColors[7][7] = {
-// //     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2},
-// //     {0x1629, 0x15a7, 0x0ecd, 0x0b53, 0x1125, 0x0ce3, 0x08a2},
-// //     {0x1628, 0x15a7, 0x0ecc, 0x0b51, 0x1124, 0x10e3, 0x0ca2},
-// //     {0x1627, 0x15a6, 0x0eca, 0x0b4f, 0x1124, 0x10e3, 0x0ca2},
-// //     {0x1626, 0x15a5, 0x0ec9, 0x0b4d, 0x1524, 0x10e3, 0x0ca2},
-// //     {0x1625, 0x15a5, 0x0ec7, 0x0b4b, 0x1524, 0x14e3, 0x0ca2},
-// //     {0x1a25, 0x19a5, 0x0ec6, 0x0b49, 0x1924, 0x14e3, 0x10a2},
-// // };
+// #define NUM_LINES 160
+// u16 gHBlankGrassPalettes[NUM_LINES][7]; // 7 palettes per line
 
+// 7 palette entries × 7 shades each
 // static const u16 baseColors[7][7] = {
-//     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2}, 
-//     {0x1628, 0x15a7, 0x0ecd, 0x0b52, 0x1124, 0x10e3, 0x08a2}, 
-//     {0x1627, 0x15a6, 0x0eca, 0x0b4f, 0x1124, 0x10e3, 0x0ca2}, 
-//     {0x1625, 0x15a5, 0x0ec7, 0x0b4b, 0x1524, 0x14e3, 0x0ca2}, 
-//     {0x1a25, 0x19a5, 0x0ec5, 0x0b48, 0x1924, 0x14e3, 0x10a2}, 
-//     {0x2225, 0x1da5, 0x12c3, 0x0b45, 0x1924, 0x18e3, 0x10a2}, 
-//     {0x2a25, 0x21a5, 0x1ac3, 0x0b42, 0x1d24, 0x18e3, 0x10a2}, 
+//     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2},
+//     {0x1629, 0x15a7, 0x0ecd, 0x0b53, 0x1125, 0x0ce3, 0x08a2},
+//     {0x1628, 0x15a7, 0x0ecc, 0x0b51, 0x1124, 0x10e3, 0x0ca2},
+//     {0x1627, 0x15a6, 0x0eca, 0x0b4f, 0x1124, 0x10e3, 0x0ca2},
+//     {0x1626, 0x15a5, 0x0ec9, 0x0b4d, 0x1524, 0x10e3, 0x0ca2},
+//     {0x1625, 0x15a5, 0x0ec7, 0x0b4b, 0x1524, 0x14e3, 0x0ca2},
+//     {0x1a25, 0x19a5, 0x0ec6, 0x0b49, 0x1924, 0x14e3, 0x10a2},
 // };
 
-// static inline uint32_t fast_hash32(uint32_t x)
+static const u16 baseColors[7][7] = {
+    {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2}, 
+    {0x1628, 0x15a7, 0x0ecd, 0x0b52, 0x1124, 0x10e3, 0x08a2}, 
+    {0x1627, 0x15a6, 0x0eca, 0x0b4f, 0x1124, 0x10e3, 0x0ca2}, 
+    {0x1625, 0x15a5, 0x0ec7, 0x0b4b, 0x1524, 0x14e3, 0x0ca2}, 
+    {0x1a25, 0x19a5, 0x0ec5, 0x0b48, 0x1924, 0x14e3, 0x10a2}, 
+    {0x2225, 0x1da5, 0x12c3, 0x0b45, 0x1924, 0x18e3, 0x10a2}, 
+    {0x2a25, 0x21a5, 0x1ac3, 0x0b42, 0x1d24, 0x18e3, 0x10a2}, 
+};
+
+static inline uint32_t fast_hash32(uint32_t x)
+{
+    x ^= x >> 15;
+    x *= 0x297a2d39;
+    x ^= x >> 12;
+   // x *= 0x297a2d39;
+   // x ^= x >> 15;
+    return x;
+}
+
+#define NUM_BANDS 8
+#define BAND_SHIFT 3
+
+// #define NUM_LINES 160
+// EWRAM_DATA u16 gHBlankGrassPalettes[NUM_LINES][7]; // 7 palettes per line
+
+// static void PrecomputeGrassPalette(void)
 // {
-//     x ^= x >> 15;
-//     x *= 0x2c1b3c6d;
-//     x ^= x >> 12;
-//     x *= 0x297a2d39;
-//     x ^= x >> 15;
-//     return x;
+//     for (u16 line = 0; line < NUM_LINES; line++)
+//     {
+//         for (int i = 0; i < 7; i++)
+//         {
+//             gHBlankGrassPalettes[line][i] = baseColors[fast_hash32(line + i) & 0x6][i];
+//         }
+//     }
 // }
 
-// #define NUM_BANDS 8
-// #define BAND_SHIFT 3
+#define PALETTE_ROTATE_INTERVAL 5  // change speed: lower = faster
+#define ROTATE_LEN 6              // number of palette entries to rotate
 
+static inline void RotateObjPalette0(void)
+{
+    volatile u16 *pal0 = (volatile u16 *)OBJ_PLTT;  // OBJ palette slot 0
+
+    // extract the colors you want to rotate
+    u16 temp[ROTATE_LEN];
+    for (int i = 0; i < ROTATE_LEN; i++)
+        temp[i] = pal0[i + 1];  // indices 1–7
+
+    // compute offset without %
+    int offset = gMain.vblankCounter1 / PALETTE_ROTATE_INTERVAL;
+    while (offset >= ROTATE_LEN)
+        offset -= ROTATE_LEN;
+
+    // write rotated colors back
+    for (int i = 0; i < ROTATE_LEN; i++) {
+        int j = i + offset;
+        if (j >= ROTATE_LEN) j -= ROTATE_LEN;  // wraparound
+        pal0[i + 1] = temp[j];
+    }
+}
+
+
+static void VBlankIntr(void)
+{
+    gMain.vblankCounter1++;
+
+    if (gMain.vblankCallback)
+        gMain.vblankCallback();
+
+    gMain.vblankCounter2++;
+
+    CopyBufferedValuesToGpuRegs();
+    ProcessDma3Requests();
+
+    gPcmDmaCounter = gSoundInfo.pcmDmaCounter;
+
+    m4aSoundMain();
+
+    if (!gTestRunnerEnabled && (!gMain.inBattle || !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_RECORDED))))
+        AdvanceRandom();
+
+    if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS)
+    {    
+        RotateObjPalette0();    
+    }
+
+    INTR_CHECK |= INTR_FLAG_VBLANK;
+    gMain.intrCheck |= INTR_FLAG_VBLANK;
+}
 
 static void HBlankIntr(void)
 {
-    // u16 line = REG_VCOUNT + gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
-    // BG_PALETTE[PALETTE_1] = baseColors[fast_hash32(line + 0) & 0x6][0];
-    // BG_PALETTE[PALETTE_2] = baseColors[fast_hash32(line + 1) & 0x6][1];
-    // BG_PALETTE[PALETTE_3] = baseColors[fast_hash32(line + 2) & 0x6][2];
-    // BG_PALETTE[PALETTE_4] = baseColors[fast_hash32(line + 3) & 0x6][3];
-    // BG_PALETTE[PALETTE_5] = baseColors[fast_hash32(line + 4) & 0x6][4];
-    // BG_PALETTE[PALETTE_6] = baseColors[fast_hash32(line + 5) & 0x6][5];
-    // BG_PALETTE[PALETTE_7] = baseColors[fast_hash32(line + 6) & 0x6][6];
+    // This is all super time sensitive. It must be inlined and I suspect only works because of the prefetch buffer 
+    // TODO: this probably needs to be a lookup table for performance in rom. If that's still to slow, a lookup table we copy into Iwram during the vbalank
+    if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS)
+    {
+        u16 line = REG_VCOUNT + gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
+        BG_PALETTE[PALETTE_1] = baseColors[fast_hash32(line + 0) & 0x6][0];
+        BG_PALETTE[PALETTE_2] = baseColors[fast_hash32(line + 1) & 0x6][1];
+        BG_PALETTE[PALETTE_3] = baseColors[fast_hash32(line + 2) & 0x6][2];
+        BG_PALETTE[PALETTE_4] = baseColors[fast_hash32(line + 3) & 0x6][3];
+        BG_PALETTE[PALETTE_5] = baseColors[fast_hash32(line + 4) & 0x6][4];
+        BG_PALETTE[PALETTE_6] = baseColors[fast_hash32(line + 5) & 0x6][5];
+        BG_PALETTE[PALETTE_7] = baseColors[fast_hash32(line + 6) & 0x6][6];
+    }
 
     if (gMain.hblankCallback)
         gMain.hblankCallback();

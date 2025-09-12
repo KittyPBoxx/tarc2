@@ -47,15 +47,15 @@
 #define FLAG_TEMP_HIDE_FOLLOWER                 FLAG_TEMP_E
 
 // Flags
-#define FLAG_UNUSED_0x57 0x57
-#define FLAG_UNUSED_0x58 0x58
-#define FLAG_UNUSED_0x59 0x59
-#define FLAG_UNUSED_0x5A 0x5A
-#define FLAG_UNUSED_0x5B 0x5B
-#define FLAG_UNUSED_0x5C 0x5C
-#define FLAG_UNUSED_0x5D 0x5D
-#define FLAG_UNUSED_0x5E 0x5E
-#define FLAG_UNUSED_0x5F 0x5F
+#define FLAG_CHOSE_STARTER           0x57
+#define FLAG_FIRST_WILD_BATTLE_DONE  0x58
+#define FLAG_TREE_CUT                0x59
+#define FLAG_FOREST_PUZZLE_SOLVED    0x5A
+#define FLAG_COMPLETED               0x5B
+#define FLAG_SUMMIT_INTRO_DONE       0x5C
+#define FLAG_TILE_PUZZLE_ROCK_BROKEN 0x5D
+#define FLAG_BERUS_FINAL_BATTLE_DONE 0x5E
+#define FLAG_GAME_CLEAR              0x5F
 #define FLAG_UNUSED_0x60 0x60
 #define FLAG_UNUSED_0x61 0x61
 #define FLAG_UNUSED_0x62 0x62

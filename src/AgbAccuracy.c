@@ -317,7 +317,7 @@ void Test_HBlank_IRQ_Handler(void)
     irqTestHBlankCounter++;
 }
 
-static s32 RunIRQTimerTest(void)
+static s32 RunIRQTest(void)
 {
     EnableInterrupts(INTR_FLAG_HBLANK | INTR_FLAG_VBLANK);
     SetHBlankCallback(Test_HBlank_IRQ_Handler);
@@ -338,7 +338,7 @@ enum TestList {
     TEST_TIMER_PRESCALER,
     TEST_INSN_PREFETCH,
     TEST_BIOS_MATHS,
-    TEST_IRQ_TIMER
+    TEST_IRQ
 };
 
 const struct TestSpec gTestSpecs[] = {
@@ -346,12 +346,12 @@ const struct TestSpec gTestSpecs[] = {
     [TEST_TIMER_PRESCALER]            = {TRUE, "Timer Prescaler", TimingTest},
     [TEST_INSN_PREFETCH]              = {TRUE, "Inst Prefetch"  , NESPipelineTest},
     [TEST_BIOS_MATHS]                 = {TRUE, "Bios Maths"     , RunAllMathTests},
-    [TEST_IRQ_TIMER]                  = {TRUE, "IRQ Timer"      , RunIRQTimerTest},
+    [TEST_IRQ]                        = {TRUE, "IRQ"            , RunIRQTest},
 };
 
 // Make sure you run this before any sound drivers such as m4a is initialized or you
 // will get sound corruption due to manipulating the timers for these tests.
-// 
+// NB: It's important to return TestsPassed rather than TestsFailed because really bad emus can clear values from ram
 u8 RunAgbAccuracyTests()
 {
     u8 failureCount = 0;
@@ -364,5 +364,5 @@ u8 RunAgbAccuracyTests()
             failureCount++;
         }
     }
-    return failureCount;
+    return ACC_TEST_COUNT - failureCount;
 }

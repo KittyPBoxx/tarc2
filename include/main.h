@@ -4,6 +4,7 @@
 typedef void (*MainCallback)(void);
 typedef void (*IntrCallback)(void);
 typedef void (*IntrFunc)(void);
+typedef void (*PaletteEffectFunc)(void);
 
 struct Main
 {
@@ -38,6 +39,8 @@ struct Main
     /*0x439*/ u8 oamLoadDisabled:1;
     /*0x439*/ u8 inBattle:1;
     /*0x439*/ u8 anyLinkBattlerHasFrontierPass:1;
+              u8 hblankPaletteEffect;
+              u8 vblankPaletteEffect;
 };
 
 #define GAME_CODE_LENGTH 4

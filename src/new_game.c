@@ -19,6 +19,7 @@
 #include "constants/items.h"
 #include "script_pokemon_util.h"
 #include "constants/moves.h"
+#include "field_effect.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
 
@@ -120,5 +121,6 @@ void NewGameInitData(void)
     AddBagItem(ITEM_TERA_ORB, 1);
 
     RunScriptImmediately(EventScript_ResetAllMapFlags);
+    gFieldCallback = FieldCB_FallWarpExit;
     RtcInitLocalTimeOffset(0, 0);
 }

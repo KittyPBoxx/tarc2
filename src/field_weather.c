@@ -194,13 +194,14 @@ static const u8 ALIGNED(2) sBasePaletteColorMapTypes[32] =
 };
 
 const u16 ALIGNED(4) gFogPalette[] = INCBIN_U16("graphics/weather/fog.gbapal");
+const u16 ALIGNED(4) gSnowPalette[] = INCBIN_U16("graphics/weather/snow0.gbapal");
 
 void StartWeather(void)
 {
     if (!FuncIsActiveTask(Task_WeatherMain))
     {
         u8 index = AllocSpritePalette(PALTAG_WEATHER);
-        CpuCopy32(gFogPalette, &gPlttBufferUnfaded[OBJ_PLTT_ID(index)], PLTT_SIZE_4BPP);
+        CpuCopy32(gSnowPalette, &gPlttBufferUnfaded[OBJ_PLTT_ID(index)], PLTT_SIZE_4BPP);
 
         sPaletteColorMapTypes = sBasePaletteColorMapTypes;
 
@@ -235,7 +236,7 @@ void SetNextWeather(u8 weather)
 
     if (gWeatherPtr->nextWeather != weather && gWeatherPtr->currWeather == weather)
     {
-        sWeatherFuncs[WEATHER_NONE].initVars();
+        sWeatherFuncs[weather].initVars();
     }
 
     gWeatherPtr->weatherChangeComplete = FALSE;
@@ -284,7 +285,7 @@ static void Task_WeatherInit(u8 taskId)
     if (gWeatherPtr->readyForInit)
     {
         UpdateCameraPanning();
-        sWeatherFuncs[WEATHER_NONE].initAll();
+        sWeatherFuncs[gWeatherPtr->currWeather].initAll();
         gTasks[taskId].func = Task_WeatherMain;
     }
 }
@@ -293,11 +294,11 @@ static void Task_WeatherMain(u8 taskId)
 {
     if (gWeatherPtr->currWeather != gWeatherPtr->nextWeather)
     {
-        if (!sWeatherFuncs[WEATHER_NONE].finish()
+        if (!sWeatherFuncs[gWeatherPtr->nextWeather].finish()
             && gWeatherPtr->palProcessingState != WEATHER_PAL_STATE_SCREEN_FADING_OUT)
         {
             // Finished cleaning up previous weather. Now transition to next weather.
-            sWeatherFuncs[WEATHER_NONE].initVars();
+            sWeatherFuncs[gWeatherPtr->nextWeather].initVars();
             gWeatherPtr->colorMapStepCounter = 0;
             gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_CHANGING_WEATHER;
             gWeatherPtr->currWeather = gWeatherPtr->nextWeather;
@@ -307,7 +308,7 @@ static void Task_WeatherMain(u8 taskId)
     }
     else
     {
-        sWeatherFuncs[WEATHER_NONE].main();
+        sWeatherFuncs[gWeatherPtr->currWeather].main();
     }
 
     gWeatherPalStateFuncs[gWeatherPtr->palProcessingState]();

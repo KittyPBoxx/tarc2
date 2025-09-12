@@ -61,7 +61,6 @@ void InitMap(void)
 {
     InitMapLayoutData(&gMapHeader);
     RunOnLoadMapScript();
-    //EnableInterrupts(INTR_FLAG_HBLANK);
 }
 
 static void InitMapLayoutData(struct MapHeader *mapHeader)

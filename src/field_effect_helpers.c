@@ -354,13 +354,22 @@ u32 FldEff_Shadow(void)
     if (spriteId != MAX_SPRITES)
     {
         // SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(8, 12));
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(12, 4));
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_BLEND;
         gSprites[spriteId].coordOffsetEnabled = TRUE;
         gSprites[spriteId].sLocalId = gFieldEffectArguments[0];
         gSprites[spriteId].sMapNum = gFieldEffectArguments[1];
         gSprites[spriteId].sMapGroup = gFieldEffectArguments[2];
         #if OW_LARGE_OW_SUPPORT
-        gSprites[spriteId].sYOffset = gShadowVerticalOffsets[graphicsInfo->shadowSize];
+        if (gObjectEvents[objectEventId].isPlayer)
+        {
+            gSprites[spriteId].sYOffset = gShadowVerticalOffsets[graphicsInfo->shadowSize] + 2;
+        }
+        else 
+        {
+            gSprites[spriteId].sYOffset = gShadowVerticalOffsets[graphicsInfo->shadowSize];
+        }
+        
         #else
         gSprites[spriteId].sYOffset = (graphicsInfo->height >> 1) - gShadowVerticalOffsets[graphicsInfo->shadowSize];
         #endif

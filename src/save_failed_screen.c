@@ -423,8 +423,13 @@ void CB2_TestResultCallback(void)
     static const u8 disclaimer[] =_("{COLOR DARK_GRAY}This mini-hack was for a jam themed on\n'Myths'. It should NOT be distributed for\nprofit or as a ROM file!");
     SaveFailedScreenTextPrint(disclaimer, 1, 1);
 
-    u8 passed = ACC_TEST_COUNT - gTestResult;
-    SaveFailedScreenTextPrint(deviceAccuracyStrings[passed], 1, 9);
+    // If it wrote random data to the test ram addr then just mark it as bad <--- based on a true story
+    if (gTestResult > ACC_TEST_COUNT)
+    {
+        gTestResult = 0;
+    }
+
+    SaveFailedScreenTextPrint(deviceAccuracyStrings[gTestResult], 1, 9);
 
 
     static const u8 continueMessage[] =_("{COLOR DARK_GRAY}Press {START_BUTTON} to continue...");

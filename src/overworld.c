@@ -62,6 +62,7 @@
 #include "constants/weather.h"
 #include "constants/game_stat.h"
 #include "map_preview_screen.h"
+#include "palette_effects.h"
 
 
 STATIC_ASSERT((B_FLAG_FOLLOWERS_DISABLED == 0 || OW_FOLLOWERS_ENABLED), FollowersFlagAssignedWithoutEnablingThem);
@@ -1732,6 +1733,7 @@ static void InitOverworldGraphicsRegisters(void)
     ShowBg(2);
     ShowBg(3);
     InitFieldMessageBox();
+    ResumeMapPaletteEffects();
 }
 
 static void ResumeMap(bool32 a1)
@@ -1751,7 +1753,6 @@ static void ResumeMap(bool32 a1)
     if (!a1)
         SetUpFieldTasks();
     RunOnResumeMapScript();
-    TryStartMirageTowerPulseBlendEffect();
 }
 
 static void InitObjectEventsLocal(void)

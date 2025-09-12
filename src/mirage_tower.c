@@ -270,11 +270,6 @@ void ClearMirageTowerPulseBlend(void)
     sMirageTowerPulseBlend = NULL;
 }
 
-void TryStartMirageTowerPulseBlendEffect(void)
-{
-    // TODO: remove
-}
-
 void ClearMirageTowerPulseBlendEffect(void)
 {
     // TODO: remove
