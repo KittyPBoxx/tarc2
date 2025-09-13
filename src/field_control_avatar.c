@@ -198,7 +198,7 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
     SetDirectionFromHeldKeys(heldKeys);
     input->dpadDirection = sCurrentDirection;
 
-    if(DEBUG_OVERWORLD_MENU && !DEBUG_OVERWORLD_IN_MENU)
+    if(DEBUG_OVERWORLD_MENU)
     {
         if ((heldKeys & DEBUG_OVERWORLD_HELD_KEYS) && input->DEBUG_OVERWORLD_TRIGGER_EVENT)
         {
@@ -278,11 +278,14 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
         return TRUE;
     }
 
-    if (input->pressedSelectButton && UseRegisteredKeyItemOnField() == TRUE)
+    if (input->pressedSelectButton && !ForestMapPreviewScreenIsRunning())
+    {
+        PlaySE(SE_WIN_OPEN);
+        ShowWarpMenu();
         return TRUE;
+    }
 
-
-    if(input->input_field_1_2 && DEBUG_OVERWORLD_MENU && !DEBUG_OVERWORLD_IN_MENU)
+    if(input->input_field_1_2 && DEBUG_OVERWORLD_MENU)
     {
         PlaySE(SE_WIN_OPEN);
         FreezeObjectEvents();

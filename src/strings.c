@@ -902,7 +902,6 @@ const u8 gText_Day[] = _("DAY");
 const u8 gText_Colon3[] = _(":");
 const u8 gText_Confirm2[] = _("CONFIRM");
 const u8 gText_MenuPokedex[] = _("POKéDEX");
-const u8 gText_MenuPokemon[] = _("POKéMON");
 const u8 gText_MenuPokenav[] = _("POKéNAV");
 const u8 gText_MenuPlayer[] = _("{PLAYER}");
 const u8 gText_MenuSave[] = _("SAVE");

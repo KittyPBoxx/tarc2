@@ -1105,6 +1105,7 @@ static u8 InitMenu(u8 windowId, u8 fontId, u8 left, u8 top, u8 cursorHeight, u8 
         LoadSpriteSheet(&sSpriteSheet_Cursor);
         LoadSpritePalette(&sSpritePal_Cursor);
         sMenu.cursorSpriteId = CreateSprite(&sSpriteTemplate_Cursor, x, y, 3);
+        gSprites[sMenu.cursorSpriteId].oam.matrixNum = 4;
         gSprites[sMenu.cursorSpriteId].data[0] = CreateComfyAnim_Spring(&yTranslateConfig);
     }
 

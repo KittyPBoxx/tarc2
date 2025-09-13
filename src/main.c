@@ -500,28 +500,28 @@ static inline uint32_t fast_hash32(uint32_t x)
 //     }
 // }
 
-#define PALETTE_ROTATE_INTERVAL 5  // change speed: lower = faster
-#define ROTATE_LEN 6              // number of palette entries to rotate
+#define ROTATE_LEN 6 // number of palette entries to rotate
 
 static inline void RotateObjPalette0(void)
 {
     volatile u16 *pal0 = (volatile u16 *)OBJ_PLTT;  // OBJ palette slot 0
 
-    // extract the colors you want to rotate
-    u16 temp[ROTATE_LEN];
-    for (int i = 0; i < ROTATE_LEN; i++)
-        temp[i] = pal0[i + 1];  // indices 1–7
+    // Div 5, but like, in a way that won't suck if they leave the gba on for a long time
+    uint64_t temp = (uint64_t)gMain.vblankCounter1 * 0xCCCCCCCDULL;
+    int offset = temp >> 34;
 
-    // compute offset without %
-    int offset = gMain.vblankCounter1 / PALETTE_ROTATE_INTERVAL;
     while (offset >= ROTATE_LEN)
         offset -= ROTATE_LEN;
 
-    // write rotated colors back
-    for (int i = 0; i < ROTATE_LEN; i++) {
-        int j = i + offset;
-        if (j >= ROTATE_LEN) j -= ROTATE_LEN;  // wraparound
-        pal0[i + 1] = temp[j];
+    if (offset == 0)
+        return;
+
+    for (int o = 0; o < offset; o++)
+    {
+        u16 temp = pal0[1];  // store first element
+        for (int i = 1; i < ROTATE_LEN; i++)
+            pal0[i] = pal0[i + 1];  // shift left
+        pal0[ROTATE_LEN] = temp;  // put first element at end
     }
 }
 

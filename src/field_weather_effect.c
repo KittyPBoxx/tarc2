@@ -980,7 +980,7 @@ static void InitSnowflakeSpriteMovement(struct Sprite *sprite)
     sprite->tFallCounter = 0;
 
     sprite->oam.affineMode = ST_OAM_AFFINE_NORMAL;
-    sprite->oam.matrixNum = 2 + gWeatherPtr->snowflakeSpriteCount;
+    sprite->oam.matrixNum = 6 + gWeatherPtr->snowflakeSpriteCount; // there are 31 maxtracies available, we use 24 for different petal sprites 
 }
 
 static void UNUSED WaitSnowflakeSprite(struct Sprite *sprite)

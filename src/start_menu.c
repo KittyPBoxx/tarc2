@@ -36,15 +36,34 @@
 #include "wild_encounter.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "constants/maps.h"
+#include "palette_effects.h"
+
+enum 
+{
+    MENU_TYPE_START,
+    MENU_TYPE_WARP
+};
 
 // Menu actions
 enum
 {
-    MENU_ACTION_POKEMON,
+    // Main actions
     MENU_ACTION_SAVE,
+    MENU_ACTION_LOAD,
     MENU_ACTION_OPTION,
-    MENU_ACTION_EXIT,
-    MENU_ACTION_DEBUG,
+    
+    // Warp actions
+    MENU_ACTION_BRIDGE,
+    MENU_ACTION_MANOR,
+    MENU_ACTION_FOREST,
+    MENU_ACTION_CAVE_F1,
+    MENU_ACTION_CAVE_F2,
+    MENU_ACTION_SUMMIT,
+    MENU_ACTION_PASS,
+
+    // Exit
+    MENU_ACTION_EXIT
 };
 
 // Save status
@@ -63,7 +82,7 @@ COMMON_DATA bool8 (*gMenuCallback)(void) = NULL;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
 EWRAM_DATA static u8 sNumStartMenuActions = 0;
 EWRAM_DATA static u8 sCurrentStartMenuActions[9] = {0};
-EWRAM_DATA static s8 sInitStartMenuData[2] = {0};
+EWRAM_DATA static s8 sInitStartMenuData[3] = {0};
 
 EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
 EWRAM_DATA static u8 sSaveDialogTimer = 0;
@@ -71,16 +90,27 @@ EWRAM_DATA static bool8 sSavingComplete = FALSE;
 EWRAM_DATA static u8 sSaveInfoWindowId = 0;
 
 // Menu action callbacks
-static bool8 StartMenuPokemonCallback(void);
 static bool8 StartMenuSaveCallback(void);
+static bool8 StartMenuLoadCallback(void);
 static bool8 StartMenuOptionCallback(void);
 static bool8 StartMenuExitCallback(void);
-static bool8 StartMenuDebugCallback(void);
 
 // Menu callbacks
 static bool8 SaveStartCallback(void);
 static bool8 SaveCallback(void);
 static bool8 HandleStartMenuInput(void);
+static bool8 LoadStartCallback(void);
+static bool8 LoadCallback(void);
+
+// Warp callbacks
+static bool8 WarpMenuGenericCallback(u8 map);
+static bool8 WarpMenuBridgeCallback(void);
+static bool8 WarpMenuManorCallback(void);
+static bool8 WarpMenuForestCallback(void);
+static bool8 WarpMenuCaveF1Callback(void);
+static bool8 WarpMenuCaveF2Callback(void);
+static bool8 WarpMenuSummitCallback(void);
+static bool8 WarpMenuPassCallback(void);
 
 // Save dialog callbacks
 static u8 SaveConfirmSaveCallback(void);
@@ -112,42 +142,34 @@ static const struct WindowTemplate sWindowTemplate_SafariBalls = {
     .baseBlock = 0x8
 };
 
-static const u8 sText_MenuDebug[] = _("DEBUG");
+static const u8 sText_MenuLoad[] = _("LOAD");
+
+static const u8 sText_WarpBridge[] = _("Bridge");
+static const u8 sText_WarpManor[] = _("Manor");
+static const u8 sText_WarpForest[] = _("Forest");
+static const u8 sText_WarpCaveF1[] = _("Cave F1");
+static const u8 sText_WarpCaveF2[] = _("Cave F2");
+static const u8 sText_WarpSummit[] = _("Summit");
+static const u8 sText_WarpPass[] = _("Pass");
 
 static const struct MenuAction sStartMenuItems[] =
 {
-    [MENU_ACTION_POKEMON]         = {gText_MenuPokemon, {.u8_void = StartMenuPokemonCallback}},
+    // Menu Actions
     [MENU_ACTION_SAVE]            = {gText_MenuSave,    {.u8_void = StartMenuSaveCallback}},
+    [MENU_ACTION_LOAD]            = {sText_MenuLoad,    {.u8_void = StartMenuLoadCallback}},
     [MENU_ACTION_OPTION]          = {gText_MenuOption,  {.u8_void = StartMenuOptionCallback}},
+    
+    // Warp Actions
+    [MENU_ACTION_BRIDGE]          = {sText_WarpBridge,  {.u8_void = WarpMenuBridgeCallback}},
+    [MENU_ACTION_MANOR]           = {sText_WarpManor,   {.u8_void = WarpMenuManorCallback}},
+    [MENU_ACTION_FOREST]          = {sText_WarpForest,  {.u8_void = WarpMenuForestCallback}},
+    [MENU_ACTION_CAVE_F1]         = {sText_WarpCaveF1,  {.u8_void = WarpMenuCaveF1Callback}},
+    [MENU_ACTION_CAVE_F2]         = {sText_WarpCaveF2,  {.u8_void = WarpMenuCaveF2Callback}},
+    [MENU_ACTION_SUMMIT]          = {sText_WarpSummit,  {.u8_void = WarpMenuSummitCallback}},
+    [MENU_ACTION_PASS]            = {sText_WarpPass,    {.u8_void = WarpMenuPassCallback}},
+    
+    // Exit
     [MENU_ACTION_EXIT]            = {gText_MenuExit,    {.u8_void = StartMenuExitCallback}},
-    [MENU_ACTION_DEBUG]           = {sText_MenuDebug,   {.u8_void = StartMenuDebugCallback}},
-};
-
-static const struct BgTemplate sBgTemplates_LinkBattleSave[] =
-{
-    {
-        .bg = 0,
-        .charBaseIndex = 2,
-        .mapBaseIndex = 31,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 0,
-        .baseTile = 0
-    }
-};
-
-static const struct WindowTemplate sWindowTemplates_LinkBattleSave[] =
-{
-    {
-        .bg = 0,
-        .tilemapLeft = 2,
-        .tilemapTop = 15,
-        .width = 26,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 0x194
-    },
-    DUMMY_WIN_TEMPLATE
 };
 
 static const struct WindowTemplate sSaveInfoWindowTemplate = {
@@ -164,12 +186,13 @@ static const struct WindowTemplate sSaveInfoWindowTemplate = {
 static void BuildStartMenuActions(void);
 static void AddStartMenuAction(u8 action);
 static void BuildNormalStartMenu(void);
-static void BuildDebugStartMenu(void);
-static void RemoveExtraStartMenuWindows(void);
+static void BuildWarpMenuActions(void);
+static void BuildWarpMenu(void);
+
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count);
 static bool32 InitStartMenuStep(void);
 static void InitStartMenu(void);
-static void CreateStartMenuTask(TaskFunc followupFunc);
+static void CreateStartMenuTask(TaskFunc followupFunc, u8 menuType);
 static void InitSave(void);
 static u8 RunSaveCallback(void);
 static void ShowSaveMessage(const u8 *message, u8 (*saveCallback)(void));
@@ -181,16 +204,17 @@ static bool8 SaveErrorTimer(void);
 static void ShowSaveInfoWindow(void);
 static void RemoveSaveInfoWindow(void);
 static void HideStartMenuWindow(void);
-static void HideStartMenuDebug(void);
 
 static void BuildStartMenuActions(void)
 {
     sNumStartMenuActions = 0;
+    BuildNormalStartMenu();
+}
 
-    if (DEBUG_OVERWORLD_MENU == TRUE && DEBUG_OVERWORLD_IN_MENU == TRUE)
-        BuildDebugStartMenu();
-    else
-        BuildNormalStartMenu();
+static void BuildWarpMenuActions(void)
+{
+    sNumStartMenuActions = 0;
+    BuildWarpMenu();
 }
 
 static void AddStartMenuAction(u8 action)
@@ -201,19 +225,21 @@ static void AddStartMenuAction(u8 action)
 static void BuildNormalStartMenu(void)
 {
     AddStartMenuAction(MENU_ACTION_SAVE);
+    AddStartMenuAction(MENU_ACTION_LOAD);
     AddStartMenuAction(MENU_ACTION_OPTION);
     AddStartMenuAction(MENU_ACTION_EXIT);
 }
 
-static void BuildDebugStartMenu(void)
+static void BuildWarpMenu(void)
 {
-    AddStartMenuAction(MENU_ACTION_DEBUG);
-    AddStartMenuAction(MENU_ACTION_SAVE);
-    AddStartMenuAction(MENU_ACTION_OPTION);
-}
-
-static void RemoveExtraStartMenuWindows(void)
-{
+    AddStartMenuAction(MENU_ACTION_EXIT);
+    AddStartMenuAction(MENU_ACTION_BRIDGE);
+    AddStartMenuAction(MENU_ACTION_MANOR);
+    AddStartMenuAction(MENU_ACTION_FOREST);
+    AddStartMenuAction(MENU_ACTION_CAVE_F1);
+    AddStartMenuAction(MENU_ACTION_CAVE_F2);
+    AddStartMenuAction(MENU_ACTION_SUMMIT);
+    AddStartMenuAction(MENU_ACTION_PASS);
 }
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
@@ -250,7 +276,14 @@ static bool32 InitStartMenuStep(void)
         sInitStartMenuData[0]++;
         break;
     case 1:
-        BuildStartMenuActions();
+        if (sInitStartMenuData[2] == MENU_TYPE_WARP)
+        {
+            BuildWarpMenuActions();
+        }
+        else
+        {
+            BuildStartMenuActions();
+        }
         sInitStartMenuData[0]++;
         break;
     case 2:
@@ -289,12 +322,13 @@ static void StartMenuTask(u8 taskId)
         SwitchTaskToFollowupFunc(taskId);
 }
 
-static void CreateStartMenuTask(TaskFunc followupFunc)
+static void CreateStartMenuTask(TaskFunc followupFunc, u8 menuType)
 {
     u8 taskId;
 
     sInitStartMenuData[0] = 0;
     sInitStartMenuData[1] = 0;
+    sInitStartMenuData[2] = menuType;
     taskId = CreateTask(StartMenuTask, 0x50);
     SetTaskFuncWithFollowupFunc(taskId, StartMenuTask, followupFunc);
 }
@@ -339,7 +373,16 @@ void ShowStartMenu(void)
     FreezeObjectEvents();
     PlayerFreeze();
     StopPlayerAvatar();
-    CreateStartMenuTask(Task_ShowStartMenu);
+    CreateStartMenuTask(Task_ShowStartMenu, MENU_TYPE_START);
+    LockPlayerFieldControls();
+}
+
+void ShowWarpMenu(void)
+{
+    FreezeObjectEvents();
+    PlayerFreeze();
+    StopPlayerAvatar();
+    CreateStartMenuTask(Task_ShowStartMenu, MENU_TYPE_WARP);
     LockPlayerFieldControls();
 }
 
@@ -363,9 +406,12 @@ static bool8 HandleStartMenuInput(void)
 
         gMenuCallback = sStartMenuItems[sCurrentStartMenuActions[sStartMenuCursorPos]].func.u8_void;
 
-        if (gMenuCallback != StartMenuSaveCallback
-            && gMenuCallback != StartMenuExitCallback
-            && gMenuCallback != StartMenuDebugCallback)
+        if (gMenuCallback != StartMenuSaveCallback && gMenuCallback != StartMenuExitCallback)
+        {
+           FadeScreen(FADE_TO_BLACK, 0);
+        }
+
+        if (gMenuCallback != StartMenuLoadCallback && gMenuCallback != StartMenuExitCallback)
         {
            FadeScreen(FADE_TO_BLACK, 0);
         }
@@ -373,25 +419,9 @@ static bool8 HandleStartMenuInput(void)
         return FALSE;
     }
 
-    if (JOY_NEW(START_BUTTON | B_BUTTON))
+    if (JOY_NEW(START_BUTTON | B_BUTTON | SELECT_BUTTON))
     {
-        RemoveExtraStartMenuWindows();
         HideStartMenu();
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
-static bool8 StartMenuPokemonCallback(void)
-{
-    if (!gPaletteFade.active)
-    {
-        PlayRainStoppingSoundEffect();
-        RemoveExtraStartMenuWindows();
-        CleanupOverworldWindowsAndTilemaps();
-        SetMainCallback2(CB2_PartyMenuFromStartMenu); // Display party menu
-
         return TRUE;
     }
 
@@ -401,7 +431,12 @@ static bool8 StartMenuPokemonCallback(void)
 static bool8 StartMenuSaveCallback(void)
 {
     gMenuCallback = SaveStartCallback; // Display save menu
+    return FALSE;
+}
 
+static bool8 StartMenuLoadCallback(void)
+{
+    gMenuCallback = LoadStartCallback; // Display save menu
     return FALSE;
 }
 
@@ -410,8 +445,8 @@ static bool8 StartMenuOptionCallback(void)
     if (!gPaletteFade.active)
     {
         PlayRainStoppingSoundEffect();
-        RemoveExtraStartMenuWindows();
         CleanupOverworldWindowsAndTilemaps();
+        HideStartMenuWindow();
         SetMainCallback2(CB2_InitOptionMenu); // Display option menu
         gMain.savedCallback = CB2_ReturnToFieldWithOpenMenu;
 
@@ -423,38 +458,21 @@ static bool8 StartMenuOptionCallback(void)
 
 static bool8 StartMenuExitCallback(void)
 {
-    RemoveExtraStartMenuWindows();
     HideStartMenu(); // Hide start menu
-
     return TRUE;
-}
-
-static bool8 StartMenuDebugCallback(void)
-{
-    RemoveExtraStartMenuWindows();
-    HideStartMenuDebug(); // Hide start menu without enabling movement
-
-    if (DEBUG_OVERWORLD_MENU)
-    {
-        FreezeObjectEvents();
-        Debug_ShowMainMenu();
-    }
-
-return TRUE;
-}
-
-static void HideStartMenuDebug(void)
-{
-    PlaySE(SE_SELECT);
-    ClearStdWindowAndFrame(GetStartMenuWindowId(), TRUE);
-    RemoveStartMenuWindow();
 }
 
 static bool8 SaveStartCallback(void)
 {
     InitSave();
     gMenuCallback = SaveCallback;
+    return FALSE;
+}
 
+static bool8 LoadStartCallback(void)
+{
+    InitSave();
+    gMenuCallback = LoadCallback;
     return FALSE;
 }
 
@@ -479,6 +497,103 @@ static bool8 SaveCallback(void)
 
     return FALSE;
 }
+
+static bool8 LoadCallback(void)
+{
+    return FALSE;
+}
+
+// static void DebugLogWindows(void)
+// {
+//     for (int i = 0; i < WINDOWS_MAX; i++)
+//     {
+//         struct Window *w = &gWindows[i];
+//         if (w->tileData != NULL) // only log active windows
+//         {
+//             DebugPrintfLevel(MGBA_LOG_ERROR, "Win %x: bg=%x pos=(%x,%x) size=%xx%x baseBlock=0x%x tileData=%x\n",
+//                         i, w->window.bg, w->window.tilemapLeft, w->window.tilemapTop,
+//                         w->window.width, w->window.height,
+//                         w->window.baseBlock, w->tileData);
+//         }
+//     }
+// }
+
+
+static bool8 WarpMenuGenericCallback(u8 map)
+{
+    switch(map)
+    {
+        case MAP_BRIDGE:
+            SetWarpDestination(MAP_GROUP(MAP_BRIDGE),MAP_NUM(MAP_BRIDGE),0,10,9);
+            break;
+        case MAP_MANOR:
+            SetWarpDestination(MAP_GROUP(MAP_MANOR),MAP_NUM(MAP_MANOR),0,10,9);
+            break;
+        case MAP_FOREST:
+            SetWarpDestination(MAP_GROUP(MAP_FOREST),MAP_NUM(MAP_FOREST),0,10,9);
+            break;
+        case MAP_CAVE_BOTTOM:
+            SetWarpDestination(MAP_GROUP(MAP_CAVE_BOTTOM),MAP_NUM(MAP_CAVE_BOTTOM),0,10,9);
+            break;
+        case MAP_CAVE_TOP:
+            SetWarpDestination(MAP_GROUP(MAP_CAVE_TOP),MAP_NUM(MAP_CAVE_TOP),0,10,9);
+            break;
+        case MAP_SUMMIT:
+            SetWarpDestination(MAP_GROUP(MAP_SUMMIT),MAP_NUM(MAP_SUMMIT),0,10,9);
+            break;
+        case MAP_RETURN_PASS:
+            SetWarpDestination(MAP_GROUP(MAP_RETURN_PASS),MAP_NUM(MAP_RETURN_PASS),0,10,9);
+            break;
+        default:
+            SetWarpDestination(MAP_GROUP(MAP_BRIDGE),MAP_NUM(MAP_BRIDGE),0,10,9);
+    }
+
+    //DebugLogWindows();
+    FreeAllWindowBuffers();
+    CleanupOverworldWindowsAndTilemaps();
+    PauseMapPaletteEffects();
+    DisableInterrupts(INTR_FLAG_HBLANK);
+    HideStartMenuWindow();
+    DoTeleportTileWarp();
+
+    return TRUE;
+}
+
+static bool8 WarpMenuBridgeCallback(void) 
+{
+    return WarpMenuGenericCallback(MAP_BRIDGE);
+}
+
+static bool8 WarpMenuManorCallback(void) 
+{
+    return WarpMenuGenericCallback(MAP_MANOR);
+}
+
+static bool8 WarpMenuForestCallback(void) 
+{
+    return WarpMenuGenericCallback(MAP_FOREST);
+}
+
+static bool8 WarpMenuCaveF1Callback(void) 
+{
+    return WarpMenuGenericCallback(MAP_CAVE_BOTTOM);
+}
+
+static bool8 WarpMenuCaveF2Callback(void) 
+{
+    return WarpMenuGenericCallback(MAP_CAVE_TOP);
+}
+
+static bool8 WarpMenuSummitCallback(void) 
+{
+    return WarpMenuGenericCallback(MAP_SUMMIT);
+}
+
+static bool8 WarpMenuPassCallback(void) 
+{
+    return WarpMenuGenericCallback(MAP_RETURN_PASS);
+}
+
 
 static void InitSave(void)
 {
