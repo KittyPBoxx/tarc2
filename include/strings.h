@@ -228,6 +228,7 @@ extern const u8 gText_MenuOptionExit[];
 
 // save menu texts
 extern const u8 gText_ConfirmSave[];
+extern const u8 gText_ConfirmLoad[];
 extern const u8 gText_DifferentSaveFile[];
 extern const u8 gText_AlreadySavedFile[];
 extern const u8 gText_SavingDontTurnOff[];

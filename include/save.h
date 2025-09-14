@@ -27,11 +27,10 @@ enum
 };
 
 #define FRAM_BASE   ((vu8*)0x0E000000)
-#define FRAM_SIZE   0x2000  // 8kb is the smallest save chip that actually works. Most emus will create a 32kb file anyway for compatibility 
+#define FRAM_SIZE   0x4000  // 8kb (0x2000) is the smallest save chip that actually works. Most emus will create a 32kb file anyway for compatibility 
 #define GLOBAL_HEADER_SIZE 0x02
 #define GLOBAL_HEADER_ADDR  ((vu8*)FRAM_BASE)
 #define SAVE_SLOT_SIZE   0x100
-#define SAVE_SLOT_COUNT  5
 
 // Fixed field offsets, relative to slot base
 #define SLOT_OFF_NAME            (SAVE_HEADER_SIZE + 0x00)
@@ -67,8 +66,12 @@ enum
     SAVE_AUTO_2,
     SAVE_MANUAL_1,
     SAVE_MANUAL_2,
-    SAVE_MANUAL_3
+    SAVE_MANUAL_3,
+    SAVE_MANUAL_4,
+    SAVE_SLOT_COUNT
 };
+
+#define LAST_SAVED_SLOT 0xFF
 
 typedef struct {
     u8 lastAutosaveSlot;
@@ -97,8 +100,10 @@ extern void (*gGameContinueCallback)(void);
 void ClearSaveData(void);
 void ClearSaveSlot(u8 slotId);
 
-u8 TrySavingData(u8 saveType);
-u8 LoadGameSave(u8 saveType);
+u8 TrySavingData(u8 saveType, u8 slot);
+u8 LoadGameSave(u8 saveType, u8 slotId);
+bool8 SlotIsValid(u8 slotId);
+void CopyPreviewDataToBuffer(u8 slot, u8 textId, u8 *dest);
 
 u16 GetSaveBlocksPointersBaseOffset(void); // Always 0
 

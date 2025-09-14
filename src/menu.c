@@ -25,6 +25,7 @@
 #include "sprite.h"
 #include "comfy_anim.h"
 #include "field_mugshot.h"
+#include "save.h"
 
 struct MenuInfoIcon
 {
@@ -1999,7 +2000,6 @@ u8 *GetMapNameGeneric(u8 *dest, u16 mapSecId)
 
 void BufferSaveMenuText(u8 textId, u8 *dest, u8 color)
 {
-    u8 *endOfString;
     u8 *string = dest;
 
     *(string++) = EXT_CTRL_CODE_BEGIN;
@@ -2028,12 +2028,53 @@ void BufferSaveMenuText(u8 textId, u8 *dest, u8 color)
             break;
         case SAVE_MENU_BADGES:
             // TODO: TARC completion percentage
-            *string = 0 + CHAR_0;
-            endOfString = string + 1;
-            *endOfString = EOS;
+            *(string++) = CHAR_0;
+            *(string++) = CHAR_PERCENT;
+            *(string++) = EOS;
             break;
     }
 }
+
+void BufferLoadMenuText(u8 slot, u8 textId, u8 *dest, u8 color)
+{
+    u8 *string = dest;
+    u8 sSavePreviewBuffer[12];
+
+    *(string++) = EXT_CTRL_CODE_BEGIN;
+    *(string++) = EXT_CTRL_CODE_COLOR;
+    *(string++) = color;
+    *(string++) = EXT_CTRL_CODE_BEGIN;
+    *(string++) = EXT_CTRL_CODE_SHADOW;
+    *(string++) = color + 1;
+
+    CopyPreviewDataToBuffer(slot, textId, sSavePreviewBuffer);
+
+    switch (textId)
+    {
+        case SAVE_MENU_NAME:
+            StringCopy(string, sSavePreviewBuffer);
+            break;
+        case SAVE_MENU_CAUGHT:
+            string = ConvertIntToDecimalStringN(string, 1, STR_CONV_MODE_LEFT_ALIGN, 3);
+            *string = EOS;
+            break;
+        case SAVE_MENU_PLAY_TIME:
+            string = ConvertIntToDecimalStringN(string, sSavePreviewBuffer[0], STR_CONV_MODE_LEFT_ALIGN, 3);
+            *(string++) = CHAR_COLON;
+            ConvertIntToDecimalStringN(string, sSavePreviewBuffer[2], STR_CONV_MODE_LEADING_ZEROS, 2);
+            break;
+        case SAVE_MENU_LOCATION:
+            GetMapNameGeneric(string, MAPSEC_NONE);
+            break;
+        case SAVE_MENU_BADGES:
+            // TODO: TARC completion percentage
+            *(string++) = CHAR_0;
+            *(string++) = CHAR_PERCENT;
+            *(string++) = EOS;
+            break;
+    }
+}
+
 
 // BW map pop-ups
 u8 AddSecondaryPopUpWindow(void)

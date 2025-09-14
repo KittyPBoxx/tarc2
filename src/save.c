@@ -7,11 +7,11 @@
 #include "overworld.h"
 #include "main.h"
 #include "new_game.h"
+#include "menu.h"
 
 COMMON_DATA u16 gSaveFileStatus = 0;
 COMMON_DATA void (*gGameContinueCallback)(void) = NULL;
 
-static bool8 SlotIsValid(u8 slotId);
 bool8 Save_VerifySlot(u8 slotId);
 static u16 Save_CalcChecksum(u8 slotId);
 
@@ -30,9 +30,8 @@ u16 GetSaveBlocksPointersBaseOffset(void)
     return 0;
 }
 
-u8 TrySavingData(u8 saveType)
+u8 TrySavingData(u8 saveType, u8 slotId)
 {
-    u8 slotId;
     GlobalSaveHeader *hdr = (GlobalSaveHeader *)FRAM_BASE;
 
     // Save options into global header
@@ -42,9 +41,6 @@ u8 TrySavingData(u8 saveType)
         u16 *optionsPtr = (u16 *)(base + 1);
         hdr->optionsPacked = *optionsPtr;
     }
-
-    // Pick slot (both cases same for now)
-    slotId = SAVE_MANUAL_1;
 
     // --- Player name ---
     Save_WriteChunk(slotId, SLOT_OFF_NAME, gSaveBlock2Ptr->playerName, SLOT_SZ_NAME);
@@ -98,12 +94,15 @@ u8 TrySavingData(u8 saveType)
 }
 
 
-u8 LoadGameSave(u8 saveType)
+u8 LoadGameSave(u8 saveType, u8 slotId)
 {
-    u8 slotId;
     GlobalSaveHeader *hdr = (GlobalSaveHeader *)FRAM_BASE;
 
-    slotId = hdr->lastSaveSlot;
+    if (slotId == LAST_SAVED_SLOT)
+    {
+        slotId = hdr->lastSaveSlot;
+    }
+
     if (slotId == 0xFF || !SlotIsValid(slotId)) 
     {
         gSaveFileStatus = SAVE_STATUS_EMPTY;
@@ -171,9 +170,31 @@ u8 LoadGameSave(u8 saveType)
     return SAVE_STATUS_OK;
 }
 
+void CopyPreviewDataToBuffer(u8 slot, u8 textId, u8 *dest)
+{
+    switch (textId)
+    {
+        case SAVE_MENU_NAME:
+            Save_ReadChunk(slot, SLOT_OFF_NAME, dest, SLOT_SZ_NAME);
+            break;
+        case SAVE_MENU_PLAY_TIME:
+            Save_ReadChunk(slot, SLOT_OFF_PLAY_H, dest, 2);
+            dest += 2;
+            Save_ReadChunk(slot, SLOT_OFF_PLAY_M, dest, 1);
+            dest += 1;
+            Save_ReadChunk(slot, SLOT_OFF_PLAY_S, dest, 1);
+            dest += 1;
+            Save_ReadChunk(slot, SLOT_OFF_PLAY_VB, dest, 1);
+            break;
+        case SAVE_MENU_CAUGHT:
+        case SAVE_MENU_LOCATION:
+        case SAVE_MENU_BADGES:
+            break;
+    }
+}
 
 
-static bool8 SlotIsValid(u8 slotId)
+bool8 SlotIsValid(u8 slotId)
 {
     SaveSlotHeader hdr;
 

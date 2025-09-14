@@ -41,6 +41,8 @@ const u8 gGameLanguage = GAME_LANGUAGE; // English
 
 const char BuildDateTime[] = "2025 09 28 23:59";
 
+#define RELOAD_OFFSET 31
+
 __attribute__((used))
 static const char sSaveTypeId[] __attribute__((aligned(4))) = "SRAM_V130"; // Some emulators and flash carts will look for magic strings to determain save type 
 
@@ -102,6 +104,7 @@ static void SeedRngWithRtc(void);
 #endif
 static void ReadKeys(void);
 static void CB2_PostSoftResetInit(void);
+static void CB2_PostSoftResetLoadSlotInit(void);
 void InitIntrHandlers(void);
 static void WaitForVBlank(void);
 void EnableVCountIntrAtLine150(void);
@@ -111,7 +114,7 @@ void EnableVCountIntrAtLine150(void);
 static void GamePakCrashHandler(void)
 {
     DebugPrintfLevel(MGBA_LOG_ERROR, "GamePak crash interrupt triggered!");
-    DoSoftReset();
+    ReloadSlot(SAVE_AUTO_1);
 }
 
 void AgbMain(void)
@@ -136,7 +139,7 @@ void AgbMain(void)
     #endif
     #endif
     
-    if (!gSoftResetFlag)
+    if (gSoftResetFlag == 0)
         testLocal = RunAgbAccuracyTests();
 
     m4aSoundInit();
@@ -189,7 +192,11 @@ static void InitMainCallbacks(void)
     gMain.vblankCounter2 = 0;
     gMain.callback1 = NULL;
     
-    if(gSoftResetFlag)
+    if (gSoftResetFlag >= RELOAD_OFFSET)
+    {
+        SetMainCallback2(CB2_PostSoftResetLoadSlotInit);
+    }
+    else if(gSoftResetFlag == 1)
     {
         SetMainCallback2(CB2_PostSoftResetInit);
     }
@@ -440,6 +447,11 @@ for (let row of palettes) {
 console.log("};");
 */
 
+/**
+To whom it may concern, forgive me because I have sinned
+*********************************************************************************
+*/
+
 #define BG_PALETTE ((volatile u16*)0x5000000)
 #define PALETTE_1 0x51 
 #define PALETTE_2 0x52 
@@ -448,20 +460,6 @@ console.log("};");
 #define PALETTE_5 0x55 
 #define PALETTE_6 0x56 
 #define PALETTE_7 0x57
-
-// #define NUM_LINES 160
-// u16 gHBlankGrassPalettes[NUM_LINES][7]; // 7 palettes per line
-
-// 7 palette entries × 7 shades each
-// static const u16 baseColors[7][7] = {
-//     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2},
-//     {0x1629, 0x15a7, 0x0ecd, 0x0b53, 0x1125, 0x0ce3, 0x08a2},
-//     {0x1628, 0x15a7, 0x0ecc, 0x0b51, 0x1124, 0x10e3, 0x0ca2},
-//     {0x1627, 0x15a6, 0x0eca, 0x0b4f, 0x1124, 0x10e3, 0x0ca2},
-//     {0x1626, 0x15a5, 0x0ec9, 0x0b4d, 0x1524, 0x10e3, 0x0ca2},
-//     {0x1625, 0x15a5, 0x0ec7, 0x0b4b, 0x1524, 0x14e3, 0x0ca2},
-//     {0x1a25, 0x19a5, 0x0ec6, 0x0b49, 0x1924, 0x14e3, 0x10a2},
-// };
 
 static const u16 baseColors[7][7] = {
     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2}, 
@@ -476,55 +474,70 @@ static const u16 baseColors[7][7] = {
 static inline uint32_t fast_hash32(uint32_t x)
 {
     x ^= x >> 15;
-    x *= 0x297a2d39;
+    x *= 0x297a2d39; // We specifically DO want a kinda biased hash function for the wavy look https://nullprogram.com/blog/2018/07/31/ 
     x ^= x >> 12;
-   // x *= 0x297a2d39;
-   // x ^= x >> 15;
     return x;
 }
 
-#define NUM_BANDS 8
-#define BAND_SHIFT 3
-
-// #define NUM_LINES 160
-// EWRAM_DATA u16 gHBlankGrassPalettes[NUM_LINES][7]; // 7 palettes per line
-
-// static void PrecomputeGrassPalette(void)
-// {
-//     for (u16 line = 0; line < NUM_LINES; line++)
-//     {
-//         for (int i = 0; i < 7; i++)
-//         {
-//             gHBlankGrassPalettes[line][i] = baseColors[fast_hash32(line + i) & 0x6][i];
-//         }
-//     }
-// }
-
+// I'm not really doing palette cycling justice. I recommend this https://www.youtube.com/watch?v=aMcJ1Jvtef0
 #define ROTATE_LEN 6 // number of palette entries to rotate
-
+EWRAM_DATA u32 sPalRotationCounter; // the "offset -= ROTATE_LEN;" while loop is a hack that would lag the game over time without this second hack #FIXED 
 static inline void RotateObjPalette0(void)
 {
     volatile u16 *pal0 = (volatile u16 *)OBJ_PLTT;  // OBJ palette slot 0
 
-    // Div 5, but like, in a way that won't suck if they leave the gba on for a long time
-    uint64_t temp = (uint64_t)gMain.vblankCounter1 * 0xCCCCCCCDULL;
-    int offset = temp >> 34;
+    // Div 5, but like, in a way that won't suck that much but still kind of sucks
+    u64 temp = (u64)sPalRotationCounter * 0xCCCCCCCDULL;
+    u32 offset = temp >> 34;
 
-    while (offset >= ROTATE_LEN)
+    while (offset >= ROTATE_LEN) 
         offset -= ROTATE_LEN;
 
     if (offset == 0)
         return;
 
-    for (int o = 0; o < offset; o++)
+    for (u32 j = 0; j < offset; j++)
     {
-        u16 temp = pal0[1];  // store first element
+        u16 temp = pal0[1]; 
         for (int i = 1; i < ROTATE_LEN; i++)
-            pal0[i] = pal0[i + 1];  // shift left
-        pal0[ROTATE_LEN] = temp;  // put first element at end
+            pal0[i] = pal0[i + 1];  
+        pal0[ROTATE_LEN] = temp;
     }
 }
 
+static inline void applyVBlankPaletteModifiers()
+{
+    sPalRotationCounter++;
+    if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS) // This is the petals not the grass
+    {    
+        RotateObjPalette0();    
+    }
+    if (sPalRotationCounter > 1000)
+    {
+        sPalRotationCounter = 0;
+    }
+}
+
+static inline void applyHBlankPaletteModifiers()
+{
+    // This is all super time sensitive. It must be inlined and I suspect only works because of the prefetch buffer 
+    // TODO: this probably needs to be a lookup table for performance in rom. If that's still to slow, a lookup table we copy into Iwram during the vbalank
+    if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS)
+    {
+        u16 line = REG_VCOUNT + gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
+        BG_PALETTE[PALETTE_1] = baseColors[fast_hash32(line + 0) & 0x6][0];
+        BG_PALETTE[PALETTE_2] = baseColors[fast_hash32(line + 1) & 0x6][1];
+        BG_PALETTE[PALETTE_3] = baseColors[fast_hash32(line + 2) & 0x6][2];
+        BG_PALETTE[PALETTE_4] = baseColors[fast_hash32(line + 3) & 0x6][3];
+        BG_PALETTE[PALETTE_5] = baseColors[fast_hash32(line + 4) & 0x6][4];
+        BG_PALETTE[PALETTE_6] = baseColors[fast_hash32(line + 5) & 0x6][5];
+        BG_PALETTE[PALETTE_7] = baseColors[fast_hash32(line + 6) & 0x6][6];
+    }
+}
+
+/**
+*********************************************************************************
+*/
 
 static void VBlankIntr(void)
 {
@@ -545,10 +558,7 @@ static void VBlankIntr(void)
     if (!gTestRunnerEnabled && (!gMain.inBattle || !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_RECORDED))))
         AdvanceRandom();
 
-    if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS)
-    {    
-        RotateObjPalette0();    
-    }
+    applyVBlankPaletteModifiers();
 
     INTR_CHECK |= INTR_FLAG_VBLANK;
     gMain.intrCheck |= INTR_FLAG_VBLANK;
@@ -556,19 +566,7 @@ static void VBlankIntr(void)
 
 static void HBlankIntr(void)
 {
-    // This is all super time sensitive. It must be inlined and I suspect only works because of the prefetch buffer 
-    // TODO: this probably needs to be a lookup table for performance in rom. If that's still to slow, a lookup table we copy into Iwram during the vbalank
-    if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS)
-    {
-        u16 line = REG_VCOUNT + gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
-        BG_PALETTE[PALETTE_1] = baseColors[fast_hash32(line + 0) & 0x6][0];
-        BG_PALETTE[PALETTE_2] = baseColors[fast_hash32(line + 1) & 0x6][1];
-        BG_PALETTE[PALETTE_3] = baseColors[fast_hash32(line + 2) & 0x6][2];
-        BG_PALETTE[PALETTE_4] = baseColors[fast_hash32(line + 3) & 0x6][3];
-        BG_PALETTE[PALETTE_5] = baseColors[fast_hash32(line + 4) & 0x6][4];
-        BG_PALETTE[PALETTE_6] = baseColors[fast_hash32(line + 5) & 0x6][5];
-        BG_PALETTE[PALETTE_7] = baseColors[fast_hash32(line + 6) & 0x6][6];
-    }
+    applyHBlankPaletteModifiers();
 
     if (gMain.hblankCallback)
         gMain.hblankCallback();
@@ -632,6 +630,29 @@ void DoSoftReset(void)
     SoftReset(RESET_ALL & ~RESET_EWRAM); // Do not reset EWRAM so the code isnt destroyed
 }
 
+/**
+* This is a softreset except we control which slot we load back into 
+*/
+void ReloadSlot(u8 slot)
+{
+    u32 value = RELOAD_OFFSET + slot;
+    REG_IME = 0;
+    m4aSoundVSyncOff();
+    ScanlineEffect_Stop();
+    DmaStop(1);
+    DmaStop(2);
+    DmaStop(3);
+    SiiRtcProtect();
+    *(vu32 *)0x2000000 = 0xE59F000C; 
+    *(vu32 *)0x2000004 = 0xE3A01000 | value; 
+    *(vu32 *)0x2000008 = 0xE5C01000; 
+    *(vu32 *)0x200000C = 0xE3A00302; 
+    *(vu32 *)0x2000010 = 0xE12FFF10; 
+    *(vu32 *)0x2000014 = 0x03007FFA; 
+    *(vu8 *)0x3007FFA = value; 
+    SoftReset(RESET_ALL & ~RESET_EWRAM); 
+}
+
 void ClearPokemonCrySongs(void)
 {
     CpuFill16(0, gPokemonCrySongs, MAX_POKEMON_CRIES * sizeof(struct PokemonCrySong));
@@ -642,8 +663,26 @@ static void CB2_PostSoftResetInit(void)
     gSoftResetFlag = 0;
 
     SetSaveBlocksPointers(GetSaveBlocksPointersBaseOffset());
-    LoadGameSave(SAVE_NORMAL);
+    LoadGameSave(SAVE_NORMAL, LAST_SAVED_SLOT);
     SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
     SetMainCallback2(CB2_InitMainMenu);
 }
 
+static void CB2_PostSoftResetLoadSlotInit()
+{
+    u8 slot = gSoftResetFlag - RELOAD_OFFSET;
+
+    if (slot > SAVE_SLOT_COUNT)
+    {
+        slot = LAST_SAVED_SLOT;
+    }
+
+    gSoftResetFlag = 0;
+
+    DebugPrintfLevel(MGBA_LOG_ERROR, "CB2_PostSoftResetLoadSlotInit");
+
+    SetSaveBlocksPointers(GetSaveBlocksPointersBaseOffset());
+    LoadGameSave(SAVE_NORMAL, slot);
+    SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
+    SetMainCallback2(CB2_ContinueSavedGame);
+}

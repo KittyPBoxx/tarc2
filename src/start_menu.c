@@ -42,7 +42,9 @@
 enum 
 {
     MENU_TYPE_START,
-    MENU_TYPE_WARP
+    MENU_TYPE_WARP,
+    MENU_TYPE_SAVE,
+    MENU_TYPE_LOAD
 };
 
 // Menu actions
@@ -52,6 +54,19 @@ enum
     MENU_ACTION_SAVE,
     MENU_ACTION_LOAD,
     MENU_ACTION_OPTION,
+
+    // Save Actions
+    MENU_ACTION_SAVE_1,
+    MENU_ACTION_SAVE_2,
+    MENU_ACTION_SAVE_3,
+    MENU_ACTION_SAVE_4,
+
+    // Load Actions
+    MENU_ACTION_LOAD_1,
+    MENU_ACTION_LOAD_2,
+    MENU_ACTION_LOAD_3,
+    MENU_ACTION_LOAD_4,
+    MENU_ACTION_LOAD_AUTO,
     
     // Warp actions
     MENU_ACTION_BRIDGE,
@@ -88,6 +103,8 @@ EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
 EWRAM_DATA static u8 sSaveDialogTimer = 0;
 EWRAM_DATA static bool8 sSavingComplete = FALSE;
 EWRAM_DATA static u8 sSaveInfoWindowId = 0;
+EWRAM_DATA static u8 sChosenSaveSlot = 0;
+EWRAM_DATA static u8 sLastLoadCursorPos = 0;
 
 // Menu action callbacks
 static bool8 StartMenuSaveCallback(void);
@@ -101,6 +118,21 @@ static bool8 SaveCallback(void);
 static bool8 HandleStartMenuInput(void);
 static bool8 LoadStartCallback(void);
 static bool8 LoadCallback(void);
+
+// Save callbacks
+static bool8 SaveMenuGenericSaveCallback(u8 slot);
+static bool8 SaveMenuSave1Callback(void);
+static bool8 SaveMenuSave2Callback(void);
+static bool8 SaveMenuSave3Callback(void);
+static bool8 SaveMenuSave4Callback(void);
+
+// Load callbacks
+static bool8 LoadMenuGenericLoadCallback(u8 slot);
+static bool8 LoadMenuLoad1Callback(void);
+static bool8 LoadMenuLoad2Callback(void);
+static bool8 LoadMenuLoad3Callback(void);
+static bool8 LoadMenuLoad4Callback(void);
+static bool8 LoadMenuLoadAutoCallback(void);
 
 // Warp callbacks
 static bool8 WarpMenuGenericCallback(u8 map);
@@ -116,33 +148,30 @@ static bool8 WarpMenuPassCallback(void);
 static u8 SaveConfirmSaveCallback(void);
 static u8 SaveYesNoCallback(void);
 static u8 SaveConfirmInputCallback(void);
-static u8 SaveFileExistsCallback(void);
-static u8 SaveConfirmOverwriteDefaultNoCallback(void);
-static u8 SaveConfirmOverwriteCallback(void);
-static u8 SaveOverwriteInputCallback(void);
-static u8 SaveSavingMessageCallback(void);
 static u8 SaveDoSaveCallback(void);
 static u8 SaveSuccessCallback(void);
 static u8 SaveReturnSuccessCallback(void);
 static u8 SaveErrorCallback(void);
 static u8 SaveReturnErrorCallback(void);
+static u8 LoadDoLoadCallback(void);
+static u8 LoadConfirmLoadCallback(void);
+static u8 LoadYesNoCallback(void);
+static u8 LoadConfirmInputCallback(void);
 
 // Task callbacks
 static void StartMenuTask(u8 taskId);
 static void SaveGameTask(u8 taskId);
 static bool8 FieldCB_ReturnToFieldStartMenu(void);
 
-static const struct WindowTemplate sWindowTemplate_SafariBalls = {
-    .bg = 0,
-    .tilemapLeft = 1,
-    .tilemapTop = 1,
-    .width = 9,
-    .height = 4,
-    .paletteNum = 15,
-    .baseBlock = 0x8
-};
-
 static const u8 sText_MenuLoad[] = _("LOAD");
+
+static const u8 sText_MenuSave1[] = _("SLOT 1");
+static const u8 sText_MenuSave2[] = _("SLOT 2");
+static const u8 sText_MenuSave3[] = _("SLOT 3");
+static const u8 sText_MenuSave4[] = _("SLOT 4");
+static const u8 sText_MenuSaveAuto[] = _("AUTO");
+
+static const u8 sText_SlotEmpty[] = _("{COLOR LIGHT_GRAY} SLOT EMPTY");
 
 static const u8 sText_WarpBridge[] = _("Bridge");
 static const u8 sText_WarpManor[] = _("Manor");
@@ -158,6 +187,19 @@ static const struct MenuAction sStartMenuItems[] =
     [MENU_ACTION_SAVE]            = {gText_MenuSave,    {.u8_void = StartMenuSaveCallback}},
     [MENU_ACTION_LOAD]            = {sText_MenuLoad,    {.u8_void = StartMenuLoadCallback}},
     [MENU_ACTION_OPTION]          = {gText_MenuOption,  {.u8_void = StartMenuOptionCallback}},
+
+    // Save Actions
+    [MENU_ACTION_SAVE_1]          = {sText_MenuSave1,  {.u8_void = SaveMenuSave1Callback}},
+    [MENU_ACTION_SAVE_2]          = {sText_MenuSave2,  {.u8_void = SaveMenuSave2Callback}},
+    [MENU_ACTION_SAVE_3]          = {sText_MenuSave3,  {.u8_void = SaveMenuSave3Callback}},
+    [MENU_ACTION_SAVE_4]          = {sText_MenuSave4,  {.u8_void = SaveMenuSave4Callback}},
+
+    // Load Actions
+    [MENU_ACTION_LOAD_1]          = {sText_MenuSave1,     {.u8_void = LoadMenuLoad1Callback}},
+    [MENU_ACTION_LOAD_2]          = {sText_MenuSave2,     {.u8_void = LoadMenuLoad2Callback}},
+    [MENU_ACTION_LOAD_3]          = {sText_MenuSave3,     {.u8_void = LoadMenuLoad3Callback}},
+    [MENU_ACTION_LOAD_4]          = {sText_MenuSave4,     {.u8_void = LoadMenuLoad4Callback}},
+    [MENU_ACTION_LOAD_AUTO]       = {sText_MenuSaveAuto,  {.u8_void = LoadMenuLoadAutoCallback}},
     
     // Warp Actions
     [MENU_ACTION_BRIDGE]          = {sText_WarpBridge,  {.u8_void = WarpMenuBridgeCallback}},
@@ -188,20 +230,25 @@ static void AddStartMenuAction(u8 action);
 static void BuildNormalStartMenu(void);
 static void BuildWarpMenuActions(void);
 static void BuildWarpMenu(void);
+static void BuildSaveMenuActions(void);
+static void BuildSaveMenu(void);
+static void BuildLoadMenuActions(void);
+static void BuildLoadMenu(void);
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count);
 static bool32 InitStartMenuStep(void);
 static void InitStartMenu(void);
 static void CreateStartMenuTask(TaskFunc followupFunc, u8 menuType);
 static void InitSave(void);
+static void InitLoad(void);
 static u8 RunSaveCallback(void);
 static void ShowSaveMessage(const u8 *message, u8 (*saveCallback)(void));
 static void HideSaveMessageWindow(void);
 static void HideSaveInfoWindow(void);
 static void SaveStartTimer(void);
-static bool8 SaveSuccesTimer(void);
 static bool8 SaveErrorTimer(void);
 static void ShowSaveInfoWindow(void);
+static void ShowLoadInfoWindow(u8 slot);
 static void RemoveSaveInfoWindow(void);
 static void HideStartMenuWindow(void);
 
@@ -216,6 +263,19 @@ static void BuildWarpMenuActions(void)
     sNumStartMenuActions = 0;
     BuildWarpMenu();
 }
+
+static void BuildSaveMenuActions(void)
+{
+    sNumStartMenuActions = 0;
+    BuildSaveMenu();
+}
+
+static void BuildLoadMenuActions(void)
+{
+    sNumStartMenuActions = 0;
+    BuildLoadMenu();
+}
+
 
 static void AddStartMenuAction(u8 action)
 {
@@ -240,6 +300,23 @@ static void BuildWarpMenu(void)
     AddStartMenuAction(MENU_ACTION_CAVE_F2);
     AddStartMenuAction(MENU_ACTION_SUMMIT);
     AddStartMenuAction(MENU_ACTION_PASS);
+}
+
+static void BuildSaveMenu(void)
+{
+    AddStartMenuAction(MENU_ACTION_SAVE_1);
+    AddStartMenuAction(MENU_ACTION_SAVE_2);
+    AddStartMenuAction(MENU_ACTION_SAVE_3);
+    AddStartMenuAction(MENU_ACTION_SAVE_4);   
+}
+
+static void BuildLoadMenu(void)
+{
+    AddStartMenuAction(MENU_ACTION_LOAD_AUTO);
+    AddStartMenuAction(MENU_ACTION_LOAD_1);
+    AddStartMenuAction(MENU_ACTION_LOAD_2);
+    AddStartMenuAction(MENU_ACTION_LOAD_3);
+    AddStartMenuAction(MENU_ACTION_LOAD_4);
 }
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
@@ -279,6 +356,14 @@ static bool32 InitStartMenuStep(void)
         if (sInitStartMenuData[2] == MENU_TYPE_WARP)
         {
             BuildWarpMenuActions();
+        }
+        else if (sInitStartMenuData[2] == MENU_TYPE_SAVE)
+        {
+            BuildSaveMenuActions();
+        }
+        else if (sInitStartMenuData[2] == MENU_TYPE_LOAD)
+        {
+            BuildLoadMenuActions();
         }
         else
         {
@@ -363,7 +448,10 @@ void Task_ShowStartMenu(u8 taskId)
         break;
     case 1:
         if (gMenuCallback() == TRUE)
+        {
+            FillBgTilemapBufferRect(0, 0, 0, 0, 32, 32, 17); // TODO: TARC This is a hack to clear the window, Why is it not actually getting removed?
             DestroyTask(taskId);
+        }
         break;
     }
 }
@@ -406,12 +494,7 @@ static bool8 HandleStartMenuInput(void)
 
         gMenuCallback = sStartMenuItems[sCurrentStartMenuActions[sStartMenuCursorPos]].func.u8_void;
 
-        if (gMenuCallback != StartMenuSaveCallback && gMenuCallback != StartMenuExitCallback)
-        {
-           FadeScreen(FADE_TO_BLACK, 0);
-        }
-
-        if (gMenuCallback != StartMenuLoadCallback && gMenuCallback != StartMenuExitCallback)
+        if (gMenuCallback != StartMenuSaveCallback && gMenuCallback != StartMenuExitCallback && gMenuCallback != StartMenuLoadCallback && gMenuCallback != StartMenuLoadCallback)
         {
            FadeScreen(FADE_TO_BLACK, 0);
         }
@@ -471,7 +554,7 @@ static bool8 SaveStartCallback(void)
 
 static bool8 LoadStartCallback(void)
 {
-    InitSave();
+    InitLoad();
     gMenuCallback = LoadCallback;
     return FALSE;
 }
@@ -500,6 +583,17 @@ static bool8 SaveCallback(void)
 
 static bool8 LoadCallback(void)
 {
+    switch (RunSaveCallback())
+    {
+    case SAVE_IN_PROGRESS:
+        return FALSE;
+    case SAVE_CANCELED: // Back to start menu
+        ClearDialogWindowAndFrameToTransparent(0, FALSE);
+        InitStartMenu();
+        gMenuCallback = HandleStartMenuInput;
+        return FALSE;
+    }
+
     return FALSE;
 }
 
@@ -594,11 +688,81 @@ static bool8 WarpMenuPassCallback(void)
     return WarpMenuGenericCallback(MAP_RETURN_PASS);
 }
 
+static bool8 SaveMenuGenericSaveCallback(u8 slot)
+{
+    u8 saveStatus;
+
+    saveStatus = TrySavingData(SAVE_NORMAL, SAVE_MANUAL_1);
+
+    if (saveStatus == SAVE_STATUS_OK)
+        ShowSaveMessage(gText_PlayerSavedGame, SaveSuccessCallback);
+    else
+        ShowSaveMessage(gText_SaveError, SaveErrorCallback);
+
+    SaveStartTimer();
+    return SAVE_IN_PROGRESS;
+}
+
+static bool8 SaveMenuSave1Callback(void) 
+{
+    return SaveMenuGenericSaveCallback(SAVE_MANUAL_1);
+}
+
+static bool8 SaveMenuSave2Callback(void) 
+{
+    return SaveMenuGenericSaveCallback(SAVE_MANUAL_2);
+}
+
+static bool8 SaveMenuSave3Callback(void) 
+{
+    return SaveMenuGenericSaveCallback(SAVE_MANUAL_3);
+}
+
+static bool8 SaveMenuSave4Callback(void) 
+{
+    return SaveMenuGenericSaveCallback(SAVE_MANUAL_4);
+}
+
+static bool8 LoadMenuGenericLoadCallback(u8 slot)
+{
+    ReloadSlot(slot);
+    return FALSE;
+}
+
+static bool8 LoadMenuLoad1Callback(void)
+{
+    return LoadMenuGenericLoadCallback(SAVE_MANUAL_1);
+}
+
+static bool8 LoadMenuLoad2Callback(void)
+{
+    return LoadMenuGenericLoadCallback(SAVE_MANUAL_2);
+}
+
+static bool8 LoadMenuLoad3Callback(void)
+{
+    return LoadMenuGenericLoadCallback(SAVE_MANUAL_3);
+}
+
+static bool8 LoadMenuLoad4Callback(void)
+{
+    return LoadMenuGenericLoadCallback(SAVE_MANUAL_4);
+}
+
+static bool8 LoadMenuLoadAutoCallback(void)
+{
+    return LoadMenuGenericLoadCallback(SAVE_AUTO_1);
+}
 
 static void InitSave(void)
 {
-    SaveMapView();
     sSaveDialogCallback = SaveConfirmSaveCallback;
+    sSavingComplete = FALSE;
+}
+
+static void InitLoad(void)
+{
+    sSaveDialogCallback = LoadConfirmLoadCallback;
     sSavingComplete = FALSE;
 }
 
@@ -623,11 +787,22 @@ void SaveGame(void)
 static void ShowSaveMessage(const u8 *message, u8 (*saveCallback)(void))
 {
     StringExpandPlaceholders(gStringVar4, message);
-    LoadMessageBoxAndFrameGfx(0, TRUE);
-    AddTextPrinterForMessage_2(TRUE);
+
+    // Clear just the top rows (reserved prompt area)
+    FillWindowPixelRect(sSaveInfoWindowId,
+                        PIXEL_FILL(1),
+                        0, 0,
+                        14 * 8, 16);  // width = window width, height = 2 lines
+
+    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL,
+                                gStringVar4, 0, 0, 0, NULL);
+
+    CopyWindowToVram(sSaveInfoWindowId, COPYWIN_MAP);
+
     sSavingComplete = TRUE;
     sSaveDialogCallback = saveCallback;
 }
+
 
 static void SaveGameTask(u8 taskId)
 {
@@ -662,25 +837,9 @@ static void HideSaveInfoWindow(void)
 
 static void SaveStartTimer(void)
 {
-    sSaveDialogTimer = 60;
+    sSaveDialogTimer = 10;
 }
 
-static bool8 SaveSuccesTimer(void)
-{
-    sSaveDialogTimer--;
-
-    if (JOY_HELD(A_BUTTON))
-    {
-        PlaySE(SE_SELECT);
-        return TRUE;
-    }
-    if (sSaveDialogTimer == 0)
-    {
-        return TRUE;
-    }
-
-    return FALSE;
-}
 
 static bool8 SaveErrorTimer(void)
 {
@@ -698,90 +857,75 @@ static bool8 SaveErrorTimer(void)
 
 static u8 SaveConfirmSaveCallback(void)
 {
-    ClearStdWindowAndFrame(GetStartMenuWindowId(), FALSE);
     RemoveStartMenuWindow();
+    sInitStartMenuData[2] = MENU_TYPE_SAVE;
+    ClearDialogWindowAndFrameToTransparent(0, FALSE);
+    InitStartMenu();
+
     ShowSaveInfoWindow();
+    sInitStartMenuData[2] = MENU_TYPE_START;
     ShowSaveMessage(gText_ConfirmSave, SaveYesNoCallback);
+
+    return SAVE_IN_PROGRESS;
+}
+
+static u8 LoadConfirmLoadCallback(void)
+{
+    RemoveStartMenuWindow();
+    sInitStartMenuData[2] = MENU_TYPE_LOAD;
+    ClearDialogWindowAndFrameToTransparent(0, FALSE);
+    InitStartMenu();
+    sSaveInfoWindowId = 0;
+    ShowLoadInfoWindow(SAVE_MANUAL_1);
+    sInitStartMenuData[2] = MENU_TYPE_START;
+    ShowSaveMessage(gText_ConfirmLoad, LoadYesNoCallback);
 
     return SAVE_IN_PROGRESS;
 }
 
 static u8 SaveYesNoCallback(void)
 {
-    DisplayYesNoMenuDefaultYes(); // Show Yes/No menu
+    //DisplayYesNoMenuDefaultYes(); // Show Yes/No menu
     sSaveDialogCallback = SaveConfirmInputCallback;
+    return SAVE_IN_PROGRESS;
+}
+
+static u8 LoadYesNoCallback(void)
+{
+    //DisplayYesNoMenuDefaultYes(); // Show Yes/No menu
+    sSaveDialogCallback = LoadConfirmInputCallback;
     return SAVE_IN_PROGRESS;
 }
 
 static u8 SaveConfirmInputCallback(void)
 {
-    switch (Menu_ProcessInputNoWrapClearOnChoose())
+    s8 result = Menu_ProcessInputNoWrapClearOnChoose();
+
+    switch (result)
     {
-    case 0: // Yes
-        switch (gSaveFileStatus)
-        {
-        case SAVE_STATUS_EMPTY:
-        case SAVE_STATUS_CORRUPT:
-            if (gDifferentSaveFile == FALSE)
-            {
-                sSaveDialogCallback = SaveFileExistsCallback;
-                return SAVE_IN_PROGRESS;
-            }
-
-            sSaveDialogCallback = SaveSavingMessageCallback;
-            return SAVE_IN_PROGRESS;
-        default:
-            sSaveDialogCallback = SaveFileExistsCallback;
-            return SAVE_IN_PROGRESS;
-        }
-    case MENU_B_PRESSED:
-    case 1: // No
-        HideSaveInfoWindow();
-        HideSaveMessageWindow();
-        return SAVE_CANCELED;
-    }
-
-    return SAVE_IN_PROGRESS;
-}
-
-// A different save file exists
-static u8 SaveFileExistsCallback(void)
-{
-    if (gDifferentSaveFile == TRUE)
-    {
-        ShowSaveMessage(gText_DifferentSaveFile, SaveConfirmOverwriteDefaultNoCallback);
-    }
-    else
-    {
-        ShowSaveMessage(gText_AlreadySavedFile, SaveConfirmOverwriteCallback);
-    }
-
-    return SAVE_IN_PROGRESS;
-}
-
-static u8 SaveConfirmOverwriteDefaultNoCallback(void)
-{
-    DisplayYesNoMenuWithDefault(1); // Show Yes/No menu (No selected as default)
-    sSaveDialogCallback = SaveOverwriteInputCallback;
-    return SAVE_IN_PROGRESS;
-}
-
-static u8 SaveConfirmOverwriteCallback(void)
-{
-    DisplayYesNoMenuDefaultYes(); // Show Yes/No menu
-    sSaveDialogCallback = SaveOverwriteInputCallback;
-    return SAVE_IN_PROGRESS;
-}
-
-static u8 SaveOverwriteInputCallback(void)
-{
-    switch (Menu_ProcessInputNoWrapClearOnChoose())
-    {
-    case 0: // Yes
-        sSaveDialogCallback = SaveSavingMessageCallback;
+    case 0: // slot
+        sChosenSaveSlot = SAVE_MANUAL_1;
+        sSaveDialogCallback = SaveDoSaveCallback;
+        StringCopy(gStringVar3, sText_MenuSave1);
+        return SAVE_IN_PROGRESS;
+    case 1: 
+        sChosenSaveSlot = SAVE_MANUAL_2;
+        sSaveDialogCallback = SaveDoSaveCallback;
+        StringCopy(gStringVar3, sText_MenuSave2);
+        return SAVE_IN_PROGRESS;
+    case 2:    
+        sChosenSaveSlot = SAVE_MANUAL_3;
+        sSaveDialogCallback = SaveDoSaveCallback;
+        StringCopy(gStringVar3, sText_MenuSave3);
+        return SAVE_IN_PROGRESS;
+    case 3:    
+        sChosenSaveSlot = SAVE_MANUAL_4;
+        sSaveDialogCallback = SaveDoSaveCallback;
+        StringCopy(gStringVar3, sText_MenuSave4);
         return SAVE_IN_PROGRESS;
     case MENU_B_PRESSED:
-    case 1: // No
+        sSaveDialogCallback = NULL;
+        RemoveStartMenuWindow();
         HideSaveInfoWindow();
         HideSaveMessageWindow();
         return SAVE_CANCELED;
@@ -790,11 +934,85 @@ static u8 SaveOverwriteInputCallback(void)
     return SAVE_IN_PROGRESS;
 }
 
-static u8 SaveSavingMessageCallback(void)
+static u8 LoadConfirmInputCallback(void)
 {
-    ShowSaveMessage(gText_SavingDontTurnOff, SaveDoSaveCallback);
+    s8 result = Menu_ProcessInputNoWrapClearOnChoose();
+
+    u8 cursorPos = Menu_GetCursorPos();
+
+    if (sLastLoadCursorPos != cursorPos)
+    {
+        switch (cursorPos)
+        {
+            case 0: 
+                ShowLoadInfoWindow(SAVE_AUTO_1);
+                break;
+            case 1:
+                ShowLoadInfoWindow(SAVE_MANUAL_1);
+                break;
+            case 2:
+                ShowLoadInfoWindow(SAVE_MANUAL_2);
+                break;
+            case 3:
+                ShowLoadInfoWindow(SAVE_MANUAL_3);
+                break;
+            case 4:
+                ShowLoadInfoWindow(SAVE_MANUAL_4);
+                break;
+        }
+    }
+
+    sLastLoadCursorPos = cursorPos;
+
+    switch (result)
+    {
+    case 0: 
+        sChosenSaveSlot = SAVE_AUTO_1;
+        if (SlotIsValid(sChosenSaveSlot))
+        {
+            sSaveDialogCallback = LoadDoLoadCallback;
+        }
+        return SAVE_IN_PROGRESS;
+    case 1: // slot
+        sChosenSaveSlot = SAVE_MANUAL_1;
+        if (SlotIsValid(sChosenSaveSlot))
+        {
+            sSaveDialogCallback = LoadDoLoadCallback;
+        }
+        return SAVE_IN_PROGRESS;
+    case 2:
+        sChosenSaveSlot = SAVE_MANUAL_2;
+        if (SlotIsValid(sChosenSaveSlot))
+        {
+            sSaveDialogCallback = LoadDoLoadCallback;
+        }
+        return SAVE_IN_PROGRESS;
+    case 3:
+        sChosenSaveSlot = SAVE_MANUAL_3;
+        if (SlotIsValid(sChosenSaveSlot))    
+        {
+            sSaveDialogCallback = LoadDoLoadCallback;
+        }
+        return SAVE_IN_PROGRESS;
+    case 4:
+        sChosenSaveSlot = SAVE_MANUAL_4;
+        if (SlotIsValid(sChosenSaveSlot))
+        {
+            sSaveDialogCallback = LoadDoLoadCallback;
+        }
+        return SAVE_IN_PROGRESS;
+    case MENU_B_PRESSED:
+        sSaveDialogCallback = NULL;
+        RemoveStartMenuWindow();
+        HideSaveInfoWindow();
+        HideSaveMessageWindow();
+        FillBgTilemapBufferRect(0, 0, 0, 0, 32, 32, 17); // TODO: TARC This is a hack to clear the window, Why is it not actually getting removed?
+        return SAVE_CANCELED;
+    }
+
     return SAVE_IN_PROGRESS;
 }
+
 
 static u8 SaveDoSaveCallback(void)
 {
@@ -802,20 +1020,28 @@ static u8 SaveDoSaveCallback(void)
 
     if (gDifferentSaveFile == TRUE)
     {
-        saveStatus = TrySavingData(SAVE_OVERWRITE_DIFFERENT_FILE);
+        saveStatus = TrySavingData(SAVE_OVERWRITE_DIFFERENT_FILE, sChosenSaveSlot);
         gDifferentSaveFile = FALSE;
     }
     else
     {
-        saveStatus = TrySavingData(SAVE_NORMAL);
+        saveStatus = TrySavingData(SAVE_NORMAL, sChosenSaveSlot);
     }
 
     if (saveStatus == SAVE_STATUS_OK)
+    {
         ShowSaveMessage(gText_PlayerSavedGame, SaveSuccessCallback);
+    }
     else
         ShowSaveMessage(gText_SaveError, SaveErrorCallback);
 
     SaveStartTimer();
+    return SAVE_IN_PROGRESS;
+}
+
+static u8 LoadDoLoadCallback(void)
+{
+    ReloadSlot(sChosenSaveSlot);
     return SAVE_IN_PROGRESS;
 }
 
@@ -832,9 +1058,15 @@ static u8 SaveSuccessCallback(void)
 
 static u8 SaveReturnSuccessCallback(void)
 {
-    if (!IsSEPlaying() && SaveSuccesTimer())
+    if (!IsSEPlaying())
     {
-        HideSaveInfoWindow();
+        sSaveDialogCallback = NULL;
+
+        // Clear and remove save windows
+        ClearStdWindowAndFrame(sSaveInfoWindowId, TRUE);
+        RemoveWindow(sSaveInfoWindowId);
+        HideStartMenuWindow();
+        FillBgTilemapBufferRect(0, 0, 0, 0, 32, 32, 17); // TODO: TARC This is a hack to clear the window, Why is it not actually getting removed?
         return SAVE_SUCCESS;
     }
     else
@@ -870,37 +1102,28 @@ static u8 SaveReturnErrorCallback(void)
 static void ShowSaveInfoWindow(void)
 {
     struct WindowTemplate saveInfoWindow = sSaveInfoWindowTemplate;
-    u8 gender;
     u8 color;
     u32 xOffset;
     u32 yOffset;
 
     saveInfoWindow.height -= 2;
-
     sSaveInfoWindowId = AddWindow(&saveInfoWindow);
     DrawStdWindowFrame(sSaveInfoWindowId, FALSE);
 
-    gender = gSaveBlock2Ptr->playerGender;
-    color = TEXT_COLOR_RED;  // Red when female, blue when male.
+    color = TEXT_COLOR_RED;
 
-    if (gender == MALE)
-    {
-        color = TEXT_COLOR_BLUE;
-    }
-
-    // Print region name
     yOffset = 1;
-    BufferSaveMenuText(SAVE_MENU_LOCATION, gStringVar4, TEXT_COLOR_GREEN);
-    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+    
+    // Leave a blank space to draw the 'Which save slot' message. Why not render the text here....? That my friend is a good question 
+    yOffset += 16;
 
     // Print player name
-    yOffset += 16;
     AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingPlayer, 0, yOffset, TEXT_SKIP_DRAW, NULL);
     BufferSaveMenuText(SAVE_MENU_NAME, gStringVar4, color);
     xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
     PrintPlayerNameOnWindow(sSaveInfoWindowId, gStringVar4, xOffset, yOffset);
 
-    // Print badge count
+    // Print Completion
     yOffset += 16;
     AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingBadges, 0, yOffset, TEXT_SKIP_DRAW, NULL);
     BufferSaveMenuText(SAVE_MENU_BADGES, gStringVar4, color);
@@ -913,6 +1136,62 @@ static void ShowSaveInfoWindow(void)
     BufferSaveMenuText(SAVE_MENU_PLAY_TIME, gStringVar4, color);
     xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
     AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
+
+    CopyWindowToVram(sSaveInfoWindowId, COPYWIN_GFX);
+}
+
+static void ShowLoadInfoWindow(u8 slot)
+{
+    struct WindowTemplate saveInfoWindow = sSaveInfoWindowTemplate;
+    u8 color;
+    u32 xOffset;
+    u32 yOffset;
+
+    saveInfoWindow.height -= 2;
+
+    if (!sSaveInfoWindowId)
+    {
+        sSaveInfoWindowId = AddWindow(&saveInfoWindow);
+    }
+
+    DrawStdWindowFrame(sSaveInfoWindowId, FALSE);
+
+    color = TEXT_COLOR_RED;
+
+   
+    yOffset = 0;
+    AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_ConfirmLoad, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+    yOffset += 17;
+
+    DebugPrintfLevel(MGBA_LOG_ERROR, "ShowSaveInfoWindow %x", slot);
+
+    if (!SlotIsValid(slot))
+    {
+         AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, sText_SlotEmpty, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+    }
+    else
+    {
+
+        // Print player name
+        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingPlayer, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+        BufferLoadMenuText(slot, SAVE_MENU_NAME, gStringVar4, color);
+        xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
+        PrintPlayerNameOnWindow(sSaveInfoWindowId, gStringVar4, xOffset, yOffset);
+
+        // Print Completion
+        yOffset += 16;
+        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingBadges, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+        BufferLoadMenuText(slot, SAVE_MENU_BADGES, gStringVar4, color);
+        xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
+        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
+
+        // Print play time
+        yOffset += 16;
+        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gText_SavingTime, 0, yOffset, TEXT_SKIP_DRAW, NULL);
+        BufferLoadMenuText(slot, SAVE_MENU_PLAY_TIME, gStringVar4, color);
+        xOffset = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar4, 0x70);
+        AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, xOffset, yOffset, TEXT_SKIP_DRAW, NULL);
+    }
 
     CopyWindowToVram(sSaveInfoWindowId, COPYWIN_GFX);
 }
@@ -948,5 +1227,5 @@ void Script_ForceSaveGame(struct ScriptContext *ctx)
     SaveGame();
     ShowSaveInfoWindow();
     gMenuCallback = SaveCallback;
-    sSaveDialogCallback = SaveSavingMessageCallback;
+    sSaveDialogCallback = SaveDoSaveCallback;
 }
