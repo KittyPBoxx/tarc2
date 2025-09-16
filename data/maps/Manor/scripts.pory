@@ -1,4 +1,28 @@
-raw `
-Manor_MapScripts::
-	.byte 0
-`
+script OrthyNPC {
+    lock
+    faceplayer
+
+	special(GetPlayerMonSpecies)
+    waitstate
+
+    if (var(VAR_0x8008) == SPECIES_MR_RIME) {
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        msgbox(format("What? No I wasn't napping! Go right in big bro.")) 
+        removefieldmugshot
+		applymovement(1, MoveOutTheWay)
+		// TODO: TARC maybe we just move the player here and then roll credits from the script.
+    }
+	else {
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        msgbox(format("They'll be a masked ball later where the gods reveal which trainers they want to sponsor. My big bro said not to let anyone in unless he was personally escorting them so don't go getting any ideas.")) 
+        removefieldmugshot
+	}
+
+    release
+    end
+}
+
+movement MoveOutTheWay {
+	face_left
+    walk_left*2
+}

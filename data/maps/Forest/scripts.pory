@@ -9,3 +9,70 @@ Forest_MapScripts_CreateTiles::
 	createvobject OBJ_EVENT_GFX_TRUCK, 1, 20, 0
 	createvobject OBJ_EVENT_GFX_TRUCK, 1, 15, 4
 	return`
+
+
+script SoraNPC {
+    lock
+    faceplayer
+
+   	if (defeated(TRAINER_EXAMINER_SORA)) {
+            
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        msgbox(format("There are four examiners and one champion to beat. Our sponsoring gods pay us based on how many candidates we stop.")) 
+        removefieldmugshot
+        trainerbattle_single(TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        msgbox(format("How could I loose? I guess dinner will be uncooked ramen again...")) 
+        removefieldmugshot
+
+    } 
+	else {
+
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		msgbox("Did you want a rematch?", MSGBOX_YESNO)
+
+		if (var(VAR_RESULT) == 1) {
+			removefieldmugshot
+			trainerbattle_single(TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
+		} else {
+			removefieldmugshot
+		}
+
+	}
+
+    release
+    end
+}
+
+script FionnNPC {
+    lock
+    faceplayer
+
+   	if (defeated(TRAINER_EXAMINER_FIONN)) {
+            
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        msgbox(format("Each area is locked with a seal. You can't progress untill you beat all the examiners first.")) 
+        removefieldmugshot
+        trainerbattle_single(TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        msgbox(format("Don't get cocky kid. Beating me only puts you one step closer to passing the exam.")) 
+        removefieldmugshot
+
+    } 
+	else {
+
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		msgbox("Did you want a rematch?", MSGBOX_YESNO)
+
+		if (var(VAR_RESULT) == 1) {
+			removefieldmugshot
+			trainerbattle_single(TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
+		} else {
+			removefieldmugshot
+		}
+
+	}
+
+    release
+    end
+}

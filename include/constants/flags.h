@@ -54,9 +54,9 @@
 #define FLAG_COMPLETED               0x5B
 #define FLAG_SUMMIT_INTRO_DONE       0x5C
 #define FLAG_TILE_PUZZLE_ROCK_BROKEN 0x5D
-#define FLAG_BERUS_FINAL_BATTLE_DONE 0x5E
+#define FLAG_UNUSED_0x5E             0x5E
 #define FLAG_GAME_CLEAR              0x5F
-#define FLAG_UNUSED_0x60 0x60
+#define FLAG_BRIDGE_INTRO_DONE       0x60
 #define FLAG_UNUSED_0x61 0x61
 #define FLAG_UNUSED_0x62 0x62
 #define FLAG_UNUSED_0x63 0x63
@@ -84,6 +84,7 @@
 // See constants/opponents.h. The values there + FLAG_TRAINER_FLAG_START are the flag IDs
 #define TRAINER_FLAGS_START                                         (FLAG_UNUSED_0x76 + 1)
 #define TRAINER_FLAGS_END                                           (TRAINER_FLAGS_START + MAX_TRAINERS_COUNT - 1) 
+
 // System Flags
 #define SYSTEM_FLAGS                                   (TRAINER_FLAGS_END + 1) 
 #define FLAG_SYS_GAME_CLEAR                            (SYSTEM_FLAGS + 0x0)

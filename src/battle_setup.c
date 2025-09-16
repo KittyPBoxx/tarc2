@@ -592,15 +592,15 @@ void ChooseStarter(void)
 
 static void CB2_GiveStarter(void)
 {
-    u16 starterMon;
+    // u16 starterMon;
 
-    *GetVarPointer(VAR_STARTER_MON) = gSpecialVar_Result;
-    starterMon = GetStarterPokemon(gSpecialVar_Result);
-    ScriptGiveMon(starterMon, 5, ITEM_NONE);
-    ResetTasks();
-    PlayBattleBGM();
-    SetMainCallback2(CB2_StartFirstBattle);
-    BattleTransition_Start(B_TRANSITION_BLUR);
+    // *GetVarPointer(VAR_STARTER_MON) = gSpecialVar_Result;
+    // starterMon = GetStarterPokemon(gSpecialVar_Result);
+    //ScriptGiveMon(starterMon, 5, ITEM_NONE);
+    //ResetTasks();
+    //PlayBattleBGM();
+    SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+    //BattleTransition_Start(B_TRANSITION_BLUR);
 }
 
 static void CB2_StartFirstBattle(void)

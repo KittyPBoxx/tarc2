@@ -111,9 +111,9 @@ static const u8 sStarterLabelCoords[STARTER_MON_COUNT][2] =
 
 static const u16 sStarterMon[STARTER_MON_COUNT] =
 {
-    SPECIES_TREECKO,
-    SPECIES_TORCHIC,
-    SPECIES_MUDKIP,
+    SPECIES_DITTO,
+    SPECIES_DITTO,
+    SPECIES_DITTO,
 };
 
 static const struct BgTemplate sBgTemplates[3] =
@@ -449,6 +449,7 @@ void CB2_ChooseStarter(void)
     spriteId = CreateSprite(&sSpriteTemplate_Pokeball, sPokeballCoords[0][0], sPokeballCoords[0][1], 2);
     gSprites[spriteId].sTaskId = taskId;
     gSprites[spriteId].sBallId = 0;
+    gSprites[spriteId].invisible = 1;
 
     spriteId = CreateSprite(&sSpriteTemplate_Pokeball, sPokeballCoords[1][0], sPokeballCoords[1][1], 2);
     gSprites[spriteId].sTaskId = taskId;
@@ -457,6 +458,7 @@ void CB2_ChooseStarter(void)
     spriteId = CreateSprite(&sSpriteTemplate_Pokeball, sPokeballCoords[2][0], sPokeballCoords[2][1], 2);
     gSprites[spriteId].sTaskId = taskId;
     gSprites[spriteId].sBallId = 2;
+    gSprites[spriteId].invisible = 1;
 
     sStarterLabelWindowId = WINDOW_NONE;
 }
@@ -502,16 +504,16 @@ static void Task_HandleStarterChooseInput(u8 taskId)
         gTasks[taskId].tPkmnSpriteId = spriteId;
         gTasks[taskId].func = Task_WaitForStarterSprite;
     }
-    else if (JOY_NEW(DPAD_LEFT) && selection > 0)
-    {
-        gTasks[taskId].tStarterSelection--;
-        gTasks[taskId].func = Task_MoveStarterChooseCursor;
-    }
-    else if (JOY_NEW(DPAD_RIGHT) && selection < STARTER_MON_COUNT - 1)
-    {
-        gTasks[taskId].tStarterSelection++;
-        gTasks[taskId].func = Task_MoveStarterChooseCursor;
-    }
+//     else if (JOY_NEW(DPAD_LEFT) && selection > 0)
+//     {
+//         gTasks[taskId].tStarterSelection--;
+//         gTasks[taskId].func = Task_MoveStarterChooseCursor;
+//     }
+//     else if (JOY_NEW(DPAD_RIGHT) && selection < STARTER_MON_COUNT - 1)
+//     {
+//         gTasks[taskId].tStarterSelection++;
+//         gTasks[taskId].func = Task_MoveStarterChooseCursor;
+//     }
 }
 
 static void Task_WaitForStarterSprite(u8 taskId)
@@ -520,7 +522,7 @@ static void Task_WaitForStarterSprite(u8 taskId)
         gSprites[gTasks[taskId].tCircleSpriteId].x == STARTER_PKMN_POS_X &&
         gSprites[gTasks[taskId].tCircleSpriteId].y == STARTER_PKMN_POS_Y)
     {
-        gTasks[taskId].func = Task_AskConfirmStarter;
+        gTasks[taskId].func = Task_HandleConfirmStarterInput;
     }
 }
 

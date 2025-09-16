@@ -32,6 +32,17 @@ void HealPlayerParty(void)
         FlagSet(B_FLAG_TERA_ORB_CHARGED);
 }
 
+void SetPlayerMonSpecies(void) 
+{
+    u16 monData = gSpecialVar_0x8008;
+    SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+}
+
+void GetPlayerMonSpecies(void)
+{
+    gSpecialVar_0x8008 = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG);
+}
+
 void HasEnoughMonsForDoubleBattle(void)
 {
     switch (GetMonsStateToDoubles())

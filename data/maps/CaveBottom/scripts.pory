@@ -1,4 +1,32 @@
-raw `
-CaveBottom_MapScripts::
-	.byte 0
-`
+script RuneNPC {
+    lock
+    faceplayer
+
+   	if (defeated(TRAINER_EXAMINER_RUNE)) {
+            
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        msgbox(format("If you beat me I'll share a secret about this room.")) 
+        removefieldmugshot
+        trainerbattle_single(TRAINER_EXAMINER_RUNE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        msgbox(format("When crossing this room you can only stand on five tiles or the door will lock. Bet you didn't know that!")) 
+        removefieldmugshot
+
+    } 
+	else {
+
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		msgbox("Did you want a rematch?", MSGBOX_YESNO)
+
+		if (var(VAR_RESULT) == 1) {
+			removefieldmugshot
+			trainerbattle_single(TRAINER_EXAMINER_RUNE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
+		} else {
+			removefieldmugshot
+		}
+
+	}
+
+    release
+    end
+}

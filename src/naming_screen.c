@@ -413,6 +413,11 @@ void DoNamingScreen(u8 templateNum, u8 *destBuffer, u16 monSpecies, u16 monGende
     }
 }
 
+void DoPlayerNamingScreen(void)
+{
+    DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnToFieldContinueScript);
+}
+
 static void CB2_LoadNamingScreen(void)
 {
     switch (gMain.state)
