@@ -54,10 +54,10 @@
 #define FLAG_COMPLETED               0x5B
 #define FLAG_SUMMIT_INTRO_DONE       0x5C
 #define FLAG_TILE_PUZZLE_ROCK_BROKEN 0x5D
-#define FLAG_UNUSED_0x5E             0x5E
+#define FLAG_TENJIN_INTRO            0x5E
 #define FLAG_GAME_CLEAR              0x5F
 #define FLAG_BRIDGE_INTRO_DONE       0x60
-#define FLAG_UNUSED_0x61 0x61
+#define FLAG_TILE_PUZZLE_SOLVED      0x61
 #define FLAG_UNUSED_0x62 0x62
 #define FLAG_UNUSED_0x63 0x63
 #define FLAG_UNUSED_0x64 0x64 

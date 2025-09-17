@@ -137,33 +137,46 @@ Debug_EventScript_Script_1_Text_Battle1_Intro:
 Debug_EventScript_Script_1_Text_Battle1_Defeat:
     .string "Battle 1 complete$"
 
+Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons:
+    .string "Not enough mons$"
+
 Debug_EventScript_Battle_2::
+	trainerbattle_single TRAINER_EXAMINER_RUNE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 	release
 	end
 
 Debug_EventScript_Battle_3::
+	trainerbattle_double TRAINER_EXAMINER_DANTE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons
 	release
 	end
 
 Debug_EventScript_Battle_4::
+	trainerbattle_single TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 	release
 	end
 
 Debug_EventScript_Battle_5::
+	trainerbattle_single TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 	release
 	end
 
 Debug_EventScript_Battle_6::
+	trainerbattle_double TRAINER_DEITY_TENJIN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons
 	release
 	end
 
 Debug_EventScript_Battle_7::
+	msgbox Debug_NoBattleSetup, MSGBOX_DEFAULT
 	release
 	end
 
 Debug_EventScript_Battle_8::
+	msgbox Debug_NoBattleSetup, MSGBOX_DEFAULT
 	release
 	end
+
+Debug_NoBattleSetup::
+	.string "No battle setup.$"
 
 Debug_CheckSaveBlock::
 	callnative CheckSaveBlock1Size

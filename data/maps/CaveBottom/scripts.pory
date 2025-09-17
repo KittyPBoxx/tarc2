@@ -1,3 +1,5 @@
+mapscripts CaveBottom_MapScripts {}
+
 script RuneNPC {
     lock
     faceplayer
@@ -26,6 +28,21 @@ script RuneNPC {
 		}
 
 	}
+
+    release
+    end
+}
+
+script CaveDoor {
+    lock
+    faceplayer
+
+    if (var(VAR_0x8008) >= 10) {
+        msgbox(format("Don’t overstep your bounds. The path yields the trainer with measured stride."))
+    }
+    else {
+        msgbox(format("For now, you may pass."))
+    }
 
     release
     end

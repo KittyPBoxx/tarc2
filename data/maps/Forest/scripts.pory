@@ -76,3 +76,21 @@ script FionnNPC {
     release
     end
 }
+
+script ForestSeal {
+    lock
+    faceplayer
+
+    if (defeated(TRAINER_EXAMINER_FIONN) && defeated(TRAINER_EXAMINER_SORA)) {
+        msgbox(format("The seal has been broken. You may pass through."))
+    }
+	elif (defeated(TRAINER_EXAMINER_FIONN) || defeated(TRAINER_EXAMINER_SORA)) {
+		msgbox(format("You must win one more battle to break this seal."))
+	}
+    else {
+        msgbox(format("You must have won two battles to break this seal."))
+    }
+
+    release
+    end
+}

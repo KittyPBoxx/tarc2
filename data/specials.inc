@@ -234,3 +234,5 @@ gSpecials::
 	def_special GetCodeFeedback
 	def_special DoSlidingPuzzle
 	def_special DoPlayerNamingScreen
+	def_special SetPlayerMonSpecies
+	def_special GetPlayerMonSpecies

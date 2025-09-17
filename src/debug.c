@@ -1748,36 +1748,162 @@ static void DebugAction_Util_Battle_1(u8 taskId)
 
 static void DebugAction_Util_Battle_2(u8 taskId)
 {
+    u16 monData;
+
+    monData = 25;
+    SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
+    monData = ABILITY_DROUGHT;
+    SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
+    monData = MOVE_SUNNY_DAY;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_AIR_BALLOON;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = SPECIES_FROSLASS;
+    SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    HealPlayerParty();
+
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_2);
 }
 
 static void DebugAction_Util_Battle_3(u8 taskId)
 {
+    u16 monData;
+
+    monData = 25;
+    SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
+    monData = ABILITY_DROUGHT;
+    SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
+    monData = MOVE_SUNNY_DAY;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_AIR_BALLOON;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = SPECIES_FROSLASS;
+    SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    HealPlayerParty();
+
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_3);
 }
 
 static void DebugAction_Util_Battle_4(u8 taskId)
 {
+    u16 monData;
+
+    monData = 25;
+    SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
+    monData = ABILITY_DROUGHT;
+    SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
+    monData = MOVE_SUNNY_DAY;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_AIR_BALLOON;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = SPECIES_FROSLASS;
+    SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    HealPlayerParty();
+
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_4);
 }
 
 static void DebugAction_Util_Battle_5(u8 taskId)
 {
+    u16 monData;
+
+    monData = 25;
+    SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
+    monData = ABILITY_DROUGHT;
+    SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
+    monData = MOVE_SUNNY_DAY;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_AIR_BALLOON;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = SPECIES_FROSLASS;
+    SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    HealPlayerParty();
+
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_5);
 }
 
 static void DebugAction_Util_Battle_6(u8 taskId)
 {
+    u16 monData;
+
+    monData = 25;
+    SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
+    monData = ABILITY_DROUGHT;
+    SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
+    monData = MOVE_SUNNY_DAY;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_AIR_BALLOON;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = SPECIES_FROSLASS;
+    SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    HealPlayerParty();
+
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_6);
 }
 
 static void DebugAction_Util_Battle_7(u8 taskId)
 {
+    u16 monData;
+
+    monData = 25;
+    SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
+    monData = ABILITY_DROUGHT;
+    SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
+    monData = MOVE_SUNNY_DAY;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_AIR_BALLOON;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = SPECIES_FROSLASS;
+    SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    HealPlayerParty();
+    
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_7);
 }
 
 static void DebugAction_Util_Battle_8(u8 taskId)
 {
+    u16 monData;
+
+    monData = 25;
+    SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
+    monData = ABILITY_DROUGHT;
+    SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
+    monData = MOVE_SUNNY_DAY;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_AIR_BALLOON;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = SPECIES_FROSLASS;
+    SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    HealPlayerParty();
+
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_8);
 }
 

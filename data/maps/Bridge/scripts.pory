@@ -178,9 +178,19 @@ script CutTree {
     faceplayer
 
     if (!flag(FLAG_TREE_CUT)) {
+        
+        
         msgbox(format("This tree looks like it could be cut down."))
-        // TODO: TARC trigger move check and cut animation
-        // setflag(FLAG_TREE_CUT) once cut
+
+        checkpartymove(MOVE_CUT)
+
+        if (var(VAR_RESULT) == 1) {
+
+            setflag(FLAG_TREE_CUT)
+            // TODO: TARC trigger move check and cut animation and remove the tree
+
+        } 
+
     }
     else {
         msgbox(format("The tree has already been cleared."))
