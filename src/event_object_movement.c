@@ -5337,7 +5337,7 @@ bool8 MovementType_FollowPlayer_Moving(struct ObjectEvent *objectEvent, struct S
     }
     else if (objectEvent->movementActionId < MOVEMENT_ACTION_EXIT_POKEBALL)
     {
-        UpdateFollowerTransformEffect(objectEvent, sprite);
+        //UpdateFollowerTransformEffect(objectEvent, sprite);
         if (OW_FOLLOWERS_BOBBING == TRUE && (sprite->data[5] & 7) == 2)
             sprite->y2 ^= -1;
     }
@@ -5363,6 +5363,7 @@ static bool32 UpdateMonMoveInPlace(struct ObjectEvent *objectEvent, struct Sprit
     {
         sprite->y2 ^= -1;
     }
+
     return FALSE;
 }
 
@@ -5373,7 +5374,7 @@ bool8 FollowablePlayerMovement_Idle(struct ObjectEvent *objectEvent, struct Spri
         sprite->sTypeFuncId = 1;
         return TRUE;
     }
-    UpdateFollowerTransformEffect(objectEvent, sprite);
+    //UpdateFollowerTransformEffect(objectEvent, sprite);
     return FALSE;
 }
 
@@ -6588,7 +6589,7 @@ static bool8 UpdateMovementNormal(struct ObjectEvent *objectEvent, struct Sprite
     {
         ShiftStillObjectEventCoords(objectEvent);
         objectEvent->triggerGroundEffectsOnStop = TRUE;
-        if (IsSpeedNormalized(sprite->sDir, sprite->sSpeed))
+        if (objectEvent->localId == OBJ_EVENT_ID_PLAYER && IsSpeedNormalized(sprite->sDir, sprite->sSpeed))
         {
             sprite->animPaused = FALSE;
             sprite->animDelayCounter = max(0, sprite->animDelayCounter - 1);

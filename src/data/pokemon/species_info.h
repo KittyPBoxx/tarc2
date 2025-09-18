@@ -142,7 +142,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
             .oam = &gObjectEventBaseOam_32x32,
             .subspriteTables = sOamTables_32x32,
             .anims = sAnimTable_Following,
-            .images = sPicTable_Substitute,
+            .images = sPicTable_Ditto,
             .affineAnims = gDummySpriteAffineAnimTable,
         },
     #endif
