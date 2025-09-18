@@ -1977,21 +1977,21 @@ static void RefreshFollowerGraphics(struct ObjectEvent *objEvent)
 
 u16 GetOverworldWeatherSpecies(u16 species)
 {
-    u32 i;
-    u32 weather = GetCurrentWeather();
-    const struct FormChange *formChanges = GetSpeciesFormChanges(species);
+    // u32 i;
+    // u32 weather = GetCurrentWeather();
+    // const struct FormChange *formChanges = GetSpeciesFormChanges(species);
 
-    for (i = 0; formChanges != NULL && formChanges[i].method != FORM_CHANGE_TERMINATOR; i++)
-    {
-        // Unlike other form change checks, we don't do the "species != formChanges[i].targetSpecies" check
-        if (formChanges[i].method == FORM_CHANGE_OVERWORLD_WEATHER)
-        {
-            if (formChanges[i].param1 == weather)
-                return formChanges[i].targetSpecies;
-            else if (formChanges[i].param1 == WEATHER_NONE) // Set the default form for weather not defined in form change table
-                species = formChanges[i].targetSpecies;
-        }
-    }
+    // for (i = 0; formChanges != NULL && formChanges[i].method != FORM_CHANGE_TERMINATOR; i++)
+    // {
+    //     // Unlike other form change checks, we don't do the "species != formChanges[i].targetSpecies" check
+    //     if (formChanges[i].method == FORM_CHANGE_OVERWORLD_WEATHER)
+    //     {
+    //         if (formChanges[i].param1 == weather)
+    //             return formChanges[i].targetSpecies;
+    //         else if (formChanges[i].param1 == WEATHER_NONE) // Set the default form for weather not defined in form change table
+    //             species = formChanges[i].targetSpecies;
+    //     }
+    // }
     return species;
 }
 

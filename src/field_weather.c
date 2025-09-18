@@ -1050,7 +1050,7 @@ bool8 Weather_UpdateBlend(void)
 
 u8 GetCurrentWeather(void)
 {
-    return gWeatherPtr->currWeather;
+    return 0;//gWeatherPtr->currWeather;
 }
 
 void SetRainStrengthFromSoundEffect(u16 soundEffect)
