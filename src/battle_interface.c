@@ -1064,8 +1064,7 @@ void UpdateHpTextInHealthbox(u32 healthboxSpriteId, u32 maxOrCurrent, s16 currHp
     {
         if (IsOnPlayerSide(battler)) // Player
         {
-            // TODO: TARC fix this not updating
-            // PrintHpOnHealthbox(healthboxSpriteId, currHp, maxHp, 3, 0xB00, 0x3A0);
+            PrintHpOnHealthbox(healthboxSpriteId, currHp, maxHp, 3, 0xB00, 0x3A0);
         }
         else // Opponent
         {

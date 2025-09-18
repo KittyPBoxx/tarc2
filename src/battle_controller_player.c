@@ -1184,7 +1184,7 @@ static void Intro_TryShinyAnimShowHealthbox(u32 battler)
         if (!gBattleSpritesDataPtr->healthBoxesData[battler].healthboxSlideInStarted)
         {
             // TODO: TARC where is the health box
-            DebugPrintfLevel(MGBA_LOG_ERROR, "WHY IS THE SPRITE NOT CREATED???");
+            DebugPrintfLevel(MGBA_LOG_ERROR, "WHY IS THE SPRITE NOT CREATED BEFORE NOW???");
             if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                 CreateHealthboxSprite(battler);
 
