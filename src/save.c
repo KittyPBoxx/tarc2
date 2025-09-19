@@ -25,6 +25,47 @@ static u8 Save_WriteChunk(u8 slotId, u16 offset, const void *data, u16 size);
 static u8 Save_ReadChunk(u8 slotId, u16 offset, void *dest, u16 size);
 
 
+void CheckAnySlotValid()
+{
+    if (SlotIsValid(SAVE_AUTO_1))
+    {
+        gSaveFileStatus = SAVE_STATUS_OK;
+        return;
+    }
+
+    if (SlotIsValid(SAVE_AUTO_2))
+    {
+        gSaveFileStatus = SAVE_STATUS_OK;
+        return;
+    }
+
+    if (SlotIsValid(SAVE_MANUAL_1))
+    {
+        gSaveFileStatus = SAVE_STATUS_OK;
+        return;
+    }
+
+    if (SlotIsValid(SAVE_MANUAL_2))
+    {
+        gSaveFileStatus = SAVE_STATUS_OK;
+        return;
+    }
+
+    if (SlotIsValid(SAVE_MANUAL_3))
+    {
+        gSaveFileStatus = SAVE_STATUS_OK;
+        return;
+    }
+
+    if (SlotIsValid(SAVE_MANUAL_4))
+    {
+        gSaveFileStatus = SAVE_STATUS_OK;
+        return;
+    }
+
+    gSaveFileStatus = SAVE_STATUS_EMPTY;
+}
+
 u16 GetSaveBlocksPointersBaseOffset(void)
 {
     return 0;
@@ -189,6 +230,9 @@ void CopyPreviewDataToBuffer(u8 slot, u8 textId, u8 *dest)
         case SAVE_MENU_CAUGHT:
         case SAVE_MENU_LOCATION:
         case SAVE_MENU_BADGES:
+            *(dest++) = CHAR_0;
+            *(dest++) = CHAR_PERCENT;
+            *(dest++) = EOS;
             break;
     }
 }

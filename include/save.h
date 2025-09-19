@@ -104,6 +104,7 @@ u8 TrySavingData(u8 saveType, u8 slot);
 u8 LoadGameSave(u8 saveType, u8 slotId);
 bool8 SlotIsValid(u8 slotId);
 void CopyPreviewDataToBuffer(u8 slot, u8 textId, u8 *dest);
+void CheckAnySlotValid();
 
 u16 GetSaveBlocksPointersBaseOffset(void); // Always 0
 
