@@ -1363,13 +1363,11 @@ static void NamingScreen_NoIcon(void)
 
 static void NamingScreen_CreatePlayerIcon(void)
 {
-    u16 rivalGfxId;
     u8 spriteId;
 
-    rivalGfxId = GetRivalAvatarGraphicsIdByStateIdAndGender(PLAYER_AVATAR_STATE_NORMAL, sNamingScreen->monSpecies);
-    spriteId = CreateObjectGraphicsSprite(rivalGfxId, SpriteCallbackDummy, 56, 37, 0);
+    LoadMonIconPalettes();
+    spriteId = CreateMonIcon(SPECIES_IMPIDIMP, SpriteCallbackDummy, 56, 40, 0, sNamingScreen->monPersonality);
     gSprites[spriteId].oam.priority = 3;
-    StartSpriteAnim(&gSprites[spriteId], ANIM_STD_GO_SOUTH);
 }
 
 static void NamingScreen_CreatePCIcon(void)
@@ -1931,17 +1929,61 @@ static const u8 *const sKeyboardTextColors[KBPAGE_COUNT] =
     [KEYBOARD_SYMBOLS]       = sTextColorStruct.colors[2]
 };
 
+static const s8 sKeyboardCharOffsets[KBPAGE_COUNT][KBROW_COUNT][KBCOL_COUNT] =
+{
+    [KEYBOARD_LETTERS_LOWER] = {
+        { 1, 1, 1, 1, 1, 1, 1, 1, }, 
+        { 2, 1, 2, 1, 1, 1, 0, 1, }, 
+        { 0, 1, 1, 1, 1, 2, 1, 0, }, 
+        { 0, 0, 0, 0, 0, 0, 1, 0, }, 
+    },
+    [KEYBOARD_LETTERS_UPPER] = {
+        { 1, 1, 1, 1, 1, 2, 0, 2, }, 
+        { 1, 1, 3, 3, 2, 3, 0, 2, }, 
+        { 0, 2, 1, 2, 0, 1, 1, 0, }, 
+        { 1, 1, 1, 0, 0, 1, 1,0, }, 
+    },
+    [KEYBOARD_SYMBOLS] = {
+        { 0, 0, 0, 0, 0, 0, 0, 0, },
+        { 0, 0, 0, 0, 0, 0, 0, 0, },
+        { 0, 0, 0, 0, 0, 0, 0, 0, },
+        { 0, 0, 0, 0, 0, 0, 0, 0, },
+    },
+};
+
 static void PrintKeyboardKeys(u8 window, u8 page)
 {
-    u8 i;
+    u8 i, j;
 
     FillWindowPixelBuffer(window, sFillValues[page]);
 
     for (i = 0; i < KBROW_COUNT; i++)
-        AddTextPrinterParameterized3(window, FONT_NORMAL, 0, i * 16 + 1, sKeyboardTextColors[page], 0, sNamingScreenKeyboardText[page][i]);
+    {
+        for (j = 0; j < KBCOL_COUNT; j++)
+        {
+            u8 ch = sKeyboardChars[page][i][j];
+            if (ch == EOS || ch == ' ')
+                continue;
+
+            s16 baseX = 10 + sPageColumnXPos[page][j];
+            s16 baseY = i * 16 + 1;
+
+            s8 offset = sKeyboardCharOffsets[page][i][j];
+
+            u8 buf[2] = { ch, EOS };
+            AddTextPrinterParameterized3(window,
+                                         FONT_NORMAL,
+                                         baseX + offset,
+                                         baseY,
+                                         sKeyboardTextColors[page],
+                                         0,
+                                         buf);
+        }
+    }
 
     PutWindowTilemap(window);
 }
+
 
 static const u8 *const sNextKeyboardPageTilemaps[] =
 {
