@@ -1628,10 +1628,10 @@ static bool32 LoadMapInStepsLocal(u8 *state, bool32 a2)
         (*state)++;
         break;
     case 11:
-        if (GetLastUsedWarpMapSectionId() != gMapHeader.regionMapSectionId && MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_FADE_IN) == TRUE)
+        if (MapHasPreviewScreen_HandleQLState2(gMapHeader.mapLayoutId, MPS_TYPE_FADE_IN) == TRUE)
         {
-            MapPreview_LoadGfx(gMapHeader.regionMapSectionId);
-            MapPreview_StartForestTransition(gMapHeader.regionMapSectionId);
+            MapPreview_LoadGfx(gMapHeader.mapLayoutId);
+            MapPreview_StartForestTransition(gMapHeader.mapLayoutId);
         }
         (*state)++;
         break;

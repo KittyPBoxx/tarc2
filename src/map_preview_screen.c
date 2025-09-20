@@ -15,6 +15,7 @@
 #include "constants/rgb.h"
 #include "bg.h"
 #include "menu.h"
+#include "constants/layouts.h"
 
 static EWRAM_DATA bool8 sAllocedBg0TilemapBuffer = FALSE;
 
@@ -23,26 +24,87 @@ static void Task_RunMapPreview_Script(u8 taskId);
 static void CB2_MapPreviewScript(void);
 static void VblankCB_MapPreviewScript(void);
 
-static const u8 sBerryForestMapPreviewPalette[] = INCBIN_U8("graphics/map_preview/berry_forest/tiles.gbapal");
-static const u8 sBerryForestMapPreviewTiles[] = INCBIN_U8("graphics/map_preview/berry_forest/tiles.4bpp.lz");
-static const u8 sBerryForestMapPreviewTilemap[] = INCBIN_U8("graphics/map_preview/berry_forest/tilemap.bin.lz");
+static const u8 sForestMapPreviewPalette[] = INCBIN_U8("graphics/map_preview/forest/tiles.gbapal");
+static const u8 sForestMapPreviewTiles[] = INCBIN_U8("graphics/map_preview/forest/tiles.4bpp.lz");
+static const u8 sForestMapPreviewTilemap[] = INCBIN_U8("graphics/map_preview/forest/tilemap.bin.lz");
+
+static const u8 sBridgeMapPreviewPalette[] = INCBIN_U8("graphics/map_preview/bridge/tiles.gbapal");
+static const u8 sBridgeMapPreviewTiles[] = INCBIN_U8("graphics/map_preview/bridge/tiles.4bpp.lz");
+static const u8 sBridgeMapPreviewTilemap[] = INCBIN_U8("graphics/map_preview/bridge/tilemap.bin.lz");
+
+static const u8 sManorMapPreviewPalette[] = INCBIN_U8("graphics/map_preview/manor/tiles.gbapal");
+static const u8 sManorMapPreviewTiles[] = INCBIN_U8("graphics/map_preview/manor/tiles.4bpp.lz");
+static const u8 sManorMapPreviewTilemap[] = INCBIN_U8("graphics/map_preview/manor/tilemap.bin.lz");
+
+static const u8 sCaveMapPreviewPalette[] = INCBIN_U8("graphics/map_preview/cave/tiles.gbapal");
+static const u8 sCaveMapPreviewTiles[] = INCBIN_U8("graphics/map_preview/cave/tiles.4bpp.lz");
+static const u8 sCaveMapPreviewTilemap[] = INCBIN_U8("graphics/map_preview/cave/tilemap.bin.lz");
+
+static const u8 sSummitMapPreviewPalette[] = INCBIN_U8("graphics/map_preview/summit/tiles.gbapal");
+static const u8 sSummitMapPreviewTiles[] = INCBIN_U8("graphics/map_preview/summit/tiles.4bpp.lz");
+static const u8 sSummitMapPreviewTilemap[] = INCBIN_U8("graphics/map_preview/summit/tilemap.bin.lz");
+
 
 // If you set flagId to MPS_FLAG_NULL, it will not set a flag when visiting the map for the first time
 // and the duration will default to MPS_DURATION_NO_FLAG.
 static const struct MapPreviewScreen sMapPreviewScreenData[MPS_COUNT] = {
-    [MPS_BERRY_FOREST] = {
-        .mapsec = MAPSEC_BERRY_FOREST,
+    [MPS_FOREST] = {
+        .mapnum = LAYOUT_FOREST,
         .type = MPS_TYPE_FADE_IN,
         .flagId = MPS_FLAG_NULL,
-        .image = IMG_BERRY_FOREST
+        .image = IMG_FOREST
+    },
+    [MPS_BRIDGE] = {
+        .mapnum = LAYOUT_BRIDGE,
+        .type = MPS_TYPE_FADE_IN,
+        .flagId = MPS_FLAG_NULL,
+        .image = IMG_BRIDGE
+    },
+    [MPS_MANOR] = {
+        .mapnum = LAYOUT_MANOR,
+        .type = MPS_TYPE_FADE_IN,
+        .flagId = MPS_FLAG_NULL,
+        .image = IMG_MANOR
+    },
+    [MPS_CAVE] = {
+        .mapnum = LAYOUT_CAVE_BOTTOM,
+        .type = MPS_TYPE_FADE_IN,
+        .flagId = MPS_FLAG_NULL,
+        .image = IMG_CAVE
+    },
+    [MPS_SUMMIT] = {
+        .mapnum = LAYOUT_SUMMIT,
+        .type = MPS_TYPE_FADE_IN,
+        .flagId = MPS_FLAG_NULL,
+        .image = IMG_SUMMIT
     }
 };
 
 static const struct ImageData sMapPreviewImageData[IMG_COUNT] = {
-    [IMG_BERRY_FOREST] = {
-        .tilesptr = sBerryForestMapPreviewTiles,
-        .tilemapptr = sBerryForestMapPreviewTilemap,
-        .palptr = sBerryForestMapPreviewPalette
+    [IMG_FOREST] = {
+        .tilesptr = sForestMapPreviewTiles,
+        .tilemapptr = sForestMapPreviewTilemap,
+        .palptr = sForestMapPreviewPalette
+    },
+    [MPS_BRIDGE] = {
+        .tilesptr = sBridgeMapPreviewTiles,
+        .tilemapptr = sBridgeMapPreviewTilemap,
+        .palptr = sBridgeMapPreviewPalette
+    },
+    [MPS_MANOR] = {
+        .tilesptr = sManorMapPreviewTiles,
+        .tilemapptr = sManorMapPreviewTilemap,
+        .palptr = sManorMapPreviewPalette
+    },
+    [MPS_CAVE] = {
+        .tilesptr = sCaveMapPreviewTiles,
+        .tilemapptr = sCaveMapPreviewTilemap,
+        .palptr = sCaveMapPreviewPalette
+    },
+    [MPS_SUMMIT] = {
+        .tilesptr = sSummitMapPreviewTiles,
+        .tilemapptr = sSummitMapPreviewTilemap,
+        .palptr = sSummitMapPreviewPalette
     }
 };
 
@@ -72,13 +134,13 @@ static const struct BgTemplate sMapPreviewBgTemplate[1] = {
     }
 };
 
-static u8 GetMapPreviewScreenIdx(u8 mapsec)
+static u8 GetMapPreviewScreenIdx(u8 mapnum)
 {
     s32 i;
 
     for (i = 0; i < MPS_COUNT; i++)
     {
-        if (sMapPreviewScreenData[i].mapsec == mapsec)
+        if (sMapPreviewScreenData[i].mapnum == mapnum)
         {
             return i;
         }
@@ -86,11 +148,11 @@ static u8 GetMapPreviewScreenIdx(u8 mapsec)
     return MPS_COUNT;
 }
 
-bool8 MapHasPreviewScreen(u8 mapsec, u8 type)
+bool8 MapHasPreviewScreen(u8 mapnum, u8 type)
 {
     u8 idx;
 
-    idx = GetMapPreviewScreenIdx(mapsec);
+    idx = GetMapPreviewScreenIdx(mapnum);
     if (idx != MPS_COUNT)
     {
         if (type == MPS_TYPE_ANY)
@@ -108,9 +170,9 @@ bool8 MapHasPreviewScreen(u8 mapsec, u8 type)
     }
 }
 
-bool32 MapHasPreviewScreen_HandleQLState2(u8 mapsec, u8 type)
+bool32 MapHasPreviewScreen_HandleQLState2(u8 mapnum, u8 type)
 {
-    return MapHasPreviewScreen(mapsec, type);
+    return MapHasPreviewScreen(mapnum, type);
 }
 
 void MapPreview_InitBgs(void)
@@ -119,15 +181,15 @@ void MapPreview_InitBgs(void)
     ShowBg(0);
 }
 
-void MapPreview_LoadGfx(u8 mapsec)
+void MapPreview_LoadGfx(u8 mapnum)
 {
     u8 idx;
 
-    idx = GetMapPreviewScreenIdx(mapsec);
+    idx = GetMapPreviewScreenIdx(mapnum);
     if (idx != MPS_COUNT)
     {
        ResetTempTileDataBuffers();
-       if (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_FADE_IN) == TRUE)
+       if (MapHasPreviewScreen_HandleQLState2(gMapHeader.mapLayoutId, MPS_TYPE_FADE_IN) == TRUE)
             LoadPalette(sMapPreviewImageData[sMapPreviewScreenData[idx].image].palptr, BG_PLTT_ID(13), 3 * PLTT_SIZE_4BPP);
         else
             LoadPalette(sMapPreviewImageData[sMapPreviewScreenData[idx].image].palptr, BG_PLTT_ID(0), 16 * PLTT_SIZE_4BPP);
@@ -161,7 +223,7 @@ bool32 MapPreview_IsGfxLoadFinished(void)
     return FreeTempTileDataBuffersIfPossible();
 }
 
-void MapPreview_StartForestTransition(u8 mapsec)
+void MapPreview_StartForestTransition(u8 mapnum)
 {
     u8 taskId;
 
@@ -172,7 +234,7 @@ void MapPreview_StartForestTransition(u8 mapsec)
     gTasks[taskId].data[3] = GetGpuReg(REG_OFFSET_DISPCNT);
     gTasks[taskId].data[6] = GetGpuReg(REG_OFFSET_WININ);
     gTasks[taskId].data[7] = GetGpuReg(REG_OFFSET_WINOUT);
-    gTasks[taskId].data[10] = MapPreview_GetDuration(mapsec);
+    gTasks[taskId].data[10] = MapPreview_GetDuration(mapnum);
     gTasks[taskId].data[8] = 16;
     gTasks[taskId].data[9] = 0;
     SetBgAttribute(0, BG_ATTR_PRIORITY, 0);
@@ -180,11 +242,11 @@ void MapPreview_StartForestTransition(u8 mapsec)
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
     SetGpuRegBits(REG_OFFSET_WININ, WININ_WIN0_CLR | WININ_WIN1_CLR);
     SetGpuRegBits(REG_OFFSET_WINOUT, WINOUT_WIN01_CLR);
-    gTasks[taskId].data[11] = MapPreview_CreateMapNameWindow(mapsec);
+    gTasks[taskId].data[11] = MapPreview_CreateMapNameWindow(mapnum);
     LockPlayerFieldControls();
 }
 
-u16 MapPreview_CreateMapNameWindow(u8 mapsec)
+u16 MapPreview_CreateMapNameWindow(u8 mapnum)
 {
     u16 windowId;
     u32 xctr;
@@ -195,7 +257,7 @@ u16 MapPreview_CreateMapNameWindow(u8 mapsec)
     u8 color[0];
     #endif
 
-    GetMapName(gStringVar4, mapsec, 0);
+    GetMapName(gStringVar4, mapnum, 0);
     if (GetStringWidth(FONT_NORMAL, gStringVar4, 0) > 104)
     {
         windowId = AddWindow(&sMapNameWindowLarge);
@@ -306,11 +368,11 @@ static void Task_RunMapPreviewScreenForest(u8 taskId)
     }
 }
 
-const struct MapPreviewScreen * GetDungeonMapPreviewScreenInfo(u8 mapsec)
+const struct MapPreviewScreen * GetDungeonMapPreviewScreenInfo(u8 mapnum)
 {
     u8 idx;
 
-    idx = GetMapPreviewScreenIdx(mapsec);
+    idx = GetMapPreviewScreenIdx(mapnum);
     if (idx == MPS_COUNT)
     {
         return NULL;
@@ -321,12 +383,12 @@ const struct MapPreviewScreen * GetDungeonMapPreviewScreenInfo(u8 mapsec)
     }
 }
 
-u16 MapPreview_GetDuration(u8 mapsec)
+u16 MapPreview_GetDuration(u8 mapnum)
 {
     u8 idx;
     u16 flagId;
 
-    idx = GetMapPreviewScreenIdx(mapsec);
+    idx = GetMapPreviewScreenIdx(mapnum);
 
     if (idx == MPS_COUNT)
     {
@@ -377,7 +439,7 @@ void Script_MapPreview(void)
 {
     SetVBlankCallback(NULL);
     gMain.savedCallback = CB2_ReturnToFieldContinueScript;
-    MapPreview_LoadGfx(gMapHeader.regionMapSectionId);
+    MapPreview_LoadGfx(gMapHeader.mapLayoutId);
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0x10, 0, RGB_BLACK);
     SetVBlankCallback(VblankCB_MapPreviewScript);
     SetMainCallback2(CB2_MapPreviewScript);
@@ -401,7 +463,7 @@ static void Task_RunMapPreview_Script(u8 taskId)
     case 0:
         if (!MapPreview_IsGfxLoadFinished() && !IsDma3ManagerBusyWithBgCopy())
         {
-            MPWindowId = MapPreview_CreateMapNameWindow(gMapHeader.regionMapSectionId);
+            MPWindowId = MapPreview_CreateMapNameWindow(gMapHeader.mapLayoutId);
             CopyWindowToVram(MPWindowId, COPYWIN_FULL);
             taskStep++;
         }

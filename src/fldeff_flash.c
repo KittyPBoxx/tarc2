@@ -130,9 +130,9 @@ static bool8 TryDoMapTransition(void)
     u8 fromType = GetLastUsedWarpMapType();
     u8 toType = GetCurrentMapType();
 
-    if (GetLastUsedWarpMapSectionId() != gMapHeader.regionMapSectionId && (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_CAVE) == TRUE || MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_BASIC) == TRUE))
+    if ((MapHasPreviewScreen_HandleQLState2(gMapHeader.mapLayoutId, MPS_TYPE_CAVE) == TRUE || MapHasPreviewScreen_HandleQLState2(gMapHeader.mapLayoutId, MPS_TYPE_BASIC) == TRUE))
     {
-        RunMapPreviewScreen(gMapHeader.regionMapSectionId);
+        RunMapPreviewScreen(gMapHeader.mapLayoutId);
         return TRUE;
     }
     for (i = 0; sTransitionTypes[i].fromType; i++)
@@ -388,7 +388,7 @@ static void Task_MapPreviewScreen_0(u8 taskId)
         data[1]++;
         if (data[1] > data[2] || JOY_HELD(B_BUTTON))
         {
-            if (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_BASIC) == TRUE)
+            if (MapHasPreviewScreen_HandleQLState2(gMapHeader.mapLayoutId, MPS_TYPE_BASIC) == TRUE)
             {
                 BeginNormalPaletteFade(PALETTES_ALL, MPS_BASIC_FADE_SPEED, 0, 16, RGB_BLACK);
             }
@@ -407,7 +407,7 @@ static void Task_MapPreviewScreen_0(u8 taskId)
                 data[i] = 0;
             }
             MapPreview_Unload(data[4]);
-            if (MapHasPreviewScreen_HandleQLState2(gMapHeader.regionMapSectionId, MPS_TYPE_BASIC) == TRUE)
+            if (MapHasPreviewScreen_HandleQLState2(gMapHeader.mapLayoutId, MPS_TYPE_BASIC) == TRUE)
             {
                 SetMainCallback2(gMain.savedCallback);
             }

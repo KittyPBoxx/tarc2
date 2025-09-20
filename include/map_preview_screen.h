@@ -3,13 +3,21 @@
 
 enum MapPreviewScreenId
 {
-    MPS_BERRY_FOREST,
+    MPS_FOREST,
+    MPS_BRIDGE,
+    MPS_MANOR,
+    MPS_CAVE,
+    MPS_SUMMIT,
     MPS_COUNT
 };
 
 enum PreviewImageId
 {
-    IMG_BERRY_FOREST,
+    IMG_FOREST,
+    IMG_BRIDGE,
+    IMG_MANOR,
+    IMG_CAVE,
+    IMG_SUMMIT,
     IMG_COUNT
 };
 
@@ -43,7 +51,7 @@ enum PreviewImageId
 
 struct MapPreviewScreen
 {
-    u8 mapsec;
+    u8 mapnum;
     u8 type;
     u16 flagId;
     u8 image;
@@ -58,14 +66,14 @@ struct ImageData
 
 u16 MapPreview_CreateMapNameWindow(u8 id);
 u16 MapPreview_GetDuration(u8 id);
-bool8 MapHasPreviewScreen(u8 mapsec, u8 type);
+bool8 MapHasPreviewScreen(u8 mapnum, u8 type);
 bool32 ForestMapPreviewScreenIsRunning(void);
-const struct MapPreviewScreen * GetDungeonMapPreviewScreenInfo(u8 mapsec);
-bool32 MapHasPreviewScreen_HandleQLState2(u8 mapsec, u8 type);
+const struct MapPreviewScreen * GetDungeonMapPreviewScreenInfo(u8 mapnum);
+bool32 MapHasPreviewScreen_HandleQLState2(u8 mapnum, u8 type);
 void MapPreview_InitBgs(void);
-void MapPreview_LoadGfx(u8 mapsec);
+void MapPreview_LoadGfx(u8 mapnum);
 bool32 MapPreview_IsGfxLoadFinished(void);
 void MapPreview_Unload(s32 windowId);
-void MapPreview_StartForestTransition(u8 mapsec);
+void MapPreview_StartForestTransition(u8 mapnum);
 
 #endif //GUARD_MAP_PREVIEW_SCREEN_H

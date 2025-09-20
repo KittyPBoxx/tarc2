@@ -115,7 +115,7 @@ void WarpFadeOutScreen(void)
         FadeScreen(FADE_TO_BLACK, 0);
         break;
     case 1:
-        if (MapHasPreviewScreen_HandleQLState2(GetDestinationWarpMapSectionId(), MPS_TYPE_CAVE))
+        if (MapHasPreviewScreen_HandleQLState2(GetDestinationWarpMapHeader()->mapLayoutId, MPS_TYPE_CAVE))
             FadeScreen(FADE_TO_BLACK, 0);
         else
             FadeScreen(FADE_TO_WHITE, 0);
