@@ -108,29 +108,16 @@ script SlidingTilePuzzle {
 
 		setvar(VAR_0x8004, 1) // puzzleId
 		setvar(VAR_0x8005, 0) // solved
+		setvar(VAR_0x8008, 0) // return species
 		special(DoSlidingPuzzle)
+		waitstate
 
-		if (var(VAR_RESULT) == 1) {
-
-			msgbox("The image of a pokemon was revealed. Do you want ditto to take its form?", MSGBOX_YESNO)
-
-			if (var(VAR_RESULT) == 1) {
-				setvar(VAR_0x8008, SPECIES_INKAY)
-				special(SetPlayerMonSpecies)
-				waitstate
-				msgbox(format("Ditto took the form of Inkay!"))
-			}
-
-		} elif (var(VAR_RESULT) == 1) {
+		if (var(VAR_0x8008) != 0) {
 
 			msgbox("The image of a pokemon was revealed. Do you want ditto to take its form?", MSGBOX_YESNO)
-
-			if (var(VAR_RESULT) == 1) {
-				setvar(VAR_0x8008, SPECIES_SANDYGAST)
-				special(SetPlayerMonSpecies)
-				waitstate
-				msgbox(format("Ditto took the form of Sandygast!"))
-			}
+			special(SetPlayerMonSpecies)
+			waitstate
+			msgbox(format("Ditto took on a new form!"))
 
 		}
 

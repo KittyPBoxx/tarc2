@@ -37,7 +37,7 @@ static bool32 CursorIsOnTile(void);
 static bool32 CursorIsOnImmovableTile(void);
 static void SelectTile(void);
 static void PlaceTile(void);
-static void RotateTile(u8);
+// static void RotateTile(u8);
 static void CheckForSolution(void);
 static void ExitSlidingPuzzle(u8);
 static void SpriteCB_Cursor(struct Sprite *);
@@ -404,9 +404,9 @@ enum
 
 static const u8 sText_MoveQuit[]            = _("{DPAD_NONE} Move {B_BUTTON} Quit");
 static const u8 sText_MovePickUpQuit[]      = _("{DPAD_NONE} Move {A_BUTTON} Pick Up {B_BUTTON} Quit");
-static const u8 sText_MovePlaceRotateQuit[] = _("{DPAD_NONE} Move {A_BUTTON} Place {L_BUTTON}{R_BUTTON} Rotate {B_BUTTON} Quit");
-static const u8 sText_MoveSwapRotateQuit[]  = _("{DPAD_NONE} Move {A_BUTTON} Swap {L_BUTTON}{R_BUTTON} Rotate {B_BUTTON} Quit");
-static const u8 sText_MoveRotateQuit[]      = _("{DPAD_NONE} Move {L_BUTTON}{R_BUTTON} Rotate {B_BUTTON} Quit");
+static const u8 sText_MovePlaceRotateQuit[] = _("{DPAD_NONE} Move {A_BUTTON} Place {B_BUTTON} Quit");
+static const u8 sText_MoveSwapRotateQuit[]  = _("{DPAD_NONE} Move {A_BUTTON} Swap {B_BUTTON} Quit");
+static const u8 sText_MoveRotateQuit[]      = _("{DPAD_NONE} Move {B_BUTTON} Quit");
 static const u8 sText_Continue[]            = _("{A_BUTTON}{B_BUTTON} Continue");
 
 static const u8 *const sInstructions[] =
@@ -600,10 +600,10 @@ static void Task_SlidingPuzzle_HandleInput(u8 taskId)
                 PlaceTile();
         }
 
-        if (JOY_NEW(L_BUTTON))
-            RotateTile(ROTATE_ANTICLOCKWISE);
-        else if (JOY_NEW(R_BUTTON))
-            RotateTile(ROTATE_CLOCKWISE);
+        // if (JOY_NEW(L_BUTTON))
+        //     RotateTile(ROTATE_ANTICLOCKWISE);
+        // else if (JOY_NEW(R_BUTTON))
+        //     RotateTile(ROTATE_CLOCKWISE);
     }
 }
 
@@ -837,41 +837,55 @@ static void PlaceTile(void)
     CheckForSolution();
 }
 
-static void RotateTile(u8 rotDir)
-{
-    struct Sprite *sprite = &gSprites[sSlidingPuzzle->heldTile];
-    u8 affineAnimation;
+// static void RotateTile(u8 rotDir)
+// {
+//     struct Sprite *sprite = &gSprites[sSlidingPuzzle->heldTile];
+//     u8 affineAnimation;
 
-    if (rotDir == ROTATE_ANTICLOCKWISE)
-    {
-        affineAnimation = sprite->sOrientation + 4;
-        if (sprite->sOrientation)
-            sprite->sOrientation--;
-        else
-            sprite->sOrientation = ORIENTATION_270;
-    }
-    else if (rotDir == ROTATE_CLOCKWISE)
-    {
-        affineAnimation = sprite->sOrientation + 8;
-        sprite->sOrientation++;
-        sprite->sOrientation = sprite->sOrientation % ORIENTATION_MAX;
-    }
+//     if (rotDir == ROTATE_ANTICLOCKWISE)
+//     {
+//         affineAnimation = sprite->sOrientation + 4;
+//         if (sprite->sOrientation)
+//             sprite->sOrientation--;
+//         else
+//             sprite->sOrientation = ORIENTATION_270;
+//     }
+//     else if (rotDir == ROTATE_CLOCKWISE)
+//     {
+//         affineAnimation = sprite->sOrientation + 8;
+//         sprite->sOrientation++;
+//         sprite->sOrientation = sprite->sOrientation % ORIENTATION_MAX;
+//     }
 
-    StartSpriteAffineAnim(sprite, affineAnimation);
-    sprite->sAnimating = TRUE;
-}
+//     StartSpriteAffineAnim(sprite, affineAnimation);
+//     sprite->sAnimating = TRUE;
+// }
 
 static void CheckForSolution(void)
 {
     u8 row, col;
+    u8 solutionLayout;
+
+    struct Sprite *tile = &gSprites[sSlidingPuzzle->tiles[0][0]];
+
+    if (tile->sTileId == 13)
+    {
+        solutionLayout = SLIDING_PUZZLE_SOLVED_ALT;
+    }
+    else
+    {
+        solutionLayout = SLIDING_PUZZLE_SOLVED;
+    }
+
     for (row = 0; row < NUM_SLIDING_PUZZLE_ROWS; row++)
     {
         for (col = 0; col < NUM_SLIDING_PUZZLE_COLS; col++)
         {
-            struct Sprite *tile = &gSprites[sSlidingPuzzle->tiles[row][col]];
-            u8 tileId = sPuzzleLayouts[SLIDING_PUZZLE_SOLVED][row][col];
+            tile = &gSprites[sSlidingPuzzle->tiles[row][col]];
+            u8 solutionTileId = sPuzzleLayouts[solutionLayout][row][col];
 
-            if (tile->sTileId != tileId || tile->sOrientation != ORIENTATION_0)
+
+            if (tile->sTileId != solutionTileId || tile->sOrientation != ORIENTATION_0)
             {
                 sSlidingPuzzle->solved = FALSE;
                 return;
@@ -880,6 +894,7 @@ static void CheckForSolution(void)
     }
 
     sSlidingPuzzle->solved = TRUE;
+    sSlidingPuzzle->solution = solutionLayout;
 }
 
 static void ExitSlidingPuzzle(u8 taskId)

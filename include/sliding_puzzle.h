@@ -36,6 +36,7 @@ struct SlidingPuzzle
     u8 cursorSpriteId;
     u8 heldTile;
     bool8 solved;
+    u8 solution;
 };
 
 #endif // GUARD_SLIDING_PUZZLE_H

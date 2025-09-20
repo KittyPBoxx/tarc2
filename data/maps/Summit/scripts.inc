@@ -138,15 +138,16 @@ SlidingTilePuzzle::
 # 110 "data/maps/Summit/scripts.pory"
 	setvar VAR_0x8005, 0
 # 111 "data/maps/Summit/scripts.pory"
+	setvar VAR_0x8008, 0
+# 112 "data/maps/Summit/scripts.pory"
 	special DoSlidingPuzzle
 # 113 "data/maps/Summit/scripts.pory"
-	compare VAR_RESULT, 1
-	goto_if_eq SlidingTilePuzzle_7
-# 124 "data/maps/Summit/scripts.pory"
-	compare VAR_RESULT, 1
-	goto_if_eq SlidingTilePuzzle_8
+	waitstate
+# 115 "data/maps/Summit/scripts.pory"
+	compare VAR_0x8008, 0
+	goto_if_ne SlidingTilePuzzle_7
 SlidingTilePuzzle_1:
-# 139 "data/maps/Summit/scripts.pory"
+# 126 "data/maps/Summit/scripts.pory"
 	release
 	end
 
@@ -168,49 +169,22 @@ SlidingTilePuzzle_5:
 	goto SlidingTilePuzzle_1
 
 SlidingTilePuzzle_7:
-# 115 "data/maps/Summit/scripts.pory"
-	msgbox SlidingTilePuzzle_Text_2, MSGBOX_YESNO
 # 117 "data/maps/Summit/scripts.pory"
-	compare VAR_RESULT, 1
-	goto_if_eq SlidingTilePuzzle_11
-	goto SlidingTilePuzzle_1
-
-SlidingTilePuzzle_8:
-# 126 "data/maps/Summit/scripts.pory"
 	msgbox SlidingTilePuzzle_Text_2, MSGBOX_YESNO
-# 128 "data/maps/Summit/scripts.pory"
-	compare VAR_RESULT, 1
-	goto_if_eq SlidingTilePuzzle_13
-	goto SlidingTilePuzzle_1
-
-SlidingTilePuzzle_11:
 # 118 "data/maps/Summit/scripts.pory"
-	setvar VAR_0x8008, SPECIES_INKAY
-# 119 "data/maps/Summit/scripts.pory"
 	special SetPlayerMonSpecies
-# 120 "data/maps/Summit/scripts.pory"
+# 119 "data/maps/Summit/scripts.pory"
 	waitstate
-# 121 "data/maps/Summit/scripts.pory"
+# 120 "data/maps/Summit/scripts.pory"
 	msgbox SlidingTilePuzzle_Text_3
 	goto SlidingTilePuzzle_1
 
-SlidingTilePuzzle_13:
-# 129 "data/maps/Summit/scripts.pory"
-	setvar VAR_0x8008, SPECIES_SANDYGAST
+
 # 130 "data/maps/Summit/scripts.pory"
-	special SetPlayerMonSpecies
-# 131 "data/maps/Summit/scripts.pory"
-	waitstate
-# 132 "data/maps/Summit/scripts.pory"
-	msgbox SlidingTilePuzzle_Text_4
-	goto SlidingTilePuzzle_1
-
-
-# 143 "data/maps/Summit/scripts.pory"
 MakeShortcut:
-# 144 "data/maps/Summit/scripts.pory"
+# 131 "data/maps/Summit/scripts.pory"
 	walk_left
-# 144 "data/maps/Summit/scripts.pory"
+# 131 "data/maps/Summit/scripts.pory"
 	walk_left
 	step_end
 
@@ -302,13 +276,9 @@ SlidingTilePuzzle_Text_1:
 	.string "A wall of square tiles was revealed$"
 
 SlidingTilePuzzle_Text_2:
-# 115 "data/maps/Summit/scripts.pory"
+# 117 "data/maps/Summit/scripts.pory"
 	.string "The image of a pokemon was revealed. Do you want ditto to take its form?$"
 
 SlidingTilePuzzle_Text_3:
-# 121 "data/maps/Summit/scripts.pory"
-	.string "Ditto took the form of Inkay!$"
-
-SlidingTilePuzzle_Text_4:
-# 132 "data/maps/Summit/scripts.pory"
-	.string "Ditto took the form of Sandygast!$"
+# 120 "data/maps/Summit/scripts.pory"
+	.string "Ditto took on a new form!$"
