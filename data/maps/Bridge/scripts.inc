@@ -34,7 +34,7 @@ BridgeIntro::
 # 24 "data/maps/Bridge/scripts.pory"
 	applymovement OBJ_EVENT_ID_PLAYER, LookUp
 # 26 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 27 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_0
 # 28 "data/maps/Bridge/scripts.pory"
@@ -45,14 +45,14 @@ BridgeIntro::
 	compare VAR_RESULT, 1
 	goto_if_eq BridgeIntro_5
 # 37 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 38 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_3
 # 39 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 BridgeIntro_4:
 # 42 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 43 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_4
 # 44 "data/maps/Bridge/scripts.pory"
@@ -64,31 +64,31 @@ BridgeIntro_4:
 # 48 "data/maps/Bridge/scripts.pory"
 	waitstate
 # 50 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 51 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_5
 # 52 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 # 54 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 55 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_6
 # 56 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 # 58 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 59 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_7
 # 60 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 # 62 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 63 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_8
 # 64 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 # 66 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 67 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_9
 # 68 "data/maps/Bridge/scripts.pory"
@@ -102,7 +102,7 @@ BridgeIntro_2:
 
 BridgeIntro_5:
 # 33 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 34 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_2
 # 35 "data/maps/Bridge/scripts.pory"
@@ -130,7 +130,7 @@ BerusNPC::
 	checktrainerflag TRAINER_BERUS
 	goto_if 0, BerusNPC_4
 # 110 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 111 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_4
 # 112 "data/maps/Bridge/scripts.pory"
@@ -142,7 +142,7 @@ BerusNPC_1:
 
 BerusNPC_2:
 # 86 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 87 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_0
 # 88 "data/maps/Bridge/scripts.pory"
@@ -151,7 +151,7 @@ BerusNPC_2:
 
 BerusNPC_3:
 # 92 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 93 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_1
 # 94 "data/maps/Bridge/scripts.pory"
@@ -159,7 +159,7 @@ BerusNPC_3:
 # 95 "data/maps/Bridge/scripts.pory"
 	trainerbattle_single TRAINER_BERUS, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 # 96 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 97 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_2
 # 98 "data/maps/Bridge/scripts.pory"
@@ -168,7 +168,7 @@ BerusNPC_3:
 
 BerusNPC_4:
 # 103 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 104 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_3
 # 105 "data/maps/Bridge/scripts.pory"
@@ -201,25 +201,25 @@ StarterBag_2:
 # 130 "data/maps/Bridge/scripts.pory"
 	waitstate
 # 132 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 133 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_0
 # 134 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 # 136 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 137 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_1
 # 138 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 # 140 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 141 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_2
 # 142 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 # 144 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 145 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_3
 # 146 "data/maps/Bridge/scripts.pory"
@@ -230,7 +230,7 @@ StarterBag_2:
 
 StarterBag_3:
 # 152 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 153 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_5
 # 154 "data/maps/Bridge/scripts.pory"

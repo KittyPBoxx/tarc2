@@ -15,7 +15,7 @@ OrthyNPC::
 	compare VAR_0x8008, SPECIES_MR_RIME
 	goto_if_eq OrthyNPC_2
 # 18 "data/maps/Manor/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 19 "data/maps/Manor/scripts.pory"
 	msgbox OrthyNPC_Text_1
 # 20 "data/maps/Manor/scripts.pory"
@@ -27,7 +27,7 @@ OrthyNPC_1:
 
 OrthyNPC_2:
 # 11 "data/maps/Manor/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 12 "data/maps/Manor/scripts.pory"
 	msgbox OrthyNPC_Text_0
 # 13 "data/maps/Manor/scripts.pory"

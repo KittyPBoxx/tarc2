@@ -6,18 +6,18 @@ script DanteNPC {
 
    	if (defeated(TRAINER_EXAMINER_DANTE)) {
             
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("You've made it far kid. I'm the last candidate you'll face before the champion.")) 
         removefieldmugshot
         trainerbattle_double(TRAINER_EXAMINER_DANTE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons)
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("The champion awaits good luck.")) 
         removefieldmugshot
 
     } 
 	else {
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 		msgbox("Did you want a rematch?", MSGBOX_YESNO)
 
 		if (var(VAR_RESULT) == 1) {

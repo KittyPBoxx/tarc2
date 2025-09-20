@@ -5,29 +5,29 @@ script TenjinNPC {
 
 	if (!flag(FLAG_TENJIN_INTRO)) {
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 		msgbox(format("Teamwork. The power of two. You finally worked out the one candidate couldn't beat exam alone, put your differences aside and now you face me."))
 		removefieldmugshot
 
 		faceplayer
 		applymovement(1, Common_Movement_QuestionMark)
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 		msgbox(format("Wait... why is there only one of you? The exams supposed to be impossible to do solo... I'm supposed to give a speech..."))
 		removefieldmugshot
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
 		msgbox(format("..."))
 		removefieldmugshot
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 		msgbox(format("Umm... determination and er.... perseverance. Yes! These were the qualities you need to pass the test!"))
 		removefieldmugshot
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
 		msgbox(format("..."))
 		removefieldmugshot
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 		msgbox(format("Sigh... ok, I'll level with you. Candidates aren't supposed to fight me by themselves, but you're the last one who hasn't passed or dropped out. I'd be happy to face you but without a miracle this is where your journey ends."))
 		removefieldmugshot
 
@@ -36,12 +36,12 @@ script TenjinNPC {
 	}
 	elif (defeated(TRAINER_DEITY_TENJIN)) {
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
 		msgbox("Are you sure you have time for a rematch?", MSGBOX_YESNO)
 		removefieldmugshot
 
 		if (var(VAR_RESULT) == 1) {
-			createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+			createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
 			msgbox(format("Very well, but don't expect me to go easy on you just because you're my favourite candidate."))
 			removefieldmugshot
 			trainerbattle_double(TRAINER_DEITY_TENJIN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons)
@@ -51,30 +51,30 @@ script TenjinNPC {
 
 		if (!flag(FLAG_TILE_PUZZLE_SOLVED)) {
 
-			createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+			createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 			msgbox(format("Did you know some prayers work outside battle? I think you could transform that ditto ust by showing it an image of a pokemon. Prepare yourself because I won't hold back.")) 
 			removefieldmugshot
 
 		} else {
 
-			createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+			createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 			msgbox(format("You're an excelent trainer {PLAYER} capable of bringing out that dittos full potential. But you're a hundred years too early to be facing me by yourself.")) 
 			removefieldmugshot
 	
 		}
 
 		trainerbattle_double(TRAINER_DEITY_TENJIN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons)
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 		msgbox(format("That was fantastic, it been  a long time since I've felt such thrill in battle.")) 
 		applymovement(1, Common_Movement_QuestionMark)
 		msgbox(format("Are you {PLAYER}? There was another candidate waiting around for you earlier. They said that you-"))
 		removefieldmugshot
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
 		msgbox(format("..."))
 		removefieldmugshot
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 		msgbox(format("I see... well {PLAYER} I understand you have a good reason for needing this sponsorshi so let me off you some advice. Never get in debt to a God. I wish we could talk more but if you want to pass you need to leave now. You can use this shortcut."))
 		removefieldmugshot
 

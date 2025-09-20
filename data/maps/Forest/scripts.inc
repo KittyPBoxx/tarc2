@@ -30,7 +30,7 @@ SoraNPC::
 	checktrainerflag TRAINER_EXAMINER_SORA
 	goto_if 1, SoraNPC_2
 # 31 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 32 "data/maps/Forest/scripts.pory"
 	msgbox SoraNPC_Text_2, MSGBOX_YESNO
 # 34 "data/maps/Forest/scripts.pory"
@@ -45,7 +45,7 @@ SoraNPC_1:
 
 SoraNPC_2:
 # 20 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 21 "data/maps/Forest/scripts.pory"
 	msgbox SoraNPC_Text_0
 # 22 "data/maps/Forest/scripts.pory"
@@ -53,7 +53,7 @@ SoraNPC_2:
 # 23 "data/maps/Forest/scripts.pory"
 	trainerbattle_single TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 # 24 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 25 "data/maps/Forest/scripts.pory"
 	msgbox SoraNPC_Text_1
 # 26 "data/maps/Forest/scripts.pory"
@@ -77,7 +77,7 @@ FionnNPC::
 	checktrainerflag TRAINER_EXAMINER_FIONN
 	goto_if 1, FionnNPC_2
 # 64 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 65 "data/maps/Forest/scripts.pory"
 	msgbox SoraNPC_Text_2, MSGBOX_YESNO
 # 67 "data/maps/Forest/scripts.pory"
@@ -92,7 +92,7 @@ FionnNPC_1:
 
 FionnNPC_2:
 # 53 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 54 "data/maps/Forest/scripts.pory"
 	msgbox FionnNPC_Text_0
 # 55 "data/maps/Forest/scripts.pory"
@@ -100,7 +100,7 @@ FionnNPC_2:
 # 56 "data/maps/Forest/scripts.pory"
 	trainerbattle_single TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 # 57 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 58 "data/maps/Forest/scripts.pory"
 	msgbox FionnNPC_Text_1
 # 59 "data/maps/Forest/scripts.pory"

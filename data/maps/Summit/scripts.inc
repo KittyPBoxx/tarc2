@@ -13,7 +13,7 @@ TenjinNPC::
 # 52 "data/maps/Summit/scripts.pory"
 	goto_if_unset FLAG_TILE_PUZZLE_SOLVED, TenjinNPC_10
 # 60 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 61 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_8
 # 62 "data/maps/Summit/scripts.pory"
@@ -22,7 +22,7 @@ TenjinNPC_9:
 # 66 "data/maps/Summit/scripts.pory"
 	trainerbattle_double TRAINER_DEITY_TENJIN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons
 # 67 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 68 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_9
 # 69 "data/maps/Summit/scripts.pory"
@@ -32,13 +32,13 @@ TenjinNPC_9:
 # 71 "data/maps/Summit/scripts.pory"
 	removefieldmugshot
 # 73 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 74 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_2
 # 75 "data/maps/Summit/scripts.pory"
 	removefieldmugshot
 # 77 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 78 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_11
 # 79 "data/maps/Summit/scripts.pory"
@@ -52,7 +52,7 @@ TenjinNPC_1:
 
 TenjinNPC_2:
 # 8 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 9 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_0
 # 10 "data/maps/Summit/scripts.pory"
@@ -62,31 +62,31 @@ TenjinNPC_2:
 # 13 "data/maps/Summit/scripts.pory"
 	applymovement 1, Common_Movement_QuestionMark
 # 14 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 15 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_1
 # 16 "data/maps/Summit/scripts.pory"
 	removefieldmugshot
 # 18 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 19 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_2
 # 20 "data/maps/Summit/scripts.pory"
 	removefieldmugshot
 # 22 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 23 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_3
 # 24 "data/maps/Summit/scripts.pory"
 	removefieldmugshot
 # 26 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 27 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_2
 # 28 "data/maps/Summit/scripts.pory"
 	removefieldmugshot
 # 30 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 31 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_4
 # 32 "data/maps/Summit/scripts.pory"
@@ -97,7 +97,7 @@ TenjinNPC_2:
 
 TenjinNPC_3:
 # 39 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 40 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_5, MSGBOX_YESNO
 # 41 "data/maps/Summit/scripts.pory"
@@ -109,7 +109,7 @@ TenjinNPC_3:
 
 TenjinNPC_7:
 # 44 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 45 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_6
 # 46 "data/maps/Summit/scripts.pory"
@@ -120,7 +120,7 @@ TenjinNPC_7:
 
 TenjinNPC_10:
 # 54 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 55 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_7
 # 56 "data/maps/Summit/scripts.pory"

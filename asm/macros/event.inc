@@ -2382,10 +2382,10 @@
 	.endm
 
 	@ example_usage:
-	@ 	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	@ 	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 	@ 	msgbox test
 	@ 	removefieldmugshot
-	@ 	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	@ 	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 	@ 	msgbox test2
 	@ 	removefieldmugshot
 

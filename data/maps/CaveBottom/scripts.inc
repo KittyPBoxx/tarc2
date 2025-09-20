@@ -11,7 +11,7 @@ RuneNPC::
 	checktrainerflag TRAINER_EXAMINER_RUNE
 	goto_if 1, RuneNPC_2
 # 20 "data/maps/CaveBottom/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 21 "data/maps/CaveBottom/scripts.pory"
 	msgbox RuneNPC_Text_2, MSGBOX_YESNO
 # 23 "data/maps/CaveBottom/scripts.pory"
@@ -26,7 +26,7 @@ RuneNPC_1:
 
 RuneNPC_2:
 # 9 "data/maps/CaveBottom/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 10 "data/maps/CaveBottom/scripts.pory"
 	msgbox RuneNPC_Text_0
 # 11 "data/maps/CaveBottom/scripts.pory"
@@ -34,7 +34,7 @@ RuneNPC_2:
 # 12 "data/maps/CaveBottom/scripts.pory"
 	trainerbattle_single TRAINER_EXAMINER_RUNE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 # 13 "data/maps/CaveBottom/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 14 "data/maps/CaveBottom/scripts.pory"
 	msgbox RuneNPC_Text_1
 # 15 "data/maps/CaveBottom/scripts.pory"

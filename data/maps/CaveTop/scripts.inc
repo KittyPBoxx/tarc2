@@ -11,7 +11,7 @@ DanteNPC::
 	checktrainerflag TRAINER_EXAMINER_DANTE
 	goto_if 1, DanteNPC_2
 # 20 "data/maps/CaveTop/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 21 "data/maps/CaveTop/scripts.pory"
 	msgbox DanteNPC_Text_2, MSGBOX_YESNO
 # 23 "data/maps/CaveTop/scripts.pory"
@@ -26,7 +26,7 @@ DanteNPC_1:
 
 DanteNPC_2:
 # 9 "data/maps/CaveTop/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 10 "data/maps/CaveTop/scripts.pory"
 	msgbox DanteNPC_Text_0
 # 11 "data/maps/CaveTop/scripts.pory"
@@ -34,7 +34,7 @@ DanteNPC_2:
 # 12 "data/maps/CaveTop/scripts.pory"
 	trainerbattle_double TRAINER_EXAMINER_DANTE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons
 # 13 "data/maps/CaveTop/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 14 "data/maps/CaveTop/scripts.pory"
 	msgbox DanteNPC_Text_1
 # 15 "data/maps/CaveTop/scripts.pory"

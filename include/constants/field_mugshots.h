@@ -5,8 +5,10 @@
 #define MUGSHOT_TEST  1
 #define MUGSHOT_COUNT 2
 
-#define EMOTE_NORMAL  0
-#define EMOTE_ALT     1
-#define EMOTE_COUNT   2
+#define EMOTE_BERUS   0
+#define EMOTE_RAE     1
+#define EMOTE_TENJIN  2
+#define EMOTE_EXAMINER 3
+#define EMOTE_COUNT   4
 
 #endif // GUARD_CONSTANTS_FIELD_MUGSHOTS_H

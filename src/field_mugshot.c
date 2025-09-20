@@ -116,8 +116,8 @@ void _CreateFieldMugshot(u32 id, u32 emote)
 
     temp.tileTag = sheet.tag;
     temp.paletteTag = sheet.tag;
-    sheet.data = (sFieldMugshots[id][emote].gfx != NULL ? sFieldMugshots[id][emote].gfx : sFieldMugshotGfx_TestNormal);
-    pal.data = (sFieldMugshots[id][emote].pal != NULL ? sFieldMugshots[id][emote].pal : sFieldMugshotPal_TestNormal);
+    sheet.data = (sFieldMugshots[id][emote].gfx != NULL ? sFieldMugshots[id][emote].gfx : sFieldMugshotGfx_TestBerus);
+    pal.data = (sFieldMugshots[id][emote].pal != NULL ? sFieldMugshots[id][emote].pal : sFieldMugshotPal_TestBerus);
 
     LoadSpritePalette(&pal);
     LoadCompressedSpriteSheet(&sheet);

@@ -23,23 +23,23 @@ script BridgeIntro {
 
     applymovement(OBJ_EVENT_ID_PLAYER, LookUp)
 
-    createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
     msgbox(format("Decided to finally show up, did we? Is there a good reason you're four hours late?"))
     removefieldmugshot
 
     msgbox("Tell the truth?", MSGBOX_YESNO)
 
     if (var(VAR_RESULT) == 1) {
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
         msgbox(format("Well, the truth is... I overslept."))
         removefieldmugshot
     } else {
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
         msgbox(format("Well, the truth is... I had to... er... give my train seat to a grandma... who was in a wheelchair... and uh... also pregnant? Then we had a fight and she stole my ticket."))
         removefieldmugshot
     }
 
-    createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
     msgbox(format("Enough of the excuses! Just tell me your name so I can mark you down."))
     removefieldmugshot
 
@@ -47,23 +47,23 @@ script BridgeIntro {
     setflag(FLAG_BRIDGE_INTRO_DONE)
     waitstate
 
-    createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
     msgbox(format("{PLAYER}... ah! You must be Thya's child. I heards she's sponsored by that trickster god now. How is she?"))
     removefieldmugshot
 
-    createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
     msgbox(format("She's so busy I haven't seen her in weeks."))
     removefieldmugshot
 
-    createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
     msgbox(format("An inspiration to us all. Well {PLAYER}, they say the apple dosn't fall far from the tree. But did you know that when fruit lands in shade it never sprouts? In fact it tends to spoil. I cannot allow someone so tardy to take the exam."))
     removefieldmugshot
 
-    createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
     msgbox(format("But the exam's not over untill sunset, surely I can still pass if I do it real quick."))
     removefieldmugshot
 
-    createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
     msgbox(format("'Real quick'? You really think you can pass this prestigious test after turning up so late? Amusing. Very well, take your POKéMON and become cautionary tale for next years cohort."))
     removefieldmugshot
 
@@ -83,31 +83,31 @@ script BerusNPC {
     faceplayer
 
     if (!flag(FLAG_CHOSE_STARTER)) {
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("Choose a Pokémon from the bag before we proceed."))
         removefieldmugshot
     }
     elif (defeated(TRAINER_DEITY_TENJIN)) {
             
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("Finally ready to admit defeat? What? You beat Tenjin? That's impossible! You must have cheated somehow. If you want me to accept that you passed, you'll have to beat me in battle.")) 
         removefieldmugshot
         trainerbattle_single(TRAINER_BERUS, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("You...YOU...you may have beaten me, but look at the sky! It's after sundown now... which means you still FAIL. Now if you'll excuse me I need to go and heal my poor doggy.")) 
         removefieldmugshot
 
     } 
     elif (!defeated(TRAINER_BERUS)) {
         
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("Don't my waste time. You should focus on trying to pass the test... not that you have a chance.")) 
         removefieldmugshot
 
     }
     else {
 
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("I don't accept this. I do not accept that a delinquent like you could pass."))
         removefieldmugshot
 
@@ -129,19 +129,19 @@ script StarterBag {
         special(ChooseStarter)
 	    waitstate
 
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
         msgbox(format("Wait, there's only one Pokémon in here..."))
         removefieldmugshot
 
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("A good trainer makes the best choice in any situation. A great trainer makes sure there is always a good choice to make. You're the last to pick so you get the leftovers."))
         removefieldmugshot
 
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_ALT)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
         msgbox(format("I guess that's my punishment for turning up late."))
         removefieldmugshot
 
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("Oh, no. This is your punishment for turning up late."))
         removefieldmugshot
 
@@ -149,7 +149,7 @@ script StarterBag {
     }
     elif (!defeated(TRAINER_BERUS)) {
 
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_NORMAL)
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("Berus's photo is on the front. I wonder if ditto can take his shape?"))
         removefieldmugshot
 
