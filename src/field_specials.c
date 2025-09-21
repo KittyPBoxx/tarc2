@@ -611,7 +611,7 @@ u8 GetBattleOutcome(void)
 
 void CableCarWarp(void)
 {
-    // TODO: remove
+    SetWarpDestination(MAP_GROUP(MAP_BRIDGE), MAP_NUM(MAP_BRIDGE), WARP_ID_NONE, 6, 4);
 }
 
 void SetHiddenItemFlag(void)

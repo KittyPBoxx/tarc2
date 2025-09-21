@@ -103,6 +103,9 @@ Debug_EventScript_Script_1_Text_TilePuzzle:
     .string "Test Sliding Tile Puzzle Starting$"
 
 Debug_EventScript_Script_3::
+	special CableCarWarp
+	special CableCar
+	waitstate
 	release
 	end
 

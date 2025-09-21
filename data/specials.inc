@@ -55,6 +55,7 @@ gSpecials::
 	def_special GetRivalSonDaughterString
 	def_special SetHiddenItemFlag
 	def_special CableCarWarp
+	def_special CableCar
 	def_special Overworld_PlaySpecialMapMusic
 	def_special StartWallClock
 	def_special Special_ViewWallClock
