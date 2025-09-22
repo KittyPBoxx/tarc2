@@ -208,68 +208,69 @@ static void SetTrainerSlideParamters(u32 battler, u32* firstId, u32* lastId, u32
 
 enum TrainerSlideTargets ShouldDoTrainerSlide(u32 battler, enum TrainerSlideType slideId)
 {
-    u32 firstId, lastId, trainerId;
-    u32 retValue = TRAINER_SLIDE_TARGET_TRAINER_A;
-    bool32 shouldRun = FALSE;
+    return TRAINER_SLIDE_TARGET_NONE;
+    // u32 firstId, lastId, trainerId;
+    // u32 retValue = TRAINER_SLIDE_TARGET_TRAINER_A;
+    // bool32 shouldRun = FALSE;
 
-    if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) || IsOnPlayerSide(battler))
-        return TRAINER_SLIDE_TARGET_NONE;
+    // if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) || IsOnPlayerSide(battler))
+    //     return TRAINER_SLIDE_TARGET_NONE;
 
-    SetTrainerSlideParamters(battler, &firstId, &lastId, &trainerId, &retValue);
+    // SetTrainerSlideParamters(battler, &firstId, &lastId, &trainerId, &retValue);
 
-    gBattleScripting.battler = battler;
+    // gBattleScripting.battler = battler;
 
-    if (IsTrainerSlidePlayed(slideId))
-        return TRAINER_SLIDE_TARGET_NONE;
+    // if (IsTrainerSlidePlayed(slideId))
+    //     return TRAINER_SLIDE_TARGET_NONE;
 
-    if (!DoesTrainerHaveSlideMessage(trainerId,slideId))
-        return TRAINER_SLIDE_TARGET_NONE;
+    // if (!DoesTrainerHaveSlideMessage(trainerId,slideId))
+    //     return TRAINER_SLIDE_TARGET_NONE;
 
-    switch (slideId)
-    {
-        case TRAINER_SLIDE_PLAYER_LANDS_FIRST_CRITICAL_HIT:
-            shouldRun = ShouldRunTrainerSlidePlayerLandsFirstCriticalHit(slideId);
-            break;
-        case TRAINER_SLIDE_ENEMY_LANDS_FIRST_CRITICAL_HIT:
-            shouldRun = ShouldRunTrainerSlideEnemyLandsFirstCriticalHit(slideId);
-            break;
-        case TRAINER_SLIDE_PLAYER_LANDS_FIRST_SUPER_EFFECTIVE_HIT:
-            shouldRun = ShouldRunTrainerSlidePlayerLandsFirstSuperEffectiveHit(battler, slideId);
-            break;
-        case TRAINER_SLIDE_PLAYER_LANDS_FIRST_STAB_MOVE:
-            shouldRun = ShouldRunTrainerSlidePlayerLandsFirstSTABMove(firstId, lastId, slideId);
-            break;
-        case TRAINER_SLIDE_PLAYER_LANDS_FIRST_DOWN:
-            shouldRun = ShouldRunTrainerSlidePlayerLandsFirstDown(firstId, lastId);
-            break;
-        case TRAINER_SLIDE_ENEMY_MON_UNAFFECTED:
-            shouldRun = ShouldRunTrainerSlideEnemyMonUnaffected(firstId, lastId, slideId);
-            break;
-        case TRAINER_SLIDE_LAST_SWITCHIN:
-            shouldRun = ShouldRunTrainerSlideLastSwitchIn(battler);
-            break;
-        case TRAINER_SLIDE_LAST_HALF_HP:
-            shouldRun = ShouldRunTrainerSlideLastHalfHP(firstId, lastId, battler);
-            break;
-        case TRAINER_SLIDE_LAST_LOW_HP:
-            shouldRun = ShouldRunTrainerSlideLastLowHp(firstId, lastId, battler);
-            break;
-        case TRAINER_SLIDE_BEFORE_FIRST_TURN:
-        case TRAINER_SLIDE_MEGA_EVOLUTION:
-        case TRAINER_SLIDE_Z_MOVE:
-        case TRAINER_SLIDE_DYNAMAX:
-            shouldRun = TRUE;
-            break;
-        default:
-            return TRAINER_SLIDE_TARGET_NONE;
-    }
+    // switch (slideId)
+    // {
+    //     case TRAINER_SLIDE_PLAYER_LANDS_FIRST_CRITICAL_HIT:
+    //         shouldRun = ShouldRunTrainerSlidePlayerLandsFirstCriticalHit(slideId);
+    //         break;
+    //     case TRAINER_SLIDE_ENEMY_LANDS_FIRST_CRITICAL_HIT:
+    //         shouldRun = ShouldRunTrainerSlideEnemyLandsFirstCriticalHit(slideId);
+    //         break;
+    //     case TRAINER_SLIDE_PLAYER_LANDS_FIRST_SUPER_EFFECTIVE_HIT:
+    //         shouldRun = ShouldRunTrainerSlidePlayerLandsFirstSuperEffectiveHit(battler, slideId);
+    //         break;
+    //     case TRAINER_SLIDE_PLAYER_LANDS_FIRST_STAB_MOVE:
+    //         shouldRun = ShouldRunTrainerSlidePlayerLandsFirstSTABMove(firstId, lastId, slideId);
+    //         break;
+    //     case TRAINER_SLIDE_PLAYER_LANDS_FIRST_DOWN:
+    //         shouldRun = ShouldRunTrainerSlidePlayerLandsFirstDown(firstId, lastId);
+    //         break;
+    //     case TRAINER_SLIDE_ENEMY_MON_UNAFFECTED:
+    //         shouldRun = ShouldRunTrainerSlideEnemyMonUnaffected(firstId, lastId, slideId);
+    //         break;
+    //     case TRAINER_SLIDE_LAST_SWITCHIN:
+    //         shouldRun = ShouldRunTrainerSlideLastSwitchIn(battler);
+    //         break;
+    //     case TRAINER_SLIDE_LAST_HALF_HP:
+    //         shouldRun = ShouldRunTrainerSlideLastHalfHP(firstId, lastId, battler);
+    //         break;
+    //     case TRAINER_SLIDE_LAST_LOW_HP:
+    //         shouldRun = ShouldRunTrainerSlideLastLowHp(firstId, lastId, battler);
+    //         break;
+    //     case TRAINER_SLIDE_BEFORE_FIRST_TURN:
+    //     case TRAINER_SLIDE_MEGA_EVOLUTION:
+    //     case TRAINER_SLIDE_Z_MOVE:
+    //     case TRAINER_SLIDE_DYNAMAX:
+    //         shouldRun = TRUE;
+    //         break;
+    //     default:
+    //         return TRAINER_SLIDE_TARGET_NONE;
+    // }
 
-    if (shouldRun == FALSE)
-        return TRAINER_SLIDE_TARGET_NONE;
+    // if (shouldRun == FALSE)
+    //     return TRAINER_SLIDE_TARGET_NONE;
 
-    MarkTrainerSlideAsPlayed(slideId);
-    SetTrainerSlideMessage(trainerId,slideId);
-    return retValue;
+    // MarkTrainerSlideAsPlayed(slideId);
+    // SetTrainerSlideMessage(trainerId,slideId);
+    // return retValue;
 }
 
 static bool32 IsSlideInitalizedOrPlayed(enum TrainerSlideType slideId)

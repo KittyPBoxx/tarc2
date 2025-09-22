@@ -237,3 +237,4 @@ gSpecials::
 	def_special DoPlayerNamingScreen
 	def_special SetPlayerMonSpecies
 	def_special GetPlayerMonSpecies
+	def_special SetBattleWeather

@@ -538,44 +538,45 @@ u8 GetWildBattleTransition(void)
 
 u8 GetTrainerBattleTransition(void)
 {
-    u8 minPartyCount = 1;
-    u8 transitionType;
-    u8 enemyLevel;
-    u8 playerLevel;
-    u32 trainerId = SanitizeTrainerId(TRAINER_BATTLE_PARAM.opponentA);
-    u32 trainerClass = GetTrainerClassFromId(TRAINER_BATTLE_PARAM.opponentA);
+    return B_TRANSITION_BLUR;
+    // u8 minPartyCount = 1;
+    // u8 transitionType;
+    // u8 enemyLevel;
+    // u8 playerLevel;
+    // u32 trainerId = SanitizeTrainerId(TRAINER_BATTLE_PARAM.opponentA);
+    // u32 trainerClass = GetTrainerClassFromId(TRAINER_BATTLE_PARAM.opponentA);
 
-    if (DoesTrainerHaveMugshot(trainerId))
-        return B_TRANSITION_MUGSHOT;
+    // if (DoesTrainerHaveMugshot(trainerId))
+    //     return B_TRANSITION_MUGSHOT;
 
-    if (trainerClass == TRAINER_CLASS_TEAM_MAGMA
-        || trainerClass == TRAINER_CLASS_MAGMA_LEADER
-        || trainerClass == TRAINER_CLASS_MAGMA_ADMIN)
-        return B_TRANSITION_MAGMA;
+    // if (trainerClass == TRAINER_CLASS_TEAM_MAGMA
+    //     || trainerClass == TRAINER_CLASS_MAGMA_LEADER
+    //     || trainerClass == TRAINER_CLASS_MAGMA_ADMIN)
+    //     return B_TRANSITION_MAGMA;
 
-    if (trainerClass == TRAINER_CLASS_TEAM_AQUA
-        || trainerClass == TRAINER_CLASS_AQUA_LEADER
-        || trainerClass == TRAINER_CLASS_AQUA_ADMIN)
-        return B_TRANSITION_AQUA;
+    // if (trainerClass == TRAINER_CLASS_TEAM_AQUA
+    //     || trainerClass == TRAINER_CLASS_AQUA_LEADER
+    //     || trainerClass == TRAINER_CLASS_AQUA_ADMIN)
+    //     return B_TRANSITION_AQUA;
 
-    switch (GetTrainerBattleType(trainerId))
-    {
-    case TRAINER_BATTLE_TYPE_SINGLES:
-        minPartyCount = 1;
-        break;
-    case TRAINER_BATTLE_TYPE_DOUBLES:
-        minPartyCount = 2; // double battles always at least have 2 Pokémon.
-        break;
-    }
+    // switch (GetTrainerBattleType(trainerId))
+    // {
+    // case TRAINER_BATTLE_TYPE_SINGLES:
+    //     minPartyCount = 1;
+    //     break;
+    // case TRAINER_BATTLE_TYPE_DOUBLES:
+    //     minPartyCount = 2; // double battles always at least have 2 Pokémon.
+    //     break;
+    // }
 
-    transitionType = GetBattleTransitionTypeByMap();
-    enemyLevel = GetSumOfEnemyPartyLevel(trainerId, minPartyCount);
-    playerLevel = GetSumOfPlayerPartyLevel(minPartyCount);
+    // transitionType = GetBattleTransitionTypeByMap();
+    // enemyLevel = GetSumOfEnemyPartyLevel(trainerId, minPartyCount);
+    // playerLevel = GetSumOfPlayerPartyLevel(minPartyCount);
 
-    if (enemyLevel < playerLevel)
-        return sBattleTransitionTable_Trainer[transitionType][0];
-    else
-        return sBattleTransitionTable_Trainer[transitionType][1];
+    // if (enemyLevel < playerLevel)
+    //     return sBattleTransitionTable_Trainer[transitionType][0];
+    // else
+    //     return sBattleTransitionTable_Trainer[transitionType][1];
 }
 
 #define RANDOM_TRANSITION(table) (table[Random() % ARRAY_COUNT(table)])
@@ -735,10 +736,10 @@ void SetMapVarsToTrainerA(void)
         gSpecialVar_LastTalked = TRAINER_BATTLE_PARAM.objEventLocalIdA;
         gSelectedObjectEvent = GetObjectEventIdByLocalIdAndMap(TRAINER_BATTLE_PARAM.objEventLocalIdA, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
     }
-    if (TRAINER_BATTLE_PARAM.opponentA != 0) 
-    {
-        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
-    }
+    // if (TRAINER_BATTLE_PARAM.opponentA != 0) 
+    // {
+    //     gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
+    // }
 }
 
 void SetMapVarsToTrainerB(void)
@@ -748,10 +749,10 @@ void SetMapVarsToTrainerB(void)
         gSpecialVar_LastTalked = TRAINER_BATTLE_PARAM.objEventLocalIdB;
         gSelectedObjectEvent = GetObjectEventIdByLocalIdAndMap(TRAINER_BATTLE_PARAM.objEventLocalIdB, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
     }
-    if (TRAINER_BATTLE_PARAM.opponentA != 0) 
-    {
-        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
-    }
+    // if (TRAINER_BATTLE_PARAM.opponentA != 0) 
+    // {
+    //     gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
+    // }
 }
 
 // expects parameters have been loaded correctly with TrainerBattleLoadArgs
@@ -1112,12 +1113,12 @@ static const u8 *GetIntroSpeechOfApproachingTrainer(void)
 {
     if (gApproachingTrainerId == 0)
     {
-        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
+        //gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
         return ReturnEmptyStringIfNull(TRAINER_BATTLE_PARAM.introTextA);
     }
     else
     {
-        gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
+        //gSpeakerName = gTrainers[TRAINER_BATTLE_PARAM.opponentA].trainerName;
         return ReturnEmptyStringIfNull(TRAINER_BATTLE_PARAM.introTextB);
     }
 }

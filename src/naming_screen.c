@@ -28,6 +28,7 @@
 #include "decompress.h"
 #include "constants/event_objects.h"
 #include "constants/rgb.h"
+#include "main_menu.h"
 
 enum {
     INPUT_NONE,
@@ -415,6 +416,7 @@ void DoNamingScreen(u8 templateNum, u8 *destBuffer, u16 monSpecies, u16 monGende
 
 void DoPlayerNamingScreen(void)
 {
+    NewGameBirchSpeech_SetDefaultPlayerName();
     DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnToFieldContinueScript);
 }
 

@@ -131,6 +131,7 @@ struct Weather
     s16 droughtState;
     u8 loadDroughtPalsIndex;
     u8 loadDroughtPalsOffset;
+    u8 gBattleWeather;
 };
 
 // field_weather.c

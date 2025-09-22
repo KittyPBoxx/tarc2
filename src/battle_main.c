@@ -3711,6 +3711,25 @@ s32 GetChosenMovePriority(u32 battler, u32 ability)
     gProtectStructs[battler].pranksterElevated = FALSE;
     if (gProtectStructs[battler].noValidMoves)
         move = MOVE_STRUGGLE;
+    else if (IsOnPlayerSide(battler) && gBattleStruct->isPrayer)
+    {
+        if (gBattleStruct->chosenMovePositions[battler] == 0)
+        {
+            move = MOVE_SKETCH;
+        }
+        else if (gBattleStruct->chosenMovePositions[battler] == 1)
+        {
+            move = MOVE_TRANSFORM;
+        }
+        else if (gBattleStruct->chosenMovePositions[battler] == 2)
+        {
+            move = MOVE_SKILL_SWAP;
+        }
+        else
+        {
+            move = MOVE_SWITCHEROO;
+        }
+    }
     else
         move = gBattleMons[battler].moves[gBattleStruct->chosenMovePositions[battler]];
 

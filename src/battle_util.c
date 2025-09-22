@@ -360,28 +360,23 @@ void HandleAction_UseMove(void)
     // choose move
     if (IsOnPlayerSide(gBattlerAttacker) && gBattleStruct->isPrayer)
     {
-        gBattleStruct->isPrayer = FALSE;
         gHitMarker |= HITMARKER_NO_PPDEDUCT;
 
         if (gCurrMovePos == 0)
         {
             gCurrentMove = gChosenMove = MOVE_SKETCH;
-            gBattleStruct->moveTarget[gBattlerAttacker] = GetBattleMoveTarget(MOVE_STRUGGLE, NO_TARGET_OVERRIDE);
         }
         else if (gCurrMovePos == 1)
         {
             gCurrentMove = gChosenMove = MOVE_TRANSFORM;
-            gBattleStruct->moveTarget[gBattlerAttacker] = GetBattleMoveTarget(MOVE_STRUGGLE, NO_TARGET_OVERRIDE);
         }
         else if (gCurrMovePos == 2)
         {
             gCurrentMove = gChosenMove = MOVE_SKILL_SWAP;
-            gBattleStruct->moveTarget[gBattlerAttacker] = GetBattleMoveTarget(MOVE_STRUGGLE, NO_TARGET_OVERRIDE);
         }
         else
         {
             gCurrentMove = gChosenMove = MOVE_SWITCHEROO;
-            gBattleStruct->moveTarget[gBattlerAttacker] = GetBattleMoveTarget(MOVE_STRUGGLE, NO_TARGET_OVERRIDE);
         }
     }
     else if (gProtectStructs[gBattlerAttacker].noValidMoves)

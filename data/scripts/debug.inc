@@ -129,42 +129,74 @@ Debug_EventScript_Script_8::
 	release
 	end
 
+Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons:
+    .string "Not enough mons$"
+
+Debug_EventScript_Script_1_Text_Battle1_Intro:
+    .string "Starting Battle BERUS$"
+
+Debug_EventScript_Script_1_Text_Battle1_Defeat:
+    .string "Battle BERUS complete$"
+
 Debug_EventScript_Battle_1::
 	trainerbattle_single TRAINER_BERUS, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 	release
 	end
 
-Debug_EventScript_Script_1_Text_Battle1_Intro:
-    .string "Starting Battle 1$"
+Debug_EventScript_Script_2_Text_Battle2_Intro:
+    .string "Starting Battle FIONN$"
 
-Debug_EventScript_Script_1_Text_Battle1_Defeat:
-    .string "Battle 1 complete$"
-
-Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons:
-    .string "Not enough mons$"
+Debug_EventScript_Script_2_Text_Battle2_Defeat:
+    .string "Battle FIONN complete$"
 
 Debug_EventScript_Battle_2::
-	trainerbattle_single TRAINER_EXAMINER_RUNE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
+	trainerbattle_single TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_2_Text_Battle2_Intro, Debug_EventScript_Script_2_Text_Battle2_Defeat
 	release
 	end
+
+Debug_EventScript_Script_3_Text_Battle3_Intro:
+    .string "Starting Battle SORA$"
+
+Debug_EventScript_Script_3_Text_Battle3_Defeat:
+    .string "Battle SORA complete$"
 
 Debug_EventScript_Battle_3::
-	trainerbattle_double TRAINER_EXAMINER_DANTE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons
+	trainerbattle_single TRAINER_EXAMINER_SORA, Debug_EventScript_Script_3_Text_Battle3_Intro, Debug_EventScript_Script_3_Text_Battle3_Defeat
 	release
 	end
+
+Debug_EventScript_Script_4_Text_Battle4_Intro:
+    .string "Starting Battle RUNE$"
+
+Debug_EventScript_Script_4_Text_Battle4_Defeat:
+    .string "Battle RUNE complete$"
 
 Debug_EventScript_Battle_4::
-	trainerbattle_single TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
+	trainerbattle_single TRAINER_EXAMINER_RUNE, Debug_EventScript_Script_4_Text_Battle4_Intro, Debug_EventScript_Script_4_Text_Battle4_Defeat
 	release
 	end
+
+Debug_EventScript_Script_5_Text_Battle5_Intro:
+    .string "Starting Battle DANTE$"
+
+Debug_EventScript_Script_5_Text_Battle5_Defeat:
+    .string "Battle DANTE complete$"
 
 Debug_EventScript_Battle_5::
-	trainerbattle_single TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
+	setvar VAR_0x8008, 4 @ weather hail/snow
+	special SetBattleWeather
+	trainerbattle_double TRAINER_EXAMINER_DANTE, Debug_EventScript_Script_5_Text_Battle5_Intro, Debug_EventScript_Script_5_Text_Battle5_Defeat, Debug_EventScript_Script_1_Text_Battle1_Defeat
 	release
 	end
 
+Debug_EventScript_Script_6_Text_Battle6_Intro:
+    .string "Starting Battle TENJIN$"
+
+Debug_EventScript_Script_6_Text_Battle6_Defeat:
+    .string "Battle TENJIN complete$"
+
 Debug_EventScript_Battle_6::
-	trainerbattle_double TRAINER_DEITY_TENJIN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons
+	trainerbattle_double TRAINER_DEITY_TENJIN, Debug_EventScript_Script_6_Text_Battle6_Intro, Debug_EventScript_Script_6_Text_Battle6_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons
 	release
 	end
 

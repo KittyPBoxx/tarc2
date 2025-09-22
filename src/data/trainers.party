@@ -90,24 +90,24 @@ Pic: Aqua Grunt M
 Gender: Male
 Music: Hiker
 Double Battle: No
-AI: Check Bad Move / Try To Faint / Check Viability
+AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN / AI_FLAG_PREFER_STATUS_MOVES
 
 Chespin
-Level: 21
+Level: 30
+Relaxed Nature
 Ability: Bulletproof
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
 - Worry Seed
-- Imprison
-- Stomp
+- Heavy Slam
 - None
 
-Chansey
-Level: 21
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Fling
-- Covet
-- Minimize
-- Low Kick
+Exeggutor
+Level: 45
+Adamant Nature
+IVs: 0 HP / 31 Atk / 0 Def / 0 SpA / 31 SpD / 31 Spe
+- Stored Power
+- Calm Mind
+- Absorb
 
 /* ######################################################################################### */
 
@@ -118,24 +118,23 @@ Pic: Aqua Grunt M
 Gender: Male
 Music: Aqua
 Double Battle: No
-AI: Check Bad Move / Try To Faint / Check Viability
+AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN / AI_FLAG_PREFER_STATUS_MOVES
 
-Mr. Mime
-Level: 32
-Ability: Soundproof
+Chansey
+Level: 25
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Dream Eater
-- Yawn
-- None
-- None
+- Fling
+- Covet
+- Minimize
+- Low Kick
 
-Hawlucha
-Level: 32
+Ampharos Mega
+Level: 25
 Ability: Mold Breaker
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Sky Drop
-- None
-- None
+- Zap Cannon
+- Focus Blast
+- Trailblaze
 - None
 
 /* ######################################################################################### */
@@ -149,21 +148,24 @@ Music: Aqua
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Slowbro @ King's Rock
-Level: 31
+Hawlucha
+Level: 30
+Lonely Nature
+Ability: Mold Breaker
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Aqua Jet
-- Curse
-- Soak
-- Avalanche
-
-
-Ampharos Mega
-Level: 31
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Zap Cannon
-- Focus Blast
+- Sky Drop
 - None
+- None
+- None
+
+Mr. Mime
+Level: 30
+Mild Nature
+Ability: Soundproof
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- Dream Eater
+- Yawn
+- Magic Powder
 - None
 
 /* ######################################################################################### */
@@ -175,27 +177,31 @@ Pic: Aqua Grunt M
 Gender: Male
 Music: Aqua
 Double Battle: Yes
-AI: Check Bad Move / Try To Faint / Check Viability
+AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN / AI_FLAG_PREFER_STATUS_MOVES / AI_FLAG_DOUBLE_BATTLE / AI_FLAG_HP_AWARE
 
-Starmie
-Level: 32
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Starmie @ Terrain Extender
+Level: /* 40 */
+Hasty Nature
+Ability: Analytic
+IVs: 31 HP / 31 Atk / 0 Def / 31 SpA / 31 SpD / 31 Spe
 - Psychic Terrain
-- Safeguard
+- Refresh
 - Heal Pulse
 - Toxic
 
 Illumise
-Level: 32
+Level:  /* 30 */
+Ability: Prankster
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Will-O-Wisp
 - Counter
 - Light Screen
-- None
+- Nature Power
 
 Haunter @ Toxic Orb
-Level: 32
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Level: 1 /* 25 */
+Sassy Nature
+IVs: 31 HP / 0 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
 - Fling
 - Curse
 - None
@@ -212,7 +218,7 @@ Double Battle: Yes
 AI: Check Bad Move / Try To Faint / Check Viability
 
 Kadabra
-Level: 32
+Level: 1
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Telekinesis
 - Quick Attack
@@ -220,7 +226,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - None
 
 Zeraora
-Level: 32
+Level: 1
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Plasma Fists
 - None

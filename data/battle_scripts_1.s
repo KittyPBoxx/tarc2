@@ -5365,18 +5365,18 @@ BattleScript_LocalTrainerBattleWon::
 BattleScript_LocalTwoTrainersDefeated::
 	printstring STRINGID_TWOENEMIESDEFEATED
 BattleScript_LocalBattleWonLoseTexts::
-	trainerslidein BS_OPPONENT1
-	waitstate
-	printstring STRINGID_TRAINER1LOSETEXT
-	jumpifnotbattletype BATTLE_TYPE_TWO_OPPONENTS, BattleScript_LocalBattleWonReward
-	trainerslideout BS_OPPONENT1
-	waitstate
-	trainerslidein BS_OPPONENT2
-	waitstate
-	printstring STRINGID_TRAINER2LOSETEXT
+	@ trainerslidein BS_OPPONENT1
+	@ waitstate
+	@ printstring STRINGID_TRAINER1LOSETEXT
+	@ jumpifnotbattletype BATTLE_TYPE_TWO_OPPONENTS, BattleScript_LocalBattleWonReward
+	@ trainerslideout BS_OPPONENT1
+	@ waitstate
+	@ trainerslidein BS_OPPONENT2
+	@ waitstate
+	@ printstring STRINGID_TRAINER2LOSETEXT
 BattleScript_LocalBattleWonReward::
-	getmoneyreward
-	printstring STRINGID_PLAYERGOTMONEY
+	@ getmoneyreward
+	@ printstring STRINGID_PLAYERGOTMONEY
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_PayDayMoneyAndPickUpItems::
 	givepaydaymoney
@@ -5470,15 +5470,15 @@ BattleScript_TowerLinkBattleWon::
 	playtrainerdefeatbgm BS_ATTACKER
 	printstring STRINGID_BATTLEEND
 	waitmessage B_WAIT_TIME_LONG
-	trainerslidein BS_OPPONENT1
-	waitstate
-	printstring STRINGID_TRAINER1LOSETEXT
-	trainerslideout BS_OPPONENT1
-	waitstate
-	trainerslidein BS_OPPONENT2
-	waitstate
-	printstring STRINGID_TRAINER2LOSETEXT
-	jumpifbattletype BATTLE_TYPE_RECORDED, BattleScript_TowerLinkBattleWonEnd
+	@ trainerslidein BS_OPPONENT1
+	@ waitstate
+	@ printstring STRINGID_TRAINER1LOSETEXT
+	@ trainerslideout BS_OPPONENT1
+	@ waitstate
+	@ trainerslidein BS_OPPONENT2
+	@ waitstate
+	@ printstring STRINGID_TRAINER2LOSETEXT
+	@ jumpifbattletype BATTLE_TYPE_RECORDED, BattleScript_TowerLinkBattleWonEnd
 	endlinkbattle
 BattleScript_TowerLinkBattleWonEnd::
 	waitmessage B_WAIT_TIME_LONG
@@ -5492,15 +5492,15 @@ BattleScript_FrontierTrainerBattleWon::
 BattleScript_FrontierTrainerBattleWon_TwoDefeated:
 	printstring STRINGID_TWOENEMIESDEFEATED
 BattleScript_FrontierTrainerBattleWon_LoseTexts:
-	trainerslidein BS_OPPONENT1
-	waitstate
-	printstring STRINGID_TRAINER1LOSETEXT
-	jumpifnotbattletype BATTLE_TYPE_TWO_OPPONENTS, BattleScript_TryPickUpItems
-	trainerslideout BS_OPPONENT1
-	waitstate
-	trainerslidein BS_OPPONENT2
-	waitstate
-	printstring STRINGID_TRAINER2LOSETEXT
+	@ trainerslidein BS_OPPONENT1
+	@ waitstate
+	@ printstring STRINGID_TRAINER1LOSETEXT
+	@ jumpifnotbattletype BATTLE_TYPE_TWO_OPPONENTS, BattleScript_TryPickUpItems
+	@ trainerslideout BS_OPPONENT1
+	@ waitstate
+	@ trainerslidein BS_OPPONENT2
+	@ waitstate
+	@ printstring STRINGID_TRAINER2LOSETEXT
 BattleScript_TryPickUpItems:
 	jumpifnotbattletype BATTLE_TYPE_PYRAMID, BattleScript_FrontierTrainerBattleWon_End
 	pickup

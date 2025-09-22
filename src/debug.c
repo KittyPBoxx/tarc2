@@ -1723,6 +1723,7 @@ static void DebugAction_Util_Script_8(u8 taskId)
 
 // *******************************
 // Battles Scripts
+// BERUS
 static void DebugAction_Util_Battle_1(u8 taskId)
 {
     u16 monData;
@@ -1733,7 +1734,9 @@ static void DebugAction_Util_Battle_1(u8 taskId)
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
     monData = MOVE_SUNNY_DAY;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    monData = MOVE_PROTECT;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    monData = MOVE_ROCK_SMASH;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
     monData = ITEM_AIR_BALLOON;
@@ -1746,115 +1749,139 @@ static void DebugAction_Util_Battle_1(u8 taskId)
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_1);
 }
 
+// FIONN
 static void DebugAction_Util_Battle_2(u8 taskId)
 {
     u16 monData;
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_DROUGHT;
+    monData = ABILITY_STATIC;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
-    monData = MOVE_SUNNY_DAY;
+    monData = MOVE_SPLASH;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    monData = MOVE_CURSE;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    monData = MOVE_FURY_CUTTER;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
-    monData = ITEM_AIR_BALLOON;
+    monData = ITEM_ZOOM_LENS;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
-    monData = SPECIES_FROSLASS;
+    monData = SPECIES_FORRETRESS;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
 
     HealPlayerParty();
 
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_2);
 }
 
+// SORA
 static void DebugAction_Util_Battle_3(u8 taskId)
 {
     u16 monData;
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_DROUGHT;
+    monData = ABILITY_BULLETPROOF;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
-    monData = MOVE_SUNNY_DAY;
+    monData = MOVE_HEAVY_SLAM;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    monData = MOVE_EARTH_POWER;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
-    monData = ITEM_AIR_BALLOON;
+    monData = ITEM_ABILITY_SHIELD;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
-    monData = SPECIES_FROSLASS;
+    monData = SPECIES_EXEGGUTOR;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
 
     HealPlayerParty();
 
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_3);
 }
 
+// RUNE
 static void DebugAction_Util_Battle_4(u8 taskId)
 {
     u16 monData;
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_DROUGHT;
+    monData = ABILITY_HEAVY_METAL;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
-    monData = MOVE_SUNNY_DAY;
+    monData = MOVE_WORRY_SEED;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    monData = MOVE_HEAVY_SLAM; 
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
-    monData = ITEM_AIR_BALLOON;
+    monData = ITEM_KINGS_ROCK;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
-    monData = SPECIES_FROSLASS;
+    monData = SPECIES_FORRETRESS;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
 
     HealPlayerParty();
 
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_4);
 }
 
+// DANTE
 static void DebugAction_Util_Battle_5(u8 taskId)
 {
     u16 monData;
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_DROUGHT;
+    monData = ABILITY_HEAVY_METAL;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
-    monData = MOVE_SUNNY_DAY;
+    monData = MOVE_MAGIC_POWDER;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    monData = MOVE_AVALANCHE;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    monData = MOVE_AVALANCHE;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    monData = MOVE_DRAGON_TAIL;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
-    monData = ITEM_AIR_BALLOON;
+    monData = ITEM_RAWST_BERRY;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
-    monData = SPECIES_FROSLASS;
+    monData = SPECIES_SKUNTANK;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
 
     HealPlayerParty();
 
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Battle_5);
 }
 
+// TENJIN
 static void DebugAction_Util_Battle_6(u8 taskId)
 {
     u16 monData;
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_DROUGHT;
+    monData = ABILITY_STATIC;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
-    monData = MOVE_SUNNY_DAY;
+    monData = MOVE_PROTECT;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    monData = MOVE_PERISH_SONG;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    monData = MOVE_SURF;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
-    monData = ITEM_AIR_BALLOON;
+    monData = ITEM_ZOOM_LENS;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
-    monData = SPECIES_FROSLASS;
+    monData = SPECIES_SANDYGAST;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+
+    BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
 
     HealPlayerParty();
 
@@ -1869,7 +1896,7 @@ static void DebugAction_Util_Battle_7(u8 taskId)
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
     monData = ABILITY_DROUGHT;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
-    monData = MOVE_SUNNY_DAY;
+    monData = MOVE_HEAVY_SLAM;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);

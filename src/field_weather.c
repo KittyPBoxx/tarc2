@@ -22,6 +22,7 @@
 #include "overworld.h"
 #include "constants/expansion.h"
 #include "map_preview_screen.h"
+#include "event_data.h"
 
 #define DROUGHT_COLOR_INDEX(color) ((((color) >> 1) & 0xF) | (((color) >> 2) & 0xF0) | (((color) >> 3) & 0xF00))
 
@@ -1048,9 +1049,18 @@ bool8 Weather_UpdateBlend(void)
     return FALSE;
 }
 
+void SetBattleWeather(void)
+{
+    gWeatherPtr->gBattleWeather = gSpecialVar_0x8008;
+}
+
 u8 GetCurrentWeather(void)
 {
-    return 0;//gWeatherPtr->currWeather;
+    if (gWeatherPtr->gBattleWeather > WEATHER_COUNT)
+    {
+        return 0;
+    }
+    return gWeatherPtr->gBattleWeather;
 }
 
 void SetRainStrengthFromSoundEffect(u16 soundEffect)

@@ -710,7 +710,7 @@ static u32 ChooseMoveOrAction_Singles(u32 battler)
             }
         }
     }
-    return consideredMoveArray[Random() % numOfBestMoves];
+    return consideredMoveArray[gBattleTurnCounter % numOfBestMoves];
 }
 
 static u32 ChooseMoveOrAction_Doubles(u32 battler)
@@ -784,7 +784,7 @@ static u32 ChooseMoveOrAction_Doubles(u32 battler)
                     }
                 }
             }
-            actionOrMoveIndex[i] = mostViableMovesIndices[Random() % mostViableMovesNo];
+            actionOrMoveIndex[i] = mostViableMovesIndices[gBattleTurnCounter % mostViableMovesNo];
             bestMovePointsForTarget[i] = mostViableMovesScores[0];
 
             // Don't use a move against ally if it has less than 100 points.
@@ -819,7 +819,7 @@ static u32 ChooseMoveOrAction_Doubles(u32 battler)
         }
     }
 
-    gBattlerTarget = mostViableTargetsArray[Random() % mostViableTargetsNo];
+    gBattlerTarget = mostViableTargetsArray[gBattleTurnCounter % mostViableTargetsNo];
     gAiBattleData->chosenTarget[battler] = gBattlerTarget;
     return actionOrMoveIndex[gBattlerTarget];
 }
@@ -5607,7 +5607,11 @@ static s32 AI_HPAware(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
     SetTypeBeforeUsingMove(move, battlerAtk);
     moveType = GetBattleMoveType(move);
 
-    if (IS_TARGETING_PARTNER(battlerAtk, battlerDef))
+    if (effect == EFFECT_HEAL_PULSE)
+    {
+        ADJUST_SCORE(BEST_EFFECT);
+    }
+    else if (IS_TARGETING_PARTNER(battlerAtk, battlerDef))
     {
         if ((effect == EFFECT_HEAL_PULSE || effect == EFFECT_HIT_ENEMY_HEAL_ALLY)
          || (moveType == TYPE_ELECTRIC && gAiLogicData->abilities[BATTLE_PARTNER(battlerAtk)] == ABILITY_VOLT_ABSORB)
