@@ -5453,7 +5453,15 @@ bool8 FollowablePlayerMovement_Step(struct ObjectEvent *objectEvent, struct Spri
         // }
         // else
         // {
-            objectEvent->movementActionId = GetPlayerRunMovementAction(direction);
+            if (direction > DIR_EAST)
+            {
+                objectEvent->movementActionId = GetPlayerRunMovementAction(direction);
+            }
+            else
+            {
+                objectEvent->movementActionId = GetWalkFastMovementAction(direction);
+            }
+            
         // }
     }
     else

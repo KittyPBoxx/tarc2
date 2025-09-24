@@ -4,7 +4,7 @@
     {
       "id": "LAYOUT_BRIDGE",
       "name": "Bridge_Layout",
-      "width": 20,
+      "width": 40,
       "height": 20,
       "primary_tileset": "gTileset_woodPrimary1",
       "secondary_tileset": "gTileset_Petalburg",
@@ -26,7 +26,7 @@
       "name": "Manor_Layout",
       "width": 20,
       "height": 20,
-      "primary_tileset": "gTileset_General",
+      "primary_tileset": "gTileset_woodPrimary1",
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/Manor/border.bin",
       "blockdata_filepath": "data/layouts/Manor/map.bin"

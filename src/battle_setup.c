@@ -187,6 +187,7 @@ void BattleSetup_StartBattlePikeWildBattle(void)
 
 static void DoStandardWildBattle(bool32 isDouble)
 {
+    RemoveFollowingPokemon();
     LockPlayerFieldControls();
     FreezeObjectEvents();
     StopPlayerAvatar();
@@ -200,6 +201,7 @@ static void DoStandardWildBattle(bool32 isDouble)
 
 void DoStandardWildBattle_Debug(void)
 {
+    RemoveFollowingPokemon();
     LockPlayerFieldControls();
     FreezeObjectEvents();
     StopPlayerAvatar();
@@ -210,6 +212,7 @@ void DoStandardWildBattle_Debug(void)
 
 static void DoTrainerBattle(void)
 {
+    RemoveFollowingPokemon();
     CreateBattleStartTask(GetTrainerBattleTransition(), 0);
 }
 

@@ -72,5 +72,6 @@ void StartTimer1(void);
 void SeedRngAndSetTrainerId(void);
 u16 GetGeneratedTrainerIdLower(void);
 void ReloadSlot(u8 slot);
+void ApplyVBlankPaletteModifiers();
 
 #endif // GUARD_MAIN_H

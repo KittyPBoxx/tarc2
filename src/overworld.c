@@ -1339,22 +1339,22 @@ static void OverworldBasic(void)
     UpdateTilesetAnimations();
     DoScheduledBgTilemapCopiesToVram();
     // Every minute if no palette fade is active, update TOD blending as needed
-    if (!gPaletteFade.active && --gTimeUpdateCounter <= 0)
-    {
-        struct TimeBlendSettings cachedBlend = gTimeBlend;
-        u32 *bld0 = (u32*)&cachedBlend;
-        u32 *bld1 = (u32*)&gTimeBlend;
-        gTimeUpdateCounter = (SECONDS_PER_MINUTE * 60 / FakeRtc_GetSecondsRatio());
-        UpdateTimeOfDay();
-        FormChangeTimeUpdate();
-        if (bld0[0] != bld1[0]
-         || bld0[1] != bld1[1]
-         || bld0[2] != bld1[2])
-        {
-           UpdateAltBgPalettes(PALETTES_BG);
-           UpdatePalettesWithTime(PALETTES_ALL);
-        }
-    }
+    // if (!gPaletteFade.active && --gTimeUpdateCounter <= 0)
+    // {
+    //     struct TimeBlendSettings cachedBlend = gTimeBlend;
+    //     u32 *bld0 = (u32*)&cachedBlend;
+    //     u32 *bld1 = (u32*)&gTimeBlend;
+    //     gTimeUpdateCounter = (SECONDS_PER_MINUTE * 60 / FakeRtc_GetSecondsRatio());
+    //     UpdateTimeOfDay();
+    //     FormChangeTimeUpdate();
+    //     if (bld0[0] != bld1[0]
+    //      || bld0[1] != bld1[1]
+    //      || bld0[2] != bld1[2])
+    //     {
+    //        UpdateAltBgPalettes(PALETTES_BG);
+    //        UpdatePalettesWithTime(PALETTES_ALL);
+    //     }
+    // }
 }
 
 // This CB2 is used when starting
@@ -1486,6 +1486,7 @@ void CB2_ReturnToFieldWithOpenMenu(void)
 {
     FieldClearVBlankHBlankCallbacks();
     gFieldCallback2 = FieldCB_ReturnToFieldOpenStartMenu;
+    RemoveFollowingPokemon();
     CB2_ReturnToField();
 }
 
@@ -1493,6 +1494,7 @@ void CB2_ReturnToFieldContinueScript(void)
 {
     FieldClearVBlankHBlankCallbacks();
     gFieldCallback = FieldCB_ContinueScript;
+    RemoveFollowingPokemon();
     CB2_ReturnToField();
 }
 
@@ -1500,6 +1502,7 @@ void CB2_ReturnToFieldContinueScriptPlayMapMusic(void)
 {
     FieldClearVBlankHBlankCallbacks();
     gFieldCallback = FieldCB_ContinueScriptHandleMusic;
+    RemoveFollowingPokemon();
     CB2_ReturnToField();
 }
 
@@ -1507,6 +1510,7 @@ void CB2_ReturnToFieldFadeFromBlack(void)
 {
     FieldClearVBlankHBlankCallbacks();
     gFieldCallback = FieldCB_WarpExitFadeFromBlack;
+    RemoveFollowingPokemon();
     CB2_ReturnToField();
 }
 
@@ -1558,6 +1562,7 @@ static void VBlankCB_Field(void)
     ScanlineEffect_InitHBlankDmaTransfer();
     FieldUpdateBgTilemapScroll();
     TransferPlttBuffer();
+    ApplyVBlankPaletteModifiers();
     TransferTilesetAnimsBuffer();
 }
 

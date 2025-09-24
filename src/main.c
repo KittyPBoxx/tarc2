@@ -22,6 +22,7 @@
 #include "main_menu.h"
 #include "AgbAccuracy.h"
 #include "palette_effects.h"
+#include "palette.h"
 
 static void VBlankIntr(void);
 static void HBlankIntr(void);
@@ -108,6 +109,7 @@ static void CB2_PostSoftResetLoadSlotInit(void);
 void InitIntrHandlers(void);
 static void WaitForVBlank(void);
 void EnableVCountIntrAtLine150(void);
+void InitFastHashRAMLUT(void);
 
 #define B_START_SELECT (B_BUTTON | START_BUTTON | SELECT_BUTTON)
 
@@ -154,6 +156,7 @@ void AgbMain(void)
     ResetBgs();
     SetDefaultFontsPointer();
     InitHeap(gHeap, HEAP_SIZE);
+    InitFastHashRAMLUT();
 
     gSoftResetDisabled = FALSE;
 
@@ -453,13 +456,39 @@ To whom it may concern, forgive me because I have sinned
 */
 
 #define BG_PALETTE ((volatile u16*)0x5000000)
-#define PALETTE_1 0x51 
-#define PALETTE_2 0x52 
-#define PALETTE_3 0x53 
-#define PALETTE_4 0x54 
-#define PALETTE_5 0x55 
-#define PALETTE_6 0x56 
-#define PALETTE_7 0x57
+#define PALETTE_0_1 ((16 * 0) + 0x01)
+#define PALETTE_0_2 ((16 * 0) + 0x02)
+#define PALETTE_0_3 ((16 * 0) + 0x05)
+#define PALETTE_0_4 ((16 * 0) + 0x06)
+#define PALETTE_0_5 ((16 * 0) + 0x03)
+#define PALETTE_0_6 ((16 * 0) + 0x04)
+#define PALETTE_0_7 ((16 * 0) + 0x09)
+
+#define PALETTE_1_1 ((16 * 1) + 0x02)
+#define PALETTE_1_6 ((16 * 1) + 0x06)
+
+#define PALETTE_2_1 ((16 * 2) + 0x02) 
+#define PALETTE_2_2 ((16 * 2) + 0x03) 
+#define PALETTE_2_3 ((16 * 2) + 0x04) 
+#define PALETTE_2_4 ((16 * 2) + 0x05) 
+#define PALETTE_2_5 ((16 * 2) + 0x06) 
+#define PALETTE_2_6 ((16 * 2) + 0x07) 
+#define PALETTE_2_7 ((16 * 2) + 0x08)
+
+#define PALETTE_3_1 ((16 * 3) + 0x01)
+#define PALETTE_3_2 ((16 * 3) + 0x02)
+#define PALETTE_3_5 ((16 * 3) + 0x05)
+
+#define PALETTE_4_1 ((16 * 4) + 0x01) 
+
+#define PALETTE_5_1  ((16 * 5) + 0x01)
+#define PALETTE_5_2  ((16 * 5) + 0x02)
+#define PALETTE_5_3  ((16 * 5) + 0x03)
+#define PALETTE_5_8  ((16 * 5) + 0x08)
+#define PALETTE_5_9  ((16 * 5) + 0x09)
+#define PALETTE_5_10 ((16 * 5) + 0x0A)
+
+
 
 static const u16 baseColors[7][7] = {
     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2}, 
@@ -471,13 +500,48 @@ static const u16 baseColors[7][7] = {
     {0x2a25, 0x21a5, 0x1ac3, 0x0b42, 0x1d24, 0x18e3, 0x10a2}, 
 };
 
-static inline uint32_t fast_hash32(uint32_t x)
+// static inline uint32_t fast_hash32(uint32_t x)
+// {
+//     x ^= x >> 15;
+//     x *= 0x297a2d39; // We specifically DO want a kinda biased hash function for the wavy look https://nullprogram.com/blog/2018/07/31/ 
+//     x ^= x >> 12;
+//     return x;
+// }
+
+COMMON_DATA uint32_t fastHashRAMLUT[168] = {0};
+
+static const uint32_t fastHashLUT[168] = {
+    0x00000000,     0x2978ba9b,     0x52f17537,     0x7c694143,     0xa5e2ea6f,     0xcf6e1433,     0xf8d28286,     0x225519fc,
+    0x4bd5d4de,     0x754cc3b8,     0x9ecc2866,     0xc833728c,     0xf1b5050d,     0x1b35f8a1,     0x44aa33f9,     0x6e2e44dd,
+    0x97aba9bd,     0xc1111119,     0xea998770,     0x14101a2e,     0x3d8850cc,     0x6703c5f6,     0x9076e518,     0xb9f18fbe,
+    0xe37a0a1b,     0x0ceea477,     0x366bf143,     0x5fe73b2f,     0x895467f3,     0xb2dc3204,     0xdc5c89ba,     0x05cb2550,
+    0x2f47537a,     0x58ba5fa4,     0x82322232,     0xabbe9589,     0xd5230ee1,     0xfea763b5,     0x2820345d,     0x5199fa61,
+    0x7b10a199,     0xa49b7732,     0xce078bec,     0xf78ae0ca,     0x20fdca30,     0x4a7d549a,     0x73f31f7c,     0x9d679b93,
+    0xc6e41437,     0xf06da1c3,     0x19dd48ef,     0x4353372b,     0x6cd7e286,     0x96423878,     0xbfce765e,     0xe93124c4,
+    0x12b8cfe6,     0x3c37d2f0,     0x65a86409,     0x8f209ea5,     0xb8a91375,     0xe212e759,     0x0b964aa1,     0x35127015,
+    0x5e8ea6f4,     0x880dfb2e,     0xb174bf48,     0xdaf47a76,     0x04744464,     0x2deceebe,     0x576d2b13,     0x80ea84e7,
+    0xaa561dc3,     0xd3dbd82f,     0xfd5ec76b,     0x26c95300,     0x504068ba,     0x79b801dc,     0xa333f4c2,     0xccbf3fa8,
+    0xf6214332,     0x1fa9b58d,     0x4926ee65,     0x729b80b1,     0x9c1f17d9,     0xc59d5afd,     0xef05c195,     0x1884d60a,
+    0x41fb9460,     0x6b7f0f4a,     0x94faa934,     0xbe65f5a2,     0xe7e63ef8,     0x11637b93,     0x3adf3727,     0x64508d4b,
+    0x8dd8286f,     0xb740562b,     0xe0cb4386,     0x0a3fdefc,     0x33ba91de,     0x5d360440,     0x86a66e56,     0xb023336c,
+    0xd9afc50d,     0x031cbda9,     0x2c9470f1,     0x561587dd,     0x7f8cecbd,     0xa90fd111,     0xd2724988,     0xfbf6242e,
+    0x25719fcc,     0x4ee918f6,     0x786fa5e0,     0xa1e84ebe,     0xcb50c813,     0xf4d9e667,     0x1e513d4b,     0x47cf79cf,
+    0x714226eb,     0x9ab6f404,     0xc435ceb2,     0xedbd6158,     0x172c9542,     0x40ac1e54,     0x6a24e02a,     0x93955681,
+    0xbd1d4de9,     0xe69ea0b5,     0x100bf65d,     0x3986bc79,     0x62f97e91,     0x8c71b90a,     0xb5f8f4ec,     0xdf602fd2,
+    0x08e888c8,     0x326115a2,     0x5bd9dd7c,     0x855ed89b,     0xaeda5627,     0xd8476ccb,     0x01c509cf,     0x2b3df123,
+    0x54bc3b87,     0x7e347e70,     0xa7a7b05e,     0xd12ae5c4,     0xfaad8ed6,     0x241e13e8,     0x4d92a601,     0x7717dd95,
+    0xa080d175,     0xca09a741,     0xf37003b9,     0x1cf8ae15,     0x4677e984,     0x6feb452e,     0x996e7f50,     0xc2ee3846,
+    0xd9afc50d,     0x031cbda9,     0x2c9470f1,     0x561587dd,     0x7f8cecbd,     0xa90fd111,     0xd2724988,     0xfbf6242e,
+}; 
+
+void InitFastHashRAMLUT(void)
 {
-    x ^= x >> 15;
-    x *= 0x297a2d39; // We specifically DO want a kinda biased hash function for the wavy look https://nullprogram.com/blog/2018/07/31/ 
-    x ^= x >> 12;
-    return x;
+    for (int i = 0; i < 168; i++)
+    {
+        fastHashRAMLUT[i] = fastHashLUT[i];
+    }
 }
+
 
 // I'm not really doing palette cycling justice. I recommend this https://www.youtube.com/watch?v=aMcJ1Jvtef0
 #define ROTATE_LEN 6 // number of palette entries to rotate
@@ -505,7 +569,7 @@ static inline void RotateObjPalette0(void)
     }
 }
 
-static inline void applyVBlankPaletteModifiers()
+void ApplyVBlankPaletteModifiers()
 {
     sPalRotationCounter++;
     if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS) // This is the petals not the grass
@@ -518,20 +582,59 @@ static inline void applyVBlankPaletteModifiers()
     }
 }
 
+#define NUM_PALETTES 6
+#define PALETTE_SIZE 16
+#define PALETTE_BYTES (NUM_PALETTES * PALETTE_SIZE)
+
+static u16 paletteBuf[PALETTE_BYTES];
+
 static inline void applyHBlankPaletteModifiers()
 {
     // This is all super time sensitive. It must be inlined and I suspect only works because of the prefetch buffer 
-    // TODO: this probably needs to be a lookup table for performance in rom. If that's still to slow, a lookup table we copy into Iwram during the vbalank
+    // I reckon if we could force porytiles to block all the palette slots together 1 or 2 dmas it would be more efficent
     if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS)
     {
-        u16 line = REG_VCOUNT + gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
-        BG_PALETTE[PALETTE_1] = baseColors[fast_hash32(line + 0) & 0x6][0];
-        BG_PALETTE[PALETTE_2] = baseColors[fast_hash32(line + 1) & 0x6][1];
-        BG_PALETTE[PALETTE_3] = baseColors[fast_hash32(line + 2) & 0x6][2];
-        BG_PALETTE[PALETTE_4] = baseColors[fast_hash32(line + 3) & 0x6][3];
-        BG_PALETTE[PALETTE_5] = baseColors[fast_hash32(line + 4) & 0x6][4];
-        BG_PALETTE[PALETTE_6] = baseColors[fast_hash32(line + 5) & 0x6][5];
-        BG_PALETTE[PALETTE_7] = baseColors[fast_hash32(line + 6) & 0x6][6];
+        u16 line = ((REG_VCOUNT + gSaveBlock1Ptr->pos.y) * 160) >> 8; //+ gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
+       
+        u16 col1 = baseColors[fastHashRAMLUT[line] & 0x6][0];
+        u16 col2 = baseColors[fastHashRAMLUT[line + 1] & 0x6][1];
+        u16 col3 = baseColors[fastHashRAMLUT[line + 2] & 0x6][2];
+        u16 col4 = baseColors[fastHashRAMLUT[line + 3] & 0x6][3];
+        u16 col5 = baseColors[fastHashRAMLUT[line + 4] & 0x6][4];
+        u16 col6 = baseColors[fastHashRAMLUT[line + 5] & 0x6][5];
+        u16 col7 = baseColors[fastHashRAMLUT[line + 6] & 0x6][6];
+
+        // Pack two u16 colors into a u32
+        #define PAIR_U16(a, b) (((u32)(b) << 16) | (u16)(a))
+
+        // Palette 0: 7 colors
+        ((u32*)&BG_PALETTE[PALETTE_0_1])[0] = PAIR_U16(col1, col2);
+        ((u32*)&BG_PALETTE[PALETTE_0_3])[0] = PAIR_U16(col3, col4);
+        ((u32*)&BG_PALETTE[PALETTE_0_5])[0] = PAIR_U16(col5, col6);
+        // BG_PALETTE[PALETTE_0_7] = col7; // last one by itself
+
+        // Palette 1: 2 colors
+        // BG_PALETTE[PALETTE_1_1] = col1;
+        // BG_PALETTE[PALETTE_1_6] = col6;
+
+        // Palette 2: 7 colors
+        ((u32*)&BG_PALETTE[PALETTE_2_1])[0] = PAIR_U16(col1, col2);
+        ((u32*)&BG_PALETTE[PALETTE_2_3])[0] = PAIR_U16(col3, col4);
+        ((u32*)&BG_PALETTE[PALETTE_2_5])[0] = PAIR_U16(col5, col6);
+        // BG_PALETTE[PALETTE_2_7] = col7;
+
+        // Palette 3: 3 colors
+        ((u32*)&BG_PALETTE[PALETTE_3_1])[0] = PAIR_U16(col1, col2);
+        //BG_PALETTE[PALETTE_3_5] = col5;
+
+        // Palette 4: 1 color
+        // BG_PALETTE[PALETTE_4_1] = col2;
+
+        // Palette 5: 6 colors
+        ((u32*)&BG_PALETTE[PALETTE_5_1])[0] = PAIR_U16(col1, col2);
+        // BG_PALETTE[PALETTE_5_3] = col3;
+        ((u32*)&BG_PALETTE[PALETTE_5_8])[0] = PAIR_U16(col5, col6);
+        // BG_PALETTE[PALETTE_5_10] = col7;
     }
 }
 
@@ -557,8 +660,6 @@ static void VBlankIntr(void)
 
     if (!gTestRunnerEnabled && (!gMain.inBattle || !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_RECORDED))))
         AdvanceRandom();
-
-    applyVBlankPaletteModifiers();
 
     INTR_CHECK |= INTR_FLAG_VBLANK;
     gMain.intrCheck |= INTR_FLAG_VBLANK;
