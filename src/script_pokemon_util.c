@@ -478,6 +478,9 @@ void Script_GetChosenMonDefensiveIVs(void)
     ConvertIntToDecimalStringN(gStringVar1, GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_HP_IV), STR_CONV_MODE_LEFT_ALIGN, 3);
     ConvertIntToDecimalStringN(gStringVar2, GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_DEF_IV), STR_CONV_MODE_LEFT_ALIGN, 3);
     ConvertIntToDecimalStringN(gStringVar3, GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPDEF_IV), STR_CONV_MODE_LEFT_ALIGN, 3);
+
+    u16 nature = GetNature(&gPlayerParty[0]);
+    StringCopy(gStringVar3, gNaturesInfo[nature].name);
 }
 
 void Script_SetStatus1(struct ScriptContext *ctx)

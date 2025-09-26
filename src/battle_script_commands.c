@@ -3695,7 +3695,7 @@ void SetMoveEffect(bool32 primary, bool32 certain)
                 {
                     gBattlescriptCurrInstr++;
                 }
-                else if (GetBattlerAbility(gBattlerTarget) == ABILITY_STICKY_HOLD)
+                else if (GetBattlerAbility(gBattlerTarget) == ABILITY_STICKY_HOLD && IsBattlerAlive(gBattlerTarget))
                 {
                     BattleScriptPush(gBattlescriptCurrInstr + 1);
                     gBattlescriptCurrInstr = BattleScript_NoItemSteal;
@@ -17912,7 +17912,7 @@ void BS_JumpIfBlockedByPerishAbility(void)
     {
         gBattlescriptCurrInstr = cmd->nextInstr;
     }
-    else if (GetBattleMoveType(gCurrentMove) == TYPE_ELECTRIC)
+    else if (GetBattleMoveType(gCurrentMove) == TYPE_ELECTRIC && GetBattlerAbility(battler) == ABILITY_VOLT_ABSORB)
     {
         gLastUsedAbility = ABILITY_VOLT_ABSORB;
         gBattlescriptCurrInstr = cmd->jumpInstr;

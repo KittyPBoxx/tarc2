@@ -406,6 +406,7 @@ static const u8 *GetInteractionScript(struct MapPosition *position, u8 metatileB
         script = GetInteractedObjectEventScript(&tryInteractPos, behavior, testDir);
         if (script != NULL)
         {
+            RemoveFollowingPokemon();
             ObjectEventTurn(playerObjEvent, testDir);
             return script;
         }
@@ -413,6 +414,7 @@ static const u8 *GetInteractionScript(struct MapPosition *position, u8 metatileB
         script = GetInteractedBackgroundEventScript(&tryInteractPos, behavior, testDir);
         if (script != NULL)
         {
+            RemoveFollowingPokemon();
             ObjectEventTurn(playerObjEvent, testDir);
             return script;
         }
@@ -420,6 +422,7 @@ static const u8 *GetInteractionScript(struct MapPosition *position, u8 metatileB
         script = GetInteractedMetatileScript(&tryInteractPos, behavior, testDir);
         if (script != NULL)
         {
+            RemoveFollowingPokemon();
             ObjectEventTurn(playerObjEvent, testDir);
             return script;
         }
@@ -427,6 +430,7 @@ static const u8 *GetInteractionScript(struct MapPosition *position, u8 metatileB
         script = GetInteractedWaterScript(&tryInteractPos, behavior, testDir);
         if (script != NULL)
         {
+            RemoveFollowingPokemon();
             ObjectEventTurn(playerObjEvent, testDir);
             return script;
         }

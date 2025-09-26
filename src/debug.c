@@ -431,7 +431,7 @@ static const struct ListMenuItem sDebugMenu_Items_Scripts[] =
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_1] = {COMPOUND_STRING("Test Wild"), DEBUG_UTIL_MENU_ITEM_SCRIPT_1},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_2] = {COMPOUND_STRING("Test Tiles"), DEBUG_UTIL_MENU_ITEM_SCRIPT_2},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_3] = {COMPOUND_STRING("Test Cable Car"), DEBUG_UTIL_MENU_ITEM_SCRIPT_3},
-    [DEBUG_UTIL_MENU_ITEM_SCRIPT_4] = {COMPOUND_STRING("Script 4"), DEBUG_UTIL_MENU_ITEM_SCRIPT_4},
+    [DEBUG_UTIL_MENU_ITEM_SCRIPT_4] = {COMPOUND_STRING("Check IVs"), DEBUG_UTIL_MENU_ITEM_SCRIPT_4},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_5] = {COMPOUND_STRING("Script 5"), DEBUG_UTIL_MENU_ITEM_SCRIPT_5},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_6] = {COMPOUND_STRING("Script 6"), DEBUG_UTIL_MENU_ITEM_SCRIPT_6},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_7] = {COMPOUND_STRING("Script 7"), DEBUG_UTIL_MENU_ITEM_SCRIPT_7},
@@ -1698,7 +1698,7 @@ static void DebugAction_Util_Script_3(u8 taskId)
 
 static void DebugAction_Util_Script_4(u8 taskId)
 {
-    Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Script_4);
+    Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_CheckIVs);
 }
 
 static void DebugAction_Util_Script_5(u8 taskId)
@@ -1842,16 +1842,18 @@ static void DebugAction_Util_Battle_5(u8 taskId)
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
     monData = MOVE_MAGIC_POWDER;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
-    monData = MOVE_AVALANCHE;
+    monData = MOVE_ROAR;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
-    monData = MOVE_AVALANCHE;
+    monData = MOVE_FLAME_CHARGE;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
-    monData = MOVE_DRAGON_TAIL;
+    monData = MOVE_ROLE_PLAY;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
     monData = ITEM_RAWST_BERRY;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
-    monData = SPECIES_SKUNTANK;
+    monData = SPECIES_MUK;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+    monData = TYPE_FIRE;
+    SetMonData(&gPlayerParty[0], MON_DATA_TERA_TYPE, &monData);
 
     BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
 
@@ -1867,17 +1869,17 @@ static void DebugAction_Util_Battle_6(u8 taskId)
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_DROUGHT;
+    monData = ABILITY_INNER_FOCUS;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
     monData = MOVE_PLASMA_FISTS;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
-    monData = MOVE_MISTY_TERRAIN;
+    monData = MOVE_SMACK_DOWN;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
-    monData = MOVE_PERISH_SONG;
+    monData = MOVE_DISABLE;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
-    monData = MOVE_TORMENT;
+    monData = MOVE_ROAR;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
-    monData = ITEM_ZOOM_LENS;
+    monData = ITEM_ROCKY_HELMET;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
     monData = SPECIES_SANDYGAST;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);

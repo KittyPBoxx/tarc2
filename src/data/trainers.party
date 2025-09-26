@@ -158,7 +158,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - None
 - None
 
-Mr. Mime
+Mr. Mime @ Lagging Tail
 Level: 30
 Mild Nature
 Ability: Soundproof
@@ -166,7 +166,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Dream Eater
 - Yawn
 - Magic Powder
-- None
+- Role Play
 
 /* ######################################################################################### */
 
@@ -177,40 +177,42 @@ Pic: Aqua Grunt M
 Gender: Male
 Music: Aqua
 Double Battle: Yes
-AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN / AI_FLAG_PREFER_STATUS_MOVES / AI_FLAG_DOUBLE_BATTLE / AI_FLAG_HP_AWARE
+AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN / AI_FLAG_DOUBLE_BATTLE
 
-Starmie @ Terrain Extender
-Level: /* 40 */
-Hasty Nature
-Ability: Analytic
-IVs: 31 HP / 31 Atk / 0 Def / 31 SpA / 31 SpD / 31 Spe
-- Psychic Terrain
-- Refresh
-- Heal Pulse
-- Toxic
-
-Illumise
-Level:  /* 30 */
-Ability: Prankster
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Will-O-Wisp
-- Counter
-- Light Screen
-- Nature Power
-
-Haunter @ Toxic Orb
-Level: 1 /* 25 */
+Starmie @ Terrain Extender  
+Level: 50  
+Ability: Analytic  
 Sassy Nature
-IVs: 31 HP / 0 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
-- Fling
-- Curse
-- None
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
+- Psychic Terrain  
+- Refresh  
+- Toxic  
+- Calm Mind
+
+Illumise (F)  
+Level: 49
+Ability: Prankster    
+Hasty Nature
+IVs: 0 HP / 31 Atk / 0 Def / 31 SpA / 31 SpD / 31 Spe
+- Will-O-Wisp  
+- Light Screen 
+- Last Resort  
+- Calm Mind
+
+Haunter @Toxic Orb 
+Level: 50  
+Ability: Levitate  
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- Curse  
+- Destiny Bond  
+- None  
+
 
 /* ######################################################################################### */
 /*- MOVE_TELEKINESIS*/
 
 === TRAINER_DEITY_TENJIN ===
-Name: GRUNT
+Name: TENJIN
 Class: Expert
 Pic: Expert M
 Gender: Male
@@ -218,16 +220,26 @@ Music: Aqua
 Double Battle: Yes
 AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN
 
-Slowpoke
+Ninjask @ ITEM_KINGS_ROCK
+Level: 33
+Timid Nature
+IVs: 31 HP / 6 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- MOVE_QUICK_ATTACK
+- MOVE_ACCELEROCK
+- MOVE_NONE
+- MOVE_NONE
+
+Slowpoke @ ITEM_ROCKY_HELMET 
 Level: 20
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
 - MOVE_PERISH_SONG
-- None
-- None
-- None
+- MOVE_MISTY_TERRAIN
+- MOVE_TELEKINESIS
+- MOVE_CONFUSION
 
 Zeraora
-Level: 50
+Level: 90
+Naughty Nature
 Ability: ABILITY_VOLT_ABSORB
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - MOVE_PLASMA_FISTS
