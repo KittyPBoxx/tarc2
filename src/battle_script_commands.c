@@ -14072,10 +14072,18 @@ static void Cmd_trysetperishsong(void)
 
     for (i = 0; i < gBattlersCount; i++)
     {
-        if (gStatuses3[i] & STATUS3_PERISH_SONG
+        bool32 isAttacker = gBattlerPartyIndexes[gBattlerAttacker] == i;
+
+        if (isAttacker)
+        {
+            gStatuses3[i] |= STATUS3_PERISH_SONG;
+            gDisableStructs[i].perishSongTimer = 3;
+        } 
+        else if (gStatuses3[i] & STATUS3_PERISH_SONG
             || GetBattlerAbility(i) == ABILITY_SOUNDPROOF
             || BlocksPrankster(gCurrentMove, gBattlerAttacker, i, TRUE)
-            || gStatuses3[i] & STATUS3_COMMANDER)
+            || gStatuses3[i] & STATUS3_COMMANDER 
+            || (GetBattleMoveType(gCurrentMove) == TYPE_ELECTRIC && GetBattlerAbility(i) == ABILITY_VOLT_ABSORB))
         {
             notAffectedCount++;
         }
@@ -17877,9 +17885,36 @@ void BS_JumpIfBlockedBySoundproof(void)
 {
     NATIVE_ARGS(u8 battler, const u8 *jumpInstr);
     u32 battler = GetBattlerForBattleScript(cmd->battler);
-    if (IsSoundMove(gCurrentMove) && GetBattlerAbility(battler) == ABILITY_SOUNDPROOF)
+
+    if (gBattlerAttacker == battler)
+    {
+        gBattlescriptCurrInstr = cmd->nextInstr;
+    }
+    else if (IsSoundMove(gCurrentMove) && GetBattlerAbility(battler) == ABILITY_SOUNDPROOF)
     {
         gLastUsedAbility = ABILITY_SOUNDPROOF;
+        gBattlescriptCurrInstr = cmd->jumpInstr;
+        RecordAbilityBattle(battler, gLastUsedAbility);
+        gBattlerAbility = battler;
+    }
+    else
+    {
+        gBattlescriptCurrInstr = cmd->nextInstr;
+    }
+}
+
+void BS_JumpIfBlockedByPerishAbility(void)
+{
+    NATIVE_ARGS(u8 battler, const u8 *jumpInstr);
+    u32 battler = GetBattlerForBattleScript(cmd->battler);
+
+    if (gBattlerAttacker == battler)
+    {
+        gBattlescriptCurrInstr = cmd->nextInstr;
+    }
+    else if (GetBattleMoveType(gCurrentMove) == TYPE_ELECTRIC)
+    {
+        gLastUsedAbility = ABILITY_VOLT_ABSORB;
         gBattlescriptCurrInstr = cmd->jumpInstr;
         RecordAbilityBattle(battler, gLastUsedAbility);
         gBattlerAbility = battler;

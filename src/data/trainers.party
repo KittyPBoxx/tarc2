@@ -207,6 +207,7 @@ IVs: 31 HP / 0 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
 - None
 
 /* ######################################################################################### */
+/*- MOVE_TELEKINESIS*/
 
 === TRAINER_DEITY_TENJIN ===
 Name: GRUNT
@@ -215,20 +216,21 @@ Pic: Expert M
 Gender: Male
 Music: Aqua
 Double Battle: Yes
-AI: Check Bad Move / Try To Faint / Check Viability
+AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN
 
-Kadabra
-Level: 1
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Telekinesis
-- Quick Attack
+Slowpoke
+Level: 20
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
+- MOVE_PERISH_SONG
+- None
 - None
 - None
 
 Zeraora
-Level: 1
+Level: 50
+Ability: ABILITY_VOLT_ABSORB
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Plasma Fists
+- MOVE_PLASMA_FISTS
 - None
 - None
 - None

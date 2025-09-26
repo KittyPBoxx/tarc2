@@ -1867,14 +1867,15 @@ static void DebugAction_Util_Battle_6(u8 taskId)
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_STATIC;
+    monData = ABILITY_DROUGHT;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
-    monData = MOVE_PROTECT;
+    monData = MOVE_PLASMA_FISTS;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
-    monData = MOVE_PERISH_SONG;
+    monData = MOVE_MISTY_TERRAIN;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
-    monData = MOVE_SURF;
+    monData = MOVE_PERISH_SONG;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    monData = MOVE_TORMENT;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
     monData = ITEM_ZOOM_LENS;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);

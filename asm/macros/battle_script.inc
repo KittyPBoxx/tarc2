@@ -1750,6 +1750,12 @@
 	.4byte \failInstr
 	.endm
 
+	.macro jumpifblockedbyPerishAbility battler:req, failInstr:req
+	callnative BS_JumpIfBlockedByPerishAbility
+	.byte \battler
+	.4byte \failInstr
+	.endm
+
 	.macro setmagiccoattarget
 	callnative BS_SetMagicCoatTarget
 	.endm
