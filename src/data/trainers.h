@@ -321,16 +321,16 @@
 #line 223
             .heldItem = ITEM_KINGS_ROCK,
 #line 226
-            .iv = TRAINER_PARTY_IVS(31, 6, 31, 31, 31, 31),
+            .iv = TRAINER_PARTY_IVS(31, 0, 31, 31, 31, 31),
 #line 224
-            .lvl = 33,
+            .lvl = 30,
 #line 225
             .nature = NATURE_TIMID,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 227
-                MOVE_QUICK_ATTACK,
-                MOVE_ACCELEROCK,
+                MOVE_NONE,
+                MOVE_BULLET_PUNCH,
                 MOVE_NONE,
                 MOVE_NONE,
             },

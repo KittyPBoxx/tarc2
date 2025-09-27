@@ -176,7 +176,7 @@ static const u8 sText_SlotEmpty[] = _("{COLOR LIGHT_GRAY} SLOT EMPTY");
 static const u8 sText_WarpBridge[] = _("Bridge");
 static const u8 sText_WarpManor[] = _("Manor");
 static const u8 sText_WarpForest[] = _("Forest");
-static const u8 sText_WarpCaveF1[] = _("Cave F1");
+static const u8 sText_WarpCaveF1[] = _("Cave");
 static const u8 sText_WarpCaveF2[] = _("Cave F2");
 static const u8 sText_WarpSummit[] = _("Summit");
 static const u8 sText_WarpPass[] = _("Pass");
@@ -297,9 +297,9 @@ static void BuildWarpMenu(void)
     AddStartMenuAction(MENU_ACTION_MANOR);
     AddStartMenuAction(MENU_ACTION_FOREST);
     AddStartMenuAction(MENU_ACTION_CAVE_F1);
-    AddStartMenuAction(MENU_ACTION_CAVE_F2);
+    //AddStartMenuAction(MENU_ACTION_CAVE_F2);
     AddStartMenuAction(MENU_ACTION_SUMMIT);
-    AddStartMenuAction(MENU_ACTION_PASS);
+    //AddStartMenuAction(MENU_ACTION_PASS);
 }
 
 static void BuildSaveMenu(void)
@@ -385,7 +385,7 @@ static bool32 InitStartMenuStep(void)
             sInitStartMenuData[0]++;
         break;
     case 5:
-        sStartMenuCursorPos = InitMenuWithSpriteCursor(GetStartMenuWindowId(), FONT_NORMAL, 0, 9, 16, sNumStartMenuActions, sStartMenuCursorPos);
+        sStartMenuCursorPos = InitMenuNormal(GetStartMenuWindowId(), FONT_NORMAL, 0, 9, 16, sNumStartMenuActions, sStartMenuCursorPos);
         CopyWindowToVram(GetStartMenuWindowId(), COPYWIN_MAP);
         return TRUE;
     }
@@ -621,19 +621,19 @@ static bool8 WarpMenuGenericCallback(u8 map)
             SetWarpDestination(MAP_GROUP(MAP_BRIDGE),MAP_NUM(MAP_BRIDGE),0,10,9);
             break;
         case MAP_MANOR:
-            SetWarpDestination(MAP_GROUP(MAP_MANOR),MAP_NUM(MAP_MANOR),0,10,9);
+            SetWarpDestination(MAP_GROUP(MAP_MANOR),MAP_NUM(MAP_MANOR),0,2,27);
             break;
         case MAP_FOREST:
-            SetWarpDestination(MAP_GROUP(MAP_FOREST),MAP_NUM(MAP_FOREST),0,10,9);
+            SetWarpDestination(MAP_GROUP(MAP_FOREST),MAP_NUM(MAP_FOREST),0,21,15);
             break;
         case MAP_CAVE_BOTTOM:
-            SetWarpDestination(MAP_GROUP(MAP_CAVE_BOTTOM),MAP_NUM(MAP_CAVE_BOTTOM),0,10,9);
+            SetWarpDestination(MAP_GROUP(MAP_CAVE_BOTTOM),MAP_NUM(MAP_CAVE_BOTTOM),0,15,18);
             break;
         case MAP_CAVE_TOP:
             SetWarpDestination(MAP_GROUP(MAP_CAVE_TOP),MAP_NUM(MAP_CAVE_TOP),0,10,9);
             break;
         case MAP_SUMMIT:
-            SetWarpDestination(MAP_GROUP(MAP_SUMMIT),MAP_NUM(MAP_SUMMIT),0,10,9);
+            SetWarpDestination(MAP_GROUP(MAP_SUMMIT),MAP_NUM(MAP_SUMMIT),0,7,10);
             break;
         case MAP_RETURN_PASS:
             SetWarpDestination(MAP_GROUP(MAP_RETURN_PASS),MAP_NUM(MAP_RETURN_PASS),0,10,9);

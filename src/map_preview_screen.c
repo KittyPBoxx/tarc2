@@ -50,31 +50,31 @@ static const u8 sSummitMapPreviewTilemap[] = INCBIN_U8("graphics/map_preview/sum
 static const struct MapPreviewScreen sMapPreviewScreenData[MPS_COUNT] = {
     [MPS_FOREST] = {
         .mapnum = LAYOUT_FOREST,
-        .type = MPS_TYPE_FADE_IN,
+        .type = MPS_TYPE_CAVE,
         .flagId = MPS_FLAG_NULL,
         .image = IMG_FOREST
     },
     [MPS_BRIDGE] = {
         .mapnum = LAYOUT_BRIDGE,
-        .type = MPS_TYPE_FADE_IN,
+        .type = MPS_TYPE_CAVE,
         .flagId = MPS_FLAG_NULL,
         .image = IMG_BRIDGE
     },
     [MPS_MANOR] = {
         .mapnum = LAYOUT_MANOR,
-        .type = MPS_TYPE_FADE_IN,
+        .type = MPS_TYPE_CAVE,
         .flagId = MPS_FLAG_NULL,
         .image = IMG_MANOR
     },
     [MPS_CAVE] = {
         .mapnum = LAYOUT_CAVE_BOTTOM,
-        .type = MPS_TYPE_FADE_IN,
+        .type = MPS_TYPE_CAVE,
         .flagId = MPS_FLAG_NULL,
         .image = IMG_CAVE
     },
     [MPS_SUMMIT] = {
         .mapnum = LAYOUT_SUMMIT,
-        .type = MPS_TYPE_FADE_IN,
+        .type = MPS_TYPE_CAVE,
         .flagId = MPS_FLAG_NULL,
         .image = IMG_SUMMIT
     }
@@ -150,24 +150,24 @@ static u8 GetMapPreviewScreenIdx(u8 mapnum)
 
 bool8 MapHasPreviewScreen(u8 mapnum, u8 type)
 {
-    u8 idx;
+    // u8 idx;
 
-    idx = GetMapPreviewScreenIdx(mapnum);
-    if (idx != MPS_COUNT)
-    {
-        if (type == MPS_TYPE_ANY)
-        {
-            return TRUE;
-        }
-        else
-        {
-            return sMapPreviewScreenData[idx].type == type ? TRUE : FALSE;
-        }
-    }
-    else
-    {
+    // idx = GetMapPreviewScreenIdx(mapnum);
+    // if (idx != MPS_COUNT)
+    // {
+    //     if (type == MPS_TYPE_ANY)
+    //     {
+    //         return TRUE;
+    //     }
+    //     else
+    //     {
+    //         return sMapPreviewScreenData[idx].type == type ? TRUE : FALSE;
+    //     }
+    // }
+    // else
+    // {
         return FALSE;
-    }
+    // }
 }
 
 bool32 MapHasPreviewScreen_HandleQLState2(u8 mapnum, u8 type)

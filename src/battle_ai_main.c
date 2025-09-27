@@ -2997,8 +2997,14 @@ static s32 AI_DoubleBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
     switch (effect)
     {
     case EFFECT_TELEKINESIS:
-        if (!IsBattlerAlive(battlerAtkPartner))
+        if (!IsTelekinesisBannedSpecies(gBattleMons[battlerDef].species) && battlerAtkPartner != battlerDef)
+        {
             ADJUST_SCORE(GOOD_EFFECT);
+        }
+        else
+        {
+            ADJUST_SCORE(-50);
+        }
         break;
     case EFFECT_HELPING_HAND:
         if (!IsBattlerAlive(battlerAtkPartner) || !HasDamagingMove(battlerAtkPartner))

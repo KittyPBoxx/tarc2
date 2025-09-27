@@ -14,9 +14,9 @@
     {
       "id": "LAYOUT_FOREST",
       "name": "Forest_Layout",
-      "width": 20,
-      "height": 20,
-      "primary_tileset": "gTileset_woodPrimary1",
+      "width": 30,
+      "height": 25,
+      "primary_tileset": "gTileset_forestPrimary1",
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/Forest/border.bin",
       "blockdata_filepath": "data/layouts/Forest/map.bin"
@@ -24,9 +24,9 @@
     {
       "id": "LAYOUT_MANOR",
       "name": "Manor_Layout",
-      "width": 20,
-      "height": 20,
-      "primary_tileset": "gTileset_woodPrimary1",
+      "width": 30,
+      "height": 30,
+      "primary_tileset": "gTileset_manorPrimary1",
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/Manor/border.bin",
       "blockdata_filepath": "data/layouts/Manor/map.bin"
@@ -34,9 +34,9 @@
     {
       "id": "LAYOUT_CAVE_BOTTOM",
       "name": "CaveBottom_Layout",
-      "width": 20,
-      "height": 20,
-      "primary_tileset": "gTileset_General",
+      "width": 30,
+      "height": 30,
+      "primary_tileset": "gTileset_cavePrimary1",
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/CaveBottom/border.bin",
       "blockdata_filepath": "data/layouts/CaveBottom/map.bin"
@@ -64,9 +64,9 @@
     {
       "id": "LAYOUT_SUMMIT",
       "name": "Summit_Layout",
-      "width": 20,
-      "height": 20,
-      "primary_tileset": "gTileset_General",
+      "width": 30,
+      "height": 15,
+      "primary_tileset": "gTileset_summitPrimary1",
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/Summit/border.bin",
       "blockdata_filepath": "data/layouts/Summit/map.bin"

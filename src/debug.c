@@ -1884,6 +1884,9 @@ static void DebugAction_Util_Battle_6(u8 taskId)
     monData = SPECIES_SANDYGAST;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
 
+    monData = TYPE_FIRE;
+    SetMonData(&gPlayerParty[0], MON_DATA_TERA_TYPE, &monData);
+
     BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
 
     HealPlayerParty();

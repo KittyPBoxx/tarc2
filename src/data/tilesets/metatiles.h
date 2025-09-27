@@ -165,3 +165,15 @@ const u16 gMetatileAttributes_UnionRoom[] = INCBIN_U16("data/tilesets/secondary/
 
 const u16 gMetatiles_woodPrimary1[] = INCBIN_U16("data/tilesets/primary/wood_primary_1/metatiles.bin");
 const u16 gMetatileAttributes_woodPrimary1[] = INCBIN_U16("data/tilesets/primary/wood_primary_1/metatile_attributes.bin");
+
+const u16 gMetatiles_manorPrimary1[] = INCBIN_U16("data/tilesets/primary/manor_primary_1/metatiles.bin");
+const u16 gMetatileAttributes_manorPrimary1[] = INCBIN_U16("data/tilesets/primary/manor_primary_1/metatile_attributes.bin");
+
+const u16 gMetatiles_forestPrimary1[] = INCBIN_U16("data/tilesets/primary/forest_primary_1/metatiles.bin");
+const u16 gMetatileAttributes_forestPrimary1[] = INCBIN_U16("data/tilesets/primary/forest_primary_1/metatile_attributes.bin");
+
+const u16 gMetatiles_summitPrimary1[] = INCBIN_U16("data/tilesets/primary/summit_primary_1/metatiles.bin");
+const u16 gMetatileAttributes_summitPrimary1[] = INCBIN_U16("data/tilesets/primary/summit_primary_1/metatile_attributes.bin");
+
+const u16 gMetatiles_cavePrimary1[] = INCBIN_U16("data/tilesets/primary/cave_primary_1/metatiles.bin");
+const u16 gMetatileAttributes_cavePrimary1[] = INCBIN_U16("data/tilesets/primary/cave_primary_1/metatile_attributes.bin");

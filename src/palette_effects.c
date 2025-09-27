@@ -16,11 +16,11 @@ void ResumeMapPaletteEffects(void)
     switch(gSaveBlock1Ptr->location.mapNum)
     {
         case MAP_NUM(MAP_BRIDGE):
-        case MAP_NUM(MAP_FOREST):
-        case MAP_NUM(MAP_MANOR):
             gMain.hblankPaletteEffect = PALETTE_EFFECT_GRASS;
             EnableInterrupts(INTR_FLAG_HBLANK | INTR_FLAG_VBLANK);
             break;
+        case MAP_NUM(MAP_FOREST):
+        case MAP_NUM(MAP_MANOR):
         case MAP_NUM(MAP_CAVE_BOTTOM):
         case MAP_NUM(MAP_CAVE_TOP):
         case MAP_NUM(MAP_SUMMIT):

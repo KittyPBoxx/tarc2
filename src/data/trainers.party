@@ -221,11 +221,11 @@ Double Battle: Yes
 AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN
 
 Ninjask @ ITEM_KINGS_ROCK
-Level: 33
+Level: 30
 Timid Nature
-IVs: 31 HP / 6 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- MOVE_QUICK_ATTACK
-- MOVE_ACCELEROCK
+IVs: 31 HP / 0 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- MOVE_NONE
+- MOVE_BULLET_PUNCH
 - MOVE_NONE
 - MOVE_NONE
 
