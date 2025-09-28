@@ -2028,7 +2028,8 @@ void BufferSaveMenuText(u8 textId, u8 *dest, u8 color)
             break;
         case SAVE_MENU_BADGES:
             // TODO: TARC completion percentage
-            *(string++) = CHAR_0;
+            u8 completion = GetCompletion();
+            string = ConvertIntToDecimalStringN(string, completion, STR_CONV_MODE_LEFT_ALIGN, 3);
             *(string++) = CHAR_PERCENT;
             *(string++) = EOS;
             break;
@@ -2068,7 +2069,7 @@ void BufferLoadMenuText(u8 slot, u8 textId, u8 *dest, u8 color)
             break;
         case SAVE_MENU_BADGES:
             // TODO: TARC completion percentage
-            *(string++) = CHAR_0;
+            string = ConvertIntToDecimalStringN(string,  sSavePreviewBuffer[0], STR_CONV_MODE_LEFT_ALIGN, 3);
             *(string++) = CHAR_PERCENT;
             *(string++) = EOS;
             break;

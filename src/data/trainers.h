@@ -359,6 +359,8 @@
 #line 240
             .species = SPECIES_ZERAORA,
             .gender = TRAINER_MON_RANDOM_GENDER,
+#line 240
+            .heldItem = ITEM_AIR_BALLOON,
 #line 244
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 243

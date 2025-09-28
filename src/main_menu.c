@@ -762,8 +762,9 @@ void BuildMenuRowString(u8 slot, const u8 *label, u8 *dest)
         ptr = ConvertIntToDecimalStringN(ptr, buf[2], STR_CONV_MODE_LEADING_ZEROS, 2); // minutes
         *(ptr++) = CHAR_SPACE;
 
-        CopyPreviewDataToBuffer(slot, SAVE_MENU_BADGES, buf);
-        ptr = StringCopy(ptr, buf);
+        CopyPreviewDataToBuffer(slot, SAVE_MENU_BADGES, buf); 
+        ptr = ConvertIntToDecimalStringN(ptr, buf[0], STR_CONV_MODE_LEFT_ALIGN, 3);
+        *(ptr++) = CHAR_PERCENT;
     }
 
     *ptr = EOS;
@@ -905,8 +906,6 @@ static bool8 HandleMainMenuInput(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 
-    DebugPrintfLevel(MGBA_LOG_ERROR, "HandleMainMenuInput current Item:%x, item Count%x", tCurrItem, tItemCount);
-
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
@@ -915,7 +914,6 @@ static bool8 HandleMainMenuInput(u8 taskId)
     }
     else if ((JOY_NEW(DPAD_UP)) && tCurrItem > 0)
     {
-        DebugPrintfLevel(MGBA_LOG_ERROR, "Do Scroll up");
         // if (tMenuType == HAS_SAVE_SLOTS && tIsScrolled == TRUE && tCurrItem == 1)
         // {
         //     ChangeBgY(0, 0x2000, BG_COORD_SUB);
@@ -928,7 +926,6 @@ static bool8 HandleMainMenuInput(u8 taskId)
     }
     else if ((JOY_NEW(DPAD_DOWN)) && tCurrItem < tItemCount - 1)
     {
-        DebugPrintfLevel(MGBA_LOG_ERROR, "Do Scroll down");
         // if (tMenuType == HAS_SAVE_SLOTS && tCurrItem == 3 && tIsScrolled == FALSE)
         // {
         //     ChangeBgY(0, 0x2000, BG_COORD_ADD);

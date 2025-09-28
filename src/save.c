@@ -8,6 +8,10 @@
 #include "main.h"
 #include "new_game.h"
 #include "menu.h"
+#include "event_data.h"
+#include "battle_setup.h"
+#include "constants/flags.h"
+#include "constants/trainers.h"
 
 COMMON_DATA u16 gSaveFileStatus = 0;
 COMMON_DATA void (*gGameContinueCallback)(void) = NULL;
@@ -23,6 +27,43 @@ void Save_Commit(u8 slotId);
 
 static u8 Save_WriteChunk(u8 slotId, u16 offset, const void *data, u16 size);
 static u8 Save_ReadChunk(u8 slotId, u16 offset, void *dest, u16 size);
+
+u8 GetCompletion(void)
+{
+    u8 result = 0;
+
+    if (FlagGet(FLAG_UNLOCK_MANOR_WARP))
+        result += 10;
+
+    if (FlagGet(FLAG_UNLOCK_FOREST_WARP))
+        result += 10;
+
+    if (FlagGet(FLAG_UNLOCK_CAVE_WARP))
+        result += 10;
+
+    if (FlagGet(FLAG_UNLOCK_BRIDGE_WARP))
+        result += 10;
+
+    if (HasTrainerBeenFought(TRAINER_BERUS))
+        result += 10;
+    
+    if (HasTrainerBeenFought(TRAINER_DEITY_TENJIN))
+        result += 10;   
+
+    if (HasTrainerBeenFought(TRAINER_EXAMINER_FIONN))
+        result += 10;
+
+    if (HasTrainerBeenFought(TRAINER_EXAMINER_SORA))
+        result += 10;
+
+    if (HasTrainerBeenFought(TRAINER_EXAMINER_DANTE))
+        result += 10;
+
+    if (HasTrainerBeenFought(TRAINER_EXAMINER_RUNE))
+        result += 10;   
+    
+    return result;
+}
 
 
 void CheckAnySlotValid()
@@ -127,6 +168,10 @@ u8 TrySavingData(u8 saveType, u8 slotId)
     Save_WriteChunk(slotId, SLOT_OFF_PLAY_S, &gSaveBlock2Ptr->playTimeSeconds, 1);
     Save_WriteChunk(slotId, SLOT_OFF_PLAY_VB, &gSaveBlock2Ptr->playTimeVBlanks, 1);
 
+    // --- Completion ---
+    u8 completion = GetCompletion();
+    Save_WriteChunk(slotId, SLOT_OFF_COMPLETION, &completion, 1);
+
     // --- Flags ---
     Save_WriteChunk(slotId, SLOT_OFF_FLAGS, gSaveBlock1Ptr->flags, NUM_FLAG_BYTES);
 
@@ -227,9 +272,11 @@ void CopyPreviewDataToBuffer(u8 slot, u8 textId, u8 *dest)
             dest += 1;
             Save_ReadChunk(slot, SLOT_OFF_PLAY_VB, dest, 1);
             break;
+        case SAVE_MENU_BADGES:
+            Save_ReadChunk(slot, SLOT_OFF_COMPLETION, dest, 1);
+            break;
         case SAVE_MENU_CAUGHT:
         case SAVE_MENU_LOCATION:
-        case SAVE_MENU_BADGES:
             *(dest++) = CHAR_0;
             *(dest++) = CHAR_PERCENT;
             *(dest++) = EOS;

@@ -56,7 +56,9 @@ enum
 #define SLOT_OFF_PLAY_S          (SAVE_HEADER_SIZE + 0x2A)
 #define SLOT_OFF_PLAY_VB         (SAVE_HEADER_SIZE + 0x2B)
 
-#define SLOT_OFF_FLAGS           (SAVE_HEADER_SIZE + 0x2C)
+#define SLOT_OFF_COMPLETION      (SAVE_HEADER_SIZE + 0x2C)
+
+#define SLOT_OFF_FLAGS           (SAVE_HEADER_SIZE + 0x2D)
 
 #define SAVE_SLOT_ADDR(slot)  (GLOBAL_HEADER_SIZE + FRAM_BASE + (SAVE_SLOT_SIZE * (slot)))
 
@@ -105,6 +107,7 @@ u8 LoadGameSave(u8 saveType, u8 slotId);
 bool8 SlotIsValid(u8 slotId);
 void CopyPreviewDataToBuffer(u8 slot, u8 textId, u8 *dest);
 void CheckAnySlotValid();
+u8 GetCompletion(void);
 
 u16 GetSaveBlocksPointersBaseOffset(void); // Always 0
 

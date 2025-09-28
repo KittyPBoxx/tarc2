@@ -237,7 +237,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
 - MOVE_TELEKINESIS
 - MOVE_CONFUSION
 
-Zeraora
+Zeraora @ ITEM_AIR_BALLOON
 Level: 90
 Naughty Nature
 Ability: ABILITY_VOLT_ABSORB
