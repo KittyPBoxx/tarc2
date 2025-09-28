@@ -9,7 +9,6 @@ script TenjinNPC {
 		msgbox(format("Teamwork. The power of two. You finally worked out the one candidate couldn't beat exam alone, put your differences aside and now you face me."))
 		removefieldmugshot
 
-		faceplayer
 		applymovement(1, Common_Movement_QuestionMark)
 		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
 		msgbox(format("Wait... why is there only one of you? The exams supposed to be impossible to do solo... I'm supposed to give a speech..."))

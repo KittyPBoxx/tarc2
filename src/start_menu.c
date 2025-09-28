@@ -633,7 +633,7 @@ static bool8 WarpMenuGenericCallback(u8 map)
             SetWarpDestination(MAP_GROUP(MAP_CAVE_TOP),MAP_NUM(MAP_CAVE_TOP),0,10,9);
             break;
         case MAP_SUMMIT:
-            SetWarpDestination(MAP_GROUP(MAP_SUMMIT),MAP_NUM(MAP_SUMMIT),0,7,10);
+            SetWarpDestination(MAP_GROUP(MAP_SUMMIT),MAP_NUM(MAP_SUMMIT),0,9,10);
             break;
         case MAP_RETURN_PASS:
             SetWarpDestination(MAP_GROUP(MAP_RETURN_PASS),MAP_NUM(MAP_RETURN_PASS),0,10,9);

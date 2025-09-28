@@ -6,14 +6,13 @@ Forest_MapScripts::
 
 
 Forest_MapScripts_CreateTiles::
-	createvobject OBJ_EVENT_GFX_TRUCK, 1, 20, 0
-	createvobject OBJ_EVENT_GFX_TRUCK, 1, 15, 4
+	@ createvobject OBJ_EVENT_GFX_TRUCK, 1, 20, 0
+	@ createvobject OBJ_EVENT_GFX_TRUCK, 1, 15, 4
 	return`
 
 
 script SoraNPC {
     lock
-    faceplayer
 
    	if (defeated(TRAINER_EXAMINER_SORA)) {
             
@@ -46,7 +45,6 @@ script SoraNPC {
 
 script FionnNPC {
     lock
-    faceplayer
 
    	if (defeated(TRAINER_EXAMINER_FIONN)) {
             
@@ -79,7 +77,6 @@ script FionnNPC {
 
 script ForestSeal {
     lock
-    faceplayer
 
     if (defeated(TRAINER_EXAMINER_FIONN) && defeated(TRAINER_EXAMINER_SORA)) {
         msgbox(format("The seal has been broken. You may pass through."))

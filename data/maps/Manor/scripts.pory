@@ -2,8 +2,6 @@ mapscripts Manor_MapScripts {}
 
 script OrthyNPC {
     lock
-    faceplayer
-
 	special(GetPlayerMonSpecies)
     waitstate
 

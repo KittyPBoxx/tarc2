@@ -2,7 +2,6 @@ mapscripts CaveTop_MapScripts {}
 
 script DanteNPC {
     lock
-    faceplayer
 
    	if (defeated(TRAINER_EXAMINER_DANTE)) {
             
@@ -35,7 +34,6 @@ script DanteNPC {
 
 script CaveSeal {
     lock
-    faceplayer
 
     if (defeated(TRAINER_EXAMINER_RUNE) && defeated(TRAINER_EXAMINER_DANTE)) {
         msgbox(format("The seal has been broken. You may pass through."))
