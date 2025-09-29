@@ -676,6 +676,12 @@ static void Task_SlidingPuzzle_Exit(u8 taskId)
     if (!gPaletteFade.active)
     {
         gSpecialVar_Result = sSlidingPuzzle->solved;
+
+        if (sSlidingPuzzle->solved)
+            gSpecialVar_0x8008 = SPECIES_SANDYGAST;
+        else
+            gSpecialVar_0x8008 = 0;
+
         Free(sSlidingPuzzle);
         FreeAllWindowBuffers();
         SetMainCallback2(gMain.savedCallback);

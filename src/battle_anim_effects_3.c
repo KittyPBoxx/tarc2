@@ -1306,7 +1306,7 @@ const struct SpriteTemplate gTeraCrystalSpriteTemplate =
 {
     .tileTag = ANIM_TAG_TERA_CRYSTAL,
     .paletteTag = ANIM_TAG_TERA_CRYSTAL,
-    .oam = &gOamData_AffineDouble_ObjBlend_64x64,
+    .oam = &gOamData_AffineDouble_ObjBlend_8x8,
     .anims = gDummySpriteAnimTable,
     .images = NULL,
     .affineAnims = gAffineAnims_LusterPurgeCircle,

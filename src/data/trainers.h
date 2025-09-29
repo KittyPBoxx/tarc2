@@ -414,9 +414,9 @@
             .moves = {
 #line 265
                 MOVE_METRONOME,
-                MOVE_NONE,
-                MOVE_NONE,
-                MOVE_NONE,
+                MOVE_SHEER_COLD,
+                MOVE_FISSURE,
+                MOVE_GUILLOTINE,
             },
             },
         },

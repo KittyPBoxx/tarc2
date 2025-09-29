@@ -1,3 +1,6 @@
+const EXAMINER_HEAD_ID = 1
+const EXAMINER_BODY_ID = 6
+
 mapscripts Manor_MapScripts {}
 
 script OrthyNPC {
@@ -9,9 +12,11 @@ script OrthyNPC {
 
     if (var(VAR_0x8008) == SPECIES_MR_RIME) {
         createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
-        msgbox(format("What? No I wasn't napping! Go right in Berus Sir.")) 
+        msgbox(format("What? No I wasn't napping! Go right ahead Berus Sir.")) 
         removefieldmugshot
-		applymovement(1, MoveOutTheWay)
+        setflag(FLAG_HIDE_EXAMINER)
+        removeobject(EXAMINER_HEAD_ID)
+        removeobject(EXAMINER_BODY_ID)
 		// TODO: TARC maybe we just move the player here and then roll credits from the script.
     }
 	else {
@@ -25,11 +30,6 @@ script OrthyNPC {
 }
 
 
-movement MoveOutTheWay {
-	face_left
-    walk_left*2
-}
-
 script ManorWarpOrb {
     lock
 
@@ -42,6 +42,13 @@ script ManorWarpOrb {
 
     msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))
 
+    release
+    end
+}
+
+script CreditsOrb {
+    lock
+    special(GameClear)
     release
     end
 }

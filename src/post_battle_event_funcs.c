@@ -7,6 +7,9 @@
 #include "script_pokemon_util.h"
 #include "constants/heal_locations.h"
 
+
+extern void CB2_EndGameCallback(void);
+
 int GameClear(void)
 {
     int i;
@@ -40,7 +43,7 @@ int GameClear(void)
         }
     }
 
-    SetMainCallback2(CB2_WhiteOut); // TODO: this will probably need updating
+    SetMainCallback2(CB2_EndGameCallback); // TODO: this will probably need updating
     return 0;
 }
 

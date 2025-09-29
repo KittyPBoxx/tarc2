@@ -36,6 +36,8 @@ void SetPlayerMonSpecies(void)
 {
     u16 monData = gSpecialVar_0x8008;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
+    BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
+    HealPlayerParty();
 }
 
 void GetPlayerMonSpecies(void)

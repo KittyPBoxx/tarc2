@@ -1,3 +1,6 @@
+const BERUS_HEAD_ID = 1
+const BERUS_BODY_ID = 5
+
 mapscripts Bridge_MapScripts {
     MAP_SCRIPT_ON_RESUME: Bridge_OnResume
     MAP_SCRIPT_ON_FRAME_TABLE [
@@ -95,7 +98,17 @@ movement LookUp {
 script BerusNPC {
     lock
 
-    if (!flag(FLAG_CHOSE_STARTER)) {
+    if (defeated(TRAINER_BERUS))
+    {
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
+        msgbox(format("You...\pYOU...\pYou may have beaten me, but...\pThe timer on the exam ran out during our battle...\pSo you still FAIL.\p Now if you'll excuse me I need to go and heal my poor doggo.")) 
+        removefieldmugshot
+
+        setflag(FLAG_HIDE_BERUS)
+        removeobject(BERUS_HEAD_ID)
+        removeobject(BERUS_BODY_ID)
+    }
+    elif (!flag(FLAG_CHOSE_STARTER)) {
         createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("Choose a Pokémon from the bag before we proceed."))
         removefieldmugshot
@@ -103,18 +116,27 @@ script BerusNPC {
     elif (defeated(TRAINER_DEITY_TENJIN)) {
             
         createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("Finally ready to admit defeat? What? You beat Tenjin? That's impossible! You must have cheated somehow. If you want me to accept that you passed, you'll have to beat me in battle.")) 
+        msgbox(format("Finally ready to admit defeat? What? You beat Tenjin? That's impossible!\pYou must have cheated somehow.\nI'll show you what I do to cheaters!")) 
         removefieldmugshot
         trainerbattle_single(TRAINER_BERUS, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("You...YOU...you may have beaten me, but look at the sky! It's after sundown now... which means you still FAIL. Now if you'll excuse me I need to go and heal my poor doggy.")) 
-        removefieldmugshot
+
+        special(GetBattleOutcome)
+        if (var(VAR_RESULT) == B_OUTCOME_WON)
+        {
+            createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
+            msgbox(format("You...\pYOU...\pYou may have beaten me, but...\pThe timer on the exam ran out during our battle...\pSo you still FAIL.\p Now if you'll excuse me I need to go and heal my poor doggo.")) 
+            removefieldmugshot
+
+            setflag(FLAG_HIDE_BERUS)
+            removeobject(BERUS_HEAD_ID)
+            removeobject(BERUS_BODY_ID)
+        }
 
     } 
-    elif (!defeated(TRAINER_BERUS)) {
+    elif (!defeated(TRAINER_DEITY_TENJIN)) {
         
         createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("Don't my waste time. You should focus on trying to pass the test... not that you have a chance.")) 
+        msgbox(format("Don't my waste time. You should focus on trying to pass the test...\pNot that you have a chance.")) 
         removefieldmugshot
 
     }
@@ -162,19 +184,18 @@ script StarterBag {
         clearflag(FLAG_TEMP_HIDE_FOLLOWER)
         setvar(VAR_TEMP_1, 0)
     }
-    elif (defeated(TRAINER_BERUS)) {
+    elif (flag(FLAG_HIDE_BERUS)) {
 
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("Berus's photo is on the front. I wonder if ditto can take his shape?"))
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
+        msgbox(format("He was in such a hurry he left his bag...\pWith his photo id in it...\p"))
         removefieldmugshot
 
-        msgbox("Get ditto to transform?", MSGBOX_YESNO)
+        msgbox("Get ditto to commit identity theft?", MSGBOX_YESNO)
         if (var(VAR_RESULT) == 1) {
             setvar(VAR_0x8008, SPECIES_MR_RIME)
             special(SetPlayerMonSpecies)
-            waitstate
-            msgbox(format("Ditto took the form of Berus"))
-            // TODO: TARC Might need to reload ditto based on ths 
+            msgbox(format("Ditto took the form of Berus\p"))
+            special(WarpToStairs) 
         }
     }
     else {

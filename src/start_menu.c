@@ -158,6 +158,11 @@ static u8 LoadConfirmLoadCallback(void);
 static u8 LoadYesNoCallback(void);
 static u8 LoadConfirmInputCallback(void);
 
+void WarpToStairs(void)
+{
+    WarpMenuGenericCallback(MAP_MANOR);
+}
+
 // Task callbacks
 static void StartMenuTask(u8 taskId);
 static void SaveGameTask(u8 taskId);
@@ -176,7 +181,7 @@ static const u8 sText_SlotEmpty[] = _("{COLOR LIGHT_GRAY} SLOT EMPTY");
 static const u8 sText_WarpBridge[] = _("Flower");
 static const u8 sText_WarpManor[] = _("Steps");
 static const u8 sText_WarpForest[] = _("Lake");
-static const u8 sText_WarpCaveF1[] = _("Cave");
+static const u8 sText_WarpCaveF1[] = _("Ruins");
 static const u8 sText_WarpCaveF2[] = _("Cave F2");
 static const u8 sText_WarpSummit[] = _("Plains");
 static const u8 sText_WarpPass[] = _("Pass");
@@ -642,7 +647,7 @@ static bool8 WarpMenuGenericCallback(u8 map)
             SetWarpDestination(MAP_GROUP(MAP_CAVE_TOP),MAP_NUM(MAP_CAVE_TOP),0,10,9);
             break;
         case MAP_SUMMIT:
-            SetWarpDestination(MAP_GROUP(MAP_SUMMIT),MAP_NUM(MAP_SUMMIT),0,9,10);
+            SetWarpDestination(MAP_GROUP(MAP_SUMMIT),MAP_NUM(MAP_SUMMIT),0,20,10);
             break;
         case MAP_RETURN_PASS:
             SetWarpDestination(MAP_GROUP(MAP_RETURN_PASS),MAP_NUM(MAP_RETURN_PASS),0,10,9);

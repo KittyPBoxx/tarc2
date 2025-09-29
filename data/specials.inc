@@ -240,3 +240,4 @@ gSpecials::
 	def_special SetBattleWeather
 	def_special AutoSave
 	def_special RemoveFollowingPokemon
+	def_special WarpToStairs

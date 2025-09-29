@@ -3,45 +3,39 @@ Manor_MapScripts::
 
 
 OrthyNPC::
-# 6 "data/maps/Manor/scripts.pory"
+# 9 "data/maps/Manor/scripts.pory"
 	lock
-# 7 "data/maps/Manor/scripts.pory"
-	special GetPlayerMonSpecies
 # 10 "data/maps/Manor/scripts.pory"
+	special GetPlayerMonSpecies
+# 13 "data/maps/Manor/scripts.pory"
 	compare VAR_0x8008, SPECIES_MR_RIME
 	goto_if_eq OrthyNPC_2
-# 18 "data/maps/Manor/scripts.pory"
+# 23 "data/maps/Manor/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_EXAMINER
-# 19 "data/maps/Manor/scripts.pory"
+# 24 "data/maps/Manor/scripts.pory"
 	msgbox OrthyNPC_Text_1
-# 20 "data/maps/Manor/scripts.pory"
+# 25 "data/maps/Manor/scripts.pory"
 	removefieldmugshot
 OrthyNPC_1:
-# 23 "data/maps/Manor/scripts.pory"
+# 28 "data/maps/Manor/scripts.pory"
 	release
 	end
 
 OrthyNPC_2:
-# 11 "data/maps/Manor/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_EXAMINER
-# 12 "data/maps/Manor/scripts.pory"
-	msgbox OrthyNPC_Text_0
-# 13 "data/maps/Manor/scripts.pory"
-	removefieldmugshot
 # 14 "data/maps/Manor/scripts.pory"
-	applymovement 1, MoveOutTheWay
+	createfieldmugshot MUGSHOT_TEST, EMOTE_EXAMINER
+# 15 "data/maps/Manor/scripts.pory"
+	msgbox OrthyNPC_Text_0
+# 16 "data/maps/Manor/scripts.pory"
+	removefieldmugshot
+# 17 "data/maps/Manor/scripts.pory"
+	setflag FLAG_HIDE_EXAMINER
+# 18 "data/maps/Manor/scripts.pory"
+	removeobject 1
+# 19 "data/maps/Manor/scripts.pory"
+	removeobject 6
 	goto OrthyNPC_1
 
-
-# 28 "data/maps/Manor/scripts.pory"
-MoveOutTheWay:
-# 29 "data/maps/Manor/scripts.pory"
-	face_left
-# 30 "data/maps/Manor/scripts.pory"
-	walk_left
-# 30 "data/maps/Manor/scripts.pory"
-	walk_left
-	step_end
 
 ManorWarpOrb::
 # 34 "data/maps/Manor/scripts.pory"
@@ -63,38 +57,48 @@ ManorWarpOrb_2:
 	goto ManorWarpOrb_1
 
 
-CuttableCube::
+CreditsOrb::
+# 50 "data/maps/Manor/scripts.pory"
+	lock
 # 51 "data/maps/Manor/scripts.pory"
+	special GameClear
+# 52 "data/maps/Manor/scripts.pory"
+	release
+	end
+
+
+CuttableCube::
+# 58 "data/maps/Manor/scripts.pory"
 	lockall
-# 53 "data/maps/Manor/scripts.pory"
+# 60 "data/maps/Manor/scripts.pory"
 	msgbox CuttableCube_Text_0
-# 55 "data/maps/Manor/scripts.pory"
+# 62 "data/maps/Manor/scripts.pory"
 	checkpartymove MOVE_CUT
-# 56 "data/maps/Manor/scripts.pory"
+# 63 "data/maps/Manor/scripts.pory"
 	compare VAR_RESULT, 0
 	goto_if_eq CuttableCube_2
 CuttableCube_1:
-# 62 "data/maps/Manor/scripts.pory"
+# 69 "data/maps/Manor/scripts.pory"
 	releaseall
 	end
 
 CuttableCube_2:
-# 57 "data/maps/Manor/scripts.pory"
+# 64 "data/maps/Manor/scripts.pory"
 	setflag FLAG_TREE_CUT
-# 58 "data/maps/Manor/scripts.pory"
+# 65 "data/maps/Manor/scripts.pory"
 	removeobject VAR_LAST_TALKED
-# 59 "data/maps/Manor/scripts.pory"
+# 66 "data/maps/Manor/scripts.pory"
 	msgbox CuttableCube_Text_1
 	goto CuttableCube_1
 
 
 OrthyNPC_Text_0:
-# 12 "data/maps/Manor/scripts.pory"
-	.string "What? No I wasn't napping! Go right in\n"
-	.string "Berus Sir.$"
+# 15 "data/maps/Manor/scripts.pory"
+	.string "What? No I wasn't napping! Go right\n"
+	.string "ahead Berus Sir.$"
 
 OrthyNPC_Text_1:
-# 19 "data/maps/Manor/scripts.pory"
+# 24 "data/maps/Manor/scripts.pory"
 	.string "Successful candidates use the warp orb\n"
 	.string "behind be to reach the gods.\p"
 	.string "After the cheating last year I'm not\n"
@@ -110,10 +114,10 @@ ManorWarpOrb_Text_1:
 	.string "Use {SELECT_BUTTON} to warp to the next area.$"
 
 CuttableCube_Text_0:
-# 53 "data/maps/Manor/scripts.pory"
+# 60 "data/maps/Manor/scripts.pory"
 	.string "The box is weak. A Pokémon might be able\n"
 	.string "to cut it.$"
 
 CuttableCube_Text_1:
-# 59 "data/maps/Manor/scripts.pory"
+# 66 "data/maps/Manor/scripts.pory"
 	.string "You cut the box.$"
