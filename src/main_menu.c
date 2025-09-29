@@ -534,7 +534,7 @@ void CB2_InitLoadMenu(void)
 
 void CB2_ReloadSlotAuto(void) 
 {
-    ReloadSlot(SAVE_AUTO_1);
+    ReloadSlot(SAVE_AUTO_2);
 }
 
 void CB2_ReloadSlot1(void) 
@@ -850,7 +850,7 @@ static void Task_DisplayMainMenu(u8 taskId)
                 FillWindowPixelBuffer(5, PIXEL_FILL(0xA));
                 FillWindowPixelBuffer(6, PIXEL_FILL(0xA));
 
-                BuildMenuRowString(SAVE_AUTO_1, gText_MainMenuLoadAuto, buf);
+                BuildMenuRowString(SAVE_AUTO_2, gText_MainMenuLoadAuto, buf);
                 AddTextPrinterParameterized3(2, FONT_NARROW, 0, 1, sTextColor_Headers, TEXT_SKIP_DRAW, buf);
 
                 BuildMenuRowString(SAVE_MANUAL_1, gText_MainMenuLoadSlot1, buf);
@@ -1046,7 +1046,7 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
                 DestroyTask(taskId);
                 break;
             case ACTION_LOAD_SLOT_AUTO:
-                if (SlotIsValid(SAVE_AUTO_1))
+                if (SlotIsValid(SAVE_AUTO_2))
                 {
                     gPlttBufferUnfaded[0] = RGB_BLACK;
                     gPlttBufferFaded[0] = RGB_BLACK;

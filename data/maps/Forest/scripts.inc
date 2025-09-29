@@ -26,16 +26,12 @@ SoraNPC::
 	lock
 # 17 "data/maps/Forest/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_SORA
-	goto_if 1, SoraNPC_2
-# 30 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 31 "data/maps/Forest/scripts.pory"
+	goto_if 0, SoraNPC_2
+# 34 "data/maps/Forest/scripts.pory"
 	msgbox SoraNPC_Text_2, MSGBOX_YESNO
-# 33 "data/maps/Forest/scripts.pory"
+# 36 "data/maps/Forest/scripts.pory"
 	compare VAR_RESULT, 1
-	goto_if_eq SoraNPC_5
-# 37 "data/maps/Forest/scripts.pory"
-	removefieldmugshot
+	goto_if_eq SoraNPC_7
 SoraNPC_1:
 # 42 "data/maps/Forest/scripts.pory"
 	release
@@ -43,25 +39,31 @@ SoraNPC_1:
 
 SoraNPC_2:
 # 19 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+	createfieldmugshot MUGSHOT_TEST, EMOTE_EXAMINER
 # 20 "data/maps/Forest/scripts.pory"
 	msgbox SoraNPC_Text_0
 # 21 "data/maps/Forest/scripts.pory"
 	removefieldmugshot
 # 22 "data/maps/Forest/scripts.pory"
 	trainerbattle_single TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
-# 23 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 24 "data/maps/Forest/scripts.pory"
-	msgbox SoraNPC_Text_1
+	special GetBattleOutcome
 # 25 "data/maps/Forest/scripts.pory"
-	removefieldmugshot
+	compare VAR_RESULT, B_OUTCOME_WON
+	goto_if_eq SoraNPC_5
 	goto SoraNPC_1
 
 SoraNPC_5:
-# 34 "data/maps/Forest/scripts.pory"
+# 27 "data/maps/Forest/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_EXAMINER
+# 28 "data/maps/Forest/scripts.pory"
+	msgbox SoraNPC_Text_1
+# 29 "data/maps/Forest/scripts.pory"
 	removefieldmugshot
-# 35 "data/maps/Forest/scripts.pory"
+	goto SoraNPC_1
+
+SoraNPC_7:
+# 37 "data/maps/Forest/scripts.pory"
 	trainerbattle_single TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 	goto SoraNPC_1
 
@@ -71,122 +73,136 @@ FionnNPC::
 	lock
 # 49 "data/maps/Forest/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_FIONN
-	goto_if 1, FionnNPC_2
-# 62 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 63 "data/maps/Forest/scripts.pory"
+	goto_if 0, FionnNPC_2
+# 66 "data/maps/Forest/scripts.pory"
 	msgbox SoraNPC_Text_2, MSGBOX_YESNO
-# 65 "data/maps/Forest/scripts.pory"
+# 67 "data/maps/Forest/scripts.pory"
 	compare VAR_RESULT, 1
-	goto_if_eq FionnNPC_5
-# 69 "data/maps/Forest/scripts.pory"
-	removefieldmugshot
+	goto_if_eq FionnNPC_7
 FionnNPC_1:
-# 74 "data/maps/Forest/scripts.pory"
+# 73 "data/maps/Forest/scripts.pory"
 	release
 	end
 
 FionnNPC_2:
 # 51 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+	createfieldmugshot MUGSHOT_TEST, EMOTE_EXAMINER
 # 52 "data/maps/Forest/scripts.pory"
 	msgbox FionnNPC_Text_0
 # 53 "data/maps/Forest/scripts.pory"
 	removefieldmugshot
 # 54 "data/maps/Forest/scripts.pory"
 	trainerbattle_single TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
-# 55 "data/maps/Forest/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
 # 56 "data/maps/Forest/scripts.pory"
-	msgbox FionnNPC_Text_1
+	special GetBattleOutcome
 # 57 "data/maps/Forest/scripts.pory"
-	removefieldmugshot
+	compare VAR_RESULT, B_OUTCOME_WON
+	goto_if_eq FionnNPC_5
 	goto FionnNPC_1
 
 FionnNPC_5:
-# 66 "data/maps/Forest/scripts.pory"
+# 59 "data/maps/Forest/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_EXAMINER
+# 60 "data/maps/Forest/scripts.pory"
+	msgbox FionnNPC_Text_1
+# 61 "data/maps/Forest/scripts.pory"
 	removefieldmugshot
-# 67 "data/maps/Forest/scripts.pory"
+	goto FionnNPC_1
+
+FionnNPC_7:
+# 68 "data/maps/Forest/scripts.pory"
 	trainerbattle_single TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
 	goto FionnNPC_1
 
 
 ForestSeal::
-# 79 "data/maps/Forest/scripts.pory"
+# 78 "data/maps/Forest/scripts.pory"
 	lock
-# 81 "data/maps/Forest/scripts.pory"
+# 80 "data/maps/Forest/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_FIONN
 	goto_if 1, ForestSeal_8
 ForestSeal_6:
-# 84 "data/maps/Forest/scripts.pory"
+# 90 "data/maps/Forest/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_FIONN
 	goto_if 1, ForestSeal_3
-# 84 "data/maps/Forest/scripts.pory"
+# 90 "data/maps/Forest/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_SORA
 	goto_if 1, ForestSeal_3
-# 88 "data/maps/Forest/scripts.pory"
-	msgbox ForestSeal_Text_2
+# 94 "data/maps/Forest/scripts.pory"
+	msgbox ForestSeal_Text_3
 ForestSeal_1:
-# 91 "data/maps/Forest/scripts.pory"
+# 97 "data/maps/Forest/scripts.pory"
 	release
 	end
 
 ForestSeal_2:
 # 82 "data/maps/Forest/scripts.pory"
-	msgbox ForestSeal_Text_0
-	goto ForestSeal_1
-
-ForestSeal_3:
-# 85 "data/maps/Forest/scripts.pory"
+	goto_if_unset FLAG_UNLOCK_CAVE_WARP, ForestSeal_12
+ForestSeal_11:
+# 87 "data/maps/Forest/scripts.pory"
 	msgbox ForestSeal_Text_1
 	goto ForestSeal_1
 
+ForestSeal_3:
+# 91 "data/maps/Forest/scripts.pory"
+	msgbox ForestSeal_Text_2
+	goto ForestSeal_1
+
 ForestSeal_8:
-# 81 "data/maps/Forest/scripts.pory"
+# 80 "data/maps/Forest/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_SORA
 	goto_if 1, ForestSeal_2
 	goto ForestSeal_6
+
+ForestSeal_12:
+# 83 "data/maps/Forest/scripts.pory"
+	msgbox ForestSeal_Text_0
+# 84 "data/maps/Forest/scripts.pory"
+	setflag FLAG_UNLOCK_CAVE_WARP
+	goto ForestSeal_11
 
 
 SoraNPC_Text_0:
 # 20 "data/maps/Forest/scripts.pory"
 	.string "There are four examiners and one\n"
-	.string "champion to beat. Our sponsoring gods\l"
-	.string "pay us based on how many candidates we\l"
-	.string "stop.$"
+	.string "champion to beat.\p"
+	.string "Our sponsoring gods pay us based on\n"
+	.string "how many candidates we stop.$"
 
 SoraNPC_Text_1:
-# 24 "data/maps/Forest/scripts.pory"
+# 28 "data/maps/Forest/scripts.pory"
 	.string "How could I loose? I guess dinner will\n"
 	.string "be uncooked ramen again...$"
 
 SoraNPC_Text_2:
-# 31 "data/maps/Forest/scripts.pory"
+# 34 "data/maps/Forest/scripts.pory"
 	.string "Did you want a rematch?$"
 
 FionnNPC_Text_0:
 # 52 "data/maps/Forest/scripts.pory"
-	.string "Each area is locked with a seal. You\n"
-	.string "can't progress untill you beat all the\l"
-	.string "examiners first.$"
+	.string "Each area is locked until you defeat us\n"
+	.string "examiners.$"
 
 FionnNPC_Text_1:
-# 56 "data/maps/Forest/scripts.pory"
+# 60 "data/maps/Forest/scripts.pory"
 	.string "Don't get cocky kid. Beating me only\n"
 	.string "puts you one step closer to passing the\l"
 	.string "exam.$"
 
 ForestSeal_Text_0:
-# 82 "data/maps/Forest/scripts.pory"
-	.string "The seal has been broken. You may pass\n"
-	.string "through.$"
+# 83 "data/maps/Forest/scripts.pory"
+	.string "A new warp was unlocked!$"
 
 ForestSeal_Text_1:
-# 85 "data/maps/Forest/scripts.pory"
-	.string "You must win one more battle to break\n"
-	.string "this seal.$"
+# 87 "data/maps/Forest/scripts.pory"
+	.string "Use {SELECT_BUTTON} to warp to the next area.$"
 
 ForestSeal_Text_2:
-# 88 "data/maps/Forest/scripts.pory"
-	.string "You must have won two battles to break\n"
-	.string "this seal.$"
+# 91 "data/maps/Forest/scripts.pory"
+	.string "The crystal is not active.\n"
+	.string "REQUIREMENT: ONE MORE TRAINER BATTLE$"
+
+ForestSeal_Text_3:
+# 94 "data/maps/Forest/scripts.pory"
+	.string "The crystal is not active.\n"
+	.string "REQUIREMENT: TWO TRAINER BATTLES$"

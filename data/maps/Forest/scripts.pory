@@ -14,27 +14,27 @@ Forest_MapScripts_CreateTiles::
 script SoraNPC {
     lock
 
-   	if (defeated(TRAINER_EXAMINER_SORA)) {
+   	if (!defeated(TRAINER_EXAMINER_SORA)) {
             
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("There are four examiners and one champion to beat. Our sponsoring gods pay us based on how many candidates we stop.")) 
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
+        msgbox(format("There are four examiners and one champion to beat.\p Our sponsoring gods pay us based on how many candidates we stop.")) 
         removefieldmugshot
         trainerbattle_single(TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("How could I loose? I guess dinner will be uncooked ramen again...")) 
-        removefieldmugshot
 
-    } 
-	else {
+        special(GetBattleOutcome)
+        if (var(VAR_RESULT) == B_OUTCOME_WON)
+        {
+            createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
+            msgbox(format("How could I loose? I guess dinner will be uncooked ramen again...")) 
+            removefieldmugshot
+        }
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
+    } else {
+
 		msgbox("Did you want a rematch?", MSGBOX_YESNO)
 
 		if (var(VAR_RESULT) == 1) {
-			removefieldmugshot
 			trainerbattle_single(TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
-		} else {
-			removefieldmugshot
 		}
 
 	}
@@ -46,27 +46,26 @@ script SoraNPC {
 script FionnNPC {
     lock
 
-   	if (defeated(TRAINER_EXAMINER_FIONN)) {
+   	if (!defeated(TRAINER_EXAMINER_FIONN)) {
             
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("Each area is locked with a seal. You can't progress untill you beat all the examiners first.")) 
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
+        msgbox(format("Each area is locked until you defeat us examiners.")) 
         removefieldmugshot
         trainerbattle_single(TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("Don't get cocky kid. Beating me only puts you one step closer to passing the exam.")) 
-        removefieldmugshot
 
-    } 
-	else {
+        special(GetBattleOutcome)
+        if (var(VAR_RESULT) == B_OUTCOME_WON)
+        {
+            createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
+            msgbox(format("Don't get cocky kid. Beating me only puts you one step closer to passing the exam.")) 
+            removefieldmugshot
+        }
 
-		createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
+    } else {
+
 		msgbox("Did you want a rematch?", MSGBOX_YESNO)
-
 		if (var(VAR_RESULT) == 1) {
-			removefieldmugshot
 			trainerbattle_single(TRAINER_EXAMINER_FIONN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
-		} else {
-			removefieldmugshot
 		}
 
 	}
@@ -79,13 +78,20 @@ script ForestSeal {
     lock
 
     if (defeated(TRAINER_EXAMINER_FIONN) && defeated(TRAINER_EXAMINER_SORA)) {
-        msgbox(format("The seal has been broken. You may pass through."))
+
+        if (!flag(FLAG_UNLOCK_CAVE_WARP)) {
+            msgbox(format("A new warp was unlocked!"))
+            setflag(FLAG_UNLOCK_CAVE_WARP)
+        }
+
+        msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))
+
     }
 	elif (defeated(TRAINER_EXAMINER_FIONN) || defeated(TRAINER_EXAMINER_SORA)) {
-		msgbox(format("You must win one more battle to break this seal."))
+		msgbox(format("The crystal is not active.\nREQUIREMENT: ONE MORE TRAINER BATTLE"))
 	}
     else {
-        msgbox(format("You must have won two battles to break this seal."))
+        msgbox(format("The crystal is not active.\nREQUIREMENT: TWO TRAINER BATTLES"))
     }
 
     release

@@ -127,6 +127,7 @@ static void Task_BattleStart(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
     
+    BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);
     HealPlayerParty();
 
     switch (tState)

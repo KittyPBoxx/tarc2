@@ -286,7 +286,7 @@ const struct TrainerClass gTrainerClasses[TRAINER_CLASS_COUNT] =
     [TRAINER_CLASS_PKMN_TRAINER_1] = { _("{PKMN} TRAINER") },
     [TRAINER_CLASS_PKMN_TRAINER_2] = { _("{PKMN} TRAINER") },
     [TRAINER_CLASS_HIKER] = { _("HIKER"), 10 },
-    [TRAINER_CLASS_TEAM_AQUA] = { _("TEAM AQUA") },
+    [TRAINER_CLASS_TEAM_AQUA] = { _("EXAMINER") },
     [TRAINER_CLASS_PKMN_BREEDER] = { _("{PKMN} BREEDER"), 10, B_TRAINER_CLASS_POKE_BALLS >= GEN_8 ? BALL_HEAL : BALL_FRIEND },
     [TRAINER_CLASS_COOLTRAINER] = { _("COOLTRAINER"), 12, BALL_ULTRA },
     [TRAINER_CLASS_BIRD_KEEPER] = { _("BIRD KEEPER"), 8 },
@@ -2311,7 +2311,6 @@ static void DoBattleIntro(void)
     switch ((enum BattleIntroStates)gBattleStruct->introState)
     {
     case BATTLE_INTRO_STATE_GET_MON_DATA:
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_GET_MON_DATA");
         battler = gBattleCommunication[1];
         BtlController_EmitGetMonData(battler, B_COMM_TO_CONTROLLER, REQUEST_ALL_BATTLE, 0);
         MarkBattlerForControllerExec(battler);
@@ -2327,7 +2326,6 @@ static void DoBattleIntro(void)
         }
         break;
     case BATTLE_INTRO_STATE_PREPARE_BG_SLIDE:
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_PREPARE_BG_SLIDE");
         if (!gBattleControllerExecFlags)
         {
             battler = GetBattlerAtPosition(0);
@@ -2339,12 +2337,10 @@ static void DoBattleIntro(void)
         }
         break;
     case BATTLE_INTRO_STATE_WAIT_FOR_BG_SLIDE:
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_WAIT_FOR_BG_SLIDE");
         if (!gBattleControllerExecFlags)
             gBattleStruct->introState++;
         break;
     case BATTLE_INTRO_STATE_DRAW_SPRITES:
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_DRAW_SPRITES");
         for (battler = 0; battler < gBattlersCount; battler++)
         {
             if ((gBattleTypeFlags & BATTLE_TYPE_SAFARI) && IsOnPlayerSide(battler))
@@ -2377,12 +2373,10 @@ static void DoBattleIntro(void)
             switch (GetBattlerPosition(battler))
             {
             case B_POSITION_PLAYER_LEFT: // player sprite
-                DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro B_POSITION_PLAYER_LEFT");
                 BtlController_EmitDrawTrainerPic(battler, B_COMM_TO_CONTROLLER);
                 MarkBattlerForControllerExec(battler);
                 break;
             case B_POSITION_OPPONENT_LEFT:
-                DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro B_POSITION_OPPONENT_LEFT");
                 // TODO: TARC fix battle intros
                 if (gBattleTypeFlags & BATTLE_TYPE_TRAINER) // opponent 1 sprite
                 {
@@ -2397,7 +2391,6 @@ static void DoBattleIntro(void)
                 }
                 break;
             case B_POSITION_PLAYER_RIGHT:
-                DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro B_POSITION_PLAYER_RIGHT");
                 if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_INGAME_PARTNER)) // partner sprite
                 {
                     BtlController_EmitDrawTrainerPic(battler, B_COMM_TO_CONTROLLER);
@@ -2405,7 +2398,6 @@ static void DoBattleIntro(void)
                 }
                 break;
             case B_POSITION_OPPONENT_RIGHT:
-                DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro B_POSITION_OPPONENT_RIGHT");
                 if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                 {
                     if (gBattleTypeFlags & (BATTLE_TYPE_MULTI | BATTLE_TYPE_TWO_OPPONENTS) && !BATTLE_TWO_VS_ONE_OPPONENT) // opponent 2 if exists
@@ -2425,7 +2417,6 @@ static void DoBattleIntro(void)
 
         }
 
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_DRAW_SPRITES end");
 
         if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
            gBattleStruct->introState++;
@@ -2433,7 +2424,6 @@ static void DoBattleIntro(void)
             gBattleStruct->introState = BATTLE_INTRO_STATE_INTRO_TEXT;
         break;
     case BATTLE_INTRO_STATE_DRAW_PARTY_SUMMARY:
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_DRAW_PARTY_SUMMARY");
         if (!gBattleControllerExecFlags)
         {
             struct HpAndStatus hpStatus[PARTY_SIZE];
@@ -2480,12 +2470,10 @@ static void DoBattleIntro(void)
         }
         break;
     case BATTLE_INTRO_STATE_WAIT_FOR_PARTY_SUMMARY:
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_WAIT_FOR_PARTY_SUMMARY");
         if (!gBattleControllerExecFlags)
             gBattleStruct->introState++;
         break;
     case BATTLE_INTRO_STATE_INTRO_TEXT:
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_INTRO_TEXT");
         if (!IsBattlerMarkedForControllerExec(GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)))
         {
             PrepareStringBattle(STRINGID_INTROMSG, GetBattlerAtPosition(B_POSITION_PLAYER_LEFT));
@@ -2493,7 +2481,6 @@ static void DoBattleIntro(void)
         }
         break;
     case BATTLE_INTRO_STATE_WAIT_FOR_INTRO_TEXT:
-        DebugPrintfLevel(MGBA_LOG_ERROR, "DoBattleIntro BATTLE_INTRO_STATE_WAIT_FOR_INTRO_TEXT");
         if (!IsBattlerMarkedForControllerExec(GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)))
         {
             if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)

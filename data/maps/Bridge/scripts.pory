@@ -9,6 +9,10 @@ script Bridge_OnResume {
     if (!flag(FLAG_BRIDGE_INTRO_DONE)) {
         setvar(VAR_TEMP_0, 1)
     }
+    if (!flag(FLAG_CHOSE_STARTER)) {
+        setvar(VAR_TEMP_1, 1)
+        setflag(FLAG_TEMP_HIDE_FOLLOWER)
+    }
     end
 }
 
@@ -18,13 +22,15 @@ script BridgeIntro {
     }
 
     setvar(VAR_TEMP_0, 0)
+    setflag(FLAG_TEMP_HIDE_FOLLOWER)
+    setvar(VAR_TEMP_1, 1)
 
     lock 
 
     applymovement(OBJ_EVENT_ID_PLAYER, LookUp)
 
     createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-    msgbox(format("Decided to finally show up, did we? Is there a good reason you're four hours late?"))
+    msgbox(format("Decided to finally show up, did we?\p Is there a good reason you're six hours late?"))
     removefieldmugshot
 
     msgbox("Tell the truth?", MSGBOX_YESNO)
@@ -35,7 +41,7 @@ script BridgeIntro {
         removefieldmugshot
     } else {
         createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
-        msgbox(format("Well, the truth is... I had to... er... give my train seat to a grandma... who was in a wheelchair... and uh... also pregnant? Then we had a fight and she stole my ticket."))
+        msgbox(format("Well, the truth is... I had to... er... give my train seat to a grandma...\p who was in a wheelchair...\p and uh... also pregnant?\p Then she beat me up she stole my ticket."))
         removefieldmugshot
     }
 
@@ -48,7 +54,7 @@ script BridgeIntro {
     waitstate
 
     createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-    msgbox(format("{PLAYER}... ah! You must be Thya's child. I heards she's sponsored by that trickster god now. How is she?"))
+    msgbox(format("{PLAYER}... ah! You must be Thya's child.\p Now there's a great trainer, plenty of deities after her contract."))
     removefieldmugshot
 
     createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
@@ -56,15 +62,23 @@ script BridgeIntro {
     removefieldmugshot
 
     createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-    msgbox(format("An inspiration to us all. Well {PLAYER}, they say the apple dosn't fall far from the tree. But did you know that when fruit lands in shade it never sprouts? In fact it tends to spoil. I cannot allow someone so tardy to take the exam."))
+    msgbox(format("An inspiration to us all! \p Well {PLAYER}, they say the apple dosn't fall far from the tree.\pBut that just means they spoil and never sprout."))
     removefieldmugshot
 
     createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
-    msgbox(format("But the exam's not over untill sunset, surely I can still pass if I do it real quick."))
+    msgbox(format("...?"))
     removefieldmugshot
 
     createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-    msgbox(format("'Real quick'? You really think you can pass this prestigious test after turning up so late? Amusing. Very well, take your POKéMON and become cautionary tale for next years cohort."))
+    msgbox(format("I'm saying I cannot allow someone so tardy to take the exam."))
+    removefieldmugshot
+
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
+    msgbox(format("But there's still an hour left! I'll be real quick."))
+    removefieldmugshot
+
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
+    msgbox(format("Not possible, even the best students take a few hours. \pAlthough....\pVery well, pick a Pokémon, you won't pass but I'll enjoy watching you suffer."))
     removefieldmugshot
 
     release  
@@ -132,7 +146,7 @@ script StarterBag {
         removefieldmugshot
 
         createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("A good trainer makes the best choice in any situation. A great trainer makes sure there is always a good choice to make. You're the last to pick so you get the leftovers."))
+        msgbox(format("A good trainer makes the best choice in any situation.\pA great trainer makes sure there is always a good choice to make.\pYou're the last to pick so you get the leftovers."))
         removefieldmugshot
 
         createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
@@ -143,9 +157,12 @@ script StarterBag {
         msgbox(format("Oh, no. This is your punishment for turning up late."))
         removefieldmugshot
 
-        msgbox(format("Berus used a prayer. {PLAYER} was cursed. You will receive terrible luck for the rest of the test."))
+        msgbox(format("Berus used a prayer.\n{PLAYER} was cursed.\pYou will receive terrible luck for the rest of the test...\pAlso there might be some glitches.\nThis is the curse...\pand definitely not unfixed bugs."))
+
+        clearflag(FLAG_TEMP_HIDE_FOLLOWER)
+        setvar(VAR_TEMP_1, 0)
     }
-    elif (!defeated(TRAINER_BERUS)) {
+    elif (defeated(TRAINER_BERUS)) {
 
         createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
         msgbox(format("Berus's photo is on the front. I wonder if ditto can take his shape?"))
@@ -161,37 +178,45 @@ script StarterBag {
         }
     }
     else {
-        msgbox(format("It's an empty bag with Berus's photo on the front."))
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
+        msgbox(format("You already picked a Pokémon.\nStop touching my bag!")) 
+        removefieldmugshot
     }
 
     release
     end
 }
 
-// -------------------
-// Cuttable Tree
-// -------------------
-script CutTree {
+movement WalkLeft {
+    walk_left
+}
+
+script PreventEarlyStart {
     lock
 
-    if (!flag(FLAG_TREE_CUT)) {
-        
-        
-        msgbox(format("This tree looks like it could be cut down."))
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
+    msgbox(format("Choose a Pokémon from the bag before we proceed."))
+    removefieldmugshot
 
-        checkpartymove(MOVE_CUT)
+    applymovement(OBJ_EVENT_ID_PLAYER, WalkLeft)
+    waitmovement(0)
 
-        if (var(VAR_RESULT) == 1) {
+    release
+    end
+}
 
-            setflag(FLAG_TREE_CUT)
-            // TODO: TARC trigger move check and cut animation and remove the tree
 
-        } 
+script BridgeWarpOrb {
+    lock
+
+    if (!flag(FLAG_UNLOCK_MANOR_WARP)) {
+         
+        msgbox(format("A new warp was unlocked!"))
+        setflag(FLAG_UNLOCK_MANOR_WARP)
 
     }
-    else {
-        msgbox(format("The tree has already been cleared."))
-    }
+
+    msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))
 
     release
     end

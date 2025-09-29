@@ -543,22 +543,22 @@ static void Task_HandleConfirmStarterInput(u8 taskId)
     switch (Menu_ProcessInputNoWrapClearOnChoose())
     {
     case 0:  // YES
+    case 1:  // NO
+    case MENU_B_PRESSED:
         // Return the starter choice and exit.
         gSpecialVar_Result = gTasks[taskId].tStarterSelection;
         ResetAllPicSprites();
         SetMainCallback2(gMain.savedCallback);
         break;
-    case 1:  // NO
-    case MENU_B_PRESSED:
-        PlaySE(SE_SELECT);
-        spriteId = gTasks[taskId].tPkmnSpriteId;
-        FreeOamMatrix(gSprites[spriteId].oam.matrixNum);
-        FreeAndDestroyMonPicSprite(spriteId);
+        // PlaySE(SE_SELECT);
+        // spriteId = gTasks[taskId].tPkmnSpriteId;
+        // FreeOamMatrix(gSprites[spriteId].oam.matrixNum);
+        // FreeAndDestroyMonPicSprite(spriteId);
 
-        spriteId = gTasks[taskId].tCircleSpriteId;
-        FreeOamMatrix(gSprites[spriteId].oam.matrixNum);
-        DestroySprite(&gSprites[spriteId]);
-        gTasks[taskId].func = Task_DeclineStarter;
+        // spriteId = gTasks[taskId].tCircleSpriteId;
+        // FreeOamMatrix(gSprites[spriteId].oam.matrixNum);
+        // DestroySprite(&gSprites[spriteId]);
+        // gTasks[taskId].func = Task_DeclineStarter;
         break;
     }
 }

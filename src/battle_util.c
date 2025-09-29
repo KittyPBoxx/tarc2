@@ -2867,6 +2867,7 @@ bool32 CanAbilityBlockMove(u32 battlerAtk, u32 battlerDef, u32 abilityAtk, u32 a
     else
         atkPriority = GetChosenMovePriority(battlerAtk, abilityAtk);
 
+    abilityDef = GetBattlerAbility(battlerDef);
     switch (abilityDef)
     {
     case ABILITY_SOUNDPROOF:

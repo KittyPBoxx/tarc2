@@ -4294,6 +4294,8 @@ const struct SpeciesInfo gSpeciesInfoGen2[] =
         .categoryName = _("Bagworm"),
         .height = 12,
         .weight = 1258,
+        .itemCommon = ITEM_ZOOM_LENS,
+        .itemRare = ITEM_ZOOM_LENS,
         .description = COMPOUND_STRING(
             "It keeps itself inside its steel shell.\n"
             "The shell is opened when it is catching\n"

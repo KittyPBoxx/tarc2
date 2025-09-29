@@ -108,6 +108,7 @@ bool8 SlotIsValid(u8 slotId);
 void CopyPreviewDataToBuffer(u8 slot, u8 textId, u8 *dest);
 void CheckAnySlotValid();
 u8 GetCompletion(void);
+void AutoSave(void);
 
 u16 GetSaveBlocksPointersBaseOffset(void); // Always 0
 

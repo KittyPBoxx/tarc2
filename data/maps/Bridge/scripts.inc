@@ -15,6 +15,9 @@ Bridge_OnResume::
 # 9 "data/maps/Bridge/scripts.pory"
 	goto_if_unset FLAG_BRIDGE_INTRO_DONE, Bridge_OnResume_2
 Bridge_OnResume_1:
+# 12 "data/maps/Bridge/scripts.pory"
+	goto_if_unset FLAG_CHOSE_STARTER, Bridge_OnResume_5
+Bridge_OnResume_4:
 	end
 
 Bridge_OnResume_2:
@@ -22,78 +25,101 @@ Bridge_OnResume_2:
 	setvar VAR_TEMP_0, 1
 	goto Bridge_OnResume_1
 
+Bridge_OnResume_5:
+# 13 "data/maps/Bridge/scripts.pory"
+	setvar VAR_TEMP_1, 1
+# 14 "data/maps/Bridge/scripts.pory"
+	setflag FLAG_TEMP_HIDE_FOLLOWER
+	goto Bridge_OnResume_4
+
 
 BridgeIntro::
-# 16 "data/maps/Bridge/scripts.pory"
+# 20 "data/maps/Bridge/scripts.pory"
 	compare VAR_TEMP_0, 1
 	goto_if_ne BridgeIntro_2
-# 20 "data/maps/Bridge/scripts.pory"
-	setvar VAR_TEMP_0, 0
-# 22 "data/maps/Bridge/scripts.pory"
-	lock
 # 24 "data/maps/Bridge/scripts.pory"
-	applymovement OBJ_EVENT_ID_PLAYER, LookUp
+	setvar VAR_TEMP_0, 0
+# 25 "data/maps/Bridge/scripts.pory"
+	setflag FLAG_TEMP_HIDE_FOLLOWER
 # 26 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 27 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeIntro_Text_0
+	setvar VAR_TEMP_1, 1
 # 28 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
+	lock
 # 30 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeIntro_Text_1, MSGBOX_YESNO
+	applymovement OBJ_EVENT_ID_PLAYER, LookUp
 # 32 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 33 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_0
+# 34 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 36 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_1, MSGBOX_YESNO
+# 38 "data/maps/Bridge/scripts.pory"
 	compare VAR_RESULT, 1
 	goto_if_eq BridgeIntro_5
-# 37 "data/maps/Bridge/scripts.pory"
+# 43 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
-# 38 "data/maps/Bridge/scripts.pory"
+# 44 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_3
-# 39 "data/maps/Bridge/scripts.pory"
+# 45 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 BridgeIntro_4:
-# 42 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 43 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeIntro_Text_4
-# 44 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
-# 46 "data/maps/Bridge/scripts.pory"
-	special DoPlayerNamingScreen
-# 47 "data/maps/Bridge/scripts.pory"
-	setflag FLAG_BRIDGE_INTRO_DONE
 # 48 "data/maps/Bridge/scripts.pory"
-	waitstate
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 49 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_4
 # 50 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 51 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeIntro_Text_5
+	removefieldmugshot
 # 52 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
+	special DoPlayerNamingScreen
+# 53 "data/maps/Bridge/scripts.pory"
+	setflag FLAG_BRIDGE_INTRO_DONE
 # 54 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
-# 55 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeIntro_Text_6
+	waitstate
 # 56 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 57 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_5
 # 58 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 59 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeIntro_Text_7
+	removefieldmugshot
 # 60 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
-# 62 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
-# 63 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeIntro_Text_8
+# 61 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_6
+# 62 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
 # 64 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
-# 66 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 67 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeIntro_Text_9
-# 68 "data/maps/Bridge/scripts.pory"
+# 65 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_7
+# 66 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
+# 68 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
+# 69 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_8
 # 70 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 72 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 73 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_9
+# 74 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 76 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
+# 77 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_10
+# 78 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 80 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 81 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeIntro_Text_11
+# 82 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 84 "data/maps/Bridge/scripts.pory"
 	release
 	end
 
@@ -101,252 +127,284 @@ BridgeIntro_2:
 	end
 
 BridgeIntro_5:
-# 33 "data/maps/Bridge/scripts.pory"
+# 39 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
-# 34 "data/maps/Bridge/scripts.pory"
+# 40 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeIntro_Text_2
-# 35 "data/maps/Bridge/scripts.pory"
+# 41 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 	goto BridgeIntro_4
 
 
-# 74 "data/maps/Bridge/scripts.pory"
+# 88 "data/maps/Bridge/scripts.pory"
 LookUp:
-# 75 "data/maps/Bridge/scripts.pory"
+# 89 "data/maps/Bridge/scripts.pory"
 	face_up
 	step_end
 
 BerusNPC::
-# 82 "data/maps/Bridge/scripts.pory"
+# 96 "data/maps/Bridge/scripts.pory"
 	lock
-# 84 "data/maps/Bridge/scripts.pory"
+# 98 "data/maps/Bridge/scripts.pory"
 	goto_if_unset FLAG_CHOSE_STARTER, BerusNPC_2
-# 89 "data/maps/Bridge/scripts.pory"
+# 103 "data/maps/Bridge/scripts.pory"
 	checktrainerflag TRAINER_DEITY_TENJIN
 	goto_if 1, BerusNPC_3
-# 100 "data/maps/Bridge/scripts.pory"
+# 114 "data/maps/Bridge/scripts.pory"
 	checktrainerflag TRAINER_BERUS
 	goto_if 0, BerusNPC_4
-# 109 "data/maps/Bridge/scripts.pory"
+# 123 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 110 "data/maps/Bridge/scripts.pory"
+# 124 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_4
-# 111 "data/maps/Bridge/scripts.pory"
+# 125 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 BerusNPC_1:
-# 115 "data/maps/Bridge/scripts.pory"
+# 129 "data/maps/Bridge/scripts.pory"
 	release
 	end
 
 BerusNPC_2:
-# 85 "data/maps/Bridge/scripts.pory"
+# 99 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 86 "data/maps/Bridge/scripts.pory"
+# 100 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_0
-# 87 "data/maps/Bridge/scripts.pory"
+# 101 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 	goto BerusNPC_1
 
 BerusNPC_3:
-# 91 "data/maps/Bridge/scripts.pory"
+# 105 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 92 "data/maps/Bridge/scripts.pory"
+# 106 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_1
-# 93 "data/maps/Bridge/scripts.pory"
+# 107 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
-# 94 "data/maps/Bridge/scripts.pory"
+# 108 "data/maps/Bridge/scripts.pory"
 	trainerbattle_single TRAINER_BERUS, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
-# 95 "data/maps/Bridge/scripts.pory"
+# 109 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 96 "data/maps/Bridge/scripts.pory"
+# 110 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_2
-# 97 "data/maps/Bridge/scripts.pory"
+# 111 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 	goto BerusNPC_1
 
 BerusNPC_4:
-# 102 "data/maps/Bridge/scripts.pory"
+# 116 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 103 "data/maps/Bridge/scripts.pory"
+# 117 "data/maps/Bridge/scripts.pory"
 	msgbox BerusNPC_Text_3
-# 104 "data/maps/Bridge/scripts.pory"
+# 118 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
 	goto BerusNPC_1
 
 
 StarterBag::
-# 123 "data/maps/Bridge/scripts.pory"
+# 137 "data/maps/Bridge/scripts.pory"
 	lock
-# 125 "data/maps/Bridge/scripts.pory"
+# 139 "data/maps/Bridge/scripts.pory"
 	goto_if_unset FLAG_CHOSE_STARTER, StarterBag_2
-# 148 "data/maps/Bridge/scripts.pory"
+# 165 "data/maps/Bridge/scripts.pory"
 	checktrainerflag TRAINER_BERUS
-	goto_if 0, StarterBag_3
-# 164 "data/maps/Bridge/scripts.pory"
+	goto_if 1, StarterBag_3
+# 181 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 182 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_8
+# 183 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
 StarterBag_1:
-# 167 "data/maps/Bridge/scripts.pory"
+# 186 "data/maps/Bridge/scripts.pory"
 	release
 	end
 
 StarterBag_2:
-# 126 "data/maps/Bridge/scripts.pory"
-	setflag FLAG_CHOSE_STARTER
-# 127 "data/maps/Bridge/scripts.pory"
-	special ChooseStarter
-# 128 "data/maps/Bridge/scripts.pory"
-	waitstate
-# 130 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
-# 131 "data/maps/Bridge/scripts.pory"
-	msgbox StarterBag_Text_0
-# 132 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
-# 134 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 135 "data/maps/Bridge/scripts.pory"
-	msgbox StarterBag_Text_1
-# 136 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
-# 138 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
-# 139 "data/maps/Bridge/scripts.pory"
-	msgbox StarterBag_Text_2
 # 140 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
+	setflag FLAG_CHOSE_STARTER
+# 141 "data/maps/Bridge/scripts.pory"
+	special ChooseStarter
 # 142 "data/maps/Bridge/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 143 "data/maps/Bridge/scripts.pory"
-	msgbox StarterBag_Text_3
+	waitstate
 # 144 "data/maps/Bridge/scripts.pory"
-	removefieldmugshot
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
+# 145 "data/maps/Bridge/scripts.pory"
+	msgbox StarterBag_Text_0
 # 146 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 148 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 149 "data/maps/Bridge/scripts.pory"
+	msgbox StarterBag_Text_1
+# 150 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 152 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
+# 153 "data/maps/Bridge/scripts.pory"
+	msgbox StarterBag_Text_2
+# 154 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 156 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 157 "data/maps/Bridge/scripts.pory"
+	msgbox StarterBag_Text_3
+# 158 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 160 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_4
+# 162 "data/maps/Bridge/scripts.pory"
+	clearflag FLAG_TEMP_HIDE_FOLLOWER
+# 163 "data/maps/Bridge/scripts.pory"
+	setvar VAR_TEMP_1, 0
 	goto StarterBag_1
 
 StarterBag_3:
-# 150 "data/maps/Bridge/scripts.pory"
+# 167 "data/maps/Bridge/scripts.pory"
 	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
-# 151 "data/maps/Bridge/scripts.pory"
+# 168 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_5
-# 152 "data/maps/Bridge/scripts.pory"
+# 169 "data/maps/Bridge/scripts.pory"
 	removefieldmugshot
-# 154 "data/maps/Bridge/scripts.pory"
+# 171 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_6, MSGBOX_YESNO
-# 155 "data/maps/Bridge/scripts.pory"
+# 172 "data/maps/Bridge/scripts.pory"
 	compare VAR_RESULT, 1
 	goto_if_eq StarterBag_7
 	goto StarterBag_1
 
 StarterBag_7:
-# 156 "data/maps/Bridge/scripts.pory"
+# 173 "data/maps/Bridge/scripts.pory"
 	setvar VAR_0x8008, SPECIES_MR_RIME
-# 157 "data/maps/Bridge/scripts.pory"
+# 174 "data/maps/Bridge/scripts.pory"
 	special SetPlayerMonSpecies
-# 158 "data/maps/Bridge/scripts.pory"
+# 175 "data/maps/Bridge/scripts.pory"
 	waitstate
-# 159 "data/maps/Bridge/scripts.pory"
+# 176 "data/maps/Bridge/scripts.pory"
 	msgbox StarterBag_Text_7
 	goto StarterBag_1
 
 
-CutTree::
-# 175 "data/maps/Bridge/scripts.pory"
+# 190 "data/maps/Bridge/scripts.pory"
+WalkLeft:
+# 191 "data/maps/Bridge/scripts.pory"
+	walk_left
+	step_end
+
+PreventEarlyStart::
+# 195 "data/maps/Bridge/scripts.pory"
 	lock
-# 177 "data/maps/Bridge/scripts.pory"
-	goto_if_unset FLAG_TREE_CUT, CutTree_2
-# 193 "data/maps/Bridge/scripts.pory"
-	msgbox CutTree_Text_1
-CutTree_1:
-# 196 "data/maps/Bridge/scripts.pory"
+# 197 "data/maps/Bridge/scripts.pory"
+	createfieldmugshot MUGSHOT_TEST, EMOTE_BERUS
+# 198 "data/maps/Bridge/scripts.pory"
+	msgbox BerusNPC_Text_0
+# 199 "data/maps/Bridge/scripts.pory"
+	removefieldmugshot
+# 201 "data/maps/Bridge/scripts.pory"
+	applymovement OBJ_EVENT_ID_PLAYER, WalkLeft
+# 202 "data/maps/Bridge/scripts.pory"
+	waitmovement 0
+# 204 "data/maps/Bridge/scripts.pory"
 	release
 	end
 
-CutTree_2:
-# 180 "data/maps/Bridge/scripts.pory"
-	msgbox CutTree_Text_0
-# 182 "data/maps/Bridge/scripts.pory"
-	checkpartymove MOVE_CUT
-# 184 "data/maps/Bridge/scripts.pory"
-	compare VAR_RESULT, 1
-	goto_if_eq CutTree_5
-	goto CutTree_1
 
-CutTree_5:
-# 186 "data/maps/Bridge/scripts.pory"
-	setflag FLAG_TREE_CUT
-	goto CutTree_1
+BridgeWarpOrb::
+# 210 "data/maps/Bridge/scripts.pory"
+	lock
+# 212 "data/maps/Bridge/scripts.pory"
+	goto_if_unset FLAG_UNLOCK_MANOR_WARP, BridgeWarpOrb_2
+BridgeWarpOrb_1:
+# 219 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeWarpOrb_Text_1
+# 221 "data/maps/Bridge/scripts.pory"
+	release
+	end
+
+BridgeWarpOrb_2:
+# 214 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeWarpOrb_Text_0
+# 215 "data/maps/Bridge/scripts.pory"
+	setflag FLAG_UNLOCK_MANOR_WARP
+	goto BridgeWarpOrb_1
 
 
 BridgeIntro_Text_0:
-# 27 "data/maps/Bridge/scripts.pory"
-	.string "Decided to finally show up, did we? Is\n"
-	.string "there a good reason you're four hours\l"
+# 33 "data/maps/Bridge/scripts.pory"
+	.string "Decided to finally show up, did we?\p"
+	.string "Is there a good reason you're six hours\n"
 	.string "late?$"
 
 BridgeIntro_Text_1:
-# 30 "data/maps/Bridge/scripts.pory"
+# 36 "data/maps/Bridge/scripts.pory"
 	.string "Tell the truth?$"
 
 BridgeIntro_Text_2:
-# 34 "data/maps/Bridge/scripts.pory"
+# 40 "data/maps/Bridge/scripts.pory"
 	.string "Well, the truth is... I overslept.$"
 
 BridgeIntro_Text_3:
-# 38 "data/maps/Bridge/scripts.pory"
+# 44 "data/maps/Bridge/scripts.pory"
 	.string "Well, the truth is... I had to... er... give\n"
-	.string "my train seat to a grandma... who was in\l"
-	.string "a wheelchair... and uh... also pregnant?\l"
-	.string "Then we had a fight and she stole my\l"
+	.string "my train seat to a grandma...\p"
+	.string "who was in a wheelchair...\p"
+	.string "and uh... also pregnant?\p"
+	.string "Then she beat me up she stole my\n"
 	.string "ticket.$"
 
 BridgeIntro_Text_4:
-# 43 "data/maps/Bridge/scripts.pory"
+# 49 "data/maps/Bridge/scripts.pory"
 	.string "Enough of the excuses! Just tell me\n"
 	.string "your name so I can mark you down.$"
 
 BridgeIntro_Text_5:
-# 51 "data/maps/Bridge/scripts.pory"
+# 57 "data/maps/Bridge/scripts.pory"
 	.string "{PLAYER}... ah! You must be Thya's\n"
-	.string "child. I heards she's sponsored by that\l"
-	.string "trickster god now. How is she?$"
+	.string "child.\p"
+	.string "Now there's a great trainer, plenty of\n"
+	.string "deities after her contract.$"
 
 BridgeIntro_Text_6:
-# 55 "data/maps/Bridge/scripts.pory"
+# 61 "data/maps/Bridge/scripts.pory"
 	.string "She's so busy I haven't seen her in\n"
 	.string "weeks.$"
 
 BridgeIntro_Text_7:
-# 59 "data/maps/Bridge/scripts.pory"
-	.string "An inspiration to us all. Well\n"
-	.string "{PLAYER}, they say the apple dosn't\l"
-	.string "fall far from the tree. But did you know\l"
-	.string "that when fruit lands in shade it never\l"
-	.string "sprouts? In fact it tends to spoil. I\l"
-	.string "cannot allow someone so tardy to take\l"
-	.string "the exam.$"
+# 65 "data/maps/Bridge/scripts.pory"
+	.string "An inspiration to us all!\p"
+	.string "Well {PLAYER}, they say the apple\n"
+	.string "dosn't fall far from the tree.\p"
+	.string "But that just means they spoil and\n"
+	.string "never sprout.$"
 
 BridgeIntro_Text_8:
-# 63 "data/maps/Bridge/scripts.pory"
-	.string "But the exam's not over untill sunset,\n"
-	.string "surely I can still pass if I do it real\l"
-	.string "quick.$"
+# 69 "data/maps/Bridge/scripts.pory"
+	.string "...?$"
 
 BridgeIntro_Text_9:
-# 67 "data/maps/Bridge/scripts.pory"
-	.string "'Real quick'? You really think you can\n"
-	.string "pass this prestigious test after\l"
-	.string "turning up so late? Amusing. Very well,\l"
-	.string "take your POKéMON and become\l"
-	.string "cautionary tale for next years cohort.$"
+# 73 "data/maps/Bridge/scripts.pory"
+	.string "I'm saying I cannot allow someone so\n"
+	.string "tardy to take the exam.$"
+
+BridgeIntro_Text_10:
+# 77 "data/maps/Bridge/scripts.pory"
+	.string "But there's still an hour left! I'll be\n"
+	.string "real quick.$"
+
+BridgeIntro_Text_11:
+# 81 "data/maps/Bridge/scripts.pory"
+	.string "Not possible, even the best students\n"
+	.string "take a few hours.\p"
+	.string "Although....\p"
+	.string "Very well, pick a Pokémon, you won't\n"
+	.string "pass but I'll enjoy watching you suffer.$"
 
 BerusNPC_Text_0:
-# 86 "data/maps/Bridge/scripts.pory"
+# 100 "data/maps/Bridge/scripts.pory"
 	.string "Choose a Pokémon from the bag before\n"
 	.string "we proceed.$"
 
 BerusNPC_Text_1:
-# 92 "data/maps/Bridge/scripts.pory"
+# 106 "data/maps/Bridge/scripts.pory"
 	.string "Finally ready to admit defeat? What?\n"
 	.string "You beat Tenjin? That's impossible! You\l"
 	.string "must have cheated somehow. If you want\l"
@@ -354,7 +412,7 @@ BerusNPC_Text_1:
 	.string "have to beat me in battle.$"
 
 BerusNPC_Text_2:
-# 96 "data/maps/Bridge/scripts.pory"
+# 110 "data/maps/Bridge/scripts.pory"
 	.string "You...YOU...you may have beaten me, but\n"
 	.string "look at the sky! It's after sundown\l"
 	.string "now... which means you still FAIL. Now if\l"
@@ -362,67 +420,71 @@ BerusNPC_Text_2:
 	.string "my poor doggy.$"
 
 BerusNPC_Text_3:
-# 103 "data/maps/Bridge/scripts.pory"
+# 117 "data/maps/Bridge/scripts.pory"
 	.string "Don't my waste time. You should focus\n"
 	.string "on trying to pass the test... not that\l"
 	.string "you have a chance.$"
 
 BerusNPC_Text_4:
-# 110 "data/maps/Bridge/scripts.pory"
+# 124 "data/maps/Bridge/scripts.pory"
 	.string "I don't accept this. I do not accept\n"
 	.string "that a delinquent like you could pass.$"
 
 StarterBag_Text_0:
-# 131 "data/maps/Bridge/scripts.pory"
+# 145 "data/maps/Bridge/scripts.pory"
 	.string "Wait, there's only one Pokémon in here...$"
 
 StarterBag_Text_1:
-# 135 "data/maps/Bridge/scripts.pory"
+# 149 "data/maps/Bridge/scripts.pory"
 	.string "A good trainer makes the best choice in\n"
-	.string "any situation. A great trainer makes\l"
-	.string "sure there is always a good choice to\l"
-	.string "make. You're the last to pick so you get\l"
-	.string "the leftovers.$"
+	.string "any situation.\p"
+	.string "A great trainer makes sure there is\n"
+	.string "always a good choice to make.\p"
+	.string "You're the last to pick so you get the\n"
+	.string "leftovers.$"
 
 StarterBag_Text_2:
-# 139 "data/maps/Bridge/scripts.pory"
+# 153 "data/maps/Bridge/scripts.pory"
 	.string "I guess that's my punishment for\n"
 	.string "turning up late.$"
 
 StarterBag_Text_3:
-# 143 "data/maps/Bridge/scripts.pory"
+# 157 "data/maps/Bridge/scripts.pory"
 	.string "Oh, no. This is your punishment for\n"
 	.string "turning up late.$"
 
 StarterBag_Text_4:
-# 146 "data/maps/Bridge/scripts.pory"
-	.string "Berus used a prayer. {PLAYER} was\n"
-	.string "cursed. You will receive terrible luck\l"
-	.string "for the rest of the test.$"
+# 160 "data/maps/Bridge/scripts.pory"
+	.string "Berus used a prayer.\n"
+	.string "{PLAYER} was cursed.\p"
+	.string "You will receive terrible luck for the\n"
+	.string "rest of the test...\p"
+	.string "Also there might be some glitches.\n"
+	.string "This is the curse...\p"
+	.string "and definitely not unfixed bugs.$"
 
 StarterBag_Text_5:
-# 151 "data/maps/Bridge/scripts.pory"
+# 168 "data/maps/Bridge/scripts.pory"
 	.string "Berus's photo is on the front. I wonder\n"
 	.string "if ditto can take his shape?$"
 
 StarterBag_Text_6:
-# 154 "data/maps/Bridge/scripts.pory"
+# 171 "data/maps/Bridge/scripts.pory"
 	.string "Get ditto to transform?$"
 
 StarterBag_Text_7:
-# 159 "data/maps/Bridge/scripts.pory"
+# 176 "data/maps/Bridge/scripts.pory"
 	.string "Ditto took the form of Berus$"
 
 StarterBag_Text_8:
-# 164 "data/maps/Bridge/scripts.pory"
-	.string "It's an empty bag with Berus's photo on\n"
-	.string "the front.$"
+# 182 "data/maps/Bridge/scripts.pory"
+	.string "You already picked a Pokémon.\n"
+	.string "Stop touching my bag!$"
 
-CutTree_Text_0:
-# 180 "data/maps/Bridge/scripts.pory"
-	.string "This tree looks like it could be cut\n"
-	.string "down.$"
+BridgeWarpOrb_Text_0:
+# 214 "data/maps/Bridge/scripts.pory"
+	.string "A new warp was unlocked!$"
 
-CutTree_Text_1:
-# 193 "data/maps/Bridge/scripts.pory"
-	.string "The tree has already been cleared.$"
+BridgeWarpOrb_Text_1:
+# 219 "data/maps/Bridge/scripts.pory"
+	.string "Use {SELECT_BUTTON} to warp to the next area.$"

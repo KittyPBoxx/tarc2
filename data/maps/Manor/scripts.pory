@@ -1,20 +1,22 @@
 mapscripts Manor_MapScripts {}
 
 script OrthyNPC {
+    
+    
     lock
 	special(GetPlayerMonSpecies)
-    waitstate
+    
 
     if (var(VAR_0x8008) == SPECIES_MR_RIME) {
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("What? No I wasn't napping! Go right in big bro.")) 
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
+        msgbox(format("What? No I wasn't napping! Go right in Berus Sir.")) 
         removefieldmugshot
 		applymovement(1, MoveOutTheWay)
 		// TODO: TARC maybe we just move the player here and then roll credits from the script.
     }
 	else {
-        createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("They'll be a masked ball later where the gods reveal which trainers they want to sponsor. My big bro said not to let anyone in unless he was personally escorting them so don't go getting any ideas.")) 
+        createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
+        msgbox(format("Successful candidates use the warp orb behind be to reach the gods.\pAfter the cheating last year I'm not supposed to let anyone in unless they're escorted by Berus personally.")) 
         removefieldmugshot
 	}
 
@@ -22,7 +24,43 @@ script OrthyNPC {
     end
 }
 
+
 movement MoveOutTheWay {
 	face_left
     walk_left*2
 }
+
+script ManorWarpOrb {
+    lock
+
+    if (!flag(FLAG_UNLOCK_FOREST_WARP)) {
+         
+        msgbox(format("A new warp was unlocked!"))
+        setflag(FLAG_UNLOCK_FOREST_WARP)
+
+    }
+
+    msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))
+
+    release
+    end
+}
+
+script CuttableCube {
+
+    lockall
+
+    msgbox(format("The box is weak. A Pokémon might be able to cut it."))
+
+    checkpartymove(MOVE_CUT)
+    if (var(VAR_RESULT) == 0) {
+        setflag(FLAG_TREE_CUT)
+        removeobject(VAR_LAST_TALKED)
+        msgbox(format("You cut the box."))
+    } 
+
+    releaseall
+    end
+}
+
+

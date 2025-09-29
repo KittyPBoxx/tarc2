@@ -173,12 +173,12 @@ static const u8 sText_MenuSaveAuto[] = _("AUTO");
 
 static const u8 sText_SlotEmpty[] = _("{COLOR LIGHT_GRAY} SLOT EMPTY");
 
-static const u8 sText_WarpBridge[] = _("Bridge");
-static const u8 sText_WarpManor[] = _("Manor");
-static const u8 sText_WarpForest[] = _("Forest");
+static const u8 sText_WarpBridge[] = _("Flower");
+static const u8 sText_WarpManor[] = _("Steps");
+static const u8 sText_WarpForest[] = _("Lake");
 static const u8 sText_WarpCaveF1[] = _("Cave");
 static const u8 sText_WarpCaveF2[] = _("Cave F2");
-static const u8 sText_WarpSummit[] = _("Summit");
+static const u8 sText_WarpSummit[] = _("Plains");
 static const u8 sText_WarpPass[] = _("Pass");
 
 static const struct MenuAction sStartMenuItems[] =
@@ -293,13 +293,22 @@ static void BuildNormalStartMenu(void)
 static void BuildWarpMenu(void)
 {
     AddStartMenuAction(MENU_ACTION_EXIT);
-    AddStartMenuAction(MENU_ACTION_BRIDGE);
+    
     AddStartMenuAction(MENU_ACTION_MANOR);
-    AddStartMenuAction(MENU_ACTION_FOREST);
-    AddStartMenuAction(MENU_ACTION_CAVE_F1);
+
+    if (FlagGet(FLAG_UNLOCK_FOREST_WARP))
+        AddStartMenuAction(MENU_ACTION_FOREST);
+
+    if (FlagGet(FLAG_UNLOCK_CAVE_WARP))
+        AddStartMenuAction(MENU_ACTION_CAVE_F1);
     //AddStartMenuAction(MENU_ACTION_CAVE_F2);
-    AddStartMenuAction(MENU_ACTION_SUMMIT);
+
+    if (FlagGet(FLAG_UNLOCK_SUMMIT_WARP))
+        AddStartMenuAction(MENU_ACTION_SUMMIT);
     //AddStartMenuAction(MENU_ACTION_PASS);
+
+    if (FlagGet(FLAG_UNLOCK_BRIDGE_WARP))
+        AddStartMenuAction(MENU_ACTION_BRIDGE);
 }
 
 static void BuildSaveMenu(void)
@@ -751,7 +760,7 @@ static bool8 LoadMenuLoad4Callback(void)
 
 static bool8 LoadMenuLoadAutoCallback(void)
 {
-    return LoadMenuGenericLoadCallback(SAVE_AUTO_1);
+    return LoadMenuGenericLoadCallback(SAVE_AUTO_2);
 }
 
 static void InitSave(void)
@@ -945,7 +954,7 @@ static u8 LoadConfirmInputCallback(void)
         switch (cursorPos)
         {
             case 0: 
-                ShowLoadInfoWindow(SAVE_AUTO_1);
+                ShowLoadInfoWindow(SAVE_AUTO_2);
                 break;
             case 1:
                 ShowLoadInfoWindow(SAVE_MANUAL_1);
@@ -967,7 +976,7 @@ static u8 LoadConfirmInputCallback(void)
     switch (result)
     {
     case 0: 
-        sChosenSaveSlot = SAVE_AUTO_1;
+        sChosenSaveSlot = SAVE_AUTO_2;
         if (SlotIsValid(sChosenSaveSlot))
         {
             sSaveDialogCallback = LoadDoLoadCallback;

@@ -137,7 +137,7 @@
 #line 135
                 MOVE_ZAP_CANNON,
                 MOVE_FOCUS_BLAST,
-                MOVE_TRAILBLAZE,
+                MOVE_NONE,
                 MOVE_NONE,
             },
             },

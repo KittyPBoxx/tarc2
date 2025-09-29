@@ -1,5 +1,4 @@
 gText_Birch_Welcome::
-	.string "Dear Diary:\p"
 	.string "Do you know why people pray to\n"
 	.string "the heavens?\p"
 	.string "It's because the gods down here...\p"
@@ -11,15 +10,19 @@ gText_Birch_Pokemon::
 	.string "$"
 
 gText_Birch_MainSpeech::
-	.string "Tomorrow's the ascendancy exam.\n"
-	.string "If I can impress one of the gods,\p"
-	.string "then they might take me on as a\n"
-	.string "sponsored trainer. I'd could get fame!\p"
-	.string "Wealth! Event move out of my parents\n"
+	.string "In this world it's not easy for\n"
+	.string "mortals to afford anything.\p"
+	.string "But tomorrow's the ascendancy exam.\p"
+	.string "If I can impress one of the gods,\n"
+	.string "then they might sponsor me as a trainer.\p"
+	.string "I'd could earn fame.\p"
+	.string "I'd could earn money.\p"
+	.string "I could move out of my parents\n"
 	.string "basement!\p"
-	.string "So tomorrow morning I'm going to wake\n"
-	.string "up extra early so I get get to the\p"
-	.string "exam site in plenty of time.\p"
+	.string "And with my skills there's not chance\n"
+	.string "I could fail!\p"
+	.string "I just need to make sure I wake up early\n"
+	.string "tomorrow...\n"
 	.string "\p"
 	.string "$"
 

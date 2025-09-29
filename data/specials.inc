@@ -238,3 +238,5 @@ gSpecials::
 	def_special SetPlayerMonSpecies
 	def_special GetPlayerMonSpecies
 	def_special SetBattleWeather
+	def_special AutoSave
+	def_special RemoveFollowingPokemon

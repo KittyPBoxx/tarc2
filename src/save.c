@@ -28,6 +28,11 @@ void Save_Commit(u8 slotId);
 static u8 Save_WriteChunk(u8 slotId, u16 offset, const void *data, u16 size);
 static u8 Save_ReadChunk(u8 slotId, u16 offset, void *dest, u16 size);
 
+void AutoSave(void) 
+{
+    TrySavingData(SAVE_NORMAL, SAVE_AUTO_1);
+}
+
 u8 GetCompletion(void)
 {
     u8 result = 0;

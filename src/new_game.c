@@ -65,7 +65,7 @@ static void SetDefaultOptions(void)
 
 static void InitialWarp(void)
 {
-    SetWarpDestination(MAP_GROUP(MAP_BRIDGE), MAP_NUM(MAP_BRIDGE), WARP_ID_NONE, -1, -1);
+    SetWarpDestination(MAP_GROUP(MAP_BRIDGE),MAP_NUM(MAP_BRIDGE),0,10,9);
     WarpIntoMap();
 }
 
@@ -113,6 +113,8 @@ void NewGameInitData(void)
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
     monData = ITEM_BOTTLE_CAP;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = TYPE_FIRE;
+    SetMonData(&gPlayerParty[0], MON_DATA_TERA_TYPE, &monData);
 
     ClearBag();
     ResetFanClub();

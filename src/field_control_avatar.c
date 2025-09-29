@@ -278,7 +278,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
         return TRUE;
     }
 
-    if (input->pressedSelectButton && !ForestMapPreviewScreenIsRunning())
+    if (input->pressedSelectButton && !ForestMapPreviewScreenIsRunning() && FlagGet(FLAG_UNLOCK_MANOR_WARP))
     {
         PlaySE(SE_WIN_OPEN);
         ShowWarpMenu();

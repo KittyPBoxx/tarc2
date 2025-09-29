@@ -133,10 +133,10 @@ Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons:
     .string "Not enough mons$"
 
 Debug_EventScript_Script_1_Text_Battle1_Intro:
-    .string "Starting Battle BERUS$"
+    .string "Exam battle starting$"
 
 Debug_EventScript_Script_1_Text_Battle1_Defeat:
-    .string "Battle BERUS complete$"
+    .string "Exam battle complete$"
 
 Debug_EventScript_Battle_1::
 	trainerbattle_single TRAINER_BERUS, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat
