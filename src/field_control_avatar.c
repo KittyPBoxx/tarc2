@@ -377,6 +377,7 @@ static const u8 *GetInteractionScript(struct MapPosition *position, u8 metatileB
     const u8 *script = GetInteractedObjectEventScript(position, metatileBehavior, direction);
     if (script != NULL)
     {
+        RemoveFollowingPokemon();
         ObjectEventTurn(playerObjEvent, direction);
         return script;
     }

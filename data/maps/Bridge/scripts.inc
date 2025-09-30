@@ -447,8 +447,9 @@ BerusNPC_Text_1:
 
 BerusNPC_Text_2:
 # 119 "data/maps/Bridge/scripts.pory"
-	.string "Finally ready to admit defeat? What?\n"
-	.string "You beat Tenjin? That's impossible!\p"
+	.string "Finally ready to admit defeat?\p"
+	.string "What? You beat Tenjin? That's\n"
+	.string "impossible!\p"
 	.string "You must have cheated somehow.\n"
 	.string "I'll show you what I do to cheaters!$"
 

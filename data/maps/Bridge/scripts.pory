@@ -116,7 +116,7 @@ script BerusNPC {
     elif (defeated(TRAINER_DEITY_TENJIN)) {
             
         createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("Finally ready to admit defeat? What? You beat Tenjin? That's impossible!\pYou must have cheated somehow.\nI'll show you what I do to cheaters!")) 
+        msgbox(format("Finally ready to admit defeat?\p What? You beat Tenjin? That's impossible!\pYou must have cheated somehow.\nI'll show you what I do to cheaters!")) 
         removefieldmugshot
         trainerbattle_single(TRAINER_BERUS, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
 
