@@ -40,6 +40,7 @@
 #include "constants/trainers.h"
 #include "constants/weather.h"
 #include "wild_encounter.h"
+#include "save.h"
 
 enum {
     TRANSITION_TYPE_NORMAL,
@@ -135,20 +136,20 @@ static void Task_BattleStart(u8 taskId)
     case 0:
         if (!FldEffPoison_IsActive()) // is poison not active?
         {
-            BattleTransition_StartOnField(tTransition);
+            //BattleTransition_StartOnField(tTransition);
             ClearMirageTowerPulseBlendEffect();
             tState++; // go to case 1.
         }
         break;
     case 1:
-        if (IsBattleTransitionDone() == TRUE)
-        {
+        // if (IsBattleTransitionDone() == TRUE)
+        // {
             CleanupOverworldWindowsAndTilemaps();
             SetMainCallback2(CB2_InitBattle);
             RestartWildEncounterImmunitySteps();
             ClearPoisonStepCounter();
             DestroyTask(taskId);
-        }
+        // }
         break;
     }
 }
@@ -157,7 +158,7 @@ static void CreateBattleStartTask(u8 transition, u16 song)
 {
     u8 taskId = CreateTask(Task_BattleStart, 1);
 
-    gTasks[taskId].tTransition = transition;
+    gTasks[taskId].tTransition = B_TRANSITION_SLICE;
     PlayMapChosenOrBattleBGM(song);
 }
 
@@ -356,6 +357,7 @@ static void CB2_EndWildBattle(void)
     }
 
     HealPlayerParty();
+    AutoSave();
 
     gWeatherPtr->gBattleWeather = 0;
 
@@ -936,6 +938,7 @@ static void CB2_EndTrainerBattle(void)
     HandleBattleVariantEndParty();
 
     HealPlayerParty();
+    AutoSave();
 
     gWeatherPtr->gBattleWeather = 0;
 

@@ -30,7 +30,7 @@ static u8 Save_ReadChunk(u8 slotId, u16 offset, void *dest, u16 size);
 
 void AutoSave(void) 
 {
-    TrySavingData(SAVE_NORMAL, SAVE_AUTO_1);
+    TrySavingData(SAVE_NORMAL, SAVE_AUTO_2);
 }
 
 u8 GetCompletion(void)

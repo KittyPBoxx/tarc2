@@ -38,6 +38,7 @@
 #include "constants/songs.h"
 #include "constants/maps.h"
 #include "palette_effects.h"
+#include "save.h"
 
 enum 
 {
@@ -664,6 +665,7 @@ static bool8 WarpMenuGenericCallback(u8 map)
     HideStartMenuWindow();
     DoWarp();
     ResetInitialPlayerAvatarState();
+    AutoSave();
 
     return TRUE;
 }
