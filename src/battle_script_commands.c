@@ -13189,6 +13189,15 @@ static void Cmd_transformdataexecution(void)
 
         // Copy species back to player party
         SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &gBattleMons[gBattlerTarget].species);
+        BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[1]);
+
+        gBattleMons[gBattlerAttacker].attack =  gPlayerParty[1].attack;
+        gBattleMons[gBattlerAttacker].defense =  gPlayerParty[1].defense;
+        gBattleMons[gBattlerAttacker].speed =  gPlayerParty[1].speed;
+        gBattleMons[gBattlerAttacker].spAttack =  gPlayerParty[1].spAttack;
+        gBattleMons[gBattlerAttacker].spDefense =  gPlayerParty[1].spDefense;
+
+        ZeroMonData(&gPlayerParty[1]);
 
         // gDisableStructs[gBattlerAttacker].overwrittenAbility = GetBattlerAbility(gBattlerTarget);
 

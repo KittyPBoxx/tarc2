@@ -1041,10 +1041,19 @@ static bool32 HandleEndTurnYawn(u32 battler)
             }
             else
             {
-                if (B_SLEEP_TURNS >= GEN_5)
-                    gBattleMons[battler].status1 |= ((Random() % 3) + 2);
-                else
-                    gBattleMons[battler].status1 |= ((Random() % 4) + 3);
+                // if (B_SLEEP_TURNS >= GEN_5)
+                //     gBattleMons[battler].status1 |= ((Random() % 3) + 2);
+                // else
+                //     gBattleMons[battler].status1 |= ((Random() % 4) + 3);
+
+                if (IsOnPlayerSide(battler))
+                {
+                    gBattleMons[battler].status1 |= 4;
+                }
+                else 
+                {
+                    gBattleMons[battler].status1 |= 2;
+                }
 
                 TryActivateSleepClause(battler, gBattlerPartyIndexes[battler]);
                 BtlController_EmitSetMonData(battler, B_COMM_TO_CONTROLLER, REQUEST_STATUS_BATTLE, 0, 4, &gBattleMons[battler].status1);

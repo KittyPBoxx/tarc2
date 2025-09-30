@@ -247,7 +247,7 @@
                 MOVE_PSYCHIC_TERRAIN,
                 MOVE_REFRESH,
                 MOVE_TOXIC,
-                MOVE_CALM_MIND,
+                MOVE_FORESIGHT,
             },
             },
             {
@@ -269,7 +269,7 @@
                 MOVE_WILL_O_WISP,
                 MOVE_LIGHT_SCREEN,
                 MOVE_LAST_RESORT,
-                MOVE_CALM_MIND,
+                MOVE_GROWTH,
             },
             },
             {

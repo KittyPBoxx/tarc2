@@ -357,6 +357,8 @@ static void CB2_EndWildBattle(void)
 
     HealPlayerParty();
 
+    gWeatherPtr->gBattleWeather = 0;
+
     if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
         if (B_FLAG_NO_WHITEOUT)
@@ -934,6 +936,8 @@ static void CB2_EndTrainerBattle(void)
     HandleBattleVariantEndParty();
 
     HealPlayerParty();
+
+    gWeatherPtr->gBattleWeather = 0;
 
     if (TRAINER_BATTLE_PARAM.opponentA == TRAINER_SECRET_BASE)
     {

@@ -662,7 +662,8 @@ static bool8 WarpMenuGenericCallback(u8 map)
     PauseMapPaletteEffects();
     DisableInterrupts(INTR_FLAG_HBLANK);
     HideStartMenuWindow();
-    DoTeleportTileWarp();
+    DoWarp();
+    ResetInitialPlayerAvatarState();
 
     return TRUE;
 }
