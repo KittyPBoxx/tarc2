@@ -36,7 +36,7 @@
         .trainerPic = TRAINER_PIC_AQUA_GRUNT_M,
         .encounterMusic_gender =
 #line 91
-            TRAINER_ENCOUNTER_MUSIC_HIKER,
+            TRAINER_ENCOUNTER_MUSIC_AQUA,
 #line 92
         .battleType = TRAINER_BATTLE_TYPE_SINGLES,
 #line 93
@@ -306,7 +306,7 @@
         .trainerPic = TRAINER_PIC_EXPERT_M,
         .encounterMusic_gender =
 #line 219
-            TRAINER_ENCOUNTER_MUSIC_AQUA,
+            TRAINER_ENCOUNTER_MUSIC_MAGMA,
 #line 220
         .battleType = TRAINER_BATTLE_TYPE_DOUBLES,
 #line 221

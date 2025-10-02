@@ -11,21 +11,21 @@ TenjinNPC_1:
 # 38 "data/maps/Summit/scripts.pory"
 	checktrainerflag TRAINER_DEITY_TENJIN
 	goto_if 0, TenjinNPC_5
-# 63 "data/maps/Summit/scripts.pory"
+# 64 "data/maps/Summit/scripts.pory"
 	goto_if_unset FLAG_UNLOCK_BRIDGE_WARP, TenjinNPC_10
-# 78 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_TENJIN
-# 79 "data/maps/Summit/scripts.pory"
-	msgbox TenjinNPC_Text_10
 # 80 "data/maps/Summit/scripts.pory"
-	removefieldmugshot
+	createfieldmugshot MUGSHOT_TEST, EMOTE_TENJIN
+# 81 "data/maps/Summit/scripts.pory"
+	msgbox TenjinNPC_Text_10
 # 82 "data/maps/Summit/scripts.pory"
-	msgbox TenjinNPC_Text_11, MSGBOX_YESNO
+	removefieldmugshot
 # 84 "data/maps/Summit/scripts.pory"
+	msgbox TenjinNPC_Text_11, MSGBOX_YESNO
+# 86 "data/maps/Summit/scripts.pory"
 	compare VAR_RESULT, 1
 	goto_if_eq TenjinNPC_13
 TenjinNPC_4:
-# 91 "data/maps/Summit/scripts.pory"
+# 93 "data/maps/Summit/scripts.pory"
 	release
 	end
 
@@ -102,84 +102,88 @@ TenjinNPC_8:
 # 51 "data/maps/Summit/scripts.pory"
 	removefieldmugshot
 # 53 "data/maps/Summit/scripts.pory"
-	msgbox TenjinNPC_Text_8
+	playfanfare MUS_OBTAIN_BADGE
 # 54 "data/maps/Summit/scripts.pory"
-	setflag FLAG_UNLOCK_BRIDGE_WARP
+	msgbox TenjinNPC_Text_8
 # 55 "data/maps/Summit/scripts.pory"
+	setflag FLAG_UNLOCK_BRIDGE_WARP
+# 56 "data/maps/Summit/scripts.pory"
 	clearflag FLAG_HIDE_FROSSGLASS
-# 57 "data/maps/Summit/scripts.pory"
+# 58 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_9
 	goto TenjinNPC_4
 
 TenjinNPC_10:
-# 65 "data/maps/Summit/scripts.pory"
-	createfieldmugshot MUGSHOT_TEST, EMOTE_TENJIN
 # 66 "data/maps/Summit/scripts.pory"
-	msgbox TenjinNPC_Text_6
+	createfieldmugshot MUGSHOT_TEST, EMOTE_TENJIN
 # 67 "data/maps/Summit/scripts.pory"
-	msgbox TenjinNPC_Text_7
+	msgbox TenjinNPC_Text_6
 # 68 "data/maps/Summit/scripts.pory"
+	msgbox TenjinNPC_Text_7
+# 69 "data/maps/Summit/scripts.pory"
 	removefieldmugshot
-# 70 "data/maps/Summit/scripts.pory"
-	msgbox TenjinNPC_Text_8
 # 71 "data/maps/Summit/scripts.pory"
-	setflag FLAG_UNLOCK_BRIDGE_WARP
+	playfanfare MUS_OBTAIN_BADGE
 # 72 "data/maps/Summit/scripts.pory"
-	clearflag FLAG_HIDE_FROSSGLASS
+	msgbox TenjinNPC_Text_8
+# 73 "data/maps/Summit/scripts.pory"
+	setflag FLAG_UNLOCK_BRIDGE_WARP
 # 74 "data/maps/Summit/scripts.pory"
+	clearflag FLAG_HIDE_FROSSGLASS
+# 76 "data/maps/Summit/scripts.pory"
 	msgbox TenjinNPC_Text_9
 	goto TenjinNPC_4
 
 TenjinNPC_13:
-# 85 "data/maps/Summit/scripts.pory"
+# 87 "data/maps/Summit/scripts.pory"
 	trainerbattle_double TRAINER_DEITY_TENJIN, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons
 	goto TenjinNPC_4
 
 
 SlidingTilePuzzle::
-# 97 "data/maps/Summit/scripts.pory"
-	lock
 # 99 "data/maps/Summit/scripts.pory"
+	lock
+# 101 "data/maps/Summit/scripts.pory"
 	msgbox SlidingTilePuzzle_Text_0
-# 102 "data/maps/Summit/scripts.pory"
-	setvar VAR_0x8004, 1
-# 103 "data/maps/Summit/scripts.pory"
-	setvar VAR_0x8005, 0
 # 104 "data/maps/Summit/scripts.pory"
-	setvar VAR_0x8008, 0
+	setvar VAR_0x8004, 1
 # 105 "data/maps/Summit/scripts.pory"
-	special DoSlidingPuzzle
+	setvar VAR_0x8005, 0
 # 106 "data/maps/Summit/scripts.pory"
-	waitstate
+	setvar VAR_0x8008, 0
+# 107 "data/maps/Summit/scripts.pory"
+	special DoSlidingPuzzle
 # 108 "data/maps/Summit/scripts.pory"
+	waitstate
+# 110 "data/maps/Summit/scripts.pory"
 	compare VAR_0x8008, 0
 	goto_if_ne SlidingTilePuzzle_2
 SlidingTilePuzzle_1:
-# 118 "data/maps/Summit/scripts.pory"
+# 120 "data/maps/Summit/scripts.pory"
 	release
 	end
 
 SlidingTilePuzzle_2:
-# 110 "data/maps/Summit/scripts.pory"
-	msgbox SlidingTilePuzzle_Text_1, MSGBOX_YESNO
 # 112 "data/maps/Summit/scripts.pory"
+	msgbox SlidingTilePuzzle_Text_1, MSGBOX_YESNO
+# 114 "data/maps/Summit/scripts.pory"
 	compare VAR_RESULT, 1
 	goto_if_eq SlidingTilePuzzle_4
 	goto SlidingTilePuzzle_1
 
 SlidingTilePuzzle_4:
-# 113 "data/maps/Summit/scripts.pory"
+# 115 "data/maps/Summit/scripts.pory"
 	special SetPlayerMonSpecies
-# 114 "data/maps/Summit/scripts.pory"
+# 116 "data/maps/Summit/scripts.pory"
 	msgbox SlidingTilePuzzle_Text_2
 	goto SlidingTilePuzzle_1
 
 
-# 122 "data/maps/Summit/scripts.pory"
+# 124 "data/maps/Summit/scripts.pory"
 MakeShortcut:
-# 123 "data/maps/Summit/scripts.pory"
+# 125 "data/maps/Summit/scripts.pory"
 	walk_left
-# 123 "data/maps/Summit/scripts.pory"
+# 125 "data/maps/Summit/scripts.pory"
 	walk_left
 	step_end
 
@@ -237,31 +241,31 @@ TenjinNPC_Text_7:
 	.string "Pokémon appear there at night.$"
 
 TenjinNPC_Text_8:
-# 53 "data/maps/Summit/scripts.pory"
+# 54 "data/maps/Summit/scripts.pory"
 	.string "A new warp was unlocked!$"
 
 TenjinNPC_Text_9:
-# 57 "data/maps/Summit/scripts.pory"
+# 58 "data/maps/Summit/scripts.pory"
 	.string "Use {SELECT_BUTTON} to warp to the next area.$"
 
 TenjinNPC_Text_10:
-# 79 "data/maps/Summit/scripts.pory"
+# 81 "data/maps/Summit/scripts.pory"
 	.string "You should go back now.\p"
 	.string "And avoid the Lake! Scary pokemon\n"
 	.string "Pokémon appear there at night.$"
 
 TenjinNPC_Text_11:
-# 82 "data/maps/Summit/scripts.pory"
+# 84 "data/maps/Summit/scripts.pory"
 	.string "Unless you want a rematch?$"
 
 SlidingTilePuzzle_Text_0:
-# 99 "data/maps/Summit/scripts.pory"
+# 101 "data/maps/Summit/scripts.pory"
 	.string "These rocks look like an image...$"
 
 SlidingTilePuzzle_Text_1:
-# 110 "data/maps/Summit/scripts.pory"
+# 112 "data/maps/Summit/scripts.pory"
 	.string "The image of a pokemon was revealed.\nDo you want ditto to take its form?$"
 
 SlidingTilePuzzle_Text_2:
-# 114 "data/maps/Summit/scripts.pory"
+# 116 "data/maps/Summit/scripts.pory"
 	.string "Ditto took on a new form!$"

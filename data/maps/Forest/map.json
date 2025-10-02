@@ -2,7 +2,7 @@
   "id": "MAP_FOREST",
   "name": "Forest",
   "layout": "LAYOUT_FOREST",
-  "music": "MUS_DUMMY",
+  "music": "MUS_BW12_086",
   "region_map_section": "0",
   "requires_flash": false,
   "weather": "WEATHER_RAIN",

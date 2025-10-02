@@ -2,7 +2,7 @@
   "id": "MAP_CAVE_BOTTOM",
   "name": "CaveBottom",
   "layout": "LAYOUT_CAVE_BOTTOM",
-  "music": "MUS_DUMMY",
+  "music": "MUS_BW12_062",
   "region_map_section": "0",
   "requires_flash": false,
   "weather": "WEATHER_NONE",

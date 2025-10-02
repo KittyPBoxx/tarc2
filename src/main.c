@@ -490,6 +490,7 @@ To whom it may concern, forgive me because I have sinned
 #define PALETTE_5_10 ((16 * 5) + 0x0A)
 
 
+COMMON_DATA u16 baseColorsRAM[7][7] = {0};
 
 static const u16 baseColors[7][7] = {
     {0x162a, 0x15a8, 0x0ecf, 0x0b55, 0x1125, 0x0ce3, 0x08a2}, 
@@ -541,6 +542,7 @@ void InitFastHashRAMLUT(void)
     {
         fastHashRAMLUT[i] = fastHashLUT[i];
     }
+    memcpy(baseColorsRAM, baseColors, sizeof(baseColors));
 }
 
 
@@ -587,7 +589,7 @@ void ApplyVBlankPaletteModifiers()
 #define PALETTE_SIZE 16
 #define PALETTE_BYTES (NUM_PALETTES * PALETTE_SIZE)
 
-static u16 paletteBuf[PALETTE_BYTES];
+//static u16 paletteBuf[PALETTE_BYTES];
 
 static inline void applyHBlankPaletteModifiers()
 {
@@ -597,13 +599,13 @@ static inline void applyHBlankPaletteModifiers()
     {
         u16 line = ((REG_VCOUNT + gSaveBlock1Ptr->pos.y) * 160) >> 8; //+ gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
        
-        u16 col1 = baseColors[fastHashRAMLUT[line] & 0x6][0];
-        u16 col2 = baseColors[fastHashRAMLUT[line + 1] & 0x6][1];
-        u16 col3 = baseColors[fastHashRAMLUT[line + 2] & 0x6][2];
-        u16 col4 = baseColors[fastHashRAMLUT[line + 3] & 0x6][3];
-        u16 col5 = baseColors[fastHashRAMLUT[line + 4] & 0x6][4];
-        u16 col6 = baseColors[fastHashRAMLUT[line + 5] & 0x6][5];
-        u16 col7 = baseColors[fastHashRAMLUT[line + 6] & 0x6][6];
+        u16 col1 = baseColorsRAM[fastHashRAMLUT[line] & 0x6][0];
+        u16 col2 = baseColorsRAM[fastHashRAMLUT[line + 1] & 0x6][1];
+        u16 col3 = baseColorsRAM[fastHashRAMLUT[line + 2] & 0x6][2];
+        u16 col4 = baseColorsRAM[fastHashRAMLUT[line + 3] & 0x6][3];
+        u16 col5 = baseColorsRAM[fastHashRAMLUT[line + 4] & 0x6][4];
+        u16 col6 = baseColorsRAM[fastHashRAMLUT[line + 5] & 0x6][5];
+        //u16 col7 = baseColorsRAM[fastHashRAMLUT[line + 6] & 0x6][6];
 
         // Pack two u16 colors into a u32
         #define PAIR_U16(a, b) (((u32)(b) << 16) | (u16)(a))

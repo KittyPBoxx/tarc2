@@ -50,6 +50,7 @@ script TenjinNPC {
 			msgbox(format("You need to hurry be cause the exam is almost over.\p And avoid the Lake! Scary pokemon Pokémon appear there at night."))
             removefieldmugshot
 
+			playfanfare(MUS_OBTAIN_BADGE) 
         	msgbox(format("A new warp was unlocked!"))
         	setflag(FLAG_UNLOCK_BRIDGE_WARP)
 			clearflag(FLAG_HIDE_FROSSGLASS)
@@ -67,6 +68,7 @@ script TenjinNPC {
 			msgbox(format("You need to hurry be cause the exam is almost over.\p And avoid the Lake! Scary pokemon Pokémon appear there at night."))
             removefieldmugshot
 
+			playfanfare(MUS_OBTAIN_BADGE) 
         	msgbox(format("A new warp was unlocked!"))
         	setflag(FLAG_UNLOCK_BRIDGE_WARP)
 			clearflag(FLAG_HIDE_FROSSGLASS)

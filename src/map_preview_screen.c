@@ -16,6 +16,7 @@
 #include "bg.h"
 #include "menu.h"
 #include "constants/layouts.h"
+#include "constants/flags.h"
 
 static EWRAM_DATA bool8 sAllocedBg0TilemapBuffer = FALSE;
 
@@ -56,7 +57,7 @@ static const struct MapPreviewScreen sMapPreviewScreenData[MPS_COUNT] = {
     },
     [MPS_BRIDGE] = {
         .mapnum = LAYOUT_BRIDGE,
-        .type = MPS_TYPE_CAVE,
+        .type = MPS_TYPE_FADE_IN,
         .flagId = MPS_FLAG_NULL,
         .image = IMG_BRIDGE
     },
@@ -157,7 +158,7 @@ bool8 MapHasPreviewScreen(u8 mapnum, u8 type)
     // {
     //     if (type == MPS_TYPE_ANY)
     //     {
-    //         return TRUE;
+            return !FlagGet(FLAG_BRIDGE_INTRO_DONE);
     //     }
     //     else
     //     {
@@ -166,7 +167,7 @@ bool8 MapHasPreviewScreen(u8 mapnum, u8 type)
     // }
     // else
     // {
-        return FALSE;
+    //   return FALSE;
     // }
 }
 
@@ -242,7 +243,7 @@ void MapPreview_StartForestTransition(u8 mapnum)
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
     SetGpuRegBits(REG_OFFSET_WININ, WININ_WIN0_CLR | WININ_WIN1_CLR);
     SetGpuRegBits(REG_OFFSET_WINOUT, WINOUT_WIN01_CLR);
-    gTasks[taskId].data[11] = MapPreview_CreateMapNameWindow(mapnum);
+    //gTasks[taskId].data[11] = MapPreview_CreateMapNameWindow(mapnum);
     LockPlayerFieldControls();
 }
 
@@ -299,7 +300,7 @@ static void Task_RunMapPreviewScreenForest(u8 taskId)
     case 0:
         if (!MapPreview_IsGfxLoadFinished() && !IsDma3ManagerBusyWithBgCopy())
         {
-            CopyWindowToVram(data[11], COPYWIN_FULL);
+            //CopyWindowToVram(data[11], COPYWIN_FULL);
             data[0]++;
         }
         break;
@@ -355,7 +356,7 @@ static void Task_RunMapPreviewScreenForest(u8 taskId)
     case 5:
         if (!IsDma3ManagerBusyWithBgCopy())
         {
-            MapPreview_Unload(data[11]);
+            //MapPreview_Unload(data[11]);
             SetBgAttribute(0, BG_ATTR_PRIORITY, data[2]);
             SetGpuReg(REG_OFFSET_DISPCNT, data[3]);
             SetGpuReg(REG_OFFSET_BLDCNT, data[4]);
@@ -463,8 +464,8 @@ static void Task_RunMapPreview_Script(u8 taskId)
     case 0:
         if (!MapPreview_IsGfxLoadFinished() && !IsDma3ManagerBusyWithBgCopy())
         {
-            MPWindowId = MapPreview_CreateMapNameWindow(gMapHeader.mapLayoutId);
-            CopyWindowToVram(MPWindowId, COPYWIN_FULL);
+            // MPWindowId = MapPreview_CreateMapNameWindow(gMapHeader.mapLayoutId);
+            // CopyWindowToVram(MPWindowId, COPYWIN_FULL);
             taskStep++;
         }
         break;
@@ -487,7 +488,7 @@ static void Task_RunMapPreview_Script(u8 taskId)
     case 3:
         if (!UpdatePaletteFade())
         {
-            MapPreview_Unload(MPWindowId);
+            // MapPreview_Unload(MPWindowId);
             DestroyTask(taskId);
             SetMainCallback2(gMain.savedCallback);
         }

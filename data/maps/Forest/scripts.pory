@@ -19,6 +19,7 @@ script SoraNPC {
         createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
         msgbox(format("There are four examiners and one champion to beat.\p Our sponsoring gods pay us based on how many candidates we stop.")) 
         removefieldmugshot
+        msgbox(format("Sora used a prayer.\nMega evo restrictions were removed."))
         trainerbattle_single(TRAINER_EXAMINER_SORA, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
 
         special(GetBattleOutcome)
@@ -80,6 +81,7 @@ script ForestSeal {
     if (defeated(TRAINER_EXAMINER_FIONN) && defeated(TRAINER_EXAMINER_SORA)) {
 
         if (!flag(FLAG_UNLOCK_CAVE_WARP)) {
+            playfanfare(MUS_OBTAIN_BADGE) 
             msgbox(format("A new warp was unlocked!"))
             setflag(FLAG_UNLOCK_CAVE_WARP)
         }

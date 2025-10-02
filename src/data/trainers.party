@@ -88,7 +88,7 @@ Name: Fionn
 Class: Team Aqua
 Pic: Aqua Grunt M
 Gender: Male
-Music: Hiker
+Music: Aqua
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN / AI_FLAG_PREFER_STATUS_MOVES
 
@@ -216,7 +216,7 @@ Name: TENJIN
 Class: Expert
 Pic: Expert M
 Gender: Male
-Music: Aqua
+Music: Magma
 Double Battle: Yes
 AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_FORCE_SETUP_FIRST_TURN
 

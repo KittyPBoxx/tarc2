@@ -6,7 +6,7 @@ script RuneNPC {
    	if (!defeated(TRAINER_EXAMINER_RUNE)) {
             
         createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
-        msgbox(format("A twerp like you made it half way? Too bad you're exam ends here.")) 
+        msgbox(format("You've made it far kid. But you're not ready for what I can bring.")) 
         removefieldmugshot
         trainerbattle_single(TRAINER_EXAMINER_RUNE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat)
 
@@ -14,7 +14,7 @@ script RuneNPC {
         if (var(VAR_RESULT) == B_OUTCOME_WON)
         {
             createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
-            msgbox(format("Sorry I called you a twerp. I'm kinda insecure about this job.")) 
+            msgbox(format("Whoa, you might have what it takes to beat the champ.")) 
             removefieldmugshot
         }
 
@@ -42,15 +42,16 @@ script DanteNPC {
 
 
         createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
-        msgbox(format("You've made it far kid. But you're not ready for what I can bring.")) 
+        msgbox(format("You're not the only one with access to prayers.")) 
         removefieldmugshot
+        msgbox(format("Dante used a prayer.\nIt began to hail."))
         trainerbattle_double(TRAINER_EXAMINER_DANTE, Debug_EventScript_Script_1_Text_Battle1_Intro, Debug_EventScript_Script_1_Text_Battle1_Defeat, Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons)
 
         special(GetBattleOutcome)
         if (var(VAR_RESULT) == B_OUTCOME_WON)
         {
             createfieldmugshot(MUGSHOT_TEST, EMOTE_EXAMINER)
-            msgbox(format("Whoa, you might have what it takes to beat the champ.")) 
+            msgbox(format("I guess you're just that much stronger...")) 
             removefieldmugshot
         }
 
@@ -78,6 +79,7 @@ script CaveDoor {
         
 
         if (!flag(FLAG_UNLOCK_SUMMIT_WARP)) {
+            playfanfare(MUS_OBTAIN_BADGE) 
             msgbox(format("A new warp was unlocked!"))
             setflag(FLAG_UNLOCK_SUMMIT_WARP)
         }

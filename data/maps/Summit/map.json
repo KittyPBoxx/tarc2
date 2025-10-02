@@ -2,7 +2,7 @@
   "id": "MAP_SUMMIT",
   "name": "Summit",
   "layout": "LAYOUT_SUMMIT",
-  "music": "MUS_DUMMY",
+  "music": "MUS_BW12_078",
   "region_map_section": "0",
   "requires_flash": false,
   "weather": "WEATHER_NONE",

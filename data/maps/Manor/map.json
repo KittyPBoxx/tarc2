@@ -2,7 +2,7 @@
   "id": "MAP_MANOR",
   "name": "Manor",
   "layout": "LAYOUT_MANOR",
-  "music": "MUS_DUMMY",
+  "music": "MUS_BW12_106",
   "region_map_section": "0",
   "requires_flash": false,
   "weather": "WEATHER_NONE",

@@ -34,7 +34,8 @@ script ManorWarpOrb {
     lock
 
     if (!flag(FLAG_UNLOCK_FOREST_WARP)) {
-         
+        
+        playfanfare(MUS_OBTAIN_BADGE) 
         msgbox(format("A new warp was unlocked!"))
         setflag(FLAG_UNLOCK_FOREST_WARP)
 
@@ -61,6 +62,7 @@ script CuttableCube {
 
     checkpartymove(MOVE_CUT)
     if (var(VAR_RESULT) == 0) {
+        playse(SE_ICE_CRACK)
         setflag(FLAG_TREE_CUT)
         removeobject(VAR_LAST_TALKED)
         msgbox(format("You cut the box."))

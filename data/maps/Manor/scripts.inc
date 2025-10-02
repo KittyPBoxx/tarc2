@@ -43,51 +43,55 @@ ManorWarpOrb::
 # 36 "data/maps/Manor/scripts.pory"
 	goto_if_unset FLAG_UNLOCK_FOREST_WARP, ManorWarpOrb_2
 ManorWarpOrb_1:
-# 43 "data/maps/Manor/scripts.pory"
+# 44 "data/maps/Manor/scripts.pory"
 	msgbox ManorWarpOrb_Text_1
-# 45 "data/maps/Manor/scripts.pory"
+# 46 "data/maps/Manor/scripts.pory"
 	release
 	end
 
 ManorWarpOrb_2:
 # 38 "data/maps/Manor/scripts.pory"
-	msgbox ManorWarpOrb_Text_0
+	playfanfare MUS_OBTAIN_BADGE
 # 39 "data/maps/Manor/scripts.pory"
+	msgbox ManorWarpOrb_Text_0
+# 40 "data/maps/Manor/scripts.pory"
 	setflag FLAG_UNLOCK_FOREST_WARP
 	goto ManorWarpOrb_1
 
 
 CreditsOrb::
-# 50 "data/maps/Manor/scripts.pory"
-	lock
 # 51 "data/maps/Manor/scripts.pory"
-	special GameClear
+	lock
 # 52 "data/maps/Manor/scripts.pory"
+	special GameClear
+# 53 "data/maps/Manor/scripts.pory"
 	release
 	end
 
 
 CuttableCube::
-# 58 "data/maps/Manor/scripts.pory"
+# 59 "data/maps/Manor/scripts.pory"
 	lockall
-# 60 "data/maps/Manor/scripts.pory"
+# 61 "data/maps/Manor/scripts.pory"
 	msgbox CuttableCube_Text_0
-# 62 "data/maps/Manor/scripts.pory"
-	checkpartymove MOVE_CUT
 # 63 "data/maps/Manor/scripts.pory"
+	checkpartymove MOVE_CUT
+# 64 "data/maps/Manor/scripts.pory"
 	compare VAR_RESULT, 0
 	goto_if_eq CuttableCube_2
 CuttableCube_1:
-# 69 "data/maps/Manor/scripts.pory"
+# 71 "data/maps/Manor/scripts.pory"
 	releaseall
 	end
 
 CuttableCube_2:
-# 64 "data/maps/Manor/scripts.pory"
-	setflag FLAG_TREE_CUT
 # 65 "data/maps/Manor/scripts.pory"
-	removeobject VAR_LAST_TALKED
+	playse SE_ICE_CRACK
 # 66 "data/maps/Manor/scripts.pory"
+	setflag FLAG_TREE_CUT
+# 67 "data/maps/Manor/scripts.pory"
+	removeobject VAR_LAST_TALKED
+# 68 "data/maps/Manor/scripts.pory"
 	msgbox CuttableCube_Text_1
 	goto CuttableCube_1
 
@@ -106,18 +110,18 @@ OrthyNPC_Text_1:
 	.string "they're escorted by Berus personally.$"
 
 ManorWarpOrb_Text_0:
-# 38 "data/maps/Manor/scripts.pory"
+# 39 "data/maps/Manor/scripts.pory"
 	.string "A new warp was unlocked!$"
 
 ManorWarpOrb_Text_1:
-# 43 "data/maps/Manor/scripts.pory"
+# 44 "data/maps/Manor/scripts.pory"
 	.string "Use {SELECT_BUTTON} to warp to the next area.$"
 
 CuttableCube_Text_0:
-# 60 "data/maps/Manor/scripts.pory"
+# 61 "data/maps/Manor/scripts.pory"
 	.string "The box is weak. A Pokémon might be able\n"
 	.string "to cut it.$"
 
 CuttableCube_Text_1:
-# 66 "data/maps/Manor/scripts.pory"
+# 68 "data/maps/Manor/scripts.pory"
 	.string "You cut the box.$"

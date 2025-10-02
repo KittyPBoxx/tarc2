@@ -2,7 +2,7 @@
   "id": "MAP_BRIDGE",
   "name": "Bridge",
   "layout": "LAYOUT_BRIDGE",
-  "music": "MUS_LITTLEROOT",
+  "music": "MUS_BW12_032",
   "region_map_section": "0",
   "requires_flash": false,
   "weather": "WEATHER_SNOW",

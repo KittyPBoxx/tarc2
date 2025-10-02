@@ -302,18 +302,18 @@ static void BuildWarpMenu(void)
     
     AddStartMenuAction(MENU_ACTION_MANOR);
 
-    if (FlagGet(FLAG_UNLOCK_FOREST_WARP))
+    //if (FlagGet(FLAG_UNLOCK_FOREST_WARP))
         AddStartMenuAction(MENU_ACTION_FOREST);
 
-    if (FlagGet(FLAG_UNLOCK_CAVE_WARP))
+    //if (FlagGet(FLAG_UNLOCK_CAVE_WARP))
         AddStartMenuAction(MENU_ACTION_CAVE_F1);
     //AddStartMenuAction(MENU_ACTION_CAVE_F2);
 
-    if (FlagGet(FLAG_UNLOCK_SUMMIT_WARP))
+    //if (FlagGet(FLAG_UNLOCK_SUMMIT_WARP))
         AddStartMenuAction(MENU_ACTION_SUMMIT);
     //AddStartMenuAction(MENU_ACTION_PASS);
 
-    if (FlagGet(FLAG_UNLOCK_BRIDGE_WARP))
+    //if (FlagGet(FLAG_UNLOCK_BRIDGE_WARP))
         AddStartMenuAction(MENU_ACTION_BRIDGE);
 }
 
