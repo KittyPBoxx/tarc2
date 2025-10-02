@@ -99,13 +99,13 @@ CuttableCube_2:
 OrthyNPC_Text_0:
 # 15 "data/maps/Manor/scripts.pory"
 	.string "What? No I wasn't napping! Go right\n"
-	.string "ahead Berus Sir.$"
+	.string "ahead, Berus, Sir.$"
 
 OrthyNPC_Text_1:
 # 24 "data/maps/Manor/scripts.pory"
 	.string "Successful candidates use the warp orb\n"
-	.string "behind be to reach the gods.\p"
-	.string "After the cheating last year I'm not\n"
+	.string "behind me to reach the gods.\p"
+	.string "After the cheating last year, I'm not\n"
 	.string "supposed to let anyone in unless\l"
 	.string "they're escorted by Berus personally.$"
 

@@ -180,8 +180,8 @@ SoraNPC_Text_1:
 
 SoraNPC_Text_2:
 # 29 "data/maps/Forest/scripts.pory"
-	.string "How could I loose? I guess dinner will\n"
-	.string "be uncooked ramen again...$"
+	.string "How could I lose? I guess dinner will be\n"
+	.string "uncooked ramen again...$"
 
 SoraNPC_Text_3:
 # 35 "data/maps/Forest/scripts.pory"
@@ -194,7 +194,7 @@ FionnNPC_Text_0:
 
 FionnNPC_Text_1:
 # 61 "data/maps/Forest/scripts.pory"
-	.string "Don't get cocky kid. Beating me only\n"
+	.string "Don't get cocky, kid. Beating me only\n"
 	.string "puts you one step closer to passing the\l"
 	.string "exam.$"
 

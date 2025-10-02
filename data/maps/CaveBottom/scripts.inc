@@ -157,7 +157,7 @@ CaveDoor_12:
 
 RuneNPC_Text_0:
 # 9 "data/maps/CaveBottom/scripts.pory"
-	.string "You've made it far kid. But you're not\n"
+	.string "You've made it far, kid. But you're not\n"
 	.string "ready for what I can bring.$"
 
 RuneNPC_Text_1:

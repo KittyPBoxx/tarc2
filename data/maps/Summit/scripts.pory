@@ -17,7 +17,7 @@ script TenjinNPC {
 		removefieldmugshot
 
 		createfieldmugshot(MUGSHOT_TEST, EMOTE_TENJIN)
-		msgbox(format("...but the last battle was supposed to be impossible to solo...\pGive me on sec I need to rewrite my speech."))
+		msgbox(format("...but the last battle was supposed to be impossible to solo...\pGive me one sec, I need to rewrite my speech."))
 		removefieldmugshot
 
 		createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
@@ -25,7 +25,7 @@ script TenjinNPC {
 		removefieldmugshot
 
 		createfieldmugshot(MUGSHOT_TEST, EMOTE_TENJIN)
-		msgbox(format("Umm... determination.\pThe power of er.... perseverance.\pYou finally figured out the secret..."))
+		msgbox(format("Umm... determination.\pThe power of er... perseverance.\pYou finally figured out the secret..."))
 		removefieldmugshot
 
 		createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
@@ -46,8 +46,8 @@ script TenjinNPC {
         if (var(VAR_RESULT) == B_OUTCOME_WON)
         {
             createfieldmugshot(MUGSHOT_TEST, EMOTE_TENJIN)
-            msgbox(format("That was the most exciting battle I've had in years!\pYou definitely deserve an internship with a god.\pMaybe even a paid one!\pI'll not supposed to do this but I'll let you warp straight to Berus."))
-			msgbox(format("You need to hurry be cause the exam is almost over.\p And avoid the Lake! Scary pokemon Pokémon appear there at night."))
+            msgbox(format("That was the most exciting battle I've had in years!\pYou definitely deserve an internship with a god.\pMaybe even a paid one!\pI'm not supposed to do this but I'll let you warp straight to Berus."))
+			msgbox(format("You need to hurry because the exam is almost over.\pAnd avoid the Lake! Scary Pokémon appear there at night."))
             removefieldmugshot
 
 			playfanfare(MUS_OBTAIN_BADGE) 
@@ -64,8 +64,8 @@ script TenjinNPC {
         if (!flag(FLAG_UNLOCK_BRIDGE_WARP))
         {
             createfieldmugshot(MUGSHOT_TEST, EMOTE_TENJIN)
-            msgbox(format("That was the most exciting battle I've had in years!\pYou definitely deserve an internship with a god.\pMaybe even a paid one!\pI'll not supposed to do this but I'll let you warp straight to Berus."))
-			msgbox(format("You need to hurry be cause the exam is almost over.\p And avoid the Lake! Scary pokemon Pokémon appear there at night."))
+            msgbox(format("That was the most exciting battle I've had in years!\pYou definitely deserve an internship with a god.\pMaybe even a paid one!\pI'm not supposed to do this but I'll let you warp straight to Berus."))
+			msgbox(format("You need to hurry because the exam is almost over.\pAnd avoid the Lake! Scary Pokémon appear there at night."))
             removefieldmugshot
 
 			playfanfare(MUS_OBTAIN_BADGE) 
@@ -78,7 +78,7 @@ script TenjinNPC {
 		else
 		{
 			createfieldmugshot(MUGSHOT_TEST, EMOTE_TENJIN)
-			msgbox(format("You should go back now.\pAnd avoid the Lake! Scary pokemon Pokémon appear there at night."))
+			msgbox(format("You should go back now.\pAnd avoid the Lake! Scary Pokémon appear there at night."))
 			removefieldmugshot
 
 			msgbox("Unless you want a rematch?", MSGBOX_YESNO)
@@ -109,7 +109,7 @@ script SlidingTilePuzzle {
 
 	if (var(VAR_0x8008) != 0) {
 
-		msgbox("The image of a pokemon was revealed.\nDo you want ditto to take its form?", MSGBOX_YESNO)
+		msgbox("The image of a pokemon was revealed.\nDo you want Ditto to take its form?", MSGBOX_YESNO)
 
 		if (var(VAR_RESULT) == 1) {
 			special(SetPlayerMonSpecies)

@@ -210,13 +210,13 @@ TenjinNPC_Text_3:
 # 20 "data/maps/Summit/scripts.pory"
 	.string "...but the last battle was supposed to\n"
 	.string "be impossible to solo...\p"
-	.string "Give me on sec I need to rewrite my\n"
+	.string "Give me one sec, I need to rewrite my\n"
 	.string "speech.$"
 
 TenjinNPC_Text_4:
 # 28 "data/maps/Summit/scripts.pory"
 	.string "Umm... determination.\p"
-	.string "The power of er.... perseverance.\p"
+	.string "The power of er... perseverance.\p"
 	.string "You finally figured out the secret...$"
 
 TenjinNPC_Text_5:
@@ -230,15 +230,15 @@ TenjinNPC_Text_6:
 	.string "You definitely deserve an internship\n"
 	.string "with a god.\p"
 	.string "Maybe even a paid one!\p"
-	.string "I'll not supposed to do this but I'll let\n"
+	.string "I'm not supposed to do this but I'll let\n"
 	.string "you warp straight to Berus.$"
 
 TenjinNPC_Text_7:
 # 50 "data/maps/Summit/scripts.pory"
-	.string "You need to hurry be cause the exam is\n"
+	.string "You need to hurry because the exam is\n"
 	.string "almost over.\p"
-	.string "And avoid the Lake! Scary pokemon\n"
-	.string "Pokémon appear there at night.$"
+	.string "And avoid the Lake! Scary Pokémon\n"
+	.string "appear there at night.$"
 
 TenjinNPC_Text_8:
 # 54 "data/maps/Summit/scripts.pory"
@@ -251,8 +251,8 @@ TenjinNPC_Text_9:
 TenjinNPC_Text_10:
 # 81 "data/maps/Summit/scripts.pory"
 	.string "You should go back now.\p"
-	.string "And avoid the Lake! Scary pokemon\n"
-	.string "Pokémon appear there at night.$"
+	.string "And avoid the Lake! Scary Pokémon\n"
+	.string "appear there at night.$"
 
 TenjinNPC_Text_11:
 # 84 "data/maps/Summit/scripts.pory"
@@ -264,7 +264,7 @@ SlidingTilePuzzle_Text_0:
 
 SlidingTilePuzzle_Text_1:
 # 112 "data/maps/Summit/scripts.pory"
-	.string "The image of a pokemon was revealed.\nDo you want ditto to take its form?$"
+	.string "The image of a pokemon was revealed.\nDo you want Ditto to take its form?$"
 
 SlidingTilePuzzle_Text_2:
 # 116 "data/maps/Summit/scripts.pory"

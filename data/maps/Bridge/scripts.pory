@@ -47,7 +47,7 @@ script BridgeIntro {
         removefieldmugshot
     } else {
         createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
-        msgbox(format("Well, the truth is... I had to... er... give my train seat to a grandma...\p who was in a wheelchair...\p and uh... also pregnant?\p Then she beat me up she stole my ticket."))
+        msgbox(format("Well, the truth is... I had to... er... give my train seat to a grandma...\pwho was in a wheelchair...\pand uh... also pregnant?\pThen she beat me up and stole my ticket."))
         removefieldmugshot
     }
 
@@ -68,7 +68,7 @@ script BridgeIntro {
     removefieldmugshot
 
     createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-    msgbox(format("An inspiration to us all! \p Well {PLAYER}, they say the apple dosn't fall far from the tree.\pBut that just means they spoil and never sprout."))
+    msgbox(format("An inspiration to us all! \pWell {PLAYER}, they say the apple doesn't fall far from the tree.\pBut that just means they spoil and never sprout."))
     removefieldmugshot
 
     createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
@@ -140,7 +140,7 @@ script BerusNPC {
     elif (!defeated(TRAINER_DEITY_TENJIN)) {
         
         createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("Don't my waste time. You should focus on trying to pass the test...\pNot that you have a chance.")) 
+        msgbox(format("Don't waste my time. You should focus on trying to pass the test...\pNot that you have a chance.")) 
         removefieldmugshot
 
     }
@@ -191,14 +191,14 @@ script StarterBag {
     elif (flag(FLAG_HIDE_BERUS)) {
 
         createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
-        msgbox(format("He was in such a hurry he left his bag...\pWith his photo id in it...\p"))
+        msgbox(format("He was in such a hurry he left his bag...\pWith his photo ID in it...\p"))
         removefieldmugshot
 
         msgbox("Get ditto to commit identity theft?", MSGBOX_YESNO)
         if (var(VAR_RESULT) == 1) {
             setvar(VAR_0x8008, SPECIES_MR_RIME)
             special(SetPlayerMonSpecies)
-            msgbox(format("Ditto took the form of Berus\p"))
+            msgbox(format("Ditto took the form of Berus.\p"))
             special(WarpToStairs) 
         }
     }

@@ -387,7 +387,7 @@ BridgeIntro_Text_3:
 	.string "my train seat to a grandma...\p"
 	.string "who was in a wheelchair...\p"
 	.string "and uh... also pregnant?\p"
-	.string "Then she beat me up she stole my\n"
+	.string "Then she beat me up and stole my\n"
 	.string "ticket.$"
 
 BridgeIntro_Text_4:
@@ -411,7 +411,7 @@ BridgeIntro_Text_7:
 # 71 "data/maps/Bridge/scripts.pory"
 	.string "An inspiration to us all!\p"
 	.string "Well {PLAYER}, they say the apple\n"
-	.string "dosn't fall far from the tree.\p"
+	.string "doesn't fall far from the tree.\p"
 	.string "But that just means they spoil and\n"
 	.string "never sprout.$"
 
@@ -468,7 +468,7 @@ BerusNPC_Text_3:
 
 BerusNPC_Text_4:
 # 143 "data/maps/Bridge/scripts.pory"
-	.string "Don't my waste time. You should focus\n"
+	.string "Don't waste my time. You should focus\n"
 	.string "on trying to pass the test...\p"
 	.string "Not that you have a chance.$"
 
@@ -513,7 +513,7 @@ StarterBag_Text_4:
 StarterBag_Text_5:
 # 194 "data/maps/Bridge/scripts.pory"
 	.string "He was in such a hurry he left his bag...\p"
-	.string "With his photo id in it...\p"
+	.string "With his photo ID in it...\p"
 	.string "$"
 
 StarterBag_Text_6:
@@ -522,7 +522,7 @@ StarterBag_Text_6:
 
 StarterBag_Text_7:
 # 201 "data/maps/Bridge/scripts.pory"
-	.string "Ditto took the form of Berus\p"
+	.string "Ditto took the form of Berus.\p"
 	.string "$"
 
 StarterBag_Text_8:
