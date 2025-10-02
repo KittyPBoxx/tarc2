@@ -124,16 +124,16 @@ ForestSeal::
 	checktrainerflag TRAINER_EXAMINER_FIONN
 	goto_if 1, ForestSeal_8
 ForestSeal_6:
-# 92 "data/maps/Forest/scripts.pory"
+# 94 "data/maps/Forest/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_FIONN
 	goto_if 1, ForestSeal_3
-# 92 "data/maps/Forest/scripts.pory"
+# 94 "data/maps/Forest/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_SORA
 	goto_if 1, ForestSeal_3
-# 96 "data/maps/Forest/scripts.pory"
+# 98 "data/maps/Forest/scripts.pory"
 	msgbox ForestSeal_Text_3
 ForestSeal_1:
-# 99 "data/maps/Forest/scripts.pory"
+# 101 "data/maps/Forest/scripts.pory"
 	release
 	end
 
@@ -141,12 +141,12 @@ ForestSeal_2:
 # 83 "data/maps/Forest/scripts.pory"
 	goto_if_unset FLAG_UNLOCK_CAVE_WARP, ForestSeal_12
 ForestSeal_11:
-# 89 "data/maps/Forest/scripts.pory"
+# 91 "data/maps/Forest/scripts.pory"
 	msgbox ForestSeal_Text_1
 	goto ForestSeal_1
 
 ForestSeal_3:
-# 93 "data/maps/Forest/scripts.pory"
+# 95 "data/maps/Forest/scripts.pory"
 	msgbox ForestSeal_Text_2
 	goto ForestSeal_1
 
@@ -158,11 +158,15 @@ ForestSeal_8:
 
 ForestSeal_12:
 # 84 "data/maps/Forest/scripts.pory"
-	playfanfare MUS_OBTAIN_BADGE
-# 85 "data/maps/Forest/scripts.pory"
-	msgbox ForestSeal_Text_0
-# 86 "data/maps/Forest/scripts.pory"
 	setflag FLAG_UNLOCK_CAVE_WARP
+# 85 "data/maps/Forest/scripts.pory"
+	special AutoSave
+# 86 "data/maps/Forest/scripts.pory"
+	playfanfare MUS_OBTAIN_BADGE
+# 87 "data/maps/Forest/scripts.pory"
+	msgbox ForestSeal_Text_0
+# 88 "data/maps/Forest/scripts.pory"
+	waitfanfare
 	goto ForestSeal_11
 
 
@@ -199,19 +203,19 @@ FionnNPC_Text_1:
 	.string "exam.$"
 
 ForestSeal_Text_0:
-# 85 "data/maps/Forest/scripts.pory"
+# 87 "data/maps/Forest/scripts.pory"
 	.string "A new warp was unlocked!$"
 
 ForestSeal_Text_1:
-# 89 "data/maps/Forest/scripts.pory"
+# 91 "data/maps/Forest/scripts.pory"
 	.string "Use {SELECT_BUTTON} to warp to the next area.$"
 
 ForestSeal_Text_2:
-# 93 "data/maps/Forest/scripts.pory"
+# 95 "data/maps/Forest/scripts.pory"
 	.string "The crystal is not active.\n"
 	.string "REQUIREMENT: ONE MORE TRAINER BATTLE$"
 
 ForestSeal_Text_3:
-# 96 "data/maps/Forest/scripts.pory"
+# 98 "data/maps/Forest/scripts.pory"
 	.string "The crystal is not active.\n"
 	.string "REQUIREMENT: TWO TRAINER BATTLES$"

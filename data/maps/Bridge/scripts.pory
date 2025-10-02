@@ -235,10 +235,11 @@ script BridgeWarpOrb {
     lock
 
     if (!flag(FLAG_UNLOCK_MANOR_WARP)) {
+        setflag(FLAG_UNLOCK_MANOR_WARP)
+        special(AutoSave)
         playfanfare(MUS_OBTAIN_BADGE) 
         msgbox(format("A new warp was unlocked!"))
-        setflag(FLAG_UNLOCK_MANOR_WARP)
-
+        waitfanfare
     }
 
     msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))

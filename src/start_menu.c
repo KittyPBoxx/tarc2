@@ -665,7 +665,7 @@ static bool8 WarpMenuGenericCallback(u8 map)
     HideStartMenuWindow();
     DoWarp();
     ResetInitialPlayerAvatarState();
-    AutoSave();
+    //AutoSave();
 
     return TRUE;
 }

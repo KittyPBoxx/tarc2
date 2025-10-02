@@ -1850,7 +1850,7 @@ static void DebugAction_Util_Battle_5(u8 taskId)
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
     monData = ITEM_RAWST_BERRY;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
-    monData = SPECIES_HAUNTER;
+    monData = SPECIES_MUK;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
     monData = TYPE_FIRE;
     SetMonData(&gPlayerParty[0], MON_DATA_TERA_TYPE, &monData);

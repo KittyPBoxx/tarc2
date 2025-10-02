@@ -81,9 +81,11 @@ script ForestSeal {
     if (defeated(TRAINER_EXAMINER_FIONN) && defeated(TRAINER_EXAMINER_SORA)) {
 
         if (!flag(FLAG_UNLOCK_CAVE_WARP)) {
+            setflag(FLAG_UNLOCK_CAVE_WARP)
+            special(AutoSave)
             playfanfare(MUS_OBTAIN_BADGE) 
             msgbox(format("A new warp was unlocked!"))
-            setflag(FLAG_UNLOCK_CAVE_WARP)
+            waitfanfare
         }
 
         msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))

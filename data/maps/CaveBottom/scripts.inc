@@ -113,16 +113,16 @@ CaveDoor::
 	checktrainerflag TRAINER_EXAMINER_RUNE
 	goto_if 1, CaveDoor_8
 CaveDoor_6:
-# 90 "data/maps/CaveBottom/scripts.pory"
+# 92 "data/maps/CaveBottom/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_RUNE
 	goto_if 1, CaveDoor_3
-# 90 "data/maps/CaveBottom/scripts.pory"
+# 92 "data/maps/CaveBottom/scripts.pory"
 	checktrainerflag TRAINER_EXAMINER_DANTE
 	goto_if 1, CaveDoor_3
-# 94 "data/maps/CaveBottom/scripts.pory"
+# 96 "data/maps/CaveBottom/scripts.pory"
 	msgbox CaveDoor_Text_3
 CaveDoor_1:
-# 97 "data/maps/CaveBottom/scripts.pory"
+# 99 "data/maps/CaveBottom/scripts.pory"
 	release
 	end
 
@@ -130,12 +130,12 @@ CaveDoor_2:
 # 81 "data/maps/CaveBottom/scripts.pory"
 	goto_if_unset FLAG_UNLOCK_SUMMIT_WARP, CaveDoor_12
 CaveDoor_11:
-# 87 "data/maps/CaveBottom/scripts.pory"
+# 89 "data/maps/CaveBottom/scripts.pory"
 	msgbox CaveDoor_Text_1
 	goto CaveDoor_1
 
 CaveDoor_3:
-# 91 "data/maps/CaveBottom/scripts.pory"
+# 93 "data/maps/CaveBottom/scripts.pory"
 	msgbox CaveDoor_Text_2
 	goto CaveDoor_1
 
@@ -147,11 +147,15 @@ CaveDoor_8:
 
 CaveDoor_12:
 # 82 "data/maps/CaveBottom/scripts.pory"
-	playfanfare MUS_OBTAIN_BADGE
-# 83 "data/maps/CaveBottom/scripts.pory"
-	msgbox CaveDoor_Text_0
-# 84 "data/maps/CaveBottom/scripts.pory"
 	setflag FLAG_UNLOCK_SUMMIT_WARP
+# 83 "data/maps/CaveBottom/scripts.pory"
+	special AutoSave
+# 84 "data/maps/CaveBottom/scripts.pory"
+	playfanfare MUS_OBTAIN_BADGE
+# 85 "data/maps/CaveBottom/scripts.pory"
+	msgbox CaveDoor_Text_0
+# 86 "data/maps/CaveBottom/scripts.pory"
+	waitfanfare
 	goto CaveDoor_11
 
 
@@ -185,20 +189,20 @@ DanteNPC_Text_2:
 	.string "stronger...$"
 
 CaveDoor_Text_0:
-# 83 "data/maps/CaveBottom/scripts.pory"
+# 85 "data/maps/CaveBottom/scripts.pory"
 	.string "A new warp was unlocked!$"
 
 CaveDoor_Text_1:
-# 87 "data/maps/CaveBottom/scripts.pory"
+# 89 "data/maps/CaveBottom/scripts.pory"
 	.string "Use {SELECT_BUTTON} to warp to the next area.$"
 
 CaveDoor_Text_2:
-# 91 "data/maps/CaveBottom/scripts.pory"
+# 93 "data/maps/CaveBottom/scripts.pory"
 	.string "The crystal is not active.\n"
 	.string "REQUIREMENT: ONE MORE TRAINER BATTLE$"
 
 CaveDoor_Text_3:
-# 94 "data/maps/CaveBottom/scripts.pory"
+# 96 "data/maps/CaveBottom/scripts.pory"
 	.string "The crystal is not active.\n"
 	.string "REQUIREMENT: TWO MORE TRAINER\l"
 	.string "BATTLES$"

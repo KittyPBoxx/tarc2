@@ -79,9 +79,11 @@ script CaveDoor {
         
 
         if (!flag(FLAG_UNLOCK_SUMMIT_WARP)) {
+            setflag(FLAG_UNLOCK_SUMMIT_WARP)
+            special(AutoSave)
             playfanfare(MUS_OBTAIN_BADGE) 
             msgbox(format("A new warp was unlocked!"))
-            setflag(FLAG_UNLOCK_SUMMIT_WARP)
+            waitfanfare
         }
 
         msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))

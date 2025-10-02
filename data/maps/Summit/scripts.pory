@@ -50,10 +50,13 @@ script TenjinNPC {
 			msgbox(format("You need to hurry because the exam is almost over.\pAnd avoid the Lake! Scary Pokémon appear there at night."))
             removefieldmugshot
 
-			playfanfare(MUS_OBTAIN_BADGE) 
-        	msgbox(format("A new warp was unlocked!"))
         	setflag(FLAG_UNLOCK_BRIDGE_WARP)
 			clearflag(FLAG_HIDE_FROSSGLASS)
+			special(AutoSave)
+			playfanfare(MUS_OBTAIN_BADGE) 
+        	msgbox(format("A new warp was unlocked!"))
+			waitfanfare
+
 
 			msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))
         }
@@ -68,10 +71,12 @@ script TenjinNPC {
 			msgbox(format("You need to hurry because the exam is almost over.\pAnd avoid the Lake! Scary Pokémon appear there at night."))
             removefieldmugshot
 
-			playfanfare(MUS_OBTAIN_BADGE) 
-        	msgbox(format("A new warp was unlocked!"))
         	setflag(FLAG_UNLOCK_BRIDGE_WARP)
 			clearflag(FLAG_HIDE_FROSSGLASS)
+			special(AutoSave)
+			playfanfare(MUS_OBTAIN_BADGE) 
+        	msgbox(format("A new warp was unlocked!"))
+			waitfanfare
 
 			msgbox(format("Use {SELECT_BUTTON} to warp to the next area."))
         }

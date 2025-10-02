@@ -35,9 +35,11 @@ script ManorWarpOrb {
 
     if (!flag(FLAG_UNLOCK_FOREST_WARP)) {
         
+        setflag(FLAG_UNLOCK_FOREST_WARP)
+        special(AutoSave)
         playfanfare(MUS_OBTAIN_BADGE) 
         msgbox(format("A new warp was unlocked!"))
-        setflag(FLAG_UNLOCK_FOREST_WARP)
+        waitfanfare
 
     }
 

@@ -351,19 +351,23 @@ BridgeWarpOrb::
 # 237 "data/maps/Bridge/scripts.pory"
 	goto_if_unset FLAG_UNLOCK_MANOR_WARP, BridgeWarpOrb_2
 BridgeWarpOrb_1:
-# 244 "data/maps/Bridge/scripts.pory"
+# 245 "data/maps/Bridge/scripts.pory"
 	msgbox BridgeWarpOrb_Text_1
-# 246 "data/maps/Bridge/scripts.pory"
+# 247 "data/maps/Bridge/scripts.pory"
 	release
 	end
 
 BridgeWarpOrb_2:
 # 238 "data/maps/Bridge/scripts.pory"
-	playfanfare MUS_OBTAIN_BADGE
-# 239 "data/maps/Bridge/scripts.pory"
-	msgbox BridgeWarpOrb_Text_0
-# 240 "data/maps/Bridge/scripts.pory"
 	setflag FLAG_UNLOCK_MANOR_WARP
+# 239 "data/maps/Bridge/scripts.pory"
+	special AutoSave
+# 240 "data/maps/Bridge/scripts.pory"
+	playfanfare MUS_OBTAIN_BADGE
+# 241 "data/maps/Bridge/scripts.pory"
+	msgbox BridgeWarpOrb_Text_0
+# 242 "data/maps/Bridge/scripts.pory"
+	waitfanfare
 	goto BridgeWarpOrb_1
 
 
@@ -531,9 +535,9 @@ StarterBag_Text_8:
 	.string "Stop touching my bag!$"
 
 BridgeWarpOrb_Text_0:
-# 239 "data/maps/Bridge/scripts.pory"
+# 241 "data/maps/Bridge/scripts.pory"
 	.string "A new warp was unlocked!$"
 
 BridgeWarpOrb_Text_1:
-# 244 "data/maps/Bridge/scripts.pory"
+# 245 "data/maps/Bridge/scripts.pory"
 	.string "Use {SELECT_BUTTON} to warp to the next area.$"
