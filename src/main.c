@@ -116,8 +116,16 @@ void InitFastHashRAMLUT(void);
 static void GamePakCrashHandler(void)
 {
     DebugPrintfLevel(MGBA_LOG_ERROR, "GamePak crash interrupt triggered!");
-    GlobalSaveHeader *hdr = (GlobalSaveHeader *)FRAM_BASE;
-    ReloadSlot(hdr->lastSaveSlot);
+
+    if (SlotIsValid(SAVE_AUTO_2))
+    {
+        ReloadSlot(SAVE_AUTO_2);
+    }
+    else
+    {
+        GlobalSaveHeader *hdr = (GlobalSaveHeader *)FRAM_BASE;
+        ReloadSlot(hdr->lastSaveSlot);
+    }
 }
 
 void AgbMain(void)

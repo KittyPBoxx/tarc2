@@ -200,7 +200,7 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
 
     if(DEBUG_OVERWORLD_MENU)
     {
-        if ((heldKeys & DEBUG_OVERWORLD_HELD_KEYS) && input->DEBUG_OVERWORLD_TRIGGER_EVENT)
+        if ((heldKeys & R_BUTTON) && (heldKeys & L_BUTTON) && (heldKeys & B_BUTTON) && input->DEBUG_OVERWORLD_TRIGGER_EVENT)
         {
             input->input_field_1_2 = TRUE;
             input->DEBUG_OVERWORLD_TRIGGER_EVENT = FALSE;
