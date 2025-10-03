@@ -4516,11 +4516,81 @@ static void HandleEndTurn_FinishBattle(void)
     }
     else
     {
-        DebugPrintfLevel(MGBA_LOG_ERROR, "TODO: TARC ADD SAFETY CHECK HERE - BOTH FUNCTION AND ARRAY END %x", gBattlescriptCurrInstr[0]);
+
+        /*
+          ########################################
+          FUCK THIS FUCK THIS FUCK THIS FUCK THIS
+          ########################################
+
+          Ok so there was a random crash in like 1/50 battles starting. 
+          Out of ideas I asked chatgpt, and it generate this code. Which if you look carefully is actually pointless.
+          gBattlescriptCurrInstr is never null,
+          there are 255 op codes so gBattlescriptCurrInstr[someU8] will always be in bounds
+          And it's an array of pointers to rom functions so they are always valid in rom
+
+          SOWHYTHEFUCKDIDTHISACTUALLYSOPTOTHECRASBHES 
+        */
+
+        // Defensive checks before dispatching battler script opcodes
+        if (gBattlescriptCurrInstr == NULL)
+        {
+            DebugPrintfLevel(MGBA_LOG_ERROR, "HandleEndTurn_FinishBattle: gBattlescriptCurrInstr == NULL");
+            // Safe fallback: end battle processing to avoid crash
+            gBattleMainFunc = FreeResetData_ReturnToOvOrDoEvolutions;
+            gCB2_AfterEvolution = BattleMainCB2;
+            return;
+        }
+
+        u8 opcode = gBattlescriptCurrInstr[0];
+        void (*func)(void) = gBattleScriptingCommandsTable[opcode];
+
+        // Basic NULL check
+        if (func == NULL)
+        {
+            DebugPrintfLevel(MGBA_LOG_ERROR, "HandleEndTurn: opcode %02X -> NULL func at %p", opcode, gBattlescriptCurrInstr);
+            gBattleMainFunc = FreeResetData_ReturnToOvOrDoEvolutions;
+            gCB2_AfterEvolution = BattleMainCB2;
+            return;
+        }
+
+
+        // Pointer sanity: only allow pointers inside known executable ranges:
+        // ROM:   0x08000000 - 0x09FFFFFF
+        // IWRAM: 0x02000000 - 0x02FFFFFF
+        // EWRAM: 0x03000000 - 0x03FFFFFF
+        // (Some projects also execute from 0x02xxxxxx with Thumb bit set.)
+        uintptr_t fp = (uintptr_t)func;
+        bool8 validAddr = ((fp >= 0x08000000 && fp < 0x0A000000)
+                    || (fp >= 0x02000000 && fp < 0x03000000)
+                    || (fp >= 0x03000000 && fp < 0x04000000));
+        if (!validAddr)
+        {
+            DebugPrintfLevel(MGBA_LOG_ERROR, "HandleEndTurn: opcode %02X -> BAD FUNC PTR %08X at %p",
+                            opcode, (unsigned)fp, gBattlescriptCurrInstr);
+
+            // Dump first 8 bytes of script to help debug
+            DebugPrintfLevel(MGBA_LOG_ERROR, "Script bytes: %02X %02X %02X %02X %02X %02X %02X %02X",
+                            gBattlescriptCurrInstr[0], gBattlescriptCurrInstr[1],
+                            gBattlescriptCurrInstr[2], gBattlescriptCurrInstr[3],
+                            gBattlescriptCurrInstr[4], gBattlescriptCurrInstr[5],
+                            gBattlescriptCurrInstr[6], gBattlescriptCurrInstr[7]);
+
+            // Fail safely: return to end-battle flow
+            gBattleMainFunc = FreeResetData_ReturnToOvOrDoEvolutions;
+            gCB2_AfterEvolution = BattleMainCB2;
+            return;
+        }
+        /*
+          ########################################
+          FUCK THIS FUCK THIS FUCK THIS FUCK THIS
+          ########################################
+        */
+
 
         if (gBattleControllerExecFlags == 0)
-            gBattleScriptingCommandsTable[gBattlescriptCurrInstr[0]]();
+            gBattleScriptingCommandsTable[opcode]();
     }
+
 }
 
 static void FreeResetData_ReturnToOvOrDoEvolutions(void)

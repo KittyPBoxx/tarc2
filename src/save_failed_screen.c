@@ -482,7 +482,7 @@ void CB2_EndGameCallback(void)
     InitWindows(textWin);
     DrawStdFrameWithCustomTileAndPalette(0, TRUE, 0x214, 0xE);
 
-    static const u8 disclaimer[] =_("{COLOR DARK_GRAY}The End!\n\n'Developed' By KittyPBoxx.\nWith Battle Puzzles By Sabata\n\nThanks For Playing!");
+    static const u8 disclaimer[] =_("{COLOR DARK_GRAY}The End!\n\n'Developed' By KittyPBoxx.\nWith Battle Puzzles By Sabata & Kitty\n\nThanks For Playing!");
     SaveFailedScreenTextPrint(disclaimer, 1, 1);
 
     TransferPlttBuffer();
