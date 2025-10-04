@@ -1862,13 +1862,13 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MovingBox = {
 
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_CableCar = {
     .tileTag = TAG_NONE,
-    .paletteTag = OBJ_EVENT_PAL_TAG_CABLE_CAR,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_1_REFLECTION,
     .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
     .size = 2048,
     .width = 64,
     .height = 64,
     .paletteSlot = PALSLOT_NPC_SPECIAL,
-    .shadowSize = SHADOW_SIZE_M,
+    .shadowSize = SHADOW_SIZE_NONE,
     .inanimate = TRUE,
     .compressed = FALSE,
     .tracks = TRACKS_NONE,

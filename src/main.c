@@ -378,6 +378,11 @@ void SetSerialCallback(IntrCallback callback)
     gMain.serialCallback = callback;
 }
 
+/**
+To whom it may concern, forgive me because I have sinned
+*********************************************************************************
+*/
+
 /*
 function gbaToRgb(color) {
   let r = (color & 0x1F) << 3;
@@ -459,11 +464,6 @@ for (let row of palettes) {
 console.log("};");
 */
 
-/**
-To whom it may concern, forgive me because I have sinned
-*********************************************************************************
-*/
-
 #define BG_PALETTE ((volatile u16*)0x5000000)
 #define PALETTE_0_1 ((16 * 0) + 0x01)
 #define PALETTE_0_2 ((16 * 0) + 0x02)
@@ -510,6 +510,7 @@ static const u16 baseColors[7][7] = {
     {0x2a25, 0x21a5, 0x1ac3, 0x0b42, 0x1d24, 0x18e3, 0x10a2}, 
 };
 
+// One or two calls is fine but this is a bit slow to do multimple times on VBlank so can just make a lut
 // static inline uint32_t fast_hash32(uint32_t x)
 // {
 //     x ^= x >> 15;
@@ -596,8 +597,6 @@ void ApplyVBlankPaletteModifiers()
 #define NUM_PALETTES 6
 #define PALETTE_SIZE 16
 #define PALETTE_BYTES (NUM_PALETTES * PALETTE_SIZE)
-
-//static u16 paletteBuf[PALETTE_BYTES];
 
 static inline void applyHBlankPaletteModifiers()
 {

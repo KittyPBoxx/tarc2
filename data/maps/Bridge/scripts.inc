@@ -512,7 +512,7 @@ StarterBag_Text_4:
 	.string "rest of the test...\p"
 	.string "Also there might be some glitches.\n"
 	.string "This is the curse...\p"
-	.string "and definitely not unfixed bugs.$"
+	.string "And definitely not unfixed bugs.$"
 
 StarterBag_Text_5:
 # 194 "data/maps/Bridge/scripts.pory"
@@ -532,7 +532,7 @@ StarterBag_Text_7:
 StarterBag_Text_8:
 # 207 "data/maps/Bridge/scripts.pory"
 	.string "You already picked a Pokémon.\n"
-	.string "Stop touching my bag!$"
+	.string "Stop touching my documents!$"
 
 BridgeWarpOrb_Text_0:
 # 241 "data/maps/Bridge/scripts.pory"
