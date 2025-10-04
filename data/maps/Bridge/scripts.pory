@@ -183,7 +183,7 @@ script StarterBag {
         msgbox(format("Oh, no. This is your punishment for turning up late."))
         removefieldmugshot
 
-        msgbox(format("Berus used a prayer.\n{PLAYER} was cursed.\pYou will receive terrible luck for the rest of the test...\pAlso there might be some glitches.\nThis is the curse...\pand definitely not unfixed bugs."))
+        msgbox(format("Berus used a prayer.\n{PLAYER} was cursed.\pYou will receive terrible luck for the rest of the test...\pAlso there might be some glitches.\nThis is the curse...\pAnd definitely not unfixed bugs."))
 
         clearflag(FLAG_TEMP_HIDE_FOLLOWER)
         setvar(VAR_TEMP_1, 0)
@@ -204,7 +204,7 @@ script StarterBag {
     }
     else {
         createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
-        msgbox(format("You already picked a Pokémon.\nStop touching my bag!")) 
+        msgbox(format("You already picked a Pokémon.\nStop touching my documents!")) 
         removefieldmugshot
     }
 
