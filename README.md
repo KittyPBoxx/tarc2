@@ -31,7 +31,7 @@ If you’d like to skip the setup and have the correct team automatically config
 ---
 
 <details>
-  <summary>Troubleshooting (The Solution Isn't Working)</summary>
+  <summary>Troubleshooting (The Solution Isn't Working or have a Bad Egg)</summary>
 
 If you’re following a solution exactly but it’s not working, your Pokémon’s data may be **corrupted** (incorrect IVs or nature).
 
@@ -188,5 +188,140 @@ If you’ve lost progress, deleted a save, etc., you can unlock warp flags manua
 | 7    | Transference | Mr. Mime |
 | 8    | Heavy Slam   | Mr. Mime |
 | 9    | Heavy Slam   | Mr. Mime |
+
+</details>
+
+
+### Examiner DANTE 
+
+<details>
+  <summary>Show Ditto Config</summary>
+
+| Species | Item        | Ability     | Move 1       | Move 2 | Move 3       | Move 4    |
+| :------ | :---------- | :---------- | :----------- | :----- | :----------- | :-------- |
+| Muk     | Rawst Berry | Heavy Metal | Magic Powder | Roar   | Flame Charge | Role Play |
+
+</details>
+
+<details>
+  <summary>Show Setup Solution</summary>
+
+| Type    | Name         | Description / How to Obtain |
+| :------ | :----------- | :-------------------------- |
+| Species | Muk          | Transmute on Muk (Lake)     |
+| Item    | Rawst Berry  | Barter on Aron (Cave)       |
+| Ability | Heavy Metal  | Transference on Aron (Cave) |
+| Move    | Magic Powder | Sketch on RUNE's Mr.Mime    |
+| Move    | Roar         | Sketch on Aron (Cave). In order to Sketch Roar you must have Soundproof. To get this use Transference on RUNE's Mr. Mime (then retire) |
+| Move    | Flame Charge | Sketch on Carkoal (Cave)    |
+| Move    | Role Play    | Sketch on RUNE's Mr.Mime    |
+
+
+</details>
+
+<details>
+  <summary>Show Battle Solution</summary>
+
+| Turn | Action                  | Target   |
+| :--- | :---------------------- | :------- |
+| 1    | Role Play               | Illumise |
+| 2    | Roar                    | Illumise |
+| 3    | Magic Powder            | Haunter  |
+| 4    | Transference            | Haunter  |
+| 5    | Transference            | Starmie  |
+| 6    | Transference            | Haunter  |
+| 7    | Transference            | Starmie  |
+| 8    | Transference            | Haunter  |
+| 9    | Tera Fire, Flame Charge | Illumise |
+| 10   | Flame Charge            | Illumise |
+| 11   | Flame Charge            | Illumise |
+| 12   | Flame Charge            | Illumise |
+| 13   | Flame Charge            | Starmie  |
+| 14   | Flame Charge            | Starmie  |
+| 15   | Flame Charge            | Starmie  |
+
+
+</details>
+
+### Examiner TENJIN 
+
+<details>
+  <summary>Show Ditto Config</summary>
+
+| Species   | Item         | Ability     | Move 1       | Move 2     | Move 3  | Move 4 |
+| :-------- | :----------- | :---------- | :----------- | :--------- | :------ | :----- |
+| Sandygast | Rocky Helmet | Inner Focus | Plasma Fists | Disable    | Roar    | -    |
+
+
+</details>
+
+<details>
+  <summary>Show Setup Solution</summary>
+
+| Type    | Name         | Description / How to Obtain |
+| :------ | :----------- | :-------------------------- |
+| Species | Sandygast    | Stone Puzzle on Summit Left |
+| Item    | Rocky Helmet | Use Barter on TENJIN's Slowpoke |
+| Ability | Inner Focus  | Use Transference on the Farfetch'd (Stairs) |
+| Move    | Plasma Fists | Use Sketch on TENJIN's Zeraora (to bring it out you'll need Roar)                           |
+| Move    | Disable      | Sketch on Muk (Lake)        |
+| Move    | Roar         | Sketch on Aron (Cave). In order to Sketch Roar you must have Soundproof. To get this use Transference on RUNE's Mr. Mime (then retire)                            |
+
+</details>
+
+<details>
+  <summary>Show Battle Solution</summary>
+
+| Turn | Action       | Target   |
+| :--- | :----------- | :------- |
+| 1    | Roar         | Ninjask  |
+| 2    | Transference | Zeraora  |
+| 3    | Disable      | Slowpoke |
+| 4    | Plasma Fists | Slowpoke |
+| 5    | Plasma Fists | Slowpoke |
+| 6    | Tera Fire, Anything     | -        |
+| 7    | Anything     | -        |
+| 8    | Anything     | -        |
+| 9    | Anything     | -        |
+| 10   | Anything     | -        |
+
+
+</details>
+
+### Examiner BERUS 
+
+<details>
+  <summary>Show Ditto Config</summary>
+
+| Species  | Item        | Ability | Move 1 | Move 2 | Move 3 | Move 4 |
+| :------- | :---------- | :------ | :----- | :----- | :----- | :----- |
+| Froslass | Air Balloon | -       | -      | -      | Curse  | -      |
+
+
+
+</details>
+
+<details>
+  <summary>Show Setup Solution</summary>
+
+| Type    | Name        | Description / How to Obtain |
+| :------ | :---------- | :-------------------------- |
+| Species | Froslass    | Transmute on Froslass (Lake after beating Tenjin) |
+| Item    | Air Balloon | Barter on TENJIN's Zeraora. (Follow the TENJIN solution up to turn 3 then Barter when Slowpoke uses Perish Song and retire)                            |
+| Move    | Curse       | Sketch on DANTE's Haunter (Don't pop the balloon!) |
+
+</details>
+
+<details>
+  <summary>Show Battle Solution</summary>
+
+| Turn | Action   | Target |
+| :--- | :------- | :----- |
+| 1    | Curse    | -      |
+| 2    | Anything | -      |
+| 3    | Anything | -      |
+| 4    | Anything | -      |
+| 5    | Anything | -      |
+
 
 </details>
