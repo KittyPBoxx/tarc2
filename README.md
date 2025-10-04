@@ -1,53 +1,192 @@
-# About `pokeemerald-expansion`
+# Pokémon Palimpsest – Puzzle Solutions
 
-![Gif that shows debugging functionality that is unique to pokeemerald-expansion such as rerolling Trainer Id, Cheat Start, PC from Debug Menu, Debug PC Fill, Pokemon Sprite Visualizer, Debug Warp to Map, and Battle Debug Menu](https://github.com/user-attachments/assets/cf9dfbee-4c6b-4bca-8e0a-07f116ef891c) ![Gif that shows overworld functionality that is unique to pokeemerald-expansion such as indoor running, BW2 style map popups, overworld followers, DNA Splicers, Gen 1 style fishing, OW Item descriptions, Quick Run from Battle, Use Last Ball, Wild Double Battles, and Catch from EXP](https://github.com/user-attachments/assets/383af243-0904-4d41-bced-721492fbc48e) ![Gif that shows off a number of modern Pokemon battle mechanics happening in the pokeemerald-expansion engine: 2 vs 1 battles, modern Pokemon, items, moves, abilities, fully customizable opponents and partners, Trainer Slides, and generational gimmicks](https://github.com/user-attachments/assets/50c576bc-415e-4d66-a38f-ad712f3316be)
+Welcome, to the acendency exam!  
+This page contains solutions for all puzzles in **Pokémon Palimpsest**.  
+Each puzzle is hidden behind a collapsible section — click **"Show Solution"** only when you're ready.  
 
-<!-- If you want to re-record or change these gifs, here are some notes that I used: https://files.catbox.moe/05001g.md -->
 
-**`pokeemerald-expansion`** is a GBA ROM hack base that equips developers with a comprehensive toolkit for creating Pokémon ROM hacks. **`pokeemerald-expansion`** is built on top of [pret's `pokeemerald`](https://github.com/pret/pokeemerald) decompilation project. **It is not a playable Pokémon game on its own.** 
+## ⚙️ Debug Menu Guide
 
-# [Features](FEATURES.md)
+Below are optional tools available in the **Debug Menu** that can make testing, troubleshooting or recovery faster.  
+Click a section to expand it.
 
-**`pokeemerald-expansion`** offers hundreds of features from various [core series Pokémon games](https://bulbapedia.bulbagarden.net/wiki/Core_series), along with popular quality-of-life enhancements designed to streamline development and improve the player experience. A full list of those featues can be found in [`FEATURES.md`](FEATURES.md).
+---
 
-# [Credits](CREDITS.md)
+<details>
+  <summary>Auto Battle Setup (Skip Team Preparation)</summary>
 
- [![](https://img.shields.io/github/all-contributors/rh-hideout/pokeemerald-expansion/upcoming)](CREDITS.md)
+Setting up your Ditto correctly is part of the puzzle experience — but it can be time-consuming.  
+If you’d like to skip the setup and have the correct team automatically configured for each battle, you can use the **Debug Menu**.
 
-If you use **`pokeemerald-expansion`**, please credit **RHH (Rom Hacking Hideout)**. Optionally, include the version number for clarity.
+**How to Access:**
+> Press **L + R + B + START** during gameplay to open the Debug Menu.
 
-```
-Based off RHH's pokeemerald-expansion 1.12.1 https://github.com/rh-hideout/pokeemerald-expansion/
-```
+**How to Auto-Setup Battles:**
+1. From the Debug Menu, select **“Battles.”**
+2. Choose the trainer you want to fight to start a **Test Battle.**
+3. On the **first turn**, retire from the test battle.
+4. Your party will now be automatically configured and ready to fight that trainer for real.
+</details>
 
-Please consider [crediting all contributors](CREDITS.md) involved in the project!
+---
 
-# Choosing `pokeemerald` or **`pokeemerald-expansion`**
+<details>
+  <summary>Troubleshooting (The Solution Isn't Working)</summary>
 
-- **`pokeemerald-expansion`** supports multiplayer functionality with other games built on **`pokeemerald-expansion`**. It is not compatible with official Pokémon games.
-- If compatibility with official games is important, use [`pokeemerald`](https://github.com/pret/pokeemerald). Otherwise, we recommend using **`pokeemerald-expansion`**.
-- **`pokeemerald-expansion`** incorporates regular updates from `pokeemerald`, including bug fixes and documentation improvements.
+If you’re following a solution exactly but it’s not working, your Pokémon’s data may be **corrupted** (incorrect IVs or nature).
 
-# [Getting Started](INSTALL.md)
+You can verify and fix this using the Debug Menu.
 
-❗❗ **Important**: Do not use GitHub's "Download Zip" option as it will not include commit history. This is necessary if you want to update or merge other feature branches. 
+**To Check:**
+1. Open the Debug Menu (**L + R + B + START**).
+2. Go to **“Scripts.”**
+3. Run **“Test IV’s.”**
 
-If you're new to git and GitHub, [Team Aqua's Asset Repo](https://github.com/Pawkkie/Team-Aquas-Asset-Repo/) has a [guide on forking and cloning the repository](https://github.com/Pawkkie/Team-Aquas-Asset-Repo/wiki/The-Basics-of-GitHub). Then you can follow one of the following guides:
+**Expected result:**  
+- All IVs = **0**  
+- Nature = **Naughty**
 
-## 📥 [Installing **`pokeemerald-expansion`**](INSTALL.md)
-## 🏗️ [Building **`pokeemerald-expansion`**](INSTALL.md#Building-pokeemerald-expansion)
-## 🚚 [Migrating from **`pokeemerald`**](INSTALL.md#Migrating-from-pokeemerald)
-## 🚀 [Updating **`pokeemerald-expansion`**](INSTALL.md#Updating-pokeemerald-expansion)
+If your results differ:
 
-# [Documentation](https://rh-hideout.github.io/pokeemerald-expansion/)
+**To Fix:**
+1. Go to **“Scripts.”**
+2. Run **“Reset Ditto.”**
 
-For detailed documentation, visit the [pokeemerald-expansion documentation page](https://rh-hideout.github.io/pokeemerald-expansion/).
+This will restore your Pokémon’s data to the correct values.
+</details>
 
-# [Contributions](CONTRIBUTING.md)
-If you are looking to [report a bug](CONTRIBUTING.md#Bug-Report), [open a pull request](CONTRIBUTING.md#Pull-Requests), or [request a feature](CONTRIBUTING.md#Feature-Request), our [`CONTRIBUTING.md`](CONTRIBUTING.md) has guides for each.
+---
 
-# [Community](https://discord.gg/6CzjAG6GZk)
+<details>
+  <summary>Unlocking Warps (Recover Lost Progress)</summary>
 
-[![](https://dcbadge.limes.pink/api/server/6CzjAG6GZk)](https://discord.gg/6CzjAG6GZk)
+If you’ve lost progress, deleted a save, etc., you can unlock warp flags manually.
 
-Our community uses the [Rom Hacking Hideout (RHH) Discord server](https://discord.gg/6CzjAG6GZk) to communicate and organize. Most of our discussions take place there, and we welcome anybody to join us!
+**How to Unlock Warps:**
+1. Open the Debug Menu (**L + R + B + START**).
+2. Navigate to **`Flags & Vars` → `Set Flags`**.
+3. Enable any of the following flags:
+
+| Area | Flag Name | Flag ID |
+|:--|:--|:--|
+| Stairs (base warp, required for others) | `FLAG_UNLOCK_STAIRS_WARP` | `0x63` |
+| Lake | `FLAG_UNLOCK_LAKE_WARP` | `0x64` |
+| Cave | `FLAG_UNLOCK_CAVE_WARP` | `0x65` |
+| Summit | `FLAG_UNLOCK_SUMMIT_WARP` | `0x66` |
+| Flower Field | `FLAG_UNLOCK_FLOWER_WARP` | `0x67` |
+
+> ⚠️ **Note:** The warp menu will only be available if the **Stairs Warp** is unlocked.
+</details>
+
+---
+
+## Solutions
+
+### Examiner FIONN 
+
+<details>
+  <summary>Show Ditto Config</summary>
+
+| Species | Item | Ability | Move 1 | Move 2 | Move 3 | Move 4 |
+|:--|:--|:--|:--|:--|:--|:--|
+| Forretress | Zoom Lens | - | Curse | Fury Cutter | - | - |
+</details>
+
+<details>
+  <summary>Show Setup Solution</summary>
+
+| Type | Name | Description / How to Obtain |
+|:--|:--|:--|
+| Species | Forretress | Transmute on the Forretress (Lake) |
+| Item | Zoom Lens | Use Barter on the Forretress (Lake) |
+| Move | Curse | Use Sketch on the Forretress (Lake) |
+| Move | Fury Cutter | Use Sketch on the Farfetch'd (Stairs) |
+</details>
+
+<details>
+  <summary>Show Battle Solution</summary>
+
+
+| Turn | Action | Target |
+|:--|:--|:--|
+| 1 | Curse | Chespin |
+| 2 | Fury Cutter | Chespin |
+| 3 | Fury Cutter | Chespin |
+| 4 | Fury Cutter | Exeggutor |
+</details>
+
+### Examiner SORA 
+
+<details>
+  <summary>Show Ditto Config</summary>
+
+| Species   | Item           | Ability     | Move 1     | Move 2      | Move 3 | Move 4 |
+| :-------- | :------------- | :---------- | :--------- | :---------- | :----- | :----- |
+| Exeggutor | Ability Shield | Bulletproof | Heavy Slam | Earth Power | -      | -      |
+
+</details>
+
+<details>
+  <summary>Show Setup Solution</summary>
+
+| Type    | Name           | Description / How to Obtain |
+| :------ | :------------- | :-------------------------- |
+| Species | Exeggutor      | Transmute on FIONNs Exeggutor          |
+| Item    | Ability Shield | Covet on Muk (Lake). Covet must knock out the Muk or sticky hold will proc. You must Barter to get rid of your held items before using Covet or you will not get the item. To get Covet you need to Sketch from Sora's Chansey. Fight Sora with Muk or else Chansey will Low Kick after Minimising and not Covet. |
+| Ability | Bulletproof    | Transference on FIONNs Chespin |
+| Move    | Heavy Slam     | Sketch on FIONNs Chespin or Forretress (Lake) |
+| Move    | Earth Power    | Sketch on Muk (Lake)                          |
+
+</details>
+
+<details>
+  <summary>Show Battle Solution</summary>
+
+| Turn | Action      | Target        |
+| :--- | :---------- | :------------ |
+| 1    | Heavy Slam  | Chansey       |
+| 2    | Heavy Slam  | Chansey       |
+| 3    | Earth Power | Mega Ampharos |
+| 4    | Earth Power | Mega Ampharos |
+| 5    | Earth Power | Mega Ampharos |
+</details>
+
+### Examiner RUNE 
+
+<details>
+  <summary>Show Ditto Config</summary>
+
+| Species    | Item        | Ability     | Move 1     | Move 2     | Move 3 | Move 4 |
+| :--------- | :---------- | :---------- | :--------- | :--------- | :----- | :----- |
+| Forretress | -           | Heavy Metal | Worry Seed | Heavy Slam | -      | -      |
+
+</details>
+
+<details>
+  <summary>Show Setup Solution</summary>
+
+| Type    | Name        | Description / How to Obtain |
+| :------ | :---------- | :-------------------------- |
+| Species | Forretress  | Transmute Forretress (Lake) |
+| Ability | Heavy Metal | Transference on Aron (Cave) |
+| Move    | Worry Seed  | Sketch on FIONNs Chespin    |
+| Move    | Heavy Slam  | Sketch on FIONNs Chespin or Forretress (Lake) |
+
+</details>
+
+<details>
+  <summary>Show Battle Solution</summary>
+
+| Turn | Action       | Target   |
+| :--- | :----------- | :------- |
+| 1    | Worry Seed   | Hawlucha |
+| 2    | Worry Seed   | Hawlucha |
+| 3    | Heavy Slam   | Hawlucha |
+| 4    | Heavy Slam   | Hawlucha |
+| 5    | Heavy Slam   | Hawlucha |
+| 6    | Worry Seed   | Mr. Mime |
+| 7    | Transference | Mr. Mime |
+| 8    | Heavy Slam   | Mr. Mime |
+| 9    | Heavy Slam   | Mr. Mime |
+
+</details>
