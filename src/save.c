@@ -257,6 +257,9 @@ u8 LoadGameSave(u8 saveType, u8 slotId)
     // --- Flags ---
     Save_ReadChunk(slotId, SLOT_OFF_FLAGS, gSaveBlock1Ptr->flags, NUM_FLAG_BYTES);
 
+
+    gSaveBlock2Ptr->optionsBattleSceneOff = TRUE;
+
     gSaveFileStatus = SAVE_STATUS_OK;
     return SAVE_STATUS_OK;
 }

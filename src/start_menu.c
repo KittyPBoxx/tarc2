@@ -642,7 +642,7 @@ static bool8 WarpMenuGenericCallback(u8 map)
             SetWarpDestination(MAP_GROUP(MAP_FOREST),MAP_NUM(MAP_FOREST),0,21,15);
             break;
         case MAP_CAVE_BOTTOM:
-            SetWarpDestination(MAP_GROUP(MAP_CAVE_BOTTOM),MAP_NUM(MAP_CAVE_BOTTOM),0,15,18);
+            SetWarpDestination(MAP_GROUP(MAP_CAVE_BOTTOM),MAP_NUM(MAP_CAVE_BOTTOM),0,15,15);
             break;
         case MAP_CAVE_TOP:
             SetWarpDestination(MAP_GROUP(MAP_CAVE_TOP),MAP_NUM(MAP_CAVE_TOP),0,10,9);

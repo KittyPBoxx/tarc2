@@ -432,7 +432,7 @@ static const struct ListMenuItem sDebugMenu_Items_Scripts[] =
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_2] = {COMPOUND_STRING("Test Tiles"), DEBUG_UTIL_MENU_ITEM_SCRIPT_2},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_3] = {COMPOUND_STRING("Test Cable Car"), DEBUG_UTIL_MENU_ITEM_SCRIPT_3},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_4] = {COMPOUND_STRING("Check IVs"), DEBUG_UTIL_MENU_ITEM_SCRIPT_4},
-    [DEBUG_UTIL_MENU_ITEM_SCRIPT_5] = {COMPOUND_STRING("Script 5"), DEBUG_UTIL_MENU_ITEM_SCRIPT_5},
+    [DEBUG_UTIL_MENU_ITEM_SCRIPT_5] = {COMPOUND_STRING("Reset Ditto"), DEBUG_UTIL_MENU_ITEM_SCRIPT_5},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_6] = {COMPOUND_STRING("Script 6"), DEBUG_UTIL_MENU_ITEM_SCRIPT_6},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_7] = {COMPOUND_STRING("Script 7"), DEBUG_UTIL_MENU_ITEM_SCRIPT_7},
     [DEBUG_UTIL_MENU_ITEM_SCRIPT_8] = {COMPOUND_STRING("Script 8"), DEBUG_UTIL_MENU_ITEM_SCRIPT_8},
@@ -1703,6 +1703,18 @@ static void DebugAction_Util_Script_4(u8 taskId)
 
 static void DebugAction_Util_Script_5(u8 taskId)
 {
+    CreateMonWithNature(&gPlayerParty[0], SPECIES_DITTO, 25, 0,  NATURE_NAUGHTY);
+    u16 monData = TRUE;
+    SetMonData(&gPlayerParty[0], MON_DATA_ABILITY_NUM, &monData);
+    monData = MOVE_SPLASH;
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
+    SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
+    monData = ITEM_BOTTLE_CAP;
+    SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
+    monData = TYPE_FIRE;
+    SetMonData(&gPlayerParty[0], MON_DATA_TERA_TYPE, &monData);
     Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Script_5);
 }
 
@@ -1730,13 +1742,13 @@ static void DebugAction_Util_Battle_1(u8 taskId)
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_DROUGHT;
+    monData = ABILITY_HEAVY_METAL;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
-    monData = MOVE_SUNNY_DAY;
+    monData = MOVE_CURSE;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
-    monData = MOVE_PROTECT;
+    monData = MOVE_SPLASH;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
-    monData = MOVE_ROCK_SMASH;
+    monData = MOVE_SPLASH;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
     monData = ITEM_AIR_BALLOON;

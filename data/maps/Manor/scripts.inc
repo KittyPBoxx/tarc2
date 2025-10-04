@@ -67,35 +67,37 @@ CreditsOrb::
 # 53 "data/maps/Manor/scripts.pory"
 	lock
 # 54 "data/maps/Manor/scripts.pory"
-	special GameClear
+	playbgm MUS_BW12_CREDITS, FALSE
 # 55 "data/maps/Manor/scripts.pory"
+	special GameClear
+# 56 "data/maps/Manor/scripts.pory"
 	release
 	end
 
 
 CuttableCube::
-# 61 "data/maps/Manor/scripts.pory"
+# 62 "data/maps/Manor/scripts.pory"
 	lockall
-# 63 "data/maps/Manor/scripts.pory"
+# 64 "data/maps/Manor/scripts.pory"
 	msgbox CuttableCube_Text_0
-# 65 "data/maps/Manor/scripts.pory"
-	checkpartymove MOVE_CUT
 # 66 "data/maps/Manor/scripts.pory"
+	checkpartymove MOVE_CUT
+# 67 "data/maps/Manor/scripts.pory"
 	compare VAR_RESULT, 0
 	goto_if_eq CuttableCube_2
 CuttableCube_1:
-# 73 "data/maps/Manor/scripts.pory"
+# 74 "data/maps/Manor/scripts.pory"
 	releaseall
 	end
 
 CuttableCube_2:
-# 67 "data/maps/Manor/scripts.pory"
-	playse SE_ICE_CRACK
 # 68 "data/maps/Manor/scripts.pory"
-	setflag FLAG_TREE_CUT
+	playse SE_ICE_CRACK
 # 69 "data/maps/Manor/scripts.pory"
-	removeobject VAR_LAST_TALKED
+	setflag FLAG_TREE_CUT
 # 70 "data/maps/Manor/scripts.pory"
+	removeobject VAR_LAST_TALKED
+# 71 "data/maps/Manor/scripts.pory"
 	msgbox CuttableCube_Text_1
 	goto CuttableCube_1
 
@@ -122,10 +124,10 @@ ManorWarpOrb_Text_1:
 	.string "Use {SELECT_BUTTON} to warp to the next area.$"
 
 CuttableCube_Text_0:
-# 63 "data/maps/Manor/scripts.pory"
+# 64 "data/maps/Manor/scripts.pory"
 	.string "The box is weak. A Pokémon might be able\n"
 	.string "to cut it.$"
 
 CuttableCube_Text_1:
-# 70 "data/maps/Manor/scripts.pory"
+# 71 "data/maps/Manor/scripts.pory"
 	.string "You cut the box.$"

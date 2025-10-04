@@ -51,6 +51,7 @@ script ManorWarpOrb {
 
 script CreditsOrb {
     lock
+    playbgm(MUS_BW12_CREDITS, FALSE)
     special(GameClear)
     release
     end

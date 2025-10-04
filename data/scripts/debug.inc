@@ -114,6 +114,7 @@ Debug_EventScript_Script_4::
 	end
 
 Debug_EventScript_Script_5::
+	msgbox Debug_EventScript_Script_5_ResetMon, MSGBOX_DEFAULT
 	release
 	end
 
@@ -128,6 +129,9 @@ Debug_EventScript_Script_7::
 Debug_EventScript_Script_8::
 	release
 	end
+
+Debug_EventScript_Script_5_ResetMon:
+    .string "Mon data has been reset.$"
 
 Debug_EventScript_Script_1_Text_Battle1_NotEnoughMons:
     .string "Not enough mons$"

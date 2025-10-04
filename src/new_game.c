@@ -102,10 +102,13 @@ void NewGameInitData(void)
     ZeroPlayerPartyMons();
     //ScriptGiveMon(SPECIES_DITTO, 5, ITEM_BOTTLE_CAP);
 
+    gSaveBlock2Ptr->optionsBattleSceneOff = TRUE;
+
     FlagSet(FLAG_HIDE_FROSSGLASS);
 
     u16 monData;
-    CreateMon(&gPlayerParty[0], SPECIES_DITTO, 25, 0, FALSE, 0, OT_ID_PLAYER_ID, 0);
+
+    CreateMonWithNature(&gPlayerParty[0], SPECIES_DITTO, 25, 0,  NATURE_NAUGHTY);
     monData = TRUE;
     SetMonData(&gPlayerParty[0], MON_DATA_ABILITY_NUM, &monData);
     monData = MOVE_SPLASH;
