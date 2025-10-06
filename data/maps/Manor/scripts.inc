@@ -69,35 +69,41 @@ CreditsOrb::
 # 54 "data/maps/Manor/scripts.pory"
 	playbgm MUS_BW12_CREDITS, FALSE
 # 55 "data/maps/Manor/scripts.pory"
-	special GameClear
+	createfieldmugshot MUGSHOT_TEST, EMOTE_RAE
 # 56 "data/maps/Manor/scripts.pory"
+	msgbox CreditsOrb_Text_0
+# 57 "data/maps/Manor/scripts.pory"
+	removefieldmugshot
+# 58 "data/maps/Manor/scripts.pory"
+	special GameClear
+# 59 "data/maps/Manor/scripts.pory"
 	release
 	end
 
 
 CuttableCube::
-# 62 "data/maps/Manor/scripts.pory"
+# 65 "data/maps/Manor/scripts.pory"
 	lockall
-# 64 "data/maps/Manor/scripts.pory"
-	msgbox CuttableCube_Text_0
-# 66 "data/maps/Manor/scripts.pory"
-	checkpartymove MOVE_CUT
 # 67 "data/maps/Manor/scripts.pory"
+	msgbox CuttableCube_Text_0
+# 69 "data/maps/Manor/scripts.pory"
+	checkpartymove MOVE_CUT
+# 70 "data/maps/Manor/scripts.pory"
 	compare VAR_RESULT, 0
 	goto_if_eq CuttableCube_2
 CuttableCube_1:
-# 74 "data/maps/Manor/scripts.pory"
+# 77 "data/maps/Manor/scripts.pory"
 	releaseall
 	end
 
 CuttableCube_2:
-# 68 "data/maps/Manor/scripts.pory"
-	playse SE_ICE_CRACK
-# 69 "data/maps/Manor/scripts.pory"
-	setflag FLAG_TREE_CUT
-# 70 "data/maps/Manor/scripts.pory"
-	removeobject VAR_LAST_TALKED
 # 71 "data/maps/Manor/scripts.pory"
+	playse SE_ICE_CRACK
+# 72 "data/maps/Manor/scripts.pory"
+	setflag FLAG_TREE_CUT
+# 73 "data/maps/Manor/scripts.pory"
+	removeobject VAR_LAST_TALKED
+# 74 "data/maps/Manor/scripts.pory"
 	msgbox CuttableCube_Text_1
 	goto CuttableCube_1
 
@@ -123,11 +129,19 @@ ManorWarpOrb_Text_1:
 # 46 "data/maps/Manor/scripts.pory"
 	.string "Use {SELECT_BUTTON} to warp to the next area.$"
 
+CreditsOrb_Text_0:
+# 56 "data/maps/Manor/scripts.pory"
+	.string "Hey Ditto, I know I don't always\n"
+	.string "do things the way you're supposed to...\p"
+	.string "Sorry about that.\p"
+	.string "But I'm really glad you're my partner.\n"
+	.string "Let's go meet the gods!$"
+
 CuttableCube_Text_0:
-# 64 "data/maps/Manor/scripts.pory"
+# 67 "data/maps/Manor/scripts.pory"
 	.string "The box is weak. A Pokémon might be able\n"
 	.string "to cut it.$"
 
 CuttableCube_Text_1:
-# 71 "data/maps/Manor/scripts.pory"
+# 74 "data/maps/Manor/scripts.pory"
 	.string "You cut the box.$"

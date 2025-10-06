@@ -52,6 +52,9 @@ script ManorWarpOrb {
 script CreditsOrb {
     lock
     playbgm(MUS_BW12_CREDITS, FALSE)
+    createfieldmugshot(MUGSHOT_TEST, EMOTE_RAE)
+    msgbox(format("Hey Ditto, I know I don't always\ndo things the way you're supposed to...\pSorry about that.\pBut I'm really glad you're my partner.\nLet's go meet the gods!"))
+    removefieldmugshot
     special(GameClear)
     release
     end

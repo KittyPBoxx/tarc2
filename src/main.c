@@ -602,7 +602,7 @@ static inline void applyHBlankPaletteModifiers()
 {
     // This is all super time sensitive. It must be inlined and I suspect only works because of the prefetch buffer 
     // I reckon if we could force porytiles to block all the palette slots together 1 or 2 dmas it would be more efficent
-    if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS)
+    if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS && (REG_VCOUNT < 160 || REG_VCOUNT > 225))
     {
         u16 line = ((REG_VCOUNT + gSaveBlock1Ptr->pos.y) * 160) >> 8; //+ gSaveBlock1Ptr->pos.y;//((REG_VCOUNT + (gSaveBlock1Ptr->pos.y >> 2)) >> BAND_SHIFT) & (NUM_BANDS - 1);//REG_VCOUNT; //^ gMain.vblankCounter1 ;
        
