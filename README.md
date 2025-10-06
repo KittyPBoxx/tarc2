@@ -80,7 +80,80 @@ If you’ve lost progress, deleted a save, etc., you can unlock warp flags manua
 
 ---
 
+## Opponent Info (Available Pokémon, Items, and Abilities by Area)
+
+Below is a list of all the wild and trainer pokemon in each area, with their abilities, items and moves.  
+Click a section to expand it.
+
+
+<details>
+  <summary>Start</summary>
+
+| Location | Species | Item | Ability | Move 1 | Move 2 | Move 3 | Move 4 |
+|:--       |:--      |:--   |:--      |:--     |:--     |:--     |:--     |
+| Wild     | Pichu   | -    | Static  | Tackle |        |        |        |
+</details>
+
+<details>
+  <summary>Stairs</summary>
+
+| Location | Species   | Item | Ability      | Move 1      | Move 2 | Move 3       | Move 4 |
+|:--       |:--        |:--   |:--           |:--          |:--     |:--           |:--     |
+| Wild     | Farfetchd | -    | Inner Focus  | Sand Attack | Leer   | Fury Cutter  | Cut    |
+</details>
+
+<details>
+  <summary>Lake</summary>
+
+| Location | Species   | Item           | Ability     | Move 1      | Move 2     | Move 3     | Move 4  |
+|:--       |:--        |:--             |:--          |:--          |:--         |:--         |:--      |
+| Wild     | Forretress| Zoom Lens      | Sturdy      | Take Down   | Rapid Spin | Heavy Slam | Curse   |
+| Wild     | Muk       | Ability Shield | Sticky Hold | Pound       | Harden     | Earth Power| Disable |
+| Examiner Fionn | Chespin | - | Bulletproof | Worry Seed | Heavy Slam | - | - |
+| Examiner Fionn | Exeggutor | - | Chlorophyll | Stored Power | Calm Mind | Absorb | - |
+| Examiner Sora | Chansey | - | Natural Cure | Fling | Covet | Minimize | Low Kick |
+| Examiner Sora | Ampharos (Mega) | - | Mold Breaker | Zap Cannon | Focus Blast | - | - |
+</details>
+
+<details>
+  <summary>Ruins</summary>
+
+| Location | Species   | Item           | Ability     | Move 1       | Move 2     | Move 3     | Move 4  |
+|:--       |:--        |:--             |:--          |:--           |:--         |:--         |:--      |
+| Wild     | Aron      | Rawst Berry    | Heavy Metal | Roar         | Headbutt   | Earth Power| Rock Slide |
+| Wild     | CarKol    | -              | Steam Engine| Flame Charge | Tackle     | Smack Down | - |
+| Examiner Rune | Hawlucha | - | Mold Breaker | Sky Drop | - | - | - |
+| Examiner Rune | Mr. Mime | Lagging Tail | Soundproof | Dream Eater | Yawn | Magic Powder | Role Play |
+| Examiner Dante | Starmie | Terrain Extender | Analytic | Psychic Terrain | Refresh | Toxic | Foresight |
+| Examiner Dante | Illumise | - | Prankster | Will-O-Wisp | Light Screen | Last Resort | Growth |
+| Examiner Dante | Haunter | Toxic Orb | Levitate | Curse | Destiny Bond | - | - |
+</details>
+
+<details>
+  <summary>Plains</summary>
+
+| Location | Species | Item | Ability | Move 1 | Move 2 | Move 3 | Move 4 |
+|:--|:--|:--|:--|:--|:--|:--|:--|
+| Deity Tenjin | Ninjask | King’s Rock | Speed Boost | - | Bullet Punch | - | - |
+| Deity Tenjin | Slowpoke | Rocky Helmet | Oblivious | Perish Song | Misty Terrain | Telekinesis | Confusion |
+| Deity Tenjin | Zeraora | Air Balloon | Volt Absorb | Plasma Fists | - | - | - |
+</details>
+
+<details>
+  <summary>End</summary>
+
+| Location | Species       | Item | Ability     | Move 1 | Move 2 | Move 3 | Move 4 |
+|:--       |:--            |:--   |:--          |:--     |:--     |:--     |:--     |
+| Wild (Lake) | Froslass   | -    | Snow Cloak  | Destiny Bond | Protect | Double Team | Leer  |
+| Berus | Houndoom (Mega) | Bright Powder | Solar Power | Metronome | Sheer Cold | Fissure | Guillotine |
+</details>
+
+
+
 ## Solutions
+
+Below are optional tools available in the **Debug Menu** that can make testing, troubleshooting or recovery faster.
+Click a section to expand it.
 
 ### Examiner FIONN 
 
