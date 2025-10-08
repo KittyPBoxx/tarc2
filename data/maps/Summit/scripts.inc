@@ -149,45 +149,70 @@ SlidingTilePuzzle::
 	lock
 # 104 "data/maps/Summit/scripts.pory"
 	msgbox SlidingTilePuzzle_Text_0
-# 107 "data/maps/Summit/scripts.pory"
-	setvar VAR_0x8004, 1
-# 108 "data/maps/Summit/scripts.pory"
-	setvar VAR_0x8005, 0
-# 109 "data/maps/Summit/scripts.pory"
-	setvar VAR_0x8008, 0
-# 110 "data/maps/Summit/scripts.pory"
-	special DoSlidingPuzzle
-# 111 "data/maps/Summit/scripts.pory"
-	waitstate
-# 113 "data/maps/Summit/scripts.pory"
-	compare VAR_0x8008, 0
-	goto_if_ne SlidingTilePuzzle_2
+# 106 "data/maps/Summit/scripts.pory"
+	goto_if_unset FLAG_TILE_PUZZLE_SOLVED, SlidingTilePuzzle_2
+# 128 "data/maps/Summit/scripts.pory"
+	msgbox SlidingTilePuzzle_Text_1, MSGBOX_YESNO
+# 130 "data/maps/Summit/scripts.pory"
+	setvar VAR_0x8008, SPECIES_SANDYGAST
+# 132 "data/maps/Summit/scripts.pory"
+	compare VAR_RESULT, 1
+	goto_if_eq SlidingTilePuzzle_7
 SlidingTilePuzzle_1:
-# 123 "data/maps/Summit/scripts.pory"
+# 141 "data/maps/Summit/scripts.pory"
 	release
 	end
 
 SlidingTilePuzzle_2:
+# 108 "data/maps/Summit/scripts.pory"
+	setflag FLAG_TEMP_HIDE_FOLLOWER
+# 109 "data/maps/Summit/scripts.pory"
+	setvar VAR_0x8004, 1
+# 110 "data/maps/Summit/scripts.pory"
+	setvar VAR_0x8005, 0
+# 111 "data/maps/Summit/scripts.pory"
+	setvar VAR_0x8008, 0
+# 112 "data/maps/Summit/scripts.pory"
+	special DoSlidingPuzzle
+# 113 "data/maps/Summit/scripts.pory"
+	waitstate
 # 115 "data/maps/Summit/scripts.pory"
-	msgbox SlidingTilePuzzle_Text_1, MSGBOX_YESNO
-# 117 "data/maps/Summit/scripts.pory"
-	compare VAR_RESULT, 1
-	goto_if_eq SlidingTilePuzzle_4
+	compare VAR_0x8008, 0
+	goto_if_ne SlidingTilePuzzle_5
 	goto SlidingTilePuzzle_1
 
-SlidingTilePuzzle_4:
+SlidingTilePuzzle_5:
+# 117 "data/maps/Summit/scripts.pory"
+	setflag FLAG_TILE_PUZZLE_SOLVED
 # 118 "data/maps/Summit/scripts.pory"
+	msgbox SlidingTilePuzzle_Text_1, MSGBOX_YESNO
+# 120 "data/maps/Summit/scripts.pory"
+	compare VAR_RESULT, 1
+	goto_if_eq SlidingTilePuzzle_9
+	goto SlidingTilePuzzle_1
+
+SlidingTilePuzzle_7:
+# 133 "data/maps/Summit/scripts.pory"
 	special SetPlayerMonSpecies
-# 119 "data/maps/Summit/scripts.pory"
+# 134 "data/maps/Summit/scripts.pory"
+	setflag FLAG_TEMP_HIDE_FOLLOWER
+# 135 "data/maps/Summit/scripts.pory"
+	msgbox SlidingTilePuzzle_Text_2
+	goto SlidingTilePuzzle_1
+
+SlidingTilePuzzle_9:
+# 121 "data/maps/Summit/scripts.pory"
+	special SetPlayerMonSpecies
+# 122 "data/maps/Summit/scripts.pory"
 	msgbox SlidingTilePuzzle_Text_2
 	goto SlidingTilePuzzle_1
 
 
-# 127 "data/maps/Summit/scripts.pory"
+# 145 "data/maps/Summit/scripts.pory"
 MakeShortcut:
-# 128 "data/maps/Summit/scripts.pory"
+# 146 "data/maps/Summit/scripts.pory"
 	walk_left
-# 128 "data/maps/Summit/scripts.pory"
+# 146 "data/maps/Summit/scripts.pory"
 	walk_left
 	step_end
 
@@ -263,9 +288,9 @@ SlidingTilePuzzle_Text_0:
 	.string "These rocks look like an image...$"
 
 SlidingTilePuzzle_Text_1:
-# 115 "data/maps/Summit/scripts.pory"
+# 118 "data/maps/Summit/scripts.pory"
 	.string "The image of a pokemon was revealed.\nDo you want Ditto to take its form?$"
 
 SlidingTilePuzzle_Text_2:
-# 119 "data/maps/Summit/scripts.pory"
+# 122 "data/maps/Summit/scripts.pory"
 	.string "Ditto took on a new form!$"

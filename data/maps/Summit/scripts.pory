@@ -103,22 +103,40 @@ script SlidingTilePuzzle {
 
 	msgbox(format("These rocks look like an image..."))
 
+	if (!flag(FLAG_TILE_PUZZLE_SOLVED))
+	{
+		setflag(FLAG_TEMP_HIDE_FOLLOWER)
+		setvar(VAR_0x8004, 1) // puzzleId
+		setvar(VAR_0x8005, 0) // solved
+		setvar(VAR_0x8008, 0) // return species
+		special(DoSlidingPuzzle)
+		waitstate
 
-	setvar(VAR_0x8004, 1) // puzzleId
-	setvar(VAR_0x8005, 0) // solved
-	setvar(VAR_0x8008, 0) // return species
-	special(DoSlidingPuzzle)
-	waitstate
+		if (var(VAR_0x8008) != 0) {
 
-	if (var(VAR_0x8008) != 0) {
+			setflag(FLAG_TILE_PUZZLE_SOLVED)
+			msgbox("The image of a pokemon was revealed.\nDo you want Ditto to take its form?", MSGBOX_YESNO)
 
+			if (var(VAR_RESULT) == 1) {
+				special(SetPlayerMonSpecies)
+				msgbox(format("Ditto took on a new form!"))
+			}
+		}
+	}
+	else
+	{
 		msgbox("The image of a pokemon was revealed.\nDo you want Ditto to take its form?", MSGBOX_YESNO)
+
+		setvar(VAR_0x8008, SPECIES_SANDYGAST) 
 
 		if (var(VAR_RESULT) == 1) {
 			special(SetPlayerMonSpecies)
+			setflag(FLAG_TEMP_HIDE_FOLLOWER)
 			msgbox(format("Ditto took on a new form!"))
 		}
 	}
+
+
 
     release
     end
