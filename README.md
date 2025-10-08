@@ -1,4 +1,4 @@
-# Pokémon Palimpsest – Puzzle Solutions
+# Pokémon Palimpsest – Puzzle Solutions (V1.2)
 
 Welcome, to the acendency exam!  
 This page contains solutions for all puzzles in **Pokémon Palimpsest**.  
