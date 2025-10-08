@@ -64,7 +64,7 @@
 #define FLAG_UNLOCK_CAVE_WARP        0x65 
 #define FLAG_UNLOCK_SUMMIT_WARP      0x66 
 #define FLAG_UNLOCK_BRIDGE_WARP      0x67 
-#define FLAG_HIDE_FROSSGLASS         0x68 
+#define FLAG_UNUSED_0x68             0x68 
 #define FLAG_HIDE_BERUS              0x69
 #define FLAG_HIDE_EXAMINER           0x6A
 #define FLAG_UNUSED_0x6B             0x6B

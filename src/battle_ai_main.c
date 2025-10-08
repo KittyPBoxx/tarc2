@@ -1042,6 +1042,11 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
         }
     }
 
+    if (move == MOVE_POISON_STING)
+    {
+        ADJUST_SCORE(-2);
+    }
+
     if (effectiveness == UQ_4_12(0.0))
     {
         RETURN_SCORE_MINUS(20);
@@ -1206,7 +1211,7 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                 RETURN_SCORE_MINUS(20);
         }
 
-        if (IsBattlerTerrainAffected(battlerAtk, STATUS_FIELD_PSYCHIC_TERRAIN) && atkPriority > 0)
+        if (IsBattlerTerrainAffected(battlerDef, STATUS_FIELD_PSYCHIC_TERRAIN) && atkPriority > 0)
         {
             RETURN_SCORE_MINUS(20);
         }
@@ -1582,11 +1587,11 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
             }
             else
             {
-                for (i = STAT_ATK; i < NUM_BATTLE_STATS; i++)
-                {
-                    if (gBattleMons[battlerAtk].statStages[i] > DEFAULT_STAT_STAGE || gBattleMons[BATTLE_PARTNER(battlerAtk)].statStages[i] > DEFAULT_STAT_STAGE)
-                        ADJUST_SCORE(-10);  // Don't want to reset our boosted stats
-                }
+                // for (i = STAT_ATK; i < NUM_BATTLE_STATS; i++)
+                // {
+                //     if (gBattleMons[battlerAtk].statStages[i] > DEFAULT_STAT_STAGE || gBattleMons[BATTLE_PARTNER(battlerAtk)].statStages[i] > DEFAULT_STAT_STAGE)
+                //         ADJUST_SCORE(-10);  // Don't want to reset our boosted stats
+                // }
                 for (i = STAT_ATK; i < NUM_BATTLE_STATS; i++)
                 {
                     if (gBattleMons[battlerDef].statStages[i] < DEFAULT_STAT_STAGE || gBattleMons[BATTLE_PARTNER(battlerDef)].statStages[i] < DEFAULT_STAT_STAGE)
@@ -1808,6 +1813,9 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
               || DoesPartnerHaveSameMoveEffect(BATTLE_PARTNER(battlerAtk), battlerDef, move, aiData->partnerMove))
                 ADJUST_SCORE(-9);
             break;
+        case EFFECT_GYRO_BALL:
+                ADJUST_SCORE(0);    
+                break;
         case EFFECT_PERISH_SONG:
             if (isDoubleBattle)
             {
@@ -3511,10 +3519,10 @@ static s32 AI_DoubleBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                 }
                 break;
             case EFFECT_ROLE_PLAY:
-                if (attackerHasBadAbility && !partnerHasBadAbility)
-                {
+                // if (attackerHasBadAbility && !partnerHasBadAbility)
+                // {
                     RETURN_SCORE_PLUS(WEAK_EFFECT);
-                }
+                // }
                 break;
             case EFFECT_WORRY_SEED:
             case EFFECT_GASTRO_ACID:
@@ -3827,7 +3835,7 @@ static u32 AI_CalcMoveEffectScore(u32 battlerAtk, u32 battlerDef, u32 move)
         break;
     case MOVE_EFFECT_BURN:
         IncreaseBurnScore(battlerAtk, battlerDef, move, &score);
-        ADJUST_SCORE(10);
+        ADJUST_SCORE(GOOD_EFFECT);
         break;
     }
     // move effect checks
@@ -4250,10 +4258,10 @@ static u32 AI_CalcMoveEffectScore(u32 battlerAtk, u32 battlerDef, u32 move)
     case EFFECT_CURSE:
         if (IS_BATTLER_OF_TYPE(battlerAtk, TYPE_GHOST))
         {
-            if (!AI_CanBattlerEscape(battlerDef) && IsBattlerTrapped(battlerAtk, battlerDef))
+            // if (!AI_CanBattlerEscape(battlerDef) && IsBattlerTrapped(battlerAtk, battlerDef))
                 ADJUST_SCORE(GOOD_EFFECT);
-            else
-                ADJUST_SCORE(WEAK_EFFECT);
+            // else
+            //     ADJUST_SCORE(WEAK_EFFECT);
         }
         else
         {
@@ -4986,7 +4994,7 @@ static u32 AI_CalcMoveEffectScore(u32 battlerAtk, u32 battlerDef, u32 move)
             ADJUST_SCORE(DECENT_EFFECT); // Attacker partner wouldn't go before target
         break;
     case EFFECT_TAILWIND:
-        if (GetBattlerSideSpeedAverage(battlerAtk) < GetBattlerSideSpeedAverage(battlerDef))
+        //if (GetBattlerSideSpeedAverage(battlerAtk) < GetBattlerSideSpeedAverage(battlerDef))
             ADJUST_SCORE(GOOD_EFFECT);
         break;
     case EFFECT_LUCKY_CHANT:

@@ -2324,6 +2324,11 @@ static bool32 AiExpectsToFaintPlayer(u32 battler)
     if (gAiBattleData->actionFlee || gAiBattleData->choiceWatch)
         return FALSE; // AI not planning to use move
 
+    if ((gBattleMons[target].ability == ABILITY_STURDY))
+    {
+        return FALSE;
+    }
+
     if (!IsBattlerAlly(target, battler)
       && CanIndexMoveFaintTarget(battler, target, gAiBattleData->chosenMoveIndex[battler], AI_ATTACKING)
       && AI_IsFaster(battler, target, GetAIChosenMove(battler)))
@@ -2354,7 +2359,7 @@ static bool32 ShouldUseItem(u32 battler)
     if (gStatuses3[battler] & STATUS3_EMBARGO)
         return FALSE;
 
-    if (AiExpectsToFaintPlayer(battler))
+    if (AiExpectsToFaintPlayer(battler) && (gBattleMons[battler].maxHP > 200) && !(gBattleMons[battler].hp < (gBattleMons[battler].maxHP - 200)))
         return FALSE;
 
     party = GetBattlerParty(battler);
@@ -2443,7 +2448,7 @@ static bool32 ShouldUseItem(u32 battler)
                 gBattleStruct->itemPartyIndex[battler] = gBattlerPartyIndexes[battler];
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_USE_ITEM, 0);
             gBattleStruct->chosenItem[battler] = item;
-            gBattleHistory->trainerItems[i] = 0;
+            //gBattleHistory->trainerItems[i] = 0;
             return shouldUse;
         }
     }
@@ -2458,7 +2463,7 @@ static bool32 AI_ShouldHeal(u32 battler, u32 healAmount)
     u32 maxDamage = 0;
     u32 dmg = 0;
 
-    if (gBattleMons[battler].hp < gBattleMons[battler].maxHP / 4
+    if (gBattleMons[battler].hp < (gBattleMons[battler].maxHP - 40)
      || gBattleMons[battler].hp == 0
      || (healAmount != 0 && gBattleMons[battler].maxHP - gBattleMons[battler].hp > healAmount))
     {

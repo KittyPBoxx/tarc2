@@ -1112,7 +1112,7 @@ const struct Ability gAbilitiesInfo[ABILITIES_COUNT] =
     {
         .name = _("Analytic"),
         .description = COMPOUND_STRING("Moving last boosts power."),
-        .aiRating = 5,
+        .aiRating = 6,
     },
 
     [ABILITY_ILLUSION] =

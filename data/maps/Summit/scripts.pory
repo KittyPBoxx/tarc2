@@ -47,11 +47,10 @@ script TenjinNPC {
         {
             createfieldmugshot(MUGSHOT_TEST, EMOTE_TENJIN)
             msgbox(format("That was the most exciting battle I've had in years!\pYou definitely deserve an internship with a god.\pMaybe even a paid one!\pI'm not supposed to do this but I'll let you warp straight to Berus."))
-			msgbox(format("You need to hurry because the exam is almost over.\pAnd avoid the Lake! Scary Pokémon appear there at night."))
+			msgbox(format("You need to hurry because the exam is almost over."))
             removefieldmugshot
 
         	setflag(FLAG_UNLOCK_BRIDGE_WARP)
-			clearflag(FLAG_HIDE_FROSSGLASS)
 			special(AutoSave)
 			playfanfare(MUS_OBTAIN_BADGE) 
         	msgbox(format("A new warp was unlocked!"))
@@ -68,11 +67,10 @@ script TenjinNPC {
         {
             createfieldmugshot(MUGSHOT_TEST, EMOTE_TENJIN)
             msgbox(format("That was the most exciting battle I've had in years!\pYou definitely deserve an internship with a god.\pMaybe even a paid one!\pI'm not supposed to do this but I'll let you warp straight to Berus."))
-			msgbox(format("You need to hurry because the exam is almost over.\pAnd avoid the Lake! Scary Pokémon appear there at night."))
+			msgbox(format("You need to hurry because the exam is almost over."))
             removefieldmugshot
 
         	setflag(FLAG_UNLOCK_BRIDGE_WARP)
-			clearflag(FLAG_HIDE_FROSSGLASS)
 			special(AutoSave)
 			playfanfare(MUS_OBTAIN_BADGE) 
         	msgbox(format("A new warp was unlocked!"))
@@ -83,7 +81,7 @@ script TenjinNPC {
 		else
 		{
 			createfieldmugshot(MUGSHOT_TEST, EMOTE_TENJIN)
-			msgbox(format("You should go back now.\pAnd avoid the Lake! Scary Pokémon appear there at night."))
+			msgbox(format("You should go back now."))
 			removefieldmugshot
 
 			msgbox("Unless you want a rematch?", MSGBOX_YESNO)

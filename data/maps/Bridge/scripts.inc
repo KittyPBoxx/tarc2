@@ -468,7 +468,7 @@ BerusNPC_Text_2:
 BerusNPC_Text_3:
 # 132 "data/maps/Bridge/scripts.pory"
 	.string "Berus used a prayer.\n"
-	.string "Mega evo restrictions were removed.$"
+	.string "Berus has infinite heals.$"
 
 BerusNPC_Text_4:
 # 143 "data/maps/Bridge/scripts.pory"

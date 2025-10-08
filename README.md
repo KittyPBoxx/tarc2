@@ -89,44 +89,44 @@ Click a section to expand it.
 <details>
   <summary>Start</summary>
 
-| Location | Species | Item | Ability | Move 1 | Move 2 | Move 3 | Move 4 |
-|:--       |:--      |:--   |:--      |:--     |:--     |:--     |:--     |
-| Wild     | Pichu   | -    | Static  | Tackle |        |        |        |
+| Location | Species | Item         | Ability | Move 1 | Move 2    | Move 3 | Move 4 |
+|:--       |:--      |:--           |:--      |:--     |:--        |:--     |:--     |
+| Wild     | Pichu   | Room Service | Static  | Tackle |           |        |        |
 </details>
 
 <details>
   <summary>Stairs</summary>
 
-| Location | Species   | Item | Ability      | Move 1      | Move 2 | Move 3       | Move 4 |
-|:--       |:--        |:--   |:--           |:--          |:--     |:--           |:--     |
-| Wild     | Farfetchd | -    | Inner Focus  | Sand Attack | Leer   | Fury Cutter  | Cut    |
+| Location | Species   | Item | Ability      | Move 1      | Move 2        | Move 3   | Move 4 |
+|:--       |:--        |:--   |:--           |:--          |:--            |:--       |:--     |
+| Wild     | Farfetchd | -    | Inner Focus  | Sand Attack | Fury Cutter   | Cut      | Leer   |
 </details>
 
 <details>
   <summary>Lake</summary>
 
-| Location | Species   | Item           | Ability     | Move 1      | Move 2     | Move 3     | Move 4  |
-|:--       |:--        |:--             |:--          |:--          |:--         |:--         |:--      |
-| Wild     | Forretress| Zoom Lens      | Sturdy      | Take Down   | Rapid Spin | Heavy Slam | Curse   |
-| Wild     | Muk       | Ability Shield | Sticky Hold | Pound       | Harden     | Earth Power| Disable |
-| Examiner Fionn | Chespin | - | Bulletproof | Worry Seed | Heavy Slam | - | - |
-| Examiner Fionn | Exeggutor | - | Chlorophyll | Stored Power | Calm Mind | Absorb | - |
-| Examiner Sora | Chansey | - | Natural Cure | Fling | Covet | Minimize | Low Kick |
-| Examiner Sora | Ampharos (Mega) | - | Mold Breaker | Zap Cannon | Focus Blast | - | - |
+| Location       | Species         | Item           | Ability     | Move 1      | Move 2     | Move 3     | Move 4  |
+|:--             |:--              |:--             |:--          |:--          |:--         |:--         |:--      |
+| Wild           | Forretress      | Zoom Lens      | Sturdy      | Take Down   | Rapid Spin | Heavy Slam | Curse   |
+| Wild           | Muk             | Ability Shield | Sticky Hold | Pound       | Harden     | Earth Power| Disable |
+| Examiner Fionn | Chespin         | -              | Bulletproof | Worry Seed | Take Down| - | - |
+| Examiner Fionn | Exeggutor       | -              | Chlorophyll | Stored Power | Calm Mind | Absorb | - |
+| Examiner Sora  | Chansey         | -              | Natural Cure | Fling | Covet | Minimize | Low Kick |
+| Examiner Sora  | Ampharos (Mega) | -              | Mold Breaker | Zap Cannon | Focus Blast | - | - |
 </details>
 
 <details>
   <summary>Ruins</summary>
 
-| Location | Species   | Item           | Ability     | Move 1       | Move 2     | Move 3     | Move 4  |
-|:--       |:--        |:--             |:--          |:--           |:--         |:--         |:--      |
-| Wild     | Aron      | Rawst Berry    | Heavy Metal | Roar         | Headbutt   | Earth Power| Rock Slide |
-| Wild     | CarKol    | -              | Steam Engine| Flame Charge | Tackle     | Smack Down | - |
-| Examiner Rune | Hawlucha | - | Mold Breaker | Sky Drop | - | - | - |
-| Examiner Rune | Mr. Mime | Lagging Tail | Soundproof | Dream Eater | Yawn | Magic Powder | Role Play |
-| Examiner Dante | Starmie | Terrain Extender | Analytic | Psychic Terrain | Refresh | Toxic | Foresight |
-| Examiner Dante | Illumise | - | Prankster | Will-O-Wisp | Light Screen | Last Resort | Growth |
-| Examiner Dante | Haunter | Toxic Orb | Levitate | Curse | Destiny Bond | - | - |
+| Location       | Species   | Item             | Ability      | Move 1          | Move 2       | Move 3     | Move 4     |
+|:--             |:--        |:--               |:--           |:--              |:--           |:--         |:--         |
+| Wild           | Aron      | Rawst Berry      | Heavy Metal  | Roar            | Headbutt     | Earth Power| Rock Slide |
+| Wild           | Numel     | -                | Oblivious    | Flame Charge    | Incinerate   | Smack Down | Endure     |
+| Examiner Rune  | Hawlucha  | -                | Mold Breaker | Sky Drop        | Poison Jab   | -          | -          |
+| Examiner Rune  | Mr. Mime  | Lagging Tail     | Soundproof   | Dream Eater     | Yawn         | Magic Powder | Role Play |
+| Examiner Dante | Starmie   | Terrain Extender | Analytic     | Psychic Terrain | Refresh      | Toxic        | Foresight |
+| Examiner Dante | Illumise  | -                | Prankster    | Will-O-Wisp     | Tail Wind    | Last Resort  | Role Play |
+| Examiner Dante | Haunter   | Toxic Orb        | Levitate     | Curse           | Destiny Bond | Haze         | - |
 </details>
 
 <details>
@@ -134,7 +134,7 @@ Click a section to expand it.
 
 | Location | Species | Item | Ability | Move 1 | Move 2 | Move 3 | Move 4 |
 |:--|:--|:--|:--|:--|:--|:--|:--|
-| Deity Tenjin | Ninjask | King’s Rock | Speed Boost | - | Bullet Punch | - | - |
+| Deity Tenjin | Ninjask | King’s Rock | Speed Boost | Poison Sting | Bullet Punch | - | - |
 | Deity Tenjin | Slowpoke | Rocky Helmet | Oblivious | Perish Song | Misty Terrain | Telekinesis | Confusion |
 | Deity Tenjin | Zeraora | Air Balloon | Volt Absorb | Plasma Fists | - | - | - |
 </details>
@@ -142,10 +142,9 @@ Click a section to expand it.
 <details>
   <summary>End</summary>
 
-| Location | Species       | Item | Ability     | Move 1 | Move 2 | Move 3 | Move 4 |
-|:--       |:--            |:--   |:--          |:--     |:--     |:--     |:--     |
-| Wild (Lake) | Froslass   | -    | Snow Cloak  | Destiny Bond | Protect | Double Team | Leer  |
-| Berus | Houndoom (Mega) | Bright Powder | Solar Power | Metronome | Sheer Cold | Fissure | Guillotine |
+| Location | Species      | Item          | Ability     | Move 1     | Move 2  | Move 3 | Move 4 |
+|:--       |:--           |:--            |:--          |:--         |:--      |:--     |:--     |
+| Berus | Houndoom (Mega) | Bright Powder | Magic Guard | Sheer Cold | Fissure | Guillotine | - |
 </details>
 
 
@@ -272,7 +271,7 @@ Click a section to expand it.
 
 | Species | Item        | Ability     | Move 1       | Move 2 | Move 3       | Move 4    |
 | :------ | :---------- | :---------- | :----------- | :----- | :----------- | :-------- |
-| Muk     | Rawst Berry | Heavy Metal | Magic Powder | Roar   | Flame Charge | Role Play |
+| Muk     | Rawst Berry | Heavy Metal | Magic Powder | Roar   | Flame Charge | -         |
 
 </details>
 
@@ -287,8 +286,6 @@ Click a section to expand it.
 | Move    | Magic Powder | Sketch on RUNE's Mr.Mime    |
 | Move    | Roar         | Sketch on Aron (Cave). In order to Sketch Roar you must have Soundproof. To get this use Transference on RUNE's Mr. Mime (then retire) |
 | Move    | Flame Charge | Sketch on Carkoal (Cave)    |
-| Move    | Role Play    | Sketch on RUNE's Mr.Mime    |
-
 
 </details>
 
@@ -297,21 +294,22 @@ Click a section to expand it.
 
 | Turn | Action                  | Target   |
 | :--- | :---------------------- | :------- |
-| 1    | Role Play               | Illumise |
-| 2    | Roar                    | Illumise |
-| 3    | Magic Powder            | Haunter  |
-| 4    | Transference            | Haunter  |
-| 5    | Transference            | Starmie  |
-| 6    | Transference            | Haunter  |
-| 7    | Transference            | Starmie  |
-| 8    | Transference            | Haunter  |
-| 9    | Tera Fire, Flame Charge | Illumise |
-| 10   | Flame Charge            | Illumise |
+| 1    | Flame Charge            | Illumise |
+| 2    | Flame Charge            | Illumise |
+| 3    | Roar                    | Illumise |
+| 4    | Magic Powder            | Haunter  |
+| 5    | Transference            | Haunter  |
+| 6    | Transference            | Starmie  |
+| 7    | Transference            | Haunter  |
+| 8    | Transference            | Starmie  |
+| 9    | Transference            | Haunter  |
+| 10   | Tera Fire, Flame Charge | Illumise |
 | 11   | Flame Charge            | Illumise |
-| 12   | Flame Charge            | Illumise |
+| 12   | Flame Charge            | Starmie  |
 | 13   | Flame Charge            | Starmie  |
 | 14   | Flame Charge            | Starmie  |
 | 15   | Flame Charge            | Starmie  |
+| 16   | Flame Charge            | Starmie  |
 
 
 </details>
@@ -366,9 +364,9 @@ Click a section to expand it.
 <details>
   <summary>Show Ditto Config</summary>
 
-| Species  | Item        | Ability | Move 1 | Move 2 | Move 3 | Move 4 |
-| :------- | :---------- | :------ | :----- | :----- | :----- | :----- |
-| Froslass | Air Balloon | -       | -      | -      | Curse  | -      |
+| Species       | Item         | Ability | Move 1 | Move 2 | Move 3        | Move 4 |
+| :-------      | :----------  | :------ | :----- | :----- | :-----        | :----- |
+| Houndoom Mega | Room Service | Sturdy  | Curse  | Leer   | Magic Powder  | Fling  |
 
 
 
@@ -377,24 +375,38 @@ Click a section to expand it.
 <details>
   <summary>Show Setup Solution</summary>
 
-| Type    | Name        | Description / How to Obtain |
-| :------ | :---------- | :-------------------------- |
-| Species | Froslass    | Transmute on Froslass (Lake after beating Tenjin) |
-| Item    | Air Balloon | Barter on TENJIN's Zeraora. (Follow the TENJIN solution up to turn 3 then Barter when Slowpoke uses Perish Song and retire)                            |
-| Move    | Curse       | Sketch on DANTE's Haunter (Don't pop the balloon!) |
+| Type    | Name         | Description / How to Obtain |
+| :------ | :----------  | :-------------------------- |
+| Species | Sandygast    | From the summit rock puzzle |
+| Ability | Sturdy       | From the Forretress (Lake)  |
+| Item    | Room Service | From the Pichu (Flower)     |
+| Move    | Curse        | Sketch on DANTE's Haunter   |
+| Move    | Magic Power  | Sketch on RUNE's Mr Mime    |
+| Move    | Leer         | Sketch on Farfetchd         |
+| Move    | Fling        | Sketch on SORA's Chansey (after a bater so it has an item) |
 
 </details>
 
 <details>
   <summary>Show Battle Solution</summary>
 
-| Turn | Action   | Target |
-| :--- | :------- | :----- |
-| 1    | Curse    | -      |
-| 2    | Anything | -      |
-| 3    | Anything | -      |
-| 4    | Anything | -      |
-| 5    | Anything | -      |
-
+| Turn | Action       | Target |
+| :--- | :-------     | :----- |
+| 1    | Curse        | -      |
+| 2    | Curse        | -      |
+| 3    | Curse        | -      |
+| 4    | Curse        | -      |
+| 5    | Curse        | -      |
+| 6    | Curse        | -      |
+| 7    | Barter       | -      |
+| 8    | Leer         | -      |
+| 9    | Leer         | -      |
+| 10   | Leer         | -      |
+| 11   | Leer         | -      |
+| 12   | Leer         | -      |
+| 13   | Magic Powder | -      |
+| 14   | Fling        | -      |
+| 15   | Barter       | -      |
+| 16   | Fling        | -      |
 
 </details>

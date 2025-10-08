@@ -3657,8 +3657,7 @@ bool32 ShouldSetScreen(u32 battlerAtk, u32 battlerDef, enum BattleMoveEffects mo
         break;
     case EFFECT_LIGHT_SCREEN:
         // Use only if the player has a special move and AI doesn't already have Light Screen itself active.
-        if (HasMoveWithCategory(battlerDef, DAMAGE_CATEGORY_SPECIAL)
-            && !(gSideStatuses[atkSide] & SIDE_STATUS_LIGHTSCREEN))
+        if (!(gSideStatuses[atkSide] & SIDE_STATUS_LIGHTSCREEN))
             return TRUE;
         break;
     default:

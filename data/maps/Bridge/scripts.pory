@@ -129,7 +129,7 @@ script BerusNPC {
             createfieldmugshot(MUGSHOT_TEST, EMOTE_BERUS)
             msgbox(format("You...\pYOU...\pYou may have beaten me, but...\pThe timer on the exam ran out during our battle...\pSo you still FAIL.\p Now if you'll excuse me I need to go and heal my poor doggo.")) 
             removefieldmugshot
-            msgbox(format("Berus used a prayer.\nMega evo restrictions were removed."))
+            msgbox(format("Berus used a prayer.\nBerus has infinite heals."))
 
             setflag(FLAG_HIDE_BERUS)
             removeobject(BERUS_HEAD_ID)

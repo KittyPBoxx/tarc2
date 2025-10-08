@@ -830,23 +830,23 @@ u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u
 {
     u8 collision = GetCollisionAtCoords(objectEvent, x, y, direction);
 
-    if (collision == COLLISION_ELEVATION_MISMATCH && CanStopSurfing(x, y, direction))
-        return COLLISION_STOP_SURFING;
+    // if (collision == COLLISION_ELEVATION_MISMATCH && CanStopSurfing(x, y, direction))
+    //     return COLLISION_STOP_SURFING;
 
-    if (ShouldJumpLedge(x, y, direction))
-    {
-        if (IsDirectionDiagonal(direction))
-        {
-            MoveCoords(direction, &x, &y);
-            collision = GetCollisionAtCoords(objectEvent, x, y, direction);
-            if (collision == COLLISION_IMPASSABLE)
-                return collision;
-        }
-    }
-    if (collision == COLLISION_OBJECT_EVENT && TryPushBoulder(x, y, direction))
-        return COLLISION_PUSHED_BOULDER;
+    // if (ShouldJumpLedge(x, y, direction))
+    // {
+    //     if (IsDirectionDiagonal(direction))
+    //     {
+    //         MoveCoords(direction, &x, &y);
+    //         collision = GetCollisionAtCoords(objectEvent, x, y, direction);
+    //         if (collision == COLLISION_IMPASSABLE)
+    //             return collision;
+    //     }
+    // }
+    // if (collision == COLLISION_OBJECT_EVENT && TryPushBoulder(x, y, direction))
+    //     return COLLISION_PUSHED_BOULDER;
 
-    if (collision == COLLISION_OBJECT_EVENT && TryStopForInteraction(x, y, direction))
+    if (TryStopForInteraction(x, y, direction))
         return COLLISION_INTERACTABLE;
 
     if (collision == COLLISION_OBJECT_EVENT && TryWildBattleCollision(x, y, direction) && !isGrinding)
@@ -930,7 +930,7 @@ static bool8 TryStopForInteraction(s16 x, s16 y, u8 direction)
 {
     struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
     u8 objectEventId = GetObjectEventIdByXY(x, y);
-    if (objectEventId != OBJECT_EVENTS_COUNT && gObjectEvents[objectEventId].graphicsId <= OBJ_EVENT_GFX_HOT_SPRINGS_OLD_WOMAN && gObjectEvents[objectEventId].graphicsId >= 0)
+    if (objectEventId != OBJECT_EVENTS_COUNT && gObjectEvents[objectEventId].graphicsId <= OBJ_EVENT_GFX_HOOH && gObjectEvents[objectEventId].graphicsId >= 0)
     {
         ObjectEventTurn(playerObjEvent, direction);
         return TRUE;

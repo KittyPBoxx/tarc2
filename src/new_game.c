@@ -104,8 +104,6 @@ void NewGameInitData(void)
 
     gSaveBlock2Ptr->optionsBattleSceneOff = TRUE;
 
-    FlagSet(FLAG_HIDE_FROSSGLASS);
-
     u16 monData;
 
     CreateMonWithNature(&gPlayerParty[0], SPECIES_DITTO, 25, 0,  NATURE_NAUGHTY);

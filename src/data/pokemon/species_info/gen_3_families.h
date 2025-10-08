@@ -6554,9 +6554,9 @@ const struct SpeciesInfo gSpeciesInfoGen3[] =
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
     #if P_UPDATED_ABILITIES >= GEN_4
-        .abilities = { ABILITY_OBLIVIOUS, ABILITY_SIMPLE, ABILITY_OWN_TEMPO },
+        .abilities = { ABILITY_OBLIVIOUS },
     #else
-        .abilities = { ABILITY_OBLIVIOUS, ABILITY_NONE, ABILITY_OWN_TEMPO },
+        .abilities = { ABILITY_OBLIVIOUS },
     #endif
         .bodyColor = BODY_COLOR_YELLOW,
         .speciesName = _("Numel"),
