@@ -39,6 +39,7 @@
 #include "constants/maps.h"
 #include "palette_effects.h"
 #include "save.h"
+#include "move.h"
 
 enum 
 {
@@ -230,6 +231,18 @@ static const struct WindowTemplate sSaveInfoWindowTemplate = {
     .baseBlock = 8
 };
 
+static const struct WindowTemplate sWindowTemplate_MonInfo = {
+    .bg = 0,
+    .tilemapLeft = 1,
+    .tilemapTop = 1,
+    .width = 9,
+    .height = 12,
+    .paletteNum = 15,
+    .baseBlock = 0x8
+};
+
+EWRAM_DATA u8 sMonInfoWindowId = 0;
+
 // Local functions
 static void BuildStartMenuActions(void);
 static void AddStartMenuAction(u8 action);
@@ -251,6 +264,8 @@ static u8 RunSaveCallback(void);
 static void ShowSaveMessage(const u8 *message, u8 (*saveCallback)(void));
 static void HideSaveMessageWindow(void);
 static void HideSaveInfoWindow(void);
+static void RemoveMonInfoWindow(void);
+static void ShowMonInfoWindow(void);
 static void SaveStartTimer(void);
 static bool8 SaveErrorTimer(void);
 static void ShowSaveInfoWindow(void);
@@ -358,6 +373,52 @@ static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
     return FALSE;
 }
 
+
+static const u8 sTextColorBlue[] = _("{COLOR BLUE}");
+static const u8 sTextColorRed[] = _("{COLOR RED}");
+static const u8 sTextColorGreen[] = _("{COLOR GREEN}");
+
+static void ShowMonInfoWindow(void)
+{
+    sMonInfoWindowId = AddWindow(&sWindowTemplate_MonInfo);
+    PutWindowTilemap(sMonInfoWindowId);
+    DrawStdWindowFrame(sMonInfoWindowId, FALSE);
+
+    u8 textVOff = 0;
+
+    StringCopy(gStringVar1, sTextColorBlue);
+    StringCopy(gStringVar1 + 3, GetSpeciesName(GetMonData(&gPlayerParty[0], MON_DATA_SPECIES)));
+    AddTextPrinterParameterized(sMonInfoWindowId, FONT_SHORT, gStringVar1, 0, textVOff, TEXT_SKIP_DRAW, NULL);
+    textVOff += 15;
+
+    StringCopy(gStringVar1, sTextColorGreen);
+    StringCopy(gStringVar1 + 3, GetItemName(GetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM)));
+    AddTextPrinterParameterized(sMonInfoWindowId, FONT_SHORT_NARROWER, gStringVar1, 0, textVOff, TEXT_SKIP_DRAW, NULL);
+    textVOff += 13;
+
+    StringCopy(gStringVar1, sTextColorRed);
+    StringCopy(gStringVar1 + 3, gAbilitiesInfo[GetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY)].name);
+    AddTextPrinterParameterized(sMonInfoWindowId, FONT_SHORT_NARROWER, gStringVar1, 0, textVOff, TEXT_SKIP_DRAW, NULL);
+    textVOff += 15;
+
+    StringCopy(gStringVar1, GetMoveName(GetMonData(&gPlayerParty[0], MON_DATA_MOVE1)));
+    AddTextPrinterParameterized(sMonInfoWindowId, FONT_SHORT_NARROWER, gStringVar1, 0, textVOff, TEXT_SKIP_DRAW, NULL);
+    textVOff += 13;
+
+    StringCopy(gStringVar1, GetMoveName(GetMonData(&gPlayerParty[0], MON_DATA_MOVE2)));
+    AddTextPrinterParameterized(sMonInfoWindowId, FONT_SHORT_NARROWER, gStringVar1, 0, textVOff, TEXT_SKIP_DRAW, NULL);
+    textVOff += 13;
+
+    StringCopy(gStringVar1, GetMoveName(GetMonData(&gPlayerParty[0], MON_DATA_MOVE3)));
+    AddTextPrinterParameterized(sMonInfoWindowId, FONT_SHORT_NARROWER, gStringVar1, 0, textVOff, TEXT_SKIP_DRAW, NULL);
+    textVOff += 13;
+
+    StringCopy(gStringVar1, GetMoveName(GetMonData(&gPlayerParty[0], MON_DATA_MOVE4)));
+    AddTextPrinterParameterized(sMonInfoWindowId, FONT_SHORT_NARROWER, gStringVar1, 0, textVOff, TEXT_SKIP_DRAW, NULL);
+
+    CopyWindowToVram(sMonInfoWindowId, 2);
+}
+
 static bool32 InitStartMenuStep(void)
 {
     s8 state = sInitStartMenuData[0];
@@ -371,6 +432,7 @@ static bool32 InitStartMenuStep(void)
         if (sInitStartMenuData[2] == MENU_TYPE_WARP)
         {
             BuildWarpMenuActions();
+            ShowMonInfoWindow();
         }
         else if (sInitStartMenuData[2] == MENU_TYPE_SAVE)
         {
@@ -1219,9 +1281,23 @@ static void RemoveSaveInfoWindow(void)
     RemoveWindow(sSaveInfoWindowId);
 }
 
+static void RemoveMonInfoWindow(void)
+{
+    ClearStdWindowAndFrame(sMonInfoWindowId, FALSE);
+    RemoveWindow(sMonInfoWindowId);
+}
+
 static void HideStartMenuWindow(void)
 {
     ClearStdWindowAndFrame(GetStartMenuWindowId(), TRUE);
+
+    if (sMonInfoWindowId != 0)
+    {
+        RemoveMonInfoWindow();
+    }
+
+    sMonInfoWindowId = 0;
+
     RemoveStartMenuWindow();
     ScriptUnfreezeObjectEvents();
     UnlockPlayerFieldControls();

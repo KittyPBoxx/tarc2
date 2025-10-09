@@ -124,6 +124,7 @@ Click a section to expand it.
 | Wild           | Numel     | -                | Oblivious    | Flame Charge    | Incinerate   | Smack Down | Endure     |
 | Examiner Rune  | Hawlucha  | -                | Mold Breaker | Sky Drop        | Poison Jab   | -          | -          |
 | Examiner Rune  | Mr. Mime  | Lagging Tail     | Soundproof   | Dream Eater     | Yawn         | Magic Powder | Role Play |
+| Examiner Rune  | Cottonee  | -                | Prankster    | Stun Spore      | Round        | -            | -         |
 | Examiner Dante | Starmie   | Terrain Extender | Analytic     | Psychic Terrain | Refresh      | Toxic        | Foresight |
 | Examiner Dante | Illumise  | -                | Prankster    | Will-O-Wisp     | Tail Wind    | Last Resort  | Role Play |
 | Examiner Dante | Haunter   | Toxic Orb        | Levitate     | Curse           | Destiny Bond | Haze         | - |
@@ -230,7 +231,7 @@ Click a section to expand it.
 
 | Species    | Item        | Ability     | Move 1     | Move 2     | Move 3 | Move 4 |
 | :--------- | :---------- | :---------- | :--------- | :--------- | :----- | :----- |
-| Forretress | -           | Heavy Metal | Worry Seed | Heavy Slam | -      | -      |
+| Exeggutor  | -           | Heavy Metal | Worry Seed | Heavy Slam | -      | -      |
 
 </details>
 
@@ -251,8 +252,8 @@ Click a section to expand it.
 
 | Turn | Action       | Target   |
 | :--- | :----------- | :------- |
-| 1    | Worry Seed   | Hawlucha |
-| 2    | Worry Seed   | Hawlucha |
+| 1    | Heavy Slam   | Hawlucha |
+| 2    | Heavy Slam   | Hawlucha |
 | 3    | Heavy Slam   | Hawlucha |
 | 4    | Heavy Slam   | Hawlucha |
 | 5    | Heavy Slam   | Hawlucha |
@@ -260,6 +261,8 @@ Click a section to expand it.
 | 7    | Transference | Mr. Mime |
 | 8    | Heavy Slam   | Mr. Mime |
 | 9    | Heavy Slam   | Mr. Mime |
+| 10   | Heavy Slam   | Cottonee |
+| 11   | Heavy Slam   | Cottonee |
 
 </details>
 

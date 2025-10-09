@@ -1834,7 +1834,7 @@ static void DebugAction_Util_Battle_4(u8 taskId)
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
     monData = ITEM_KINGS_ROCK;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
-    monData = SPECIES_FORRETRESS;
+    monData = SPECIES_EXEGGUTOR;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);
 
     BoxMonToMon(&gPlayerParty[0].box, &gPlayerParty[0]);

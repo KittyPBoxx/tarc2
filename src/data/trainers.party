@@ -148,15 +148,15 @@ Pic: Aqua Grunt M
 Gender: Male
 Music: Aqua
 Double Battle: No
-AI: Check Bad Move / Try To Faint / Check Viability
+AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_ACE_POKEMON
 
 Hawlucha
-Level: 30
+Level: 35
 Lonely Nature
-Ability: Mold Breaker
+Ability: Unburden
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Sky Drop
-- Poison Jab
+- None
 - None
 - None
 
@@ -169,6 +169,15 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Yawn
 - Magic Powder
 - Role Play
+
+Cottonee
+Level: 30
+Impish Nature
+Ability: Prankster
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- Stun Spore
+- Round
+
 
 /* ######################################################################################### */
 
