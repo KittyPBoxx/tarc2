@@ -41,6 +41,8 @@ struct Main
     /*0x439*/ u8 anyLinkBattlerHasFrontierPass:1;
               u8 hblankPaletteEffect;
               u8 vblankPaletteEffect;
+
+              u8 gSpeedupDisabled;
 };
 
 #define GAME_CODE_LENGTH 4

@@ -711,7 +711,20 @@ static void IntrDummy(void)
 static void WaitForVBlank(void)
 {
     gMain.intrCheck &= ~INTR_FLAG_VBLANK;
-    VBlankIntrWait();
+
+    if (gPaletteFade.active || PrevPaletteFadeResult() == PALETTE_FADE_STATUS_LOADING)
+    {
+        VBlankIntrWait();
+    }
+    else if (gMain.gSpeedupDisabled)
+    {
+        DebugPrintfLevel(MGBA_LOG_ERROR, "Speedup Disabled");
+        VBlankIntrWait();
+    }
+    else if (!(gMain.heldKeysRaw & R_BUTTON))
+    {
+        VBlankIntrWait();
+    }
 }
 
 void SetTrainerHillVBlankCounter(u32 *counter)

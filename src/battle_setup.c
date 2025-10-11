@@ -198,6 +198,7 @@ static void DoStandardWildBattle(bool32 isDouble)
     if (isDouble)
         gBattleTypeFlags |= BATTLE_TYPE_DOUBLE;
 
+    gMain.gSpeedupDisabled = TRUE;
     CreateBattleStartTask(GetWildBattleTransition(), 0);
 }
 
@@ -215,6 +216,7 @@ void DoStandardWildBattle_Debug(void)
 static void DoTrainerBattle(void)
 {
     RemoveFollowingPokemon();
+    gMain.gSpeedupDisabled = TRUE;
     CreateBattleStartTask(GetTrainerBattleTransition(), 0);
 }
 

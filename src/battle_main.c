@@ -2806,6 +2806,7 @@ static void TryDoEventsBeforeFirstTurn(void)
         if ((i = ShouldDoTrainerSlide(GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT), TRAINER_SLIDE_BEFORE_FIRST_TURN)))
             BattleScriptExecute(i == 1 ? BattleScript_TrainerASlideMsgEnd2 : BattleScript_TrainerBSlideMsgEnd2);
         gBattleStruct->eventsBeforeFirstTurnState = 0;
+        gMain.gSpeedupDisabled = FALSE;
         break;
     }
 }
