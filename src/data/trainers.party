@@ -101,8 +101,8 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
 - Take Down
 - None
 
-Exeggutor
-Level: 45
+Exeggutor @ Coba Berry
+Level: 38
 Adamant Nature
 IVs: 0 HP / 31 Atk / 0 Def / 0 SpA / 31 SpD / 31 Spe
 - Stored Power
@@ -129,15 +129,24 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Minimize
 - Low Kick
 
-Ampharos Mega
+Hawlucha
 Level: 35
-Hardy Nature
-Ability: Mold Breaker
+Lonely Nature
+Ability: Unburden
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Zap Cannon
-- Focus Blast
+- Sky Drop
 - None
 - None
+- None
+
+Cottonee
+Level: 30
+Impish Nature
+Ability: Prankster
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- Stun Spore
+- Round
+
 
 /* ######################################################################################### */
 
@@ -150,13 +159,14 @@ Music: Aqua
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability / AI_FLAG_ACE_POKEMON
 
-Hawlucha
+
+Ampharos Mega
 Level: 35
-Lonely Nature
-Ability: Unburden
+Hardy Nature
+Ability: Mold Breaker
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Sky Drop
-- None
+- Zap Cannon
+- Focus Blast
 - None
 - None
 
@@ -169,14 +179,6 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Yawn
 - Magic Powder
 - Role Play
-
-Cottonee
-Level: 30
-Impish Nature
-Ability: Prankster
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Stun Spore
-- Round
 
 
 /* ######################################################################################### */

@@ -1797,11 +1797,10 @@ static void DebugAction_Util_Battle_3(u8 taskId)
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_BULLETPROOF;
+    monData = ABILITY_HEAVY_METAL;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
     monData = MOVE_HEAVY_SLAM;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
-    monData = MOVE_EARTH_POWER;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
@@ -1824,15 +1823,16 @@ static void DebugAction_Util_Battle_4(u8 taskId)
 
     monData = 25;
     SetMonData(&gPlayerParty[0], MON_DATA_LEVEL, &monData);
-    monData = ABILITY_HEAVY_METAL;
+    monData = ABILITY_BULLETPROOF;
     SetMonData(&gPlayerParty[0], MON_DATA_OVERWRITTEN_ABILITY, &monData);
     monData = MOVE_WORRY_SEED;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE1, &monData);
     monData = MOVE_HEAVY_SLAM; 
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE2, &monData);
+    monData = MOVE_EARTH_POWER;
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE3, &monData);
     SetMonData(&gPlayerParty[0], MON_DATA_MOVE4, &monData);
-    monData = ITEM_KINGS_ROCK;
+    monData = ITEM_ABILITY_SHIELD;
     SetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM, &monData);
     monData = SPECIES_EXEGGUTOR;
     SetMonData(&gPlayerParty[0], MON_DATA_SPECIES, &monData);

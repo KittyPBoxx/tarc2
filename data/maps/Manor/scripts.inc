@@ -144,4 +144,5 @@ CuttableCube_Text_0:
 
 CuttableCube_Text_1:
 # 74 "data/maps/Manor/scripts.pory"
-	.string "You cut the box.$"
+	.string "You cut the box revealing a note:\n"
+	.string "Use {SELECT_BUTTON} in battle to reorder moves.$"

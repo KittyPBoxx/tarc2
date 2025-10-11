@@ -71,7 +71,7 @@ If you’ve lost progress, deleted a save, etc., you can unlock warp flags manua
 |:--|:--|:--|
 | Stairs (base warp, required for others) | `FLAG_UNLOCK_STAIRS_WARP` | `0x63` |
 | Lake | `FLAG_UNLOCK_LAKE_WARP` | `0x64` |
-| Cave | `FLAG_UNLOCK_CAVE_WARP` | `0x65` |
+| Ruins | `FLAG_UNLOCK_CAVE_WARP` | `0x65` |
 | Summit | `FLAG_UNLOCK_SUMMIT_WARP` | `0x66` |
 | Flower Field | `FLAG_UNLOCK_FLOWER_WARP` | `0x67` |
 
@@ -105,29 +105,30 @@ Click a section to expand it.
 <details>
   <summary>Lake</summary>
 
-| Location       | Species         | Item           | Ability     | Move 1      | Move 2     | Move 3     | Move 4  |
-|:--             |:--              |:--             |:--          |:--          |:--         |:--         |:--      |
-| Wild           | Forretress      | Zoom Lens      | Sturdy      | Take Down   | Rapid Spin | Heavy Slam | Curse   |
-| Wild           | Muk             | Ability Shield | Sticky Hold | Pound       | Harden     | Earth Power| Disable |
-| Examiner Fionn | Chespin         | -              | Bulletproof | Worry Seed | Take Down| - | - |
-| Examiner Fionn | Exeggutor       | -              | Chlorophyll | Stored Power | Calm Mind | Absorb | - |
-| Examiner Sora  | Chansey         | -              | Natural Cure | Fling | Covet | Minimize | Low Kick |
-| Examiner Sora  | Ampharos (Mega) | -              | Mold Breaker | Zap Cannon | Focus Blast | - | - |
+| Location       | Species         | Item           | Ability      | Move 1       | Move 2     | Move 3     | Move 4     |
+|:--             |:--              |:--             |:--           |:--           |:--         |:--         |:--         |
+| Wild           | Forretress      | Zoom Lens      | Sturdy       | Take Down    | Rapid Spin | Heavy Slam | Curse      |
+| Wild           | Aron            | Rawst Berry    | Heavy Metal  | Roar         | Metal Claw | Rock Tomb  | Rock Slide |
+| Examiner Fionn | Chespin         | -              | Bulletproof  | Worry Seed   | Take Down  | -          | -          |
+| Examiner Fionn | Exeggutor       | Coba Berry     | Chlorophyll  | Stored Power | Calm Mind  | Absorb     | -          |
+| Examiner Sora  | Chansey         | -              | Natural Cure | Fling        | Covet      | Minimize   | Low Kick   |
+| Examiner Sora  | Hawlucha        | -              | Unburden     | Sky Drop     | -          | -          | -          |
+| Examiner Rune  | Cottonee        | -              | Prankster    | Stun Spore   | Round      | -          | -          |
+
 </details>
 
 <details>
   <summary>Ruins</summary>
 
-| Location       | Species   | Item             | Ability      | Move 1          | Move 2       | Move 3     | Move 4     |
-|:--             |:--        |:--               |:--           |:--              |:--           |:--         |:--         |
-| Wild           | Aron      | Rawst Berry      | Heavy Metal  | Roar            | Headbutt     | Earth Power| Rock Slide |
-| Wild           | Numel     | -                | Oblivious    | Flame Charge    | Incinerate   | Smack Down | Endure     |
-| Examiner Rune  | Hawlucha  | -                | Mold Breaker | Sky Drop        | Poison Jab   | -          | -          |
-| Examiner Rune  | Mr. Mime  | Lagging Tail     | Soundproof   | Dream Eater     | Yawn         | Magic Powder | Role Play |
-| Examiner Rune  | Cottonee  | -                | Prankster    | Stun Spore      | Round        | -            | -         |
-| Examiner Dante | Starmie   | Terrain Extender | Analytic     | Psychic Terrain | Refresh      | Toxic        | Foresight |
-| Examiner Dante | Illumise  | -                | Prankster    | Will-O-Wisp     | Tail Wind    | Last Resort  | Role Play |
-| Examiner Dante | Haunter   | Toxic Orb        | Levitate     | Curse           | Destiny Bond | Haze         | - |
+| Location       | Species         | Item             | Ability      | Move 1          | Move 2       | Move 3       | Move 4    |
+|:--             |:--              |:--               |:--           |:--              |:--           |:--           |:--        |
+| Wild           | Muk             | Ability Shield   | Sticky Hold  | Pound           | Harden       | Earth Power  | Disable   |
+| Wild           | Numel           | -                | Oblivious    | Flame Charge    | Incinerate   | Smack Down   | Endure    |
+| Examiner Rune  | Ampharos (Mega) | -                | Mold Breaker | Zap Cannon      | Focus Blast  | -            | -         |
+| Examiner Rune  | Mr. Mime        | Lagging Tail     | Soundproof   | Dream Eater     | Yawn         | Magic Powder | Role Play |
+| Examiner Dante | Starmie         | Terrain Extender | Analytic     | Psychic Terrain | Refresh      | Toxic        | Foresight |
+| Examiner Dante | Illumise        | -                | Prankster    | Will-O-Wisp     | Tail Wind    | Last Resort  | Role Play |
+| Examiner Dante | Haunter         | Toxic Orb        | Levitate     | Curse           | Destiny Bond | Haze         | -         |
 </details>
 
 <details>
@@ -195,33 +196,36 @@ Click a section to expand it.
 
 | Species   | Item           | Ability     | Move 1     | Move 2      | Move 3 | Move 4 |
 | :-------- | :------------- | :---------- | :--------- | :---------- | :----- | :----- |
-| Exeggutor | Ability Shield | Bulletproof | Heavy Slam | Earth Power | -      | -      |
+| Exeggutor | -              | Bulletproof | Heavy Slam | -           | -      | -      |
 
 </details>
 
 <details>
   <summary>Show Setup Solution</summary>
 
-| Type    | Name           | Description / How to Obtain |
-| :------ | :------------- | :-------------------------- |
-| Species | Exeggutor      | Transmute on FIONNs Exeggutor          |
-| Item    | Ability Shield | Covet on Muk (Lake). Covet must knock out the Muk or sticky hold will proc. You must Barter to get rid of your held items before using Covet or you will not get the item. To get Covet you need to Sketch from Sora's Chansey. Fight Sora with Muk or else Chansey will Low Kick after Minimising and not Covet. |
-| Ability | Bulletproof    | Transference on FIONNs Chespin |
-| Move    | Heavy Slam     | Sketch on FIONNs Chespin or Forretress (Lake) |
-| Move    | Earth Power    | Sketch on Muk (Lake)                          |
+| Type    | Name           | Description / How to Obtain     |
+| :------ | :------------- | :--------------------------     |
+| Species | Exeggutor      | Transmute on FIONNs Exeggutor   |
+| Ability | Bulletproof    | Transference on FIONNs Chespin  |
+| Move    | Heavy Slam     | Sketch on Forretress (Lake)     |
+| Ability | Heavy Metal    | Transference on Aron (Lake)     |
 
 </details>
 
 <details>
   <summary>Show Battle Solution</summary>
 
-| Turn | Action      | Target        |
-| :--- | :---------- | :------------ |
-| 1    | Heavy Slam  | Chansey       |
-| 2    | Heavy Slam  | Chansey       |
-| 3    | Earth Power | Mega Ampharos |
-| 4    | Earth Power | Mega Ampharos |
-| 5    | Earth Power | Mega Ampharos |
+| Turn | Action       | Target        |
+| :--- | :----------  | :------------ |
+| 1    | Heavy Slam   | Chansey       |
+| 2    | Heavy Slam   | Hawlucha      |
+| 3    | Heavy Slam   | Hawlucha      |
+| 4    | Heavy Slam   | Hawlucha      |
+| 5    | Heavy Slam   | Hawlucha      |
+| 6    | Heavy Slam   | Hawlucha      |
+| 7    | Heavy Slam   | Cottonee      |
+| 8    | Heavy Slam   | Cottonee      |
+
 </details>
 
 ### Examiner RUNE 
@@ -229,40 +233,42 @@ Click a section to expand it.
 <details>
   <summary>Show Ditto Config</summary>
 
-| Species    | Item        | Ability     | Move 1     | Move 2     | Move 3 | Move 4 |
-| :--------- | :---------- | :---------- | :--------- | :--------- | :----- | :----- |
-| Exeggutor  | -           | Heavy Metal | Worry Seed | Heavy Slam | -      | -      |
+| Species    | Item           | Ability     | Move 1     | Move 2     | Move 3      | Move 4 |
+| :--------- | :----------    | :---------- | :--------- | :--------- | :-----      | :----- |
+| Exeggutor  | Ability Shield | Bulletproof | Worry Seed | Heavy Slam | Earth Power | -      |
 
 </details>
 
 <details>
   <summary>Show Setup Solution</summary>
 
-| Type    | Name        | Description / How to Obtain |
-| :------ | :---------- | :-------------------------- |
-| Species | Forretress  | Transmute Forretress (Lake) |
-| Ability | Heavy Metal | Transference on Aron (Cave) |
-| Move    | Worry Seed  | Sketch on FIONNs Chespin    |
-| Move    | Heavy Slam  | Sketch on FIONNs Chespin or Forretress (Lake) |
+| Type    | Name           | Description / How to Obtain |
+| :------ | :----------    | :-------------------------- |
+| Species | Forretress     | Transmute Forretress (Lake) |
+| Move    | Worry Seed     | Sketch on FIONNs Chespin    |
+| Move    | Heavy Slam     | Sketch on Forretress (Lake) |
+| Move    | Earth Power    | Sketch on Muk (Ruins)       |
+| Item    | Ability Shield | Covet on Muk (Ruins). Covet must knock out the Muk or sticky hold will proc. You must Barter to get rid of your held items before using Covet or you will not get the item. To get Covet you need to Sketch from Sora's Chansey. Fight Sora with Muk or else Chansey will Low Kick after Minimising and not Covet. |
 
 </details>
 
 <details>
   <summary>Show Battle Solution</summary>
 
-| Turn | Action       | Target   |
-| :--- | :----------- | :------- |
-| 1    | Heavy Slam   | Hawlucha |
-| 2    | Heavy Slam   | Hawlucha |
-| 3    | Heavy Slam   | Hawlucha |
-| 4    | Heavy Slam   | Hawlucha |
-| 5    | Heavy Slam   | Hawlucha |
-| 6    | Worry Seed   | Mr. Mime |
-| 7    | Transference | Mr. Mime |
-| 8    | Heavy Slam   | Mr. Mime |
-| 9    | Heavy Slam   | Mr. Mime |
-| 10   | Heavy Slam   | Cottonee |
-| 11   | Heavy Slam   | Cottonee |
+| Turn | Action       | Target        |
+| :--- | :----------- | :-------      |
+| 1    | Earth Power  | Mega Ampharos |
+| 2    | Earth Power  | Mega Ampharos |
+| 3    | Earth Power  | Mega Ampharos |
+| 4    | Earth Power  | Mega Ampharos |
+| 5    | Worry Seed   | Mega Ampharos |
+| 6    | Barter       | Mega Ampharos |
+| 7    | Earth Power  | Mega Ampharos |
+| 8    | Worry Seed   | Mr. Mime      |
+| 9    | Transference | Mr. Mime      |
+| 10   | Heavy Slam   | Mr. Mime      |
+| 11   | Heavy Slam   | Mr. Mime      |
+| 12   | Heavy Slam   | Mr. Mime      |
 
 </details>
 
@@ -283,12 +289,12 @@ Click a section to expand it.
 
 | Type    | Name         | Description / How to Obtain |
 | :------ | :----------- | :-------------------------- |
-| Species | Muk          | Transmute on Muk (Lake)     |
-| Item    | Rawst Berry  | Barter on Aron (Cave)       |
-| Ability | Heavy Metal  | Transference on Aron (Cave) |
+| Species | Muk          | Transmute on Muk (Ruins)    |
+| Item    | Rawst Berry  | Barter on Aron (Lake)       |
+| Ability | Heavy Metal  | Transference on Aron (Lake) |
 | Move    | Magic Powder | Sketch on RUNE's Mr.Mime    |
-| Move    | Roar         | Sketch on Aron (Cave). In order to Sketch Roar you must have Soundproof. To get this use Transference on RUNE's Mr. Mime (then retire) |
-| Move    | Flame Charge | Sketch on Carkoal (Cave)    |
+| Move    | Roar         | Sketch on Aron (Lake). In order to Sketch Roar you must have Soundproof. To get this use Transference on RUNE's Mr. Mime (then retire) |
+| Move    | Flame Charge | Sketch on Numel (Ruins)    |
 
 </details>
 
@@ -338,8 +344,8 @@ Click a section to expand it.
 | Item    | Rocky Helmet | Use Barter on TENJIN's Slowpoke |
 | Ability | Inner Focus  | Use Transference on the Farfetch'd (Stairs) |
 | Move    | Plasma Fists | Use Sketch on TENJIN's Zeraora (to bring it out you'll need Roar)                           |
-| Move    | Disable      | Sketch on Muk (Lake)        |
-| Move    | Roar         | Sketch on Aron (Cave). In order to Sketch Roar you must have Soundproof. To get this use Transference on RUNE's Mr. Mime (then retire)                            |
+| Move    | Disable      | Sketch on Muk (Ruins)        |
+| Move    | Roar         | Sketch on Aron (Lake). In order to Sketch Roar you must have Soundproof. To get this use Transference on RUNE's Mr. Mime (then retire)                            |
 
 </details>
 

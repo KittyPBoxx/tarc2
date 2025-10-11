@@ -71,7 +71,7 @@ script CuttableCube {
         playse(SE_ICE_CRACK)
         setflag(FLAG_TREE_CUT)
         removeobject(VAR_LAST_TALKED)
-        msgbox(format("You cut the box."))
+        msgbox(format("You cut the box revealing a note:\nUse {SELECT_BUTTON} in battle to reorder moves."))
     } 
 
     releaseall

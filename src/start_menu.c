@@ -180,13 +180,13 @@ static const u8 sText_MenuSaveAuto[] = _("AUTO");
 
 static const u8 sText_SlotEmpty[] = _("{COLOR LIGHT_GRAY} SLOT EMPTY");
 
-static const u8 sText_WarpBridge[] = _("Flower");
-static const u8 sText_WarpManor[] = _("Steps");
-static const u8 sText_WarpForest[] = _("Lake");
-static const u8 sText_WarpCaveF1[] = _("Ruins");
-static const u8 sText_WarpCaveF2[] = _("Cave F2");
-static const u8 sText_WarpSummit[] = _("Plains");
-static const u8 sText_WarpPass[] = _("Pass");
+static const u8 sText_WarpBridge[] = _("FLOWER");
+static const u8 sText_WarpManor[] = _("STEPS");
+static const u8 sText_WarpForest[] = _("LAKE");
+static const u8 sText_WarpCaveF1[] = _("RUINS");
+static const u8 sText_WarpCaveF2[] = _("CAVE F2");
+static const u8 sText_WarpSummit[] = _("PLAINS");
+static const u8 sText_WarpPass[] = _("PASS");
 
 static const struct MenuAction sStartMenuItems[] =
 {
