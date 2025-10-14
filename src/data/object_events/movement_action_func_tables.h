@@ -305,6 +305,7 @@ u8 MovementAction_JumpSpecialNorthwest_Step0(struct ObjectEvent *, struct Sprite
 u8 MovementAction_JumpSpecialNorthwest_Step1(struct ObjectEvent *, struct Sprite *);
 u8 MovementAction_JumpSpecialNortheast_Step0(struct ObjectEvent *, struct Sprite *);
 u8 MovementAction_JumpSpecialNortheast_Step1(struct ObjectEvent *, struct Sprite *);
+u8 MovementAction_FloatingOrb_Step0(struct ObjectEvent *, struct Sprite *);
 
 u8 (*const gMovementActionFuncs_FaceDown[])(struct ObjectEvent *, struct Sprite *);
 u8 (*const gMovementActionFuncs_FaceUp[])(struct ObjectEvent *, struct Sprite *);
@@ -484,6 +485,7 @@ u8 (*const gMovementActionFuncs_JumpSpecialNorthwest[])(struct ObjectEvent *, st
 u8 (*const gMovementActionFuncs_JumpSpecialNortheast[])(struct ObjectEvent *, struct Sprite *);
 u8 (*const gMovementActionFuncs_EmoteX[])(struct ObjectEvent *, struct Sprite *);
 u8 (*const gMovementActionFuncs_EmoteDoubleExclMark[])(struct ObjectEvent *, struct Sprite *);
+u8 (*const gMovementActionFuncs_FloatingOrb[])(struct ObjectEvent *, struct Sprite *);
 
 u8 (*const *const gMovementActionFuncs[])(struct ObjectEvent *, struct Sprite *) = {
     [MOVEMENT_ACTION_FACE_DOWN] = gMovementActionFuncs_FaceDown,
@@ -664,6 +666,7 @@ u8 (*const *const gMovementActionFuncs[])(struct ObjectEvent *, struct Sprite *)
     [MOVEMENT_ACTION_EMOTE_DOUBLE_EXCL_MARK] = gMovementActionFuncs_EmoteDoubleExclMark,
     [MOVEMENT_ACTION_EXIT_POKEBALL] = gMovementActionFuncs_ExitPokeball,
     [MOVEMENT_ACTION_ENTER_POKEBALL] = gMovementActionFuncs_EnterPokeball,
+    [MOVEMENT_ACTION_FLOATING_ORB] = gMovementActionFuncs_FloatingOrb,
 };
 
 u8 (*const gMovementActionFuncs_FaceDown[])(struct ObjectEvent *, struct Sprite *) = {
@@ -1695,4 +1698,8 @@ u8 (*const gMovementActionFuncs_JumpSpecialNortheast[])(struct ObjectEvent *, st
     MovementAction_JumpSpecialNortheast_Step0,
     MovementAction_JumpSpecialNortheast_Step1,
     MovementAction_PauseSpriteAnim,
+};
+
+u8 (*const gMovementActionFuncs_FloatingOrb[])(struct ObjectEvent *, struct Sprite *) = {
+    MovementAction_FloatingOrb_Step0,
 };

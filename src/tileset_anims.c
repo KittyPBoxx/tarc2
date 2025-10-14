@@ -1022,3 +1022,68 @@ static void QueueAnimTiles_Sootopolis_StormyWater(u16 timer)
     u16 i = timer % ARRAY_COUNT(gTilesetAnims_Sootopolis_StormyWater);
     AppendTilesetAnimToBuffer(gTilesetAnims_Sootopolis_StormyWater[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(NUM_TILES_IN_PRIMARY + 240)), 96 * TILE_SIZE_4BPP);
 }
+
+
+// Manor
+const u16 gTilesetAnims_ManorPrimary1_Flower_Frame0[] = INCBIN_U16("data/tilesets/primary/manor_primary_1/anim/flower_red/00.4bpp");
+const u16 gTilesetAnims_ManorPrimary1_Flower_Frame1[] = INCBIN_U16("data/tilesets/primary/manor_primary_1/anim/flower_red/01.4bpp");
+const u16 gTilesetAnims_ManorPrimary1_Flower_Frame2[] = INCBIN_U16("data/tilesets/primary/manor_primary_1/anim/flower_red/02.4bpp");
+
+const u16 *const gTilesetAnims_ManorPrimary1_Flower[] = {
+    gTilesetAnims_ManorPrimary1_Flower_Frame0,
+    gTilesetAnims_ManorPrimary1_Flower_Frame1,
+    gTilesetAnims_ManorPrimary1_Flower_Frame2,
+    gTilesetAnims_ManorPrimary1_Flower_Frame1,
+};
+
+static void QueueAnimTiles_ManorPrimary1_Flower(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_ManorPrimary1_Flower);
+    AppendTilesetAnimToBuffer(gTilesetAnims_ManorPrimary1_Flower[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(1)), 4 * TILE_SIZE_4BPP);
+}
+
+static void TilesetAnim_ManorPrimary1(u16 timer)
+{
+    if (timer % 16 == 0) {
+        QueueAnimTiles_ManorPrimary1_Flower(timer / 16);
+    }
+}
+
+void InitTilesetAnim_ManorPrimary1(void)
+{
+    sPrimaryTilesetAnimCounter = 0;
+    sPrimaryTilesetAnimCounterMax = 256;
+    sPrimaryTilesetAnimCallback = TilesetAnim_ManorPrimary1;
+}
+
+// Forest
+const u16 gTilesetAnims_ForestPrimary1_Flower_Frame0[] = INCBIN_U16("data/tilesets/primary/forest_primary_1/anim/flower_red/00.4bpp");
+const u16 gTilesetAnims_ForestPrimary1_Flower_Frame1[] = INCBIN_U16("data/tilesets/primary/forest_primary_1/anim/flower_red/01.4bpp");
+const u16 gTilesetAnims_ForestPrimary1_Flower_Frame2[] = INCBIN_U16("data/tilesets/primary/forest_primary_1/anim/flower_red/02.4bpp");
+
+const u16 *const gTilesetAnims_ForstPrimary1_Flower[] = {
+    gTilesetAnims_ForestPrimary1_Flower_Frame0,
+    gTilesetAnims_ForestPrimary1_Flower_Frame2,
+    gTilesetAnims_ForestPrimary1_Flower_Frame1,
+    gTilesetAnims_ForestPrimary1_Flower_Frame2,
+};
+
+static void QueueAnimTiles_ForestPrimary1_Flower(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_ForstPrimary1_Flower);
+    AppendTilesetAnimToBuffer(gTilesetAnims_ForstPrimary1_Flower[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(1)), 4 * TILE_SIZE_4BPP);
+}
+
+static void TilesetAnim_ForestPrimary1(u16 timer)
+{
+    if (timer % 64 == 0) {
+        QueueAnimTiles_ForestPrimary1_Flower(timer / 64);
+    }
+}
+
+void InitTilesetAnim_ForestPrimary1(void)
+{
+    sPrimaryTilesetAnimCounter = 0;
+    sPrimaryTilesetAnimCounterMax = 256;
+    sPrimaryTilesetAnimCallback = TilesetAnim_ForestPrimary1;
+}

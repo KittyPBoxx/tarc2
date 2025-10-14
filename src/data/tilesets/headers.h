@@ -43,7 +43,7 @@ const struct Tileset gTileset_manorPrimary1 =
     .palettes = gTilesetPalettes_manorPrimary1,
     .metatiles = gMetatiles_manorPrimary1,
     .metatileAttributes = gMetatileAttributes_manorPrimary1,
-    .callback = NULL,
+    .callback = InitTilesetAnim_ManorPrimary1,
 };
 
 const struct Tileset gTileset_forestPrimary1 =
@@ -54,7 +54,7 @@ const struct Tileset gTileset_forestPrimary1 =
     .palettes = gTilesetPalettes_forestPrimary1,
     .metatiles = gMetatiles_forestPrimary1,
     .metatileAttributes = gMetatileAttributes_forestPrimary1,
-    .callback = NULL,
+    .callback = InitTilesetAnim_ForestPrimary1,
 };
 
 const struct Tileset gTileset_summitPrimary1 =

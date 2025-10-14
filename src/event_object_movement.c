@@ -48,6 +48,7 @@
 #include "constants/metatile_behaviors.h"
 #include "constants/trainer_types.h"
 #include "constants/weather.h"
+#include "trig.h"
 
 #define SPECIAL_LOCALIDS_START (min(LOCALID_CAMERA, \
                                 min(LOCALID_PLAYER, \
@@ -341,6 +342,7 @@ static void (*const sMovementTypeCallbacks[])(struct Sprite *) =
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_LEFT] = MovementType_WalkSlowlyInPlace,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_RIGHT] = MovementType_WalkSlowlyInPlace,
     [MOVEMENT_TYPE_FOLLOW_PLAYER] = MovementType_FollowPlayer,
+    [MOVEMENT_TYPE_FLOATING_ORB] = MovementType_FloatingOrb,
 };
 
 static const bool8 sMovementTypeHasRange[NUM_MOVEMENT_TYPES] = {
@@ -470,6 +472,7 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_LEFT] = DIR_WEST,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_RIGHT] = DIR_EAST,
     [MOVEMENT_TYPE_FOLLOW_PLAYER] = DIR_SOUTH,
+    [MOVEMENT_TYPE_FLOATING_ORB] = DIR_SOUTH,
 };
 
 #include "data/object_events/object_event_graphics_info_pointers.h"
@@ -5721,6 +5724,24 @@ bool8 MovementType_Invisible_Step2(struct ObjectEvent *objectEvent, struct Sprit
     return FALSE;
 }
 
+movement_type_def(MovementType_FloatingOrb, gMovementTypeFuncs_FloatingOrb)
+
+bool8 MovementType_FloatingOrb_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    // phase counter for vertical motion
+    sprite->data[2] = (sprite->data[2] + 2) & 0xFF;
+    // separate phase for horizontal sway, slightly out of sync
+    sprite->data[3] = (sprite->data[3] + 3) & 0xFF;
+
+    // gentle vertical float, slower near peaks
+    sprite->y2 = Sin(sprite->data[2], 3);   // 3 px amplitude
+    // subtle horizontal sway, smaller amplitude
+    sprite->x2 = Cos(sprite->data[3], 1);   // 1 px amplitude
+
+    return FALSE;
+}
+
+
 void ClearObjectEventMovement(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
     objectEvent->singleMovementActive = FALSE;
@@ -7464,6 +7485,22 @@ bool8 MovementAction_EnterPokeball_Step2(struct ObjectEvent *objectEvent, struct
 
 #undef sDuration
 #undef sSpeedFlip
+
+bool8 MovementAction_FloatingOrb_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    // phase counter for vertical motion
+    sprite->data[2] = (sprite->data[2] + 2) & 0xFF;
+    // separate phase for horizontal sway, slightly out of sync
+    sprite->data[3] = (sprite->data[3] + 3) & 0xFF;
+
+    // gentle vertical float, slower near peaks
+    sprite->y2 = Sin(sprite->data[2], 3);   // 3 px amplitude
+    // subtle horizontal sway, smaller amplitude
+    sprite->x2 = Cos(sprite->data[3], 1);   // 1 px amplitude
+
+    return FALSE;
+}
+
 
 bool8 MovementAction_WalkInPlaceSlowUp_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {

@@ -83,7 +83,8 @@
 #define MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_LEFT        0x4F
 #define MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_RIGHT       0x50
 #define MOVEMENT_TYPE_FOLLOW_PLAYER                    0x51
-#define NUM_MOVEMENT_TYPES                             0x52
+#define MOVEMENT_TYPE_FLOATING_ORB                     0x52
+#define NUM_MOVEMENT_TYPES                             0x53
 
 #define MOVEMENT_ACTION_FACE_DOWN                       0x0
 #define MOVEMENT_ACTION_FACE_UP                         0x1
@@ -263,6 +264,7 @@
 #define MOVEMENT_ACTION_EMOTE_DOUBLE_EXCL_MARK            0xCF
 #define MOVEMENT_ACTION_EXIT_POKEBALL                     0xD0
 #define MOVEMENT_ACTION_ENTER_POKEBALL                    0xD1
+#define MOVEMENT_ACTION_FLOATING_ORB                      0xD2
 
 #define MOVEMENT_ACTION_STEP_END 0xFE
 #define MOVEMENT_ACTION_NONE     0xFF

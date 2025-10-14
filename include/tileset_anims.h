@@ -28,4 +28,7 @@ void InitTilesetAnim_SootopolisGym(void);
 void InitTilesetAnim_MauvilleGym(void);
 void InitTilesetAnim_EliteFour(void);
 
+void InitTilesetAnim_ManorPrimary1(void);
+void InitTilesetAnim_ForestPrimary1(void);
+
 #endif // GUARD_TILESET_ANIMS_H
