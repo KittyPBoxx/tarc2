@@ -972,13 +972,25 @@ void DroughtStateRun(void)
             }
         }
         break;
+
     case 1:
-        gWeatherPtr->droughtTimer = (gWeatherPtr->droughtTimer + 3) & 0x7F;
-        gWeatherPtr->droughtBrightnessStage = ((gSineTable[gWeatherPtr->droughtTimer] - 1) >> 6) + 2;
-        if (gWeatherPtr->droughtBrightnessStage != gWeatherPtr->droughtLastBrightnessStage)
-            SetDroughtColorMap(gWeatherPtr->droughtBrightnessStage);
-        gWeatherPtr->droughtLastBrightnessStage = gWeatherPtr->droughtBrightnessStage;
+        // Add a slow frame timer to avoid too-fast jitter
+        if (++gWeatherPtr->droughtTimer > 6) // increase number = slower flicker
+        {
+            gWeatherPtr->droughtTimer = 0;
+
+            u8 newStage = 2 + (Random() % 2);
+
+            // Only apply if it's different to avoid rapid redundant updates
+            if (newStage != gWeatherPtr->droughtLastBrightnessStage)
+            {
+                gWeatherPtr->droughtBrightnessStage = newStage;
+                SetDroughtColorMap(newStage);
+                gWeatherPtr->droughtLastBrightnessStage = newStage;
+            }
+        }
         break;
+
     case 2:
         if (++gWeatherPtr->droughtTimer > 5)
         {
@@ -990,6 +1002,7 @@ void DroughtStateRun(void)
         break;
     }
 }
+
 
 void Weather_SetBlendCoeffs(u8 eva, u8 evb)
 {
