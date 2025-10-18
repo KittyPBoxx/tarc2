@@ -30,7 +30,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_DIAMOND_CUSHION",
       "x": 20,
-      "y": 9,
+      "y": 4,
       "elevation": 0,
       "movement_type": "MOVEMENT_TYPE_FLOATING_ORB",
       "movement_range_x": 0,
@@ -146,8 +146,8 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BIG_VENUSAUR_DOLL",
-      "x": 21,
-      "y": 6,
+      "x": 28,
+      "y": 4,
       "elevation": 0,
       "movement_type": "MOVEMENT_TYPE_NONE",
       "movement_range_x": 0,
