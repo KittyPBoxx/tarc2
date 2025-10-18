@@ -24,6 +24,8 @@
 #include "palette_effects.h"
 #include "palette.h"
 #include "trig.h"
+#include "constants/event_objects.h"
+
 
 static void VBlankIntr(void);
 static void HBlankIntr(void);
@@ -607,6 +609,9 @@ static inline u16 ApplyBrightnessToColor(u16 color, s16 delta)
     return (b << 10) | (g << 5) | r;
 }
 
+#define OBJ_PALETTE ((volatile u16 *)(0x5000000 + 0x200))
+#define OBJ_PALETTE_SLOT(n) ((n) * 16)
+#define OBJ_PALETTE_INDEX(n, i) (((n) * 16) + (i))
 
 void ApplyVBlankPaletteModifiers()
 {
@@ -663,6 +668,77 @@ void ApplyVBlankPaletteModifiers()
         
         // Cant change this because it also effects the grass (I really need to learn porytile palette overrides)
         //BG_PALETTE[PALETTE_5_2] = 0x15a8;
+    }
+    else if (gMain.vblankPaletteEffect == PALETTE_EFFECT_RUINS)
+    {
+        static u16 sCrystalPhase = 0;
+        const u16 indexDelta = 2;
+        const u8  fracDelta  = 64; // controls interpolation smoothness (64 → 4 substeps)
+
+        s16 palSlot = IndexOfSpritePaletteTag(OBJ_EVENT_PAL_TAG_POOCHYENA);
+
+        sCrystalPhase = (u16)(sCrystalPhase + ((indexDelta << 8) | fracDelta));
+
+        // --- Interpolated sine A ---
+        u8 idxA  = (u8)(sCrystalPhase >> 8);
+        u8 idxA1 = (u8)(idxA + 1);
+        u8 frac  = (u8)(sCrystalPhase & 0xFF);
+
+        s16 v0 = gSineTable[idxA];
+        s16 v1 = gSineTable[idxA1];
+        s16 waveA = (s16)(v0 + (((s32)(v1 - v0) * frac) >> 8)); // interpolated -255..+255
+
+        // --- Interpolated sine B (phase shifted by 64 indices) ---
+        u16 phaseB = (u16)(sCrystalPhase + (64 << 8));
+        u8 idxB  = (u8)(phaseB >> 8);
+        u8 idxB1 = (u8)(idxB + 1);
+        u8 fracB = (u8)(phaseB & 0xFF);
+
+        s16 vb0 = gSineTable[idxB];
+        s16 vb1 = gSineTable[idxB1];
+        s16 waveB = (s16)(vb0 + (((s32)(vb1 - vb0) * fracB) >> 8));
+
+        // Core wave-to-brightness mapping
+        s16 baseBright = waveA >> 6;  // ~ -4..+4
+        s16 hueShiftR  =  waveB >> 7; // ~ -2..+2
+        s16 hueShiftB  = -(waveB >> 7);
+
+        for (int i = 1; i < 16; i++) // skip transparency index 0
+        {
+            u16 baseColor = OBJ_PALETTE[OBJ_PALETTE_INDEX(palSlot, i)];
+
+            s16 r = baseColor & 0x1F;
+            s16 g = (baseColor >> 5) & 0x1F;
+            s16 b = (baseColor >> 10) & 0x1F;
+
+            // Compute perceived brightness (average of RGB roughly)
+            s16 avg = (r + g + b) / 3;
+
+            // Scale oscillation depth based on darkness:
+            // darker colors (small avg) → larger multiplier (up to ×2)
+            // brighter colors (large avg) → smaller multiplier (down to ×0.5)
+            //
+            // Using an inverse-linear curve: scale = 1.5 - (avg / 64.0)
+            // (so darkest colors pulse ~2× more, bright ones ~0.5×)
+            s16 depthScale = 96 - (avg * 2); // 0..96 roughly (fixed-point scale /64)
+            if (depthScale < 32) depthScale = 32; // clamp min
+            if (depthScale > 128) depthScale = 128;
+
+            // Apply scaled brightness oscillation
+            s16 brightShift = (baseBright * depthScale) >> 6; // depthScale ~64=1×, 128=2×
+
+            // Apply color modulation
+            r += hueShiftR + brightShift;
+            g += brightShift;
+            b += hueShiftB + brightShift;
+
+            // Clamp to [0, 31]
+            if (r < 0) r = 0; else if (r > 31) r = 31;
+            if (g < 0) g = 0; else if (g > 31) g = 31;
+            if (b < 0) b = 0; else if (b > 31) b = 31;
+
+            OBJ_PALETTE[OBJ_PALETTE_INDEX(palSlot, i)] = (b << 10) | (g << 5) | r;
+        }
     }
     if (sPalRotationCounter > 1000)
     {
