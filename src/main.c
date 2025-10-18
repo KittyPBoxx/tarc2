@@ -23,6 +23,7 @@
 #include "AgbAccuracy.h"
 #include "palette_effects.h"
 #include "palette.h"
+#include "trig.h"
 
 static void VBlankIntr(void);
 static void HBlankIntr(void);
@@ -486,16 +487,27 @@ console.log("};");
 
 #define PALETTE_3_1 ((16 * 3) + 0x01)
 #define PALETTE_3_2 ((16 * 3) + 0x02)
+#define PALETTE_3_4 ((16 * 3) + 0x04)
 #define PALETTE_3_5 ((16 * 3) + 0x05)
+#define PALETTE_3_11 ((16 * 3) + 0x0B)
 
 #define PALETTE_4_1 ((16 * 4) + 0x01) 
+#define PALETTE_4_7 ((16 * 4) + 0x07) 
+#define PALETTE_4_9 ((16 * 4) + 0x09) 
 
 #define PALETTE_5_1  ((16 * 5) + 0x01)
 #define PALETTE_5_2  ((16 * 5) + 0x02)
 #define PALETTE_5_3  ((16 * 5) + 0x03)
+#define PALETTE_5_5  ((16 * 5) + 0x05)
 #define PALETTE_5_8  ((16 * 5) + 0x08)
 #define PALETTE_5_9  ((16 * 5) + 0x09)
 #define PALETTE_5_10 ((16 * 5) + 0x0A)
+
+#define PALETTE_9_9  ((16 * 9) + 0x09)
+#define PALETTE_9_10 ((16 * 9) + 0x0A)
+
+#define PALETTE_10_9  ((16 * 10) + 0x09)
+#define PALETTE_10_10 ((16 * 10) + 0x0A)
 
 
 COMMON_DATA u16 baseColorsRAM[7][7] = {0};
@@ -581,12 +593,76 @@ static inline void RotateObjPalette0(void)
     }
 }
 
+EWRAM_DATA u32 sPalWaterCounter; 
+static inline u16 ApplyBrightnessToColor(u16 color, s16 delta)
+{
+    s16 r = (color & 0x1F) + delta;
+    s16 g = ((color >> 5) & 0x1F) + delta;
+    s16 b = ((color >> 10) & 0x1F) + delta;
+
+    if (r < 0) r = 0; else if (r > 31) r = 31;
+    if (g < 0) g = 0; else if (g > 31) g = 31;
+    if (b < 0) b = 0; else if (b > 31) b = 31;
+
+    return (b << 10) | (g << 5) | r;
+}
+
+
 void ApplyVBlankPaletteModifiers()
 {
     sPalRotationCounter++;
     if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS) // This is the petals not the grass
     {    
         RotateObjPalette0();    
+    } 
+    else if (gMain.vblankPaletteEffect == PALETTE_EFFECT_WATER)
+    {
+
+        // Increment our slower counter every few frames
+        static u8 frameDiv = 0;
+        if (++frameDiv >= 3)  // update every 3 frames
+        {
+            frameDiv = 0;
+            sPalWaterCounter++;
+        }
+
+        s16 wave = gSineTable[(sPalWaterCounter * 3) & 0xFF] >> 5;
+
+        // Base water edge colors
+        u16 lightBase = 0x6291; // lighter blue
+        u16 darkBase  = 0x55EA; // darker blue
+
+        // Apply a very small brightness shift
+        u16 light = ApplyBrightnessToColor(lightBase,  wave);
+        u16 dark  = ApplyBrightnessToColor(darkBase, -wave);
+
+        // outline
+        BG_PALETTE[PALETTE_5_3] = light;
+        BG_PALETTE[PALETTE_5_5] = dark;
+
+        // some outline + pads
+        //BG_PALETTE[PALETTE_4_7] = light;
+        BG_PALETTE[PALETTE_4_9] = dark;
+
+        // water flowers + highlights (smaller change, using bitshift)
+        //BG_PALETTE[PALETTE_3_4]  = dark;
+        BG_PALETTE[PALETTE_3_11] = ApplyBrightnessToColor(0x66D5, wave >> 1);
+
+
+        // outline
+        // BG_PALETTE[PALETTE_5_3] = 0x6291; // 0x6291 lighter blue
+        // BG_PALETTE[PALETTE_5_5] = 0x55ea; // 0x55ea darker blue
+
+        // // some outline + pads
+        // BG_PALETTE[PALETTE_4_7] = 0x6291; // 0x6291 lighter blue
+        // BG_PALETTE[PALETTE_4_9] = 0x55ea; // 0x55ea darker blue
+
+        // // water flowers + highlights
+        // BG_PALETTE[PALETTE_3_4] = 0x55ea; // 0x55ea darker blue
+        // BG_PALETTE[PALETTE_3_11] = 0x66d5; // 0x66d5 lighter blue
+        
+        // Cant change this because it also effects the grass (I really need to learn porytile palette overrides)
+        //BG_PALETTE[PALETTE_5_2] = 0x15a8;
     }
     if (sPalRotationCounter > 1000)
     {
@@ -600,7 +676,7 @@ void ApplyVBlankPaletteModifiers()
 
 static inline void applyHBlankPaletteModifiers()
 {
-    // This is all super time sensitive. It must be inlined and I suspect only works because of the prefetch buffer 
+    // This is all super time sensitive. It must be inlined <strike>and I suspect only works because of the prefetch buffer</strike> This is now all in ram so the prefetch buffer is no longer used.  
     // I reckon if we could force porytiles to block all the palette slots together 1 or 2 dmas it would be more efficent
     if (gMain.hblankPaletteEffect == PALETTE_EFFECT_GRASS && (REG_VCOUNT < 160 || REG_VCOUNT > 225))
     {

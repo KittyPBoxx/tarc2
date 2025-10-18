@@ -20,6 +20,9 @@ void ResumeMapPaletteEffects(void)
             EnableInterrupts(INTR_FLAG_HBLANK | INTR_FLAG_VBLANK);
             break;
         case MAP_NUM(MAP_FOREST):
+            gMain.vblankPaletteEffect = PALETTE_EFFECT_WATER;
+            EnableInterrupts(INTR_FLAG_VBLANK);
+            break;
         case MAP_NUM(MAP_MANOR):
         case MAP_NUM(MAP_CAVE_BOTTOM):
         case MAP_NUM(MAP_CAVE_TOP):
