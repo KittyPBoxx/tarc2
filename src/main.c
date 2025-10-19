@@ -500,6 +500,7 @@ console.log("};");
 #define PALETTE_5_1  ((16 * 5) + 0x01)
 #define PALETTE_5_2  ((16 * 5) + 0x02)
 #define PALETTE_5_3  ((16 * 5) + 0x03)
+#define PALETTE_5_4  ((16 * 5) + 0x04)
 #define PALETTE_5_5  ((16 * 5) + 0x05)
 #define PALETTE_5_8  ((16 * 5) + 0x08)
 #define PALETTE_5_9  ((16 * 5) + 0x09)
@@ -608,6 +609,77 @@ static inline u16 ApplyBrightnessToColor(u16 color, s16 delta)
 
     return (b << 10) | (g << 5) | r;
 }
+
+static const u16 sSkyGradient[40] = {
+    0x408c, 0x408c, 0x408d, 0x40ad, 0x40ae, 0x44cf, 0x44cf, 0x44d0, 
+    0x44f0, 0x44f1, 0x4912, 0x4912, 0x4913, 0x4933, 0x4934, 0x4955, 
+    0x4955, 0x4956, 0x4976, 0x4977, 0x4998, 0x4598, 0x4598, 0x45b9, 
+    0x45b9, 0x45da, 0x41da, 0x41da, 0x41fb, 0x41fb, 0x421c, 0x3e1c, 
+    0x3e1c, 0x3a3c, 0x3a3c, 0x3a5d, 0x365d, 0x365d, 0x327d, 0x327d
+};
+
+EWRAM_DATA u16 sStar1[40];
+EWRAM_DATA u16 sStar2[40];
+
+#define STAR_TWINKLE_SPEED  1    // Lower = slower fade
+#define STAR_PHASE_OFFSET   2    // How much to offset per star
+#define STAR_TWINKLE_MAX    8    // Max extra brightness (0–31)
+
+EWRAM_DATA static u8 sTwinkleFrame = 0;
+
+// Fast linear interpolation between two 5-bit colors
+static inline u8 Lerp5(u8 a, u8 b, u8 t)
+{
+    return a + (((b - a) * t) >> 4);
+}
+
+// Blend toward white (lighten)
+static inline u16 LightenTowardWhite(u16 color, u8 t)
+{
+    u8 r = color & 0x1F;
+    u8 g = (color >> 5) & 0x1F;
+    u8 b = (color >> 10) & 0x1F;
+
+    // Scale t to max allowed increment
+    u8 maxT = (t * STAR_TWINKLE_MAX) >> 4;
+
+    r += maxT;
+    if (r > 31) r = 31;
+    g += maxT;
+    if (g > 31) g = 31;
+    b += maxT;
+    if (b > 31) b = 31;
+
+    return (b << 10) | (g << 5) | r;
+}
+
+#define LUT_SIZE 168
+
+void UpdateStarPalettes(void)
+{
+    sTwinkleFrame += STAR_TWINKLE_SPEED;
+
+    for (int i = 0; i < 40; i++)
+    {
+        // Use LUT to pick a phase offset for each star
+        int lutIndex = i;
+        if (lutIndex >= LUT_SIZE) lutIndex -= LUT_SIZE;  // wrap without modulo
+        u8 phaseOffset = fastHashLUT[lutIndex] & 0x1F;  // 0–31
+
+        // Triangle wave using the LUT phase
+        u8 phase = (sTwinkleFrame + phaseOffset) & 0x1F; // 0–31 repeating
+        u8 t = (phase < 16) ? phase : (31 - phase);
+
+        // Out of phase for Star1 vs Star2
+        u8 t1 = t;
+        u8 t2 = 16 - t;
+
+        u16 base = sSkyGradient[i];
+        sStar1[i] = LightenTowardWhite(base, t1);
+        sStar2[i] = LightenTowardWhite(base, t2);
+    }
+}
+
 
 #define OBJ_PALETTE ((volatile u16 *)(0x5000000 + 0x200))
 #define OBJ_PALETTE_SLOT(n) ((n) * 16)
@@ -740,6 +812,11 @@ void ApplyVBlankPaletteModifiers()
             OBJ_PALETTE[OBJ_PALETTE_INDEX(palSlot, i)] = (b << 10) | (g << 5) | r;
         }
     }
+    else if (gMain.vblankPaletteEffect == PALETTE_EFFECT_PLAINS)
+    {
+        UpdateStarPalettes();
+    }
+
     if (sPalRotationCounter > 1000)
     {
         sPalRotationCounter = 0;
@@ -749,6 +826,7 @@ void ApplyVBlankPaletteModifiers()
 #define NUM_PALETTES 6
 #define PALETTE_SIZE 16
 #define PALETTE_BYTES (NUM_PALETTES * PALETTE_SIZE)
+
 
 static inline void applyHBlankPaletteModifiers()
 {
@@ -797,6 +875,13 @@ static inline void applyHBlankPaletteModifiers()
         // BG_PALETTE[PALETTE_5_3] = col3;
         ((u32*)&BG_PALETTE[PALETTE_5_8])[0] = PAIR_U16(col5, col6);
         // BG_PALETTE[PALETTE_5_10] = col7;
+    }
+    else if (gMain.vblankPaletteEffect == PALETTE_EFFECT_PLAINS && (REG_VCOUNT < 40))
+    {
+        BG_PALETTE[PALETTE_5_2] = sSkyGradient[REG_VCOUNT];
+
+        BG_PALETTE[PALETTE_5_3] = sStar1[REG_VCOUNT];
+        BG_PALETTE[PALETTE_5_4] = sStar2[REG_VCOUNT];
     }
 }
 

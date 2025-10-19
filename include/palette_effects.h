@@ -8,5 +8,6 @@ void PauseMapPaletteEffects(void);
 #define PALETTE_EFFECT_GRASS 1
 #define PALETTE_EFFECT_WATER 2
 #define PALETTE_EFFECT_RUINS 3
+#define PALETTE_EFFECT_PLAINS 4
 
 #endif // PALETTE_EFFECTS_H

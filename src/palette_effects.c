@@ -26,9 +26,13 @@ void ResumeMapPaletteEffects(void)
         case MAP_NUM(MAP_CAVE_BOTTOM):
             gMain.vblankPaletteEffect = PALETTE_EFFECT_RUINS;
             break;
+        case MAP_NUM(MAP_SUMMIT):
+            gMain.vblankPaletteEffect = PALETTE_EFFECT_PLAINS;
+            gMain.hblankPaletteEffect = PALETTE_EFFECT_PLAINS;
+            EnableInterrupts(INTR_FLAG_HBLANK | INTR_FLAG_VBLANK);
+            break;
         case MAP_NUM(MAP_MANOR):
         case MAP_NUM(MAP_CAVE_TOP):
-        case MAP_NUM(MAP_SUMMIT):
         case MAP_NUM(MAP_RETURN_PASS):
         default:
 

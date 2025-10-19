@@ -144,6 +144,7 @@ static const struct WeatherCallbacks sWeatherFuncs[] =
     [WEATHER_DROUGHT]            = {Drought_InitVars,       Drought_Main,       Drought_InitAll,       Drought_Finish},
     [WEATHER_DOWNPOUR]           = {Downpour_InitVars,      Thunderstorm_Main,  Downpour_InitAll,      Thunderstorm_Finish},
     [WEATHER_UNDERWATER_BUBBLES] = {Bubbles_InitVars,       Bubbles_Main,       Bubbles_InitAll,       Bubbles_Finish},
+    [WEATHER_GOD_RAYS]           = {GodRays_InitVars,       GodRays_Main,       GodRays_InitAll,       GodRays_Finish},
 };
 
 void (*const gWeatherPalStateFuncs[])(void) =
@@ -1169,5 +1170,6 @@ bool32 IsWeatherAlphaBlend(void)
     return (gWeatherPtr->currWeather == WEATHER_FOG_HORIZONTAL
          || gWeatherPtr->currWeather == WEATHER_FOG_DIAGONAL
          || gWeatherPtr->currWeather == WEATHER_UNDERWATER_BUBBLES
-         || gWeatherPtr->currWeather == WEATHER_UNDERWATER);
+         || gWeatherPtr->currWeather == WEATHER_UNDERWATER
+         || gWeatherPtr->currWeather == WEATHER_GOD_RAYS);
 }

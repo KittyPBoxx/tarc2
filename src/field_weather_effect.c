@@ -17,6 +17,7 @@
 #include "palette.h"
 #include "map_preview_screen.h"
 #include "constants/expansion.h"
+#include "field_camera.h"
 
 EWRAM_DATA static u8 sCurrentAbnormalWeather = 0;
 
@@ -1444,9 +1445,23 @@ void FogHorizontal_InitVars(void)
         gWeatherPtr->fogHScrollCounter = 0;
         gWeatherPtr->fogHScrollOffset = 0;
         gWeatherPtr->fogHScrollPosX = 0;
-        Weather_SetBlendCoeffs(0, 16);
+        //Weather_SetBlendCoeffs(0, 16);
     }
     gWeatherPtr->noShadows = FALSE;
+    // Force the desired blend immediately and make the target match so UpdateBlend won't interpolate away.
+    gWeatherPtr->currBlendEVA   = 1;
+    gWeatherPtr->currBlendEVB   = 16;
+    gWeatherPtr->targetBlendEVA = 1;
+    gWeatherPtr->targetBlendEVB = 16;
+
+    // Update the hw register directly (ensure macro BLDALPHA_BLEND(a,b) -> ((b << 8) | (a)))
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(1, 16));
+
+    // Also set the internal "current" so Weather_SetBlendCoeffs won't race later
+    gWeatherPtr->currBlendEVA = 1;
+    gWeatherPtr->currBlendEVB = 16;
+
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(1,16));
 }
 
 void FogHorizontal_InitAll(void)
@@ -1470,21 +1485,21 @@ void FogHorizontal_Main(void)
         CreateFogHorizontalSprites();
         if (gWeatherPtr->currWeather == WEATHER_FOG_HORIZONTAL)
         {
-            Weather_SetTargetBlendCoeffs(12, 8, 3);
+            //Weather_SetTargetBlendCoeffs(12, 8, 3);
             UpdateShadowColor(RGB_GRAY);
         }
         else
         {
-            Weather_SetTargetBlendCoeffs(4, 16, 0);
+            //Weather_SetTargetBlendCoeffs(4, 16, 0);
         }
         gWeatherPtr->initStep++;
         break;
     case 1:
-        if (Weather_UpdateBlend())
-        {
+        // if (Weather_UpdateBlend())
+        // {
             gWeatherPtr->weatherGfxLoaded = TRUE;
             gWeatherPtr->initStep++;
-        }
+        // }
         break;
     }
 }
@@ -1501,11 +1516,11 @@ bool8 FogHorizontal_Finish(void)
     switch (gWeatherPtr->finishStep)
     {
     case 0:
-        Weather_SetTargetBlendCoeffs(0, 16, 3);
+        //Weather_SetTargetBlendCoeffs(0, 16, 3);
         gWeatherPtr->finishStep++;
         break;
     case 1:
-        if (Weather_UpdateBlend())
+        //if (Weather_UpdateBlend())
             gWeatherPtr->finishStep++;
         break;
     case 2:
@@ -1523,6 +1538,7 @@ bool8 FogHorizontal_Finish(void)
 
 static void FogHorizontalSpriteCallback(struct Sprite *sprite)
 {
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(1,16));
     sprite->y2 = (u8)gSpriteCoordOffsetY;
     sprite->x = gWeatherPtr->fogHScrollPosX + 32 + sprite->tSpriteColumn * 64;
     if (sprite->x >= DISPLAY_WIDTH + 32)
@@ -2580,6 +2596,190 @@ static void CreateAbnormalWeatherTask(void)
 #undef tWeatherB
 #undef tDelay
 
+//------------------------------------------------------------------------------
+// WEATHER_GOD_RAYS
+//------------------------------------------------------------------------------
+
+#define tSpriteTimer    gWeatherPtr->ashUnused
+#define tGlowTimer      gWeatherPtr->droughtTimer
+#define tSpritesCreated gWeatherPtr->ashSpritesCreated
+#define tSpriteArray    gWeatherPtr->sprites.s1.snowflakeSprites
+#define tSpriteColumn   data[0]
+#define tSpriteRow      data[1]
+
+static void CreateGodRaySprites(void);
+static void DestroyGodRaySprites(void);
+static void UpdateGodRaySprite(struct Sprite *);
+
+void GodRays_InitVars(void)
+{
+    gWeatherPtr->initStep = 0;
+    gWeatherPtr->targetColorMapIndex = 3;
+    gWeatherPtr->colorMapStepDelay = 20;
+    Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY);
+
+    tSpriteTimer = 0;
+    tGlowTimer = 0;
+    tSpritesCreated = FALSE;
+
+    gWeatherPtr->noShadows = FALSE;
+}
+
+void GodRays_InitAll(void)
+{
+    GodRays_InitVars();
+    while (!tSpritesCreated)
+        GodRays_Main();
+    gWeatherPtr->weatherGfxLoaded = TRUE;
+}
+
+void GodRays_Main(void)
+{
+    switch (gWeatherPtr->initStep)
+    {
+    case 0:
+        CreateGodRaySprites();
+        gWeatherPtr->initStep++;
+        break;
+    case 1:
+        Weather_SetTargetBlendCoeffs(12, 8, 8); // subtle brightening for rays
+        gWeatherPtr->initStep++;
+        break;
+    case 2:
+        if (!Weather_UpdateBlend())
+            break;
+        tSpritesCreated = TRUE;
+        gWeatherPtr->initStep++;
+        break;
+    }
+}
+
+bool8 GodRays_Finish(void)
+{
+    switch (gWeatherPtr->finishStep)
+    {
+    case 0:
+        Weather_SetTargetBlendCoeffs(0, 16, 1);
+        gWeatherPtr->finishStep++;
+        break;
+    case 1:
+        if (!Weather_UpdateBlend())
+            break;
+        gWeatherPtr->finishStep++;
+        break;
+    case 2:
+        DestroyGodRaySprites();
+        gWeatherPtr->finishStep++;
+        break;
+    default:
+        return FALSE;
+    }
+    return TRUE;
+}
+
+//------------------------------------------------------------------------------
+// Sprites (currently unused)
+//------------------------------------------------------------------------------
+
+static const struct SpriteSheet sGodRaySpriteSheet =
+{
+    .data = gWeatherFogDiagonalTiles, // reuse fog diagonal tiles
+    .size = sizeof(gWeatherFogDiagonalTiles),
+    .tag = GFXTAG_FOG_D,
+};
+
+static const struct OamData sGodRaySpriteOamData =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_BLEND,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(64x64),
+    .x = 0,
+    .size = SPRITE_SIZE(64x64),
+    .tileNum = 0,
+    .priority = 1,
+    .paletteNum = 0,
+};
+
+static const union AnimCmd sGodRaySpriteAnimCmd0[] =
+{
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sGodRaySpriteAnimCmds[] =
+{
+    sGodRaySpriteAnimCmd0,
+};
+
+static const struct SpriteTemplate sGodRaySpriteTemplate =
+{
+    .tileTag = GFXTAG_FOG_D,
+    .paletteTag = PALTAG_WEATHER,
+    .oam = &sGodRaySpriteOamData,
+    .anims = sGodRaySpriteAnimCmds,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateGodRaySprite,
+};
+
+static void CreateGodRaySprites(void)
+{
+    if (tSpritesCreated)
+        return;
+
+    LoadSpriteSheet(&sGodRaySpriteSheet);
+    for (int i = 0; i < NUM_GOD_RAY_SPRITES; i++)
+    {
+        u8 spriteId = CreateSpriteAtEnd(&sGodRaySpriteTemplate, 0, (i / 8) * 64, 0xFF);
+        if (spriteId != MAX_SPRITES)
+        {
+            struct Sprite *sprite = &gSprites[spriteId];
+            sprite->tSpriteColumn = i % 8; // column in the grid
+            sprite->tSpriteRow = i / 8;    // row in the grid
+            tSpriteArray[i] = sprite;
+        }
+        else
+        {
+            tSpriteArray[i] = NULL;
+        }
+    }
+
+    tSpritesCreated = TRUE;
+}
+
+static void UpdateGodRaySprite(struct Sprite *sprite)
+{
+    sprite->oam.priority = (gMain.vblankCounter1 & 1) ? 1 : 2;
+
+    // Align sprite to camera + tile position
+    sprite->x = 32 + sprite->tSpriteColumn * 64 + gTotalCameraPixelOffsetX;
+    sprite->y = 32 + sprite->tSpriteRow    * 64 + gTotalCameraPixelOffsetY;
+}
+
+static void DestroyGodRaySprites(void)
+{
+    for (int i = 0; i < NUM_GOD_RAY_SPRITES; i++)
+    {
+        if (tSpriteArray[i])
+            DestroySprite(tSpriteArray[i]);
+        tSpriteArray[i] = NULL;
+    }
+
+    FreeSpriteTilesByTag(GFXTAG_FOG_D);
+    tSpritesCreated = FALSE;
+}
+
+#undef tSpriteTimer
+#undef tGlowTimer
+#undef tSpritesCreated
+#undef tSpriteArray
+#undef tSpriteColumn
+#undef tSpriteRow
+
+//------------------------------------------------------------------------------
+
 static u8 TranslateWeatherNum(u8);
 
 void SetSavedWeather(u32 weather)
@@ -2686,6 +2886,7 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_ABNORMAL:           return WEATHER_ABNORMAL;
     case WEATHER_ROUTE119_CYCLE:     return sWeatherCycleRoute119[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE123_CYCLE:     return sWeatherCycleRoute123[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_GOD_RAYS:           return WEATHER_GOD_RAYS;
     default:                         return WEATHER_NONE;
     }
 }

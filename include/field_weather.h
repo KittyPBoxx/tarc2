@@ -226,6 +226,12 @@ void Bubbles_Main(void);
 void Bubbles_InitAll(void);
 bool8 Bubbles_Finish(void);
 
+void GodRays_InitVars(void);
+void GodRays_Main(void);
+void GodRays_InitAll(void);
+bool8 GodRays_Finish(void);
+
+
 u8 GetSavedWeather(void);
 void SetSavedWeather(u32 weather);
 void SetSavedWeatherFromCurrMapHeader(void);
