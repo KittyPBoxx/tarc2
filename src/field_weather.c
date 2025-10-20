@@ -197,6 +197,7 @@ static const u8 ALIGNED(2) sBasePaletteColorMapTypes[32] =
 
 const u16 ALIGNED(4) gFogPalette[] = INCBIN_U16("graphics/weather/fog.gbapal");
 const u16 ALIGNED(4) gSnowPalette[] = INCBIN_U16("graphics/weather/snow0.gbapal");
+const u16 ALIGNED(4) gSkylightPalette[] = INCBIN_U16("graphics/weather/skylight.gbapal");
 
 void StartWeather(void)
 {

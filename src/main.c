@@ -685,6 +685,231 @@ void UpdateStarPalettes(void)
 #define OBJ_PALETTE_SLOT(n) ((n) * 16)
 #define OBJ_PALETTE_INDEX(n, i) (((n) * 16) + (i))
 
+static inline void updateWaterPalettes() 
+{
+    // Increment our slower counter every few frames
+    static u8 frameDiv = 0;
+    if (++frameDiv >= 3)  // update every 3 frames
+    {
+        frameDiv = 0;
+        sPalWaterCounter++;
+    }
+
+    s16 wave = gSineTable[(sPalWaterCounter * 3) & 0xFF] >> 5;
+
+    // Base water edge colors
+    u16 lightBase = 0x6291; // lighter blue
+    u16 darkBase  = 0x55EA; // darker blue
+
+    // Apply a very small brightness shift
+    u16 light = ApplyBrightnessToColor(lightBase,  wave);
+    u16 dark  = ApplyBrightnessToColor(darkBase, -wave);
+
+    // outline
+    BG_PALETTE[PALETTE_5_3] = light;
+    BG_PALETTE[PALETTE_5_5] = dark;
+
+    // some outline + pads
+    //BG_PALETTE[PALETTE_4_7] = light;
+    BG_PALETTE[PALETTE_4_9] = dark;
+
+    // water flowers + highlights (smaller change, using bitshift)
+    //BG_PALETTE[PALETTE_3_4]  = dark;
+    BG_PALETTE[PALETTE_3_11] = ApplyBrightnessToColor(0x66D5, wave >> 1);
+
+
+    // outline
+    // BG_PALETTE[PALETTE_5_3] = 0x6291; // 0x6291 lighter blue
+    // BG_PALETTE[PALETTE_5_5] = 0x55ea; // 0x55ea darker blue
+
+    // // some outline + pads
+    // BG_PALETTE[PALETTE_4_7] = 0x6291; // 0x6291 lighter blue
+    // BG_PALETTE[PALETTE_4_9] = 0x55ea; // 0x55ea darker blue
+
+    // // water flowers + highlights
+    // BG_PALETTE[PALETTE_3_4] = 0x55ea; // 0x55ea darker blue
+    // BG_PALETTE[PALETTE_3_11] = 0x66d5; // 0x66d5 lighter blue
+    
+    // Cant change this because it also effects the grass (I really need to learn porytile palette overrides)
+    //BG_PALETTE[PALETTE_5_2] = 0x15a8;
+}
+
+static inline void updateCrystalPalettes() 
+{
+    static u16 sCrystalPhase = 0;
+    const u16 indexDelta = 2;
+    const u8  fracDelta  = 64; // controls interpolation smoothness (64 → 4 substeps)
+
+    s16 palSlot = IndexOfSpritePaletteTag(OBJ_EVENT_PAL_TAG_POOCHYENA);
+
+    sCrystalPhase = (u16)(sCrystalPhase + ((indexDelta << 8) | fracDelta));
+
+    // --- Interpolated sine A ---
+    u8 idxA  = (u8)(sCrystalPhase >> 8);
+    u8 idxA1 = (u8)(idxA + 1);
+    u8 frac  = (u8)(sCrystalPhase & 0xFF);
+
+    s16 v0 = gSineTable[idxA];
+    s16 v1 = gSineTable[idxA1];
+    s16 waveA = (s16)(v0 + (((s32)(v1 - v0) * frac) >> 8)); // interpolated -255..+255
+
+    // --- Interpolated sine B (phase shifted by 64 indices) ---
+    u16 phaseB = (u16)(sCrystalPhase + (64 << 8));
+    u8 idxB  = (u8)(phaseB >> 8);
+    u8 idxB1 = (u8)(idxB + 1);
+    u8 fracB = (u8)(phaseB & 0xFF);
+
+    s16 vb0 = gSineTable[idxB];
+    s16 vb1 = gSineTable[idxB1];
+    s16 waveB = (s16)(vb0 + (((s32)(vb1 - vb0) * fracB) >> 8));
+
+    // Core wave-to-brightness mapping
+    s16 baseBright = waveA >> 6;  // ~ -4..+4
+    s16 hueShiftR  =  waveB >> 7; // ~ -2..+2
+    s16 hueShiftB  = -(waveB >> 7);
+
+    for (int i = 1; i < 16; i++) // skip transparency index 0
+    {
+        u16 baseColor = OBJ_PALETTE[OBJ_PALETTE_INDEX(palSlot, i)];
+
+        s16 r = baseColor & 0x1F;
+        s16 g = (baseColor >> 5) & 0x1F;
+        s16 b = (baseColor >> 10) & 0x1F;
+
+        // Compute perceived brightness (average of RGB roughly)
+        s16 avg = (r + g + b) / 3;
+
+        // Scale oscillation depth based on darkness:
+        // darker colors (small avg) → larger multiplier (up to ×2)
+        // brighter colors (large avg) → smaller multiplier (down to ×0.5)
+        //
+        // Using an inverse-linear curve: scale = 1.5 - (avg / 64.0)
+        // (so darkest colors pulse ~2× more, bright ones ~0.5×)
+        s16 depthScale = 96 - (avg * 2); // 0..96 roughly (fixed-point scale /64)
+        if (depthScale < 32) depthScale = 32; // clamp min
+        if (depthScale > 128) depthScale = 128;
+
+        // Apply scaled brightness oscillation
+        s16 brightShift = (baseBright * depthScale) >> 6; // depthScale ~64=1×, 128=2×
+
+        // Apply color modulation
+        r += hueShiftR + brightShift;
+        g += brightShift;
+        b += hueShiftB + brightShift;
+
+        // Clamp to [0, 31]
+        if (r < 0) r = 0; else if (r > 31) r = 31;
+        if (g < 0) g = 0; else if (g > 31) g = 31;
+        if (b < 0) b = 0; else if (b > 31) b = 31;
+
+        OBJ_PALETTE[OBJ_PALETTE_INDEX(palSlot, i)] = (b << 10) | (g << 5) | r;
+    }
+}
+
+#define SKYLIGHT_PULSE_SPEED_FP  2  // smaller = slower (8 ≈ 1/8th speed)
+EWRAM_DATA static u16 sSkylightPulseTimer = 0;  // 8.8 fixed-point
+#define SKYLIGHT_PULSE_STRENGTH 6   // Max brightness increase (0–31)
+
+// Base skylight palette colors (RGB555)
+static const u16 sBaseSkylightPalette[15] = {
+    RGB(31, 0, 31),   // placeholder (255 0 254) transparency marker
+    RGB(26, 26, 25),
+    RGB(23, 23, 22),
+    RGB(23, 23, 20),
+    RGB(21, 20, 18),
+    RGB(18, 18, 15),
+    RGB(17, 17, 14),
+    RGB(15, 15, 14),
+    RGB(15, 15, 12),
+    RGB(12, 12, 10),
+    RGB(9, 9, 7),
+    RGB(7, 7, 5),
+    RGB(4, 4, 3),
+    RGB(2, 2, 1),
+    RGB(0, 0, 0),
+};
+
+static inline u16 AdjustBrightness(u16 color, s8 delta)
+{
+    s8 r = color & 0x1F;
+    s8 g = (color >> 5) & 0x1F;
+    s8 b = (color >> 10) & 0x1F;
+
+    r += delta; if (r < 0) r = 0; if (r > 31) r = 31;
+    g += delta; if (g < 0) g = 0; if (g > 31) g = 31;
+    b += delta; if (b < 0) b = 0; if (b > 31) b = 31;
+
+    return (b << 10) | (g << 5) | r;
+}
+
+static const u8 sOrangeBiasLUT[16] = {
+    5, 6, 6, 7, 8, 7, 6, 6,
+    5,  4,  4,  3,  2,  2,  1,  1
+};
+
+static const u8 sPulseCurve[32] = {
+    0, 1, 2, 3, 5, 6, 7, 9,
+    10, 11, 12, 13, 14, 14, 15, 15,
+    15, 15, 14, 14, 13, 12, 11, 10,
+    9, 7, 6, 5, 3, 2, 1, 0
+};
+
+static inline u8 Clamp5(s16 v)
+{
+    if (v < 0) return 0;
+    if (v > 31) return 31;
+    return (u8)v;
+}
+
+#define PAUSE_FRAMES 15
+
+static inline void updateSkylightPalettes(void)
+{
+    // Determine if we are at the top or bottom of the curve
+    u8 index = (sSkylightPulseTimer >> 3) & 0x1F;  // 0..31
+    s8 wave = sPulseCurve[index];                  // triangle -> sin^2-ish curve
+
+    // Pause logic: only advance the timer if we're not in a pause window
+    if (!((index == 0 && (gMain.vblankCounter1 & (PAUSE_FRAMES-1)) != 0)
+       || (index == 31 && (gMain.vblankCounter1 & (PAUSE_FRAMES-1)) != 0)))
+    {
+        sSkylightPulseTimer += SKYLIGHT_PULSE_SPEED_FP;
+    }
+
+    s8 brightnessDelta = wave - 4;
+
+    // Separate brighten/darken scale
+    s8 delta;
+    if (brightnessDelta > 0)
+        delta = (brightnessDelta * (SKYLIGHT_PULSE_STRENGTH / 2)) / 8;
+    else
+        delta = (brightnessDelta * SKYLIGHT_PULSE_STRENGTH) / 8;
+
+    // Use wave value to pick a consistent “orange-ness”
+    u8 orangeBias = sOrangeBiasLUT[wave & 0xF];
+
+    for (int i = 1; i < 15; i++)
+    {
+        u16 base = sBaseSkylightPalette[i];
+        s8 r = base & 0x1F;
+        s8 g = (base >> 5) & 0x1F;
+        s8 b = (base >> 10) & 0x1F;
+
+        // Apply brightness adjustment
+        r = Clamp5(r + delta);
+        g = Clamp5(g + delta);
+        b = Clamp5(b + delta);
+
+        // Apply independent orange bias (more red, less blue)
+        r = Clamp5(r + (orangeBias >> 2));
+        b = Clamp5(b - (orangeBias >> 3));
+
+        if (i != 8)
+            OBJ_PALETTE[PALETTE_0_1 + i] = (b << 10) | (g << 5) | r;
+    }
+}
+
+
 void ApplyVBlankPaletteModifiers()
 {
     sPalRotationCounter++;
@@ -694,123 +919,12 @@ void ApplyVBlankPaletteModifiers()
     } 
     else if (gMain.vblankPaletteEffect == PALETTE_EFFECT_WATER)
     {
-
-        // Increment our slower counter every few frames
-        static u8 frameDiv = 0;
-        if (++frameDiv >= 3)  // update every 3 frames
-        {
-            frameDiv = 0;
-            sPalWaterCounter++;
-        }
-
-        s16 wave = gSineTable[(sPalWaterCounter * 3) & 0xFF] >> 5;
-
-        // Base water edge colors
-        u16 lightBase = 0x6291; // lighter blue
-        u16 darkBase  = 0x55EA; // darker blue
-
-        // Apply a very small brightness shift
-        u16 light = ApplyBrightnessToColor(lightBase,  wave);
-        u16 dark  = ApplyBrightnessToColor(darkBase, -wave);
-
-        // outline
-        BG_PALETTE[PALETTE_5_3] = light;
-        BG_PALETTE[PALETTE_5_5] = dark;
-
-        // some outline + pads
-        //BG_PALETTE[PALETTE_4_7] = light;
-        BG_PALETTE[PALETTE_4_9] = dark;
-
-        // water flowers + highlights (smaller change, using bitshift)
-        //BG_PALETTE[PALETTE_3_4]  = dark;
-        BG_PALETTE[PALETTE_3_11] = ApplyBrightnessToColor(0x66D5, wave >> 1);
-
-
-        // outline
-        // BG_PALETTE[PALETTE_5_3] = 0x6291; // 0x6291 lighter blue
-        // BG_PALETTE[PALETTE_5_5] = 0x55ea; // 0x55ea darker blue
-
-        // // some outline + pads
-        // BG_PALETTE[PALETTE_4_7] = 0x6291; // 0x6291 lighter blue
-        // BG_PALETTE[PALETTE_4_9] = 0x55ea; // 0x55ea darker blue
-
-        // // water flowers + highlights
-        // BG_PALETTE[PALETTE_3_4] = 0x55ea; // 0x55ea darker blue
-        // BG_PALETTE[PALETTE_3_11] = 0x66d5; // 0x66d5 lighter blue
-        
-        // Cant change this because it also effects the grass (I really need to learn porytile palette overrides)
-        //BG_PALETTE[PALETTE_5_2] = 0x15a8;
+        updateWaterPalettes();
     }
     else if (gMain.vblankPaletteEffect == PALETTE_EFFECT_RUINS)
     {
-        static u16 sCrystalPhase = 0;
-        const u16 indexDelta = 2;
-        const u8  fracDelta  = 64; // controls interpolation smoothness (64 → 4 substeps)
-
-        s16 palSlot = IndexOfSpritePaletteTag(OBJ_EVENT_PAL_TAG_POOCHYENA);
-
-        sCrystalPhase = (u16)(sCrystalPhase + ((indexDelta << 8) | fracDelta));
-
-        // --- Interpolated sine A ---
-        u8 idxA  = (u8)(sCrystalPhase >> 8);
-        u8 idxA1 = (u8)(idxA + 1);
-        u8 frac  = (u8)(sCrystalPhase & 0xFF);
-
-        s16 v0 = gSineTable[idxA];
-        s16 v1 = gSineTable[idxA1];
-        s16 waveA = (s16)(v0 + (((s32)(v1 - v0) * frac) >> 8)); // interpolated -255..+255
-
-        // --- Interpolated sine B (phase shifted by 64 indices) ---
-        u16 phaseB = (u16)(sCrystalPhase + (64 << 8));
-        u8 idxB  = (u8)(phaseB >> 8);
-        u8 idxB1 = (u8)(idxB + 1);
-        u8 fracB = (u8)(phaseB & 0xFF);
-
-        s16 vb0 = gSineTable[idxB];
-        s16 vb1 = gSineTable[idxB1];
-        s16 waveB = (s16)(vb0 + (((s32)(vb1 - vb0) * fracB) >> 8));
-
-        // Core wave-to-brightness mapping
-        s16 baseBright = waveA >> 6;  // ~ -4..+4
-        s16 hueShiftR  =  waveB >> 7; // ~ -2..+2
-        s16 hueShiftB  = -(waveB >> 7);
-
-        for (int i = 1; i < 16; i++) // skip transparency index 0
-        {
-            u16 baseColor = OBJ_PALETTE[OBJ_PALETTE_INDEX(palSlot, i)];
-
-            s16 r = baseColor & 0x1F;
-            s16 g = (baseColor >> 5) & 0x1F;
-            s16 b = (baseColor >> 10) & 0x1F;
-
-            // Compute perceived brightness (average of RGB roughly)
-            s16 avg = (r + g + b) / 3;
-
-            // Scale oscillation depth based on darkness:
-            // darker colors (small avg) → larger multiplier (up to ×2)
-            // brighter colors (large avg) → smaller multiplier (down to ×0.5)
-            //
-            // Using an inverse-linear curve: scale = 1.5 - (avg / 64.0)
-            // (so darkest colors pulse ~2× more, bright ones ~0.5×)
-            s16 depthScale = 96 - (avg * 2); // 0..96 roughly (fixed-point scale /64)
-            if (depthScale < 32) depthScale = 32; // clamp min
-            if (depthScale > 128) depthScale = 128;
-
-            // Apply scaled brightness oscillation
-            s16 brightShift = (baseBright * depthScale) >> 6; // depthScale ~64=1×, 128=2×
-
-            // Apply color modulation
-            r += hueShiftR + brightShift;
-            g += brightShift;
-            b += hueShiftB + brightShift;
-
-            // Clamp to [0, 31]
-            if (r < 0) r = 0; else if (r > 31) r = 31;
-            if (g < 0) g = 0; else if (g > 31) g = 31;
-            if (b < 0) b = 0; else if (b > 31) b = 31;
-
-            OBJ_PALETTE[OBJ_PALETTE_INDEX(palSlot, i)] = (b << 10) | (g << 5) | r;
-        }
+        updateCrystalPalettes();
+        updateSkylightPalettes();
     }
     else if (gMain.vblankPaletteEffect == PALETTE_EFFECT_PLAINS)
     {

@@ -31,6 +31,7 @@ const u8 gWeatherBubbleTiles[] = INCBIN_U8("graphics/weather/bubble.4bpp");
 const u8 gWeatherAshTiles[] = INCBIN_U8("graphics/weather/ash.4bpp");
 const u8 gWeatherRainTiles[] = INCBIN_U8("graphics/weather/rain.4bpp");
 const u8 gWeatherSandstormTiles[] = INCBIN_U8("graphics/weather/sandstorm.4bpp");
+const u8 gWeatherSkylightTiles[] = INCBIN_U8("graphics/weather/skylight.4bpp");
 
 //------------------------------------------------------------------------------
 // WEATHER_SUNNY_CLOUDS
@@ -2611,12 +2612,16 @@ static void CreateGodRaySprites(void);
 static void DestroyGodRaySprites(void);
 static void UpdateGodRaySprite(struct Sprite *);
 
+
 void GodRays_InitVars(void)
 {
+    CpuCopy32((u32 *)gSkylightPalette, (u32 *)&gPlttBufferUnfaded[OBJ_PLTT_ID(gWeatherPtr->contrastColorMapSpritePalIndex)], PLTT_SIZE_4BPP);
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(7,15));
+
     gWeatherPtr->initStep = 0;
     gWeatherPtr->targetColorMapIndex = 3;
     gWeatherPtr->colorMapStepDelay = 20;
-    Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY);
+    //Weather_SetBlendCoeffs(8, BASE_SHADOW_INTENSITY);
 
     tSpriteTimer = 0;
     tGlowTimer = 0;
@@ -2642,12 +2647,12 @@ void GodRays_Main(void)
         gWeatherPtr->initStep++;
         break;
     case 1:
-        Weather_SetTargetBlendCoeffs(12, 8, 8); // subtle brightening for rays
+        //Weather_SetTargetBlendCoeffs(12, 8, 8); // subtle brightening for rays
         gWeatherPtr->initStep++;
         break;
     case 2:
-        if (!Weather_UpdateBlend())
-            break;
+        // if (!Weather_UpdateBlend())
+        //     break;
         tSpritesCreated = TRUE;
         gWeatherPtr->initStep++;
         break;
@@ -2659,12 +2664,12 @@ bool8 GodRays_Finish(void)
     switch (gWeatherPtr->finishStep)
     {
     case 0:
-        Weather_SetTargetBlendCoeffs(0, 16, 1);
+        // Weather_SetTargetBlendCoeffs(0, 16, 1);
         gWeatherPtr->finishStep++;
         break;
     case 1:
-        if (!Weather_UpdateBlend())
-            break;
+        // if (!Weather_UpdateBlend())
+        //     break;
         gWeatherPtr->finishStep++;
         break;
     case 2:
@@ -2678,13 +2683,13 @@ bool8 GodRays_Finish(void)
 }
 
 //------------------------------------------------------------------------------
-// Sprites (currently unused)
+// Sprites
 //------------------------------------------------------------------------------
 
 static const struct SpriteSheet sGodRaySpriteSheet =
 {
-    .data = gWeatherFogDiagonalTiles, // reuse fog diagonal tiles
-    .size = sizeof(gWeatherFogDiagonalTiles),
+    .data = gWeatherSkylightTiles,
+    .size = sizeof(gWeatherSkylightTiles),
     .tag = GFXTAG_FOG_D,
 };
 
@@ -2724,20 +2729,49 @@ static const struct SpriteTemplate sGodRaySpriteTemplate =
     .callback = UpdateGodRaySprite,
 };
 
+static const struct {
+    s16 col; 
+    s16 row; 
+    s16 fineX; 
+    s16 fineY; 
+} sGodRaySpritePositions[NUM_GOD_RAY_SPRITES] = {
+    {  3,  5, -20, 5},  
+    {  4,  3 , 12, -5},
+    {  6,  2 , 60, 5},
+    {  4,  4 , 60, -5},
+    {  5,  3 , 40, -2},
+    {  3,  3 , -20, -40},
+    {  6,  5 , 76, -10}
+};
+
 static void CreateGodRaySprites(void)
 {
     if (tSpritesCreated)
         return;
 
+    // Capture the player's initial world pixel position once at creation (tile -> px: *16)
+    gWeatherPtr->sandstormXOffset = ((u32)gSaveBlock1Ptr->pos.x * 16) + gTotalCameraPixelOffsetX;
+    gWeatherPtr->sandstormYOffset = ((u32)gSaveBlock1Ptr->pos.y * 16) + gTotalCameraPixelOffsetY;
+
     LoadSpriteSheet(&sGodRaySpriteSheet);
+
     for (int i = 0; i < NUM_GOD_RAY_SPRITES; i++)
     {
-        u8 spriteId = CreateSpriteAtEnd(&sGodRaySpriteTemplate, 0, (i / 8) * 64, 0xFF);
+        u8 spriteId = CreateSpriteAtEnd(&sGodRaySpriteTemplate, 0, 0, 0xFF);
         if (spriteId != MAX_SPRITES)
         {
             struct Sprite *sprite = &gSprites[spriteId];
-            sprite->tSpriteColumn = i % 8; // column in the grid
-            sprite->tSpriteRow = i / 8;    // row in the grid
+
+            // store logical grid indices for any existing code that expects them
+            sprite->tSpriteColumn = sGodRaySpritePositions[i].col;
+            sprite->tSpriteRow    = sGodRaySpritePositions[i].row;
+
+            // Compute and store absolute world pixel coordinates for this ray (centered)
+            // worldX_px = 32 + col * 64  (matches your update math's base)
+            sprite->data[6] = 32 + sGodRaySpritePositions[i].col * 64; // world X in px (s16)
+            sprite->data[7] = 32 + sGodRaySpritePositions[i].row * 64; // world Y in px (s16)
+            sprite->data[5] = i;
+
             tSpriteArray[i] = sprite;
         }
         else
@@ -2752,11 +2786,21 @@ static void CreateGodRaySprites(void)
 static void UpdateGodRaySprite(struct Sprite *sprite)
 {
     sprite->oam.priority = (gMain.vblankCounter1 & 1) ? 1 : 2;
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(7, 15));
 
-    // Align sprite to camera + tile position
-    sprite->x = 32 + sprite->tSpriteColumn * 64 + gTotalCameraPixelOffsetX;
-    sprite->y = 32 + sprite->tSpriteRow    * 64 + gTotalCameraPixelOffsetY;
+    // Use the world pixel coords stored at creation (data[6]/data[7])
+    // and the player-load pixel origin stored in gWeatherPtr->sandstormXOffset/Y.
+    s32 worldX = (s16)sprite->data[6]; // world pixel X of the ray
+    s32 worldY = (s16)sprite->data[7]; // world pixel Y of the ray
+
+    s32 playerLoadPxX = (s32)gWeatherPtr->sandstormXOffset;
+    s32 playerLoadPxY = (s32)gWeatherPtr->sandstormYOffset;
+
+    // screen = world - playerLoad + cameraOffset
+    sprite->x = worldX - playerLoadPxX + gTotalCameraPixelOffsetX + sGodRaySpritePositions[sprite->data[5]].fineX;
+    sprite->y = worldY - playerLoadPxY + gTotalCameraPixelOffsetY + sGodRaySpritePositions[sprite->data[5]].fineY;
 }
+
 
 static void DestroyGodRaySprites(void)
 {

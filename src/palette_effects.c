@@ -25,6 +25,7 @@ void ResumeMapPaletteEffects(void)
             break;
         case MAP_NUM(MAP_CAVE_BOTTOM):
             gMain.vblankPaletteEffect = PALETTE_EFFECT_RUINS;
+            EnableInterrupts(INTR_FLAG_VBLANK);
             break;
         case MAP_NUM(MAP_SUMMIT):
             gMain.vblankPaletteEffect = PALETTE_EFFECT_PLAINS;
