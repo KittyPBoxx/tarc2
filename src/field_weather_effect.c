@@ -32,6 +32,8 @@ const u8 gWeatherAshTiles[] = INCBIN_U8("graphics/weather/ash.4bpp");
 const u8 gWeatherRainTiles[] = INCBIN_U8("graphics/weather/rain.4bpp");
 const u8 gWeatherSandstormTiles[] = INCBIN_U8("graphics/weather/sandstorm.4bpp");
 const u8 gWeatherSkylightTiles[] = INCBIN_U8("graphics/weather/skylight.4bpp");
+const u8 gWeatherSkylightTiles2[] = INCBIN_U8("graphics/weather/skylight2.4bpp");
+
 
 //------------------------------------------------------------------------------
 // WEATHER_SUNNY_CLOUDS
@@ -2686,11 +2688,29 @@ bool8 GodRays_Finish(void)
 // Sprites
 //------------------------------------------------------------------------------
 
+static const struct SpriteFrameImage sSkylightSpriteImages[] =
+{
+    {gWeatherSkylightTiles + 0x00, 64*64},
+    {gWeatherSkylightTiles + 64*64, 64*64}
+};
+
+static const struct SpriteFrameImage sSkylightSpriteImages2[] =
+{
+    {gWeatherSkylightTiles2 + 0x00, 64*64}
+};
+
 static const struct SpriteSheet sGodRaySpriteSheet =
 {
     .data = gWeatherSkylightTiles,
     .size = sizeof(gWeatherSkylightTiles),
     .tag = GFXTAG_FOG_D,
+};
+
+static const struct SpriteSheet sGodRaySpriteSheet2 =
+{
+    .data = gWeatherSkylightTiles2,
+    .size = sizeof(gWeatherSkylightTiles2),
+    .tag = GFXTAG_SANDSTORM,
 };
 
 static const struct OamData sGodRaySpriteOamData =
@@ -2709,13 +2729,32 @@ static const struct OamData sGodRaySpriteOamData =
 
 static const union AnimCmd sGodRaySpriteAnimCmd0[] =
 {
-    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_FRAME(0, 1),
+    ANIMCMD_FRAME(64, 1),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd sGodRaySpriteAnimCmd1[] =
+{
+    ANIMCMD_FRAME(64, 1),
     ANIMCMD_END,
 };
 
 static const union AnimCmd *const sGodRaySpriteAnimCmds[] =
 {
     sGodRaySpriteAnimCmd0,
+    sGodRaySpriteAnimCmd1
+};
+
+static const union AnimCmd sGodRaySpriteAnimCmd02[] =
+{
+    ANIMCMD_FRAME(0, 1),
+    ANIMCMD_END
+};
+
+static const union AnimCmd *const sGodRaySpriteAnimCmds2[] =
+{
+    sGodRaySpriteAnimCmd02
 };
 
 static const struct SpriteTemplate sGodRaySpriteTemplate =
@@ -2724,17 +2763,31 @@ static const struct SpriteTemplate sGodRaySpriteTemplate =
     .paletteTag = PALTAG_WEATHER,
     .oam = &sGodRaySpriteOamData,
     .anims = sGodRaySpriteAnimCmds,
-    .images = NULL,
+    .images = sSkylightSpriteImages,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = UpdateGodRaySprite,
 };
+
+static const struct SpriteTemplate sGodRaySpriteTemplate2 =
+{
+    .tileTag = GFXTAG_SANDSTORM,
+    .paletteTag = PALTAG_WEATHER,
+    .oam = &sGodRaySpriteOamData,
+    .anims = sGodRaySpriteAnimCmds2,
+    .images = sSkylightSpriteImages2,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateGodRaySprite,
+};
+
+
+#define NUM_GOD_RAY_SPRITES_HALF 7
 
 static const struct {
     s16 col; 
     s16 row; 
     s16 fineX; 
     s16 fineY; 
-} sGodRaySpritePositions[NUM_GOD_RAY_SPRITES] = {
+} sGodRaySpritePositions[NUM_GOD_RAY_SPRITES_HALF] = {
     {  3,  5, -20, 5},  
     {  4,  3 , 12, -5},
     {  6,  2 , 60, 5},
@@ -2754,8 +2807,9 @@ static void CreateGodRaySprites(void)
     gWeatherPtr->sandstormYOffset = ((u32)gSaveBlock1Ptr->pos.y * 16) + gTotalCameraPixelOffsetY;
 
     LoadSpriteSheet(&sGodRaySpriteSheet);
+    LoadSpriteSheet(&sGodRaySpriteSheet2);
 
-    for (int i = 0; i < NUM_GOD_RAY_SPRITES; i++)
+    for (int i = 0; i < NUM_GOD_RAY_SPRITES_HALF; i++)
     {
         u8 spriteId = CreateSpriteAtEnd(&sGodRaySpriteTemplate, 0, 0, 0xFF);
         if (spriteId != MAX_SPRITES)
@@ -2771,7 +2825,34 @@ static void CreateGodRaySprites(void)
             sprite->data[6] = 32 + sGodRaySpritePositions[i].col * 64; // world X in px (s16)
             sprite->data[7] = 32 + sGodRaySpritePositions[i].row * 64; // world Y in px (s16)
             sprite->data[5] = i;
+            sprite->oam.priority = 1;
+            tSpriteArray[i] = sprite;
+        }
+        else
+        {
+            tSpriteArray[i] = NULL;
+        }
+    }
 
+    
+
+    for (int i = 0; i < NUM_GOD_RAY_SPRITES_HALF; i++)
+    {
+        u8 spriteId = CreateSpriteAtEnd(&sGodRaySpriteTemplate2, 0, 0, 0xFF);
+        if (spriteId != MAX_SPRITES)
+        {
+            struct Sprite *sprite = &gSprites[spriteId];
+
+            // store logical grid indices for any existing code that expects them
+            sprite->tSpriteColumn = sGodRaySpritePositions[i].col;
+            sprite->tSpriteRow    = sGodRaySpritePositions[i].row;
+
+            // Compute and store absolute world pixel coordinates for this ray (centered)
+            // worldX_px = 32 + col * 64  (matches your update math's base)
+            sprite->data[6] = 32 + sGodRaySpritePositions[i].col * 64; // world X in px (s16)
+            sprite->data[7] = 32 + sGodRaySpritePositions[i].row * 64; // world Y in px (s16)
+            sprite->data[5] = i;
+            sprite->oam.priority = 2;
             tSpriteArray[i] = sprite;
         }
         else
@@ -2785,7 +2866,6 @@ static void CreateGodRaySprites(void)
 
 static void UpdateGodRaySprite(struct Sprite *sprite)
 {
-    sprite->oam.priority = (gMain.vblankCounter1 & 1) ? 1 : 2;
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(7, 15));
 
     // Use the world pixel coords stored at creation (data[6]/data[7])
@@ -2804,7 +2884,14 @@ static void UpdateGodRaySprite(struct Sprite *sprite)
 
 static void DestroyGodRaySprites(void)
 {
-    for (int i = 0; i < NUM_GOD_RAY_SPRITES; i++)
+    for (int i = 0; i < NUM_GOD_RAY_SPRITES_HALF; i++)
+    {
+        if (tSpriteArray[i])
+            DestroySprite(tSpriteArray[i]);
+        tSpriteArray[i] = NULL;
+    }
+
+    for (int i = 0; i < NUM_GOD_RAY_SPRITES_HALF; i++)
     {
         if (tSpriteArray[i])
             DestroySprite(tSpriteArray[i]);
@@ -2812,6 +2899,7 @@ static void DestroyGodRaySprites(void)
     }
 
     FreeSpriteTilesByTag(GFXTAG_FOG_D);
+    FreeSpriteTilesByTag(GFXTAG_SANDSTORM);
     tSpritesCreated = FALSE;
 }
 
