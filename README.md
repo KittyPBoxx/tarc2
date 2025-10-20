@@ -196,7 +196,7 @@ Click a section to expand it.
 
 | Species   | Item           | Ability     | Move 1     | Move 2      | Move 3 | Move 4 |
 | :-------- | :------------- | :---------- | :--------- | :---------- | :----- | :----- |
-| Exeggutor | -              | Bulletproof | Heavy Slam | -           | -      | -      |
+| Exeggutor | -              | Heavy Metal | Heavy Slam | -           | -      | -      |
 
 </details>
 
@@ -206,7 +206,6 @@ Click a section to expand it.
 | Type    | Name           | Description / How to Obtain     |
 | :------ | :------------- | :--------------------------     |
 | Species | Exeggutor      | Transmute on FIONNs Exeggutor   |
-| Ability | Bulletproof    | Transference on FIONNs Chespin  |
 | Move    | Heavy Slam     | Sketch on Forretress (Lake)     |
 | Ability | Heavy Metal    | Transference on Aron (Lake)     |
 
@@ -242,12 +241,12 @@ Click a section to expand it.
 <details>
   <summary>Show Setup Solution</summary>
 
-| Type    | Name           | Description / How to Obtain |
-| :------ | :----------    | :-------------------------- |
-| Species | Forretress     | Transmute Forretress (Lake) |
-| Move    | Worry Seed     | Sketch on FIONNs Chespin    |
-| Move    | Heavy Slam     | Sketch on Forretress (Lake) |
-| Move    | Earth Power    | Sketch on Muk (Ruins)       |
+| Type    | Name           | Description / How to Obtain   |
+| :------ | :----------    | :--------------------------   |
+| Species | Exeggutor      | Transmute on FIONNs Exeggutor |
+| Move    | Worry Seed     | Sketch on FIONNs Chespin      |
+| Move    | Heavy Slam     | Sketch on Forretress (Lake)   |
+| Move    | Earth Power    | Sketch on Muk (Ruins)         |
 | Item    | Ability Shield | Covet on Muk (Ruins). Covet must knock out the Muk or sticky hold will proc. You must Barter to get rid of your held items before using Covet or you will not get the item. To get Covet you need to Sketch from Sora's Chansey. Fight Sora with Muk or else Chansey will Low Kick after Minimising and not Covet. |
 
 </details>
@@ -280,7 +279,7 @@ Click a section to expand it.
 
 | Species | Item        | Ability     | Move 1       | Move 2 | Move 3       | Move 4    |
 | :------ | :---------- | :---------- | :----------- | :----- | :----------- | :-------- |
-| Muk     | Rawst Berry | Heavy Metal | Magic Powder | Roar   | Flame Charge | -         |
+| Muk     | Rawst Berry | Prankster   | Magic Powder | Roar   | Flame Charge | -         |
 
 </details>
 
@@ -291,7 +290,7 @@ Click a section to expand it.
 | :------ | :----------- | :-------------------------- |
 | Species | Muk          | Transmute on Muk (Ruins)    |
 | Item    | Rawst Berry  | Barter on Aron (Lake)       |
-| Ability | Heavy Metal  | Transference on Aron (Lake) |
+| Ability | Prankster    | Transference on Dantes Illumise |
 | Move    | Magic Powder | Sketch on RUNE's Mr.Mime    |
 | Move    | Roar         | Sketch on Aron (Lake). In order to Sketch Roar you must have Soundproof. To get this use Transference on RUNE's Mr. Mime (then retire) |
 | Move    | Flame Charge | Sketch on Numel (Ruins)    |
